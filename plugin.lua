@@ -1534,7 +1534,10 @@ function automateSVs(settingVars)
     for idx, ho in pairs(selected) do
         if (not settingVars.maintainMs and idx == 1) then goto continue end
         do
-            timeSinceLastObject = timeSinceLastObject + ho.StartTime - selected[math.max(1, idx - 1)].StartTime
+            local thisTime = truthy(ho.EndTime) and ho.EndTime or ho.StartTime
+            local prevTime = truthy(selected[math.max(1, idx - 1)].EndTime) and selected[math.max(1, idx - 1)].EndTime or
+                selected[math.max(1, idx - 1)].StartTime
+            timeSinceLastObject = timeSinceLastObject + thisTime - prevTime
             if (timeSinceLastObject > settingVars.ms and settingVars.maintainMs and settingVars.optimizeTGs) then
                 idIndex = 1
                 timeSinceLastObject = 0
@@ -1546,19 +1549,22 @@ function automateSVs(settingVars)
                 neededIds[idName] = { hos = {}, svs = {} }
             end
             neededIds[idName].hos[#neededIds[idName].hos + 1] = ho
+            local startTime = truthy(selected[1].EndTime) and selected[1].EndTime or selected[1].StartTime
+            local secondaryTime = truthy(selected[2].EndTime) and selected[2].EndTime or selected[2].StartTime
             for _, sv in ipairs(settingVars.copiedSVs) do
+                local currentTime = truthy(ho.EndTime) and ho.EndTime or ho.StartTime
                 local maxRelativeOffset = settingVars.copiedSVs[#settingVars.copiedSVs].relativeOffset
                 local progress = 1 - sv.relativeOffset / maxRelativeOffset
                 if (settingVars.scaleSVs) then
                     local scalingFactor =
-                        (ho.StartTime - selected[1].StartTime) / (selected[2].StartTime - selected[1].StartTime)
+                        (currentTime - startTime) / (secondaryTime - startTime)
                     if (not settingVars.maintainMs) then scalingFactor = 1 / scalingFactor end
                     sv.multiplier = sv.multiplier * scalingFactor
                 end
                 if (settingVars.maintainMs) then
-                    svTime = ho.StartTime - progress * settingVars.ms
+                    svTime = currentTime - progress * settingVars.ms
                 else
-                    svTime = ho.StartTime - progress * (ho.StartTime - selected[1].StartTime)
+                    svTime = currentTime - progress * (currentTime - startTime)
                 end
                 table.insert(neededIds[idName].svs, createSV(svTime, sv.multiplier))
             end
