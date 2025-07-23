@@ -36,7 +36,7 @@ end
 --    m                : current (x, y) mouse position [Table]
 --    trailPoints      : number of trail points for the snake trail [Int]
 function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
-    if state.GetValue("initializeSnakeTrail") then
+    if (state.GetValue("initializeSnakeTrail")) then
         for i = 1, trailPoints do
             snakeTrailPoints[i] = {}
         end
@@ -46,6 +46,7 @@ function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
         snakeTrailPoints[i] = m
     end
     state.SetValue("initializeSnakeTrail", true)
+    saveVariables("snakeTrailPoints", snakeTrailPoints)
 end
 
 -- Updates the points of the snake trail
@@ -61,11 +62,11 @@ function updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoint
     for i = trailPoints, 1, -1 do
         local currentTrailPoint = snakeTrailPoints[i]
         if i == 1 then
-            currentTrailPoint = m
+            snakeTrailPoints[i] = m
         else
             local lastTrailPoint = snakeTrailPoints[i - 1]
             local change = lastTrailPoint - currentTrailPoint
-            currentTrailPoint = currentTrailPoint + snakeSpringConstant * change
+            snakeTrailPoints[i] = currentTrailPoint + snakeSpringConstant * change
         end
     end
 end
@@ -89,8 +90,7 @@ function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrail
         end
         local color = rgbaToUint(255, 255, 255, alpha)
         if trailShape == "Circles" then
-            local coords = { point.x, point.y }
-            o.AddCircleFilled(coords, cursorTrailSize, color)
+            o.AddCircleFilled(point, cursorTrailSize, color)
         elseif trailShape == "Triangles" then
             drawTriangleTrailPoint(o, m, point, cursorTrailSize, color)
         end
@@ -207,7 +207,7 @@ end
 --    m          : current (x, y) mouse position [Table]
 --    t          : current in-game plugin time [Int/Float]
 --    sz         : dimensions of the window for Quaver [Table]
-function drawSparkleTrail(_, o, m, t, sz)
+function drawSparkleTrail(o, m, t, sz)
     local sparkleSize = 10
     local sparkleDuration = 0.3
     local numSparkleParticles = 10
@@ -322,10 +322,9 @@ end
 -- Parameters
 --    currentMousePosition : current (x, y) coordinates of the mouse [Table]
 function checkIfMouseMoved(currentMousePosition)
-    local oldMousePosition = vector2(0)
-    getVariables("oldMousePosition", oldMousePosition)
+    oldMousePosition = state.GetValue("oldMousePosition", vector2(0))
     local mousePositionChanged = currentMousePosition ~= oldMousePosition
-    saveVariables("oldMousePosition", currentMousePosition)
+    state.SetValue("oldMousePosition", currentMousePosition)
     return mousePositionChanged
 end
 

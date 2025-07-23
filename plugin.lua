@@ -1013,7 +1013,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.cursorTrailIndex = math.toNumber(tempGlobalVars.cursorTrailIndex)
     globalVars.cursorTrailShapeIndex = math.toNumber(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.effectFPS = math.toNumber(tempGlobalVars.effectFPS)
-    globalVars.cursorTrailPoints = math.toNumber(tempGlobalVars.cursorTrailPoints)
+    globalVars.cursorTrailPoints = math.toNumber(math.clamp(tempGlobalVars.cursorTrailPoints, 0, 100))
     globalVars.cursorTrailSize = math.toNumber(tempGlobalVars.cursorTrailSize)
     globalVars.snakeSpringConstant = math.toNumber(tempGlobalVars.snakeSpringConstant)
     globalVars.cursorTrailGhost = truthy(tempGlobalVars.cursorTrailGhost)
@@ -1948,7 +1948,7 @@ function ssfVibrato(menuVars, func1, func2)
             createSSF(time + delta + 1 / getUsableDisplacementMultiplier(time), func2(y)))
         time = time + 2 * delta
     end
-    addFinalSSF(ssfs, endTime, map.GetScrollSpeedFactorAt(endTime, state.SelectedScrollGroupId).Multiplier)
+    addFinalSSF(ssfs, endTime, getSSFMultiplierAt(endTime))
     actions.PerformBatch({
         utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfs)
     })
@@ -3391,7 +3391,7 @@ function drawSnakeTrail(o, m, t)
         globalVars.cursorTrailGhost, trailShape)
 end
 function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
-    if state.GetValue("initializeSnakeTrail") then
+    if (state.GetValue("initializeSnakeTrail")) then
         for i = 1, trailPoints do
             snakeTrailPoints[i] = {}
         end
@@ -3401,6 +3401,7 @@ function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
         snakeTrailPoints[i] = m
     end
     state.SetValue("initializeSnakeTrail", true)
+    saveVariables("snakeTrailPoints", snakeTrailPoints)
 end
 function updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoints,
                                 snakeSpringConstant)
@@ -3408,11 +3409,11 @@ function updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoint
     for i = trailPoints, 1, -1 do
         local currentTrailPoint = snakeTrailPoints[i]
         if i == 1 then
-            currentTrailPoint = m
+            snakeTrailPoints[i] = m
         else
             local lastTrailPoint = snakeTrailPoints[i - 1]
             local change = lastTrailPoint - currentTrailPoint
-            currentTrailPoint = currentTrailPoint + snakeSpringConstant * change
+            snakeTrailPoints[i] = currentTrailPoint + snakeSpringConstant * change
         end
     end
 end
@@ -3426,8 +3427,7 @@ function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrail
         end
         local color = rgbaToUint(255, 255, 255, alpha)
         if trailShape == "Circles" then
-            local coords = { point.x, point.y }
-            o.AddCircleFilled(coords, cursorTrailSize, color)
+            o.AddCircleFilled(point, cursorTrailSize, color)
         elseif trailShape == "Triangles" then
             drawTriangleTrailPoint(o, m, point, cursorTrailSize, color)
         end
@@ -3501,7 +3501,7 @@ function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustS
         end
     end
 end
-function drawSparkleTrail(_, o, m, t, sz)
+function drawSparkleTrail(o, m, t, sz)
     local sparkleSize = 10
     local sparkleDuration = 0.3
     local numSparkleParticles = 10
@@ -3570,10 +3570,9 @@ function generateParticle(x, y, xRange, yRange, endTime, showParticle)
     return particle
 end
 function checkIfMouseMoved(currentMousePosition)
-    local oldMousePosition = vector2(0)
-    getVariables("oldMousePosition", oldMousePosition)
+    oldMousePosition = state.GetValue("oldMousePosition", vector2(0))
     local mousePositionChanged = currentMousePosition ~= oldMousePosition
-    saveVariables("oldMousePosition", currentMousePosition)
+    state.SetValue("oldMousePosition", currentMousePosition)
     return mousePositionChanged
 end
 function drawEquilateralTriangle(o, centerPoint, size, angle, color)
