@@ -1517,7 +1517,7 @@ function automateCopySVs(settingVars)
             relativeOffset = sv.StartTime - firstSVTime,
             multiplier = sv.Multiplier
         }
-        settingVars.copiedSVs[#settingVars.copiedSVs + 1] = copiedSV
+        table.insert(settingVars.copiedSVs, copiedSV)
     end
     if (#settingVars.copiedSVs > 0) then toggleablePrint("s!", table.concat({"Copied ", #settingVars.copiedSVs, " SVs."})) end
 end
@@ -1548,7 +1548,7 @@ function automateSVs(settingVars)
             if (not neededIds[idName]) then
                 neededIds[idName] = { hos = {}, svs = {} }
             end
-            neededIds[idName].hos[#neededIds[idName].hos + 1] = ho
+            table.insert(neededIds[idName].hos, ho)
             local startTime = truthy(selected[1].EndTime) and selected[1].EndTime or selected[1].StartTime
             local secondaryTime = truthy(selected[2].EndTime) and selected[2].EndTime or selected[2].StartTime
             for _, sv in ipairs(settingVars.copiedSVs) do
@@ -2245,7 +2245,7 @@ function copyItems(menuVars)
             signature = line.Signature,
             hidden = line.Hidden,
         }
-        menuVars.copied.lines[menuVars.curSlot][#menuVars.copied.lines[menuVars.curSlot] + 1] = copiedLine
+        table.insert(menuVars.copied.lines[menuVars.curSlot], copiedLine)
     end
     ::continue1::
     if (not menuVars.copyTable[2]) then goto continue2 end
@@ -2255,7 +2255,7 @@ function copyItems(menuVars)
             relativeOffset = sv.StartTime - startOffset,
             multiplier = sv.Multiplier
         }
-        menuVars.copied.SVs[menuVars.curSlot][#menuVars.copied.SVs[menuVars.curSlot] + 1] = copiedSV
+        table.insert(menuVars.copied.SVs[menuVars.curSlot], copiedSV)
     end
     ::continue2::
     if (not menuVars.copyTable[3]) then goto continue3 end
@@ -2265,7 +2265,7 @@ function copyItems(menuVars)
             relativeOffset = ssf.StartTime - startOffset,
             multiplier = ssf.Multiplier
         }
-        menuVars.copied.SSFs[menuVars.curSlot][#menuVars.copied.SSFs[menuVars.curSlot] + 1] = copiedSSF
+        table.insert(menuVars.copied.SSFs[menuVars.curSlot], copiedSSF)
     end
     ::continue3::
     if (not menuVars.copyTable[4]) then goto continue4 end
@@ -2275,7 +2275,7 @@ function copyItems(menuVars)
             relativeOffset = bm.StartTime - startOffset,
             note = bm.Note
         }
-        menuVars.copied.BMs[menuVars.curSlot][#menuVars.copied.BMs[menuVars.curSlot] + 1] = copiedBM
+        table.insert(menuVars.copied.BMs[menuVars.curSlot], copiedBM)
     end
     ::continue4::
     if (#menuVars.copied.BMs[menuVars.curSlot] > 0) then toggleablePrint("s!", table.concat({"Copied ", #menuVars.copied.BMs[menuVars.curSlot], " Bookmarks."})) end
@@ -2630,7 +2630,7 @@ function layerSnaps()
         end
         local newLayerName = layer.Name .. "-plumoguSV-snap-" .. color
         if (table.contains(layerNames, newLayerName)) then
-            layerDict[newLayerName].hos[#layerDict[newLayerName].hos + 1] = ho
+            table.insert(layerDict[newLayerName].hos, ho)
         else
             layerDict[newLayerName] = { hos = { ho }, ColorRgb = layer.ColorRgb, Hidden = layer.Hidden }
             layerNames[#layerNames + 1] = newLayerName
@@ -4744,7 +4744,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         if (menuLabel == "Vibrato") then
             preset.menu = VIBRATO_SVS[menuVars.svTypeIndex]
         end
-        globalVars.presets[#globalVars.presets + 1] = preset
+        table.insert(globalVars.presets, preset)
         write(globalVars)
     end
     state.SetValue("newPresetName", newPresetName)
@@ -4864,13 +4864,13 @@ function addFrameTimes(settingVars)
             if frameTimeToIndex[time] then
                 local index = frameTimeToIndex[time]
                 local frameTime = settingVars.frameTimes[index] ---@cast frameTime { time: number, lanes: number[] }
-                frameTime.lanes[#frameTime.lanes + 1] = lane
+                table.insert(frameTime.lanes, lane)
                 frameTime.lanes = sort(frameTime.lanes, sortAscending)
             else
                 local defaultFrame = settingVars.currentFrame
                 local defaultPosition = 0
                 local newFrameTime = createFrameTime(time, { lane }, defaultFrame, defaultPosition)
-                settingVars.frameTimes[#settingVars.frameTimes + 1] = newFrameTime
+                table.insert(settingVars.frameTimes, newFrameTime)
                 frameTimeToIndex[time] = #settingVars.frameTimes
             end
         end
@@ -4945,7 +4945,7 @@ function drawCurrentFrame(settingVars)
 end
 function addSelectedNoteTimesToList(menuVars)
     for _, ho in pairs(state.SelectedHitObjects) do
-        menuVars.noteTimes[#menuVars.noteTimes + 1] = ho.StartTime
+        table.insert(menuVars.noteTimes, ho.StartTime)
     end
     menuVars.noteTimes = table.dedupe(menuVars.noteTimes)
     menuVars.noteTimes = sort(menuVars.noteTimes, sortAscending)
@@ -5429,10 +5429,10 @@ function copyNPasteMenu()
     if #menuVars.copied.lines < menuVars.curSlot then
         local newCopied = table.duplicate(menuVars.copied)
         while #newCopied.lines < menuVars.curSlot do
-            newCopied.lines[#newCopied.lines + 1] = {}
-            newCopied.SVs[#newCopied.SVs + 1] = {}
-            newCopied.SSFs[#newCopied.SSFs + 1] = {}
-            newCopied.BMs[#newCopied.BMs + 1] = {}
+            table.insert(newCopied.lines, {})
+            table.insert(newCopied.SVs, {})
+            table.insert(newCopied.SSFs, {})
+            table.insert(newCopied.BMs, {})
         end
         menuVars.copied = newCopied
     end
@@ -8582,7 +8582,7 @@ function adjustNumberOfMultipliers(settingVars)
     if settingVars.svPoints > #settingVars.svMultipliers then
         local difference = settingVars.svPoints - #settingVars.svMultipliers
         for _ = 1, difference do
-            settingVars.svMultipliers[#settingVars.svMultipliers + 1] = 1
+            table.insert(settingVars.svMultipliers, 1)
         end
     end
     if settingVars.svPoints >= #settingVars.svMultipliers then return end
