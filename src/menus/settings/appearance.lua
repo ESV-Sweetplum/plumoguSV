@@ -18,7 +18,7 @@ function showAppearanceSettings()
     GlobalCheckbox("drawCapybara312", "Capybara 312", "Draws a capybara???!?!??!!!!? AGAIN?!?!")
     AddSeparator()
     choosePulseCoefficient()
-    _, globalVars.useCustomPulseColor = imgui.Checkbox("Use Custom Color?", globalVars.useCustomPulseColor)
+    GlobalCheckbox("useCustomPulseColor", "Use Custom Color?")
     if (not globalVars.useCustomPulseColor) then imgui.BeginDisabled() end
     KeepSameLine()
     if (imgui.Button("Edit Color")) then
