@@ -60,14 +60,4 @@ function renderBackground()
     end
 
     local colorValue = math.floor(50 * (1 + state.GetValue("borderPulseStatus", 0)))
-
-    local darkPurple = rgbaToUint(colorValue, 0, colorValue, 150)
-    local darkRed = rgbaToUint(colorValue, 0, 0, 150)
-    local transparent = rgbaToUint(0, 0, 0, 0)
-
-    ctx.AddRectFilledMultiColor(topLeft, vector.New(topLeft.x + dim.x * 0.2, topLeft.y + dim.y), darkPurple, transparent,
-        transparent, darkPurple)
-
-    ctx.AddRectFilledMultiColor(topLeft + dim - vector.New(dim.x * 0.2, dim.y), topLeft + dim, transparent, darkRed,
-        darkRed, transparent)
 end
