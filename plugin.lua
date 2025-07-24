@@ -156,7 +156,7 @@ end
 ---@return number
 function math.toNumber(x)
     local result = tonumber(x)
-    if (not result) then return 0 end
+    if (not result or type(result) ~= "number") then return 0 end
     return result
 end
 ---Restricts a number to be within a closed ring.
