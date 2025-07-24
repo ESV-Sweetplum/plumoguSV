@@ -83,9 +83,9 @@ export default async function transpiler(
     ); // Same as above, but with notification type parameter
 
     output = output.replaceAll(
-        /for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_\(\), ]+)\) do\n( *)/g,
+        /for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_, ]+)\) do\n( *)/g,
         'for k = 1, #$2 do\n$3local $1 = $2[k]\n$3'
-    ); // Reduce function overhead by removing ipairs
+    ); // Reduce function overhead by removing ipairs (only for static tables)
 
     for (let i = 2; i <= 9; i++) {
         const regex = new RegExp(` ([^\\)]) \\^ ${i}`, 'g');

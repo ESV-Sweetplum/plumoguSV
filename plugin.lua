@@ -1013,7 +1013,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.cursorTrailIndex = math.toNumber(tempGlobalVars.cursorTrailIndex)
     globalVars.cursorTrailShapeIndex = math.toNumber(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.effectFPS = math.toNumber(tempGlobalVars.effectFPS)
-    globalVars.cursorTrailPoints = math.toNumber(math.clamp(tempGlobalVars.cursorTrailPoints, 0, 100))
+    globalVars.cursorTrailPoints = math.clamp(math.toNumber(tempGlobalVars.cursorTrailPoints), 0, 100)
     globalVars.cursorTrailSize = math.toNumber(tempGlobalVars.cursorTrailSize)
     globalVars.snakeSpringConstant = math.toNumber(tempGlobalVars.snakeSpringConstant)
     globalVars.cursorTrailGhost = truthy(tempGlobalVars.cursorTrailGhost)
@@ -1511,8 +1511,7 @@ function automateCopySVs(settingVars)
         return
     end
     local firstSVTime = svs[1].StartTime
-    for k = 1, #getSVsBetweenOffsets(startOffset, endOffset) do
-        local sv = getSVsBetweenOffsets(startOffset, endOffset)[k]
+    for _, sv in ipairs(getSVsBetweenOffsets(startOffset, endOffset)) do
         local copiedSV = {
             relativeOffset = sv.StartTime - firstSVTime,
             multiplier = sv.Multiplier
@@ -2237,8 +2236,7 @@ function copyItems(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     if (not menuVars.copyTable[1]) then goto continue1 end
-    for k = 1, #getLinesBetweenOffsets(startOffset, endOffset) do
-        local line = getLinesBetweenOffsets(startOffset, endOffset)[k]
+    for _, line in ipairs(getLinesBetweenOffsets(startOffset, endOffset)) do
         local copiedLine = {
             relativeOffset = line.StartTime - startOffset,
             bpm = line.Bpm,
@@ -2249,8 +2247,7 @@ function copyItems(menuVars)
     end
     ::continue1::
     if (not menuVars.copyTable[2]) then goto continue2 end
-    for k = 1, #getSVsBetweenOffsets(startOffset, endOffset) do
-        local sv = getSVsBetweenOffsets(startOffset, endOffset)[k]
+    for _, sv in ipairs(getSVsBetweenOffsets(startOffset, endOffset)) do
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
             multiplier = sv.Multiplier
@@ -2259,8 +2256,7 @@ function copyItems(menuVars)
     end
     ::continue2::
     if (not menuVars.copyTable[3]) then goto continue3 end
-    for k = 1, #getSSFsBetweenOffsets(startOffset, endOffset) do
-        local ssf = getSSFsBetweenOffsets(startOffset, endOffset)[k]
+    for _, ssf in ipairs(getSSFsBetweenOffsets(startOffset, endOffset)) do
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
             multiplier = ssf.Multiplier
@@ -2269,8 +2265,7 @@ function copyItems(menuVars)
     end
     ::continue3::
     if (not menuVars.copyTable[4]) then goto continue4 end
-    for k = 1, #getBookmarksBetweenOffsets(startOffset, endOffset) do
-        local bm = getBookmarksBetweenOffsets(startOffset, endOffset)[k]
+    for _, bm in ipairs(getBookmarksBetweenOffsets(startOffset, endOffset)) do
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
             note = bm.Note
@@ -2620,8 +2615,7 @@ REVERSE_COLOR_MAP = {
 function layerSnaps()
     local layerDict = {}
     local layerNames = table.property(map.EditorLayers, "Name")
-    for k = 1, #uniqueNotesBetweenSelected() do
-        local ho = uniqueNotesBetweenSelected()[k]
+    for _, ho in ipairs(uniqueNotesBetweenSelected()) do
         local color = COLOR_MAP[getSnapFromTime(ho.StartTime)]
         if (ho.EditorLayer == 0) then
             layer = { Name = "Default", ColorRgb = "255,255,255", Hidden = false }
