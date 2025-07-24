@@ -4329,13 +4329,6 @@ function renderBackground()
         ctx.AddCircleFilled(star.pos + topLeft, star.size, rgbaToUint(255, 255, 255, math.floor(255 * brightness)))
     end
     local colorValue = math.floor(50 * (1 + state.GetValue("borderPulseStatus", 0)))
-    local darkPurple = rgbaToUint(colorValue, 0, colorValue, 150)
-    local darkRed = rgbaToUint(colorValue, 0, 0, 150)
-    local transparent = rgbaToUint(0, 0, 0, 0)
-    ctx.AddRectFilledMultiColor(topLeft, vector.New(topLeft.x + dim.x * 0.2, topLeft.y + dim.y), darkPurple, transparent,
-        transparent, darkPurple)
-    ctx.AddRectFilledMultiColor(topLeft + dim - vector.New(dim.x * 0.2, dim.y), topLeft + dim, transparent, darkRed,
-        darkRed, transparent)
 end
 function setPluginAppearance()
     local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
@@ -5988,7 +5981,7 @@ function showAppearanceSettings()
     GlobalCheckbox("drawCapybara312", "Capybara 312", "Draws a capybara???!?!??!!!!? AGAIN?!?!")
     AddSeparator()
     choosePulseCoefficient()
-    _, globalVars.useCustomPulseColor = imgui.Checkbox("Use Custom Color?", globalVars.useCustomPulseColor)
+    GlobalCheckbox("useCustomPulseColor", "Use Custom Color?")
     if (not globalVars.useCustomPulseColor) then imgui.BeginDisabled() end
     KeepSameLine()
     if (imgui.Button("Edit Color")) then
@@ -6608,6 +6601,7 @@ function showPluginSettingsWindow()
     if (imgui.Button("Reset Settings")) then
         write({})
         globalVars = DEFAULT_GLOBAL_VARS
+        globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
         toggleablePrint("e!", "Settings have been reset.")
     end
     if (imgui.Button("Crash The Game")) then
