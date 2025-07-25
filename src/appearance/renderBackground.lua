@@ -46,7 +46,7 @@ function renderBackground()
                 {
                     pos = vector.New(math.random() * 500, math.random() * 500),
                     v = vector.New(math.random() * 3 + 1, 0),
-                    size = math.random(3) * 0.5
+                    size = math.random(3) * 0.5,
                 })
         end
     else
@@ -56,7 +56,7 @@ function renderBackground()
     for _, star in ipairs(stars) do
         local progress = star.pos.x / dim.x
         local brightness = math.clamp(-8 * progress * (progress - 1), 0, 1)
-        ctx.AddCircleFilled(star.pos + topLeft, star.size, rgbaToUint(255, 255, 255, math.floor(255 * brightness)))
+        ctx.AddCircleFilled(star.pos + topLeft, star.size, rgbaToUint(255, 255, 255, math.floor(brightness * 255)))
     end
 
     local colorValue = math.floor(50 * (1 + state.GetValue("borderPulseStatus", 0)))
