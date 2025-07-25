@@ -28,30 +28,30 @@ advancedMode: false
 hideAutomatic: false
 pulseCoefficient: 1
 pulseColor:
-- 1
-- 1
-- 1
-- 1
+    - 1
+    - 1
+    - 1
+    - 1
 useCustomPulseColor: true
 hotkeyList:
-- T
-- Shift+T
-- S
-- N
-- R
-- B
-- M
-- V
-- G
-- Ctrl+Shift+Alt+L
+    - T
+    - Shift+T
+    - S
+    - N
+    - R
+    - B
+    - M
+    - V
+    - G
+    - Ctrl+Shift+Alt+L
 customStyle:
-- 
+    -
 dontPrintCreation: false
 equalizeLinear: false
 defaultProperties:
-  settings:
-  - 
-  menu:
-  - 
+    settings:
+        -
+    menu:
+        -
 presets:
-- 
+    -
