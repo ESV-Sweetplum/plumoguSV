@@ -15,10 +15,10 @@ drawCapybara: true
 drawCapybara2: true
 drawCapybara312: false
 selectTypeIndex: 1
-placeTypeIndex: 1
+placeTypeIndex: 2
 editToolIndex: 1
 showPresetMenu: false
-scrollGroupIndex: 3
+scrollGroupIndex: 1
 hideSVInfo: true
 showVibratoWidget: true
 showNoteDataWidget: true
@@ -28,565 +28,567 @@ advancedMode: true
 hideAutomatic: true
 pulseCoefficient: 1
 pulseColor:
-    - 1
-    - 1
-    - 1
-    - 1
+- 1
+- 1
+- 1
+- 1
 useCustomPulseColor: true
 hotkeyList:
-    - T
-    - Shift+T
-    - S
-    - N
-    - R
-    - B
-    - M
-    - V
-    - G
-    - Ctrl+Shift+Alt+L
+- T
+- Shift+T
+- S
+- N
+- R
+- B
+- M
+- V
+- G
+- Ctrl+Shift+Alt+L
 customStyle:
-    windowBg:
-        - 0
-        - 0
-        - 0
-        - 1
-    popupBg:
-        - 0.078431375324726105
-        - 0.078431375324726105
-        - 0.078431375324726105
-        - 0.93725490570068359
-    frameBg:
-        - 0.13725490868091583
-        - 0.23921568691730499
-        - 0.27843138575553894
-        - 1
-    frameBgHovered:
-        - 0.23921568691730499
-        - 0.33725491166114807
-        - 0.37647059559822083
-        - 1
-    frameBgActive:
-        - 0.28627452254295349
-        - 0.38823530077934265
-        - 0.42745098471641541
-        - 1
-    titleBg:
-        - 0
-        - 0
-        - 0
-        - 0.94901961088180542
-    titleBgActive:
-        - 0.11937450617551804
-        - 0.016241420060396194
-        - 0.27407407760620117
-        - 1
-    titleBgCollapsed:
-        - 0.50980395078659058
-        - 0.57647061347961426
-        - 0.74901962280273438
-        - 0.38823530077934265
-    checkMark:
-        - 0.80784314870834351
-        - 0.87843137979507446
-        - 1
-        - 1
-    sliderGrab:
-        - 0.30980393290519714
-        - 0.37647059559822083
-        - 0.49803921580314636
-        - 1
-    sliderGrabActive:
-        - 0.50980395078659058
-        - 0.57647061347961426
-        - 0.69803923368453979
-        - 1
-    button:
-        - 0.30980393290519714
-        - 0.37647059559822083
-        - 0.49803921580314636
-        - 1
-    buttonHovered:
-        - 0.40784314274787903
-        - 0.47843137383460999
-        - 0.60000002384185791
-        - 1
-    buttonActive:
-        - 0.50980395078659058
-        - 0.57647061347961426
-        - 0.69803923368453979
-        - 1
-    tab:
-        - 0.30980393290519714
-        - 0.37647059559822083
-        - 0.49803921580314636
-        - 1
-    tabHovered:
-        - 0.50980395078659058
-        - 0.57647061347961426
-        - 0.74901962280273438
-        - 1
-    tabActive:
-        - 0.50980395078659058
-        - 0.57647061347961426
-        - 0.74901962280273438
-        - 1
-    header:
-        - 0.80784314870834351
-        - 0.87843137979507446
-        - 1
-        - 0.40000000596046448
-    headerHovered:
-        - 0.80784314870834351
-        - 0.87843137979507446
-        - 1
-        - 0.49803921580314636
-    headerActive:
-        - 0.80784314870834351
-        - 0.87843137979507446
-        - 1
-        - 0.5372549295425415
-    separator:
-        - 0.80784314870834351
-        - 0.87843137979507446
-        - 1
-        - 0.29803922772407532
-    text:
-        - 1
-        - 1
-        - 1
-        - 1
-    textSelectedBg:
-        - 0.80784314870834351
-        - 0.87843137979507446
-        - 1
-        - 0.40000000596046448
-    scrollbarGrabHovered:
-        - 0.40784314274787903
-        - 0.47843137383460999
-        - 0.60000002384185791
-        - 1
-    plotLines:
-        - 0.60784316062927246
-        - 0.60784316062927246
-        - 0.60784316062927246
-        - 1
-    plotLinesHovered:
-        - 1
-        - 0.42745098471641541
-        - 0.3490196168422699
-        - 1
-    plotHistogram:
-        - 0.89803922176361084
-        - 0.69803923368453979
-        - 0
-        - 1
-    plotHistogramHovered:
-        - 1
-        - 0.60000002384185791
-        - 0
-        - 1
-    scrollbarGrab:
-        - 0.31000000238418579
-        - 0.37999999523162842
-        - 0.5
-        - 1
-    scrollbarGrabActive:
-        - 0.50999999046325684
-        - 0.57999998331069946
-        - 0.69999998807907104
-        - 1
+  windowBg:
+  - 0
+  - 0
+  - 0
+  - 1
+  popupBg:
+  - 0.078431375324726105
+  - 0.078431375324726105
+  - 0.078431375324726105
+  - 0.93725490570068359
+  frameBg:
+  - 0.15697117149829865
+  - 0.031604938209056854
+  - 0.26666665077209473
+  - 1
+  frameBgHovered:
+  - 0.29623022675514221
+  - 0.076049372553825378
+  - 0.48888885974884033
+  - 1
+  frameBgActive:
+  - 0.69684487581253052
+  - 0.501728355884552
+  - 0.94074076414108276
+  - 1
+  titleBg:
+  - 0
+  - 0
+  - 0
+  - 0.94901961088180542
+  titleBgActive:
+  - 0.11937450617551804
+  - 0.016241420060396194
+  - 0.27407407760620117
+  - 1
+  titleBgCollapsed:
+  - 0.60549026727676392
+  - 0.50980395078659058
+  - 0.74901962280273438
+  - 0.38823530077934265
+  checkMark:
+  - 0.35555553436279297
+  - 0
+  - 1
+  - 1
+  sliderGrab:
+  - 0.49803921580314636
+  - 0.30980396270751953
+  - 0.49385625123977661
+  - 1
+  sliderGrabActive:
+  - 0.83362400531768799
+  - 0.52543210983276367
+  - 0.93333333730697632
+  - 1
+  button:
+  - 0.1828988641500473
+  - 0.032921809703111649
+  - 0.37037038803100586
+  - 1
+  buttonHovered:
+  - 0.2455841600894928
+  - 0.02414265088737011
+  - 0.40740740299224854
+  - 1
+  buttonActive:
+  - 0.43871599435806274
+  - 0.28444445133209229
+  - 0.60000002384185791
+  - 1
+  tab:
+  - 0.18431372940540314
+  - 0.031372550874948502
+  - 0.36862745881080627
+  - 1
+  tabHovered:
+  - 0.24705882370471954
+  - 0.023529412224888802
+  - 0.40784314274787903
+  - 1
+  tabActive:
+  - 0.43921568989753723
+  - 0.28627452254295349
+  - 0.60000002384185791
+  - 1
+  header:
+  - 0.69135785102844238
+  - 0.44444441795349121
+  - 1
+  - 0.40000000596046448
+  headerHovered:
+  - 0.69019609689712524
+  - 0.44313725829124451
+  - 1
+  - 0.40000000596046448
+  headerActive:
+  - 0.69019609689712524
+  - 0.44313725829124451
+  - 1
+  - 0.40000000596046448
+  separator:
+  - 0.53333330154418945
+  - 0
+  - 1
+  - 0.29803922772407532
+  text:
+  - 1
+  - 1
+  - 1
+  - 1
+  textSelectedBg:
+  - 0.9674074649810791
+  - 0.51111114025115967
+  - 1
+  - 0.40000000596046448
+  scrollbarGrabHovered:
+  - 0.40784314274787903
+  - 0.47843137383460999
+  - 0.60000002384185791
+  - 1
+  plotLines:
+  - 0.60784316062927246
+  - 0.60784316062927246
+  - 0.60784316062927246
+  - 1
+  plotLinesHovered:
+  - 1
+  - 0.42745098471641541
+  - 0.3490196168422699
+  - 1
+  plotHistogram:
+  - 0.89803922176361084
+  - 0.69803923368453979
+  - 0
+  - 1
+  plotHistogramHovered:
+  - 1
+  - 0.60000002384185791
+  - 0
+  - 1
+  scrollbarGrab:
+  - 0.31000000238418579
+  - 0.37999999523162842
+  - 0.5
+  - 1
+  scrollbarGrabActive:
+  - 0.50999999046325684
+  - 0.57999998331069946
+  - 0.69999998807907104
+  - 1
 dontPrintCreation: false
 equalizeLinear: true
 defaultProperties:
-    settings:
-        linearVibratoSV:
-            startMsx: 100
-            endMsx: 0
-        exponentialVibratoSV:
-            startMsx: 100
-            endMsx: 0
-            curvatureIndex: 5
-        sinusoidalVibratoSV:
-            startMsx: 100
-            endMsx: 0
-            verticalShift: 0
-            periods: 1
-            periodsShift: 0.25
-        sigmoidalVibratoSV:
-            startMsx: 100
-            endMsx: 0
-            curvatureIndex: 5
-        customVibratoSV:
-            code: >-
-                return function (x)
-                    local maxHeight = 150
-                    heightFactor = maxHeight * math.exp((1 - math.sqrt(17)) / 2) / (31 - 7 * math.sqrt(17)) * 16
-                    primaryCoefficient = (x^2 - x^3) * math.exp(2 * x)
-                    sinusoidalCoefficient = math.sin(8 * math.pi * x)
-                    return heightFactor * primaryCoefficient * sinusoidalCoefficient
-                end
-        linearVibratoSSF:
-            lowerStart: 0.5
-            lowerEnd: 0.5
-            higherStart: 1
-            higherEnd: 1
-        exponentialVibratoSSF:
-            lowerStart: 0.5
-            lowerEnd: 0.5
-            higherStart: 1
-            higherEnd: 1
-            curvatureIndex: 10
-        sinusoidalVibratoSSF:
-            lowerStart: 0.5
-            lowerEnd: 0.5
-            higherStart: 1
-            higherEnd: 1
-            verticalShift: 0
-            periods: 1
-            periodsShift: 0.25
-            applyToHigher: false
-        sigmoidalVibratoSSF:
-            lowerStart: 0.5
-            lowerEnd: 0.5
-            higherStart: 1
-            higherEnd: 1
-            curvatureIndex: 5
-        customVibratoSSF:
-            code1: return function (x) return 0.69 end
-            code2: return function (x) return 1.420 end
-        linear:
-            startSV: -1.5
-            endSV: 1.5
-            svPoints: 16
-            finalSVIndex: 2
-            customSV: 1
-        exponential:
-            behaviorIndex: 1
-            intensity: 20
-            verticalShift: 0
-            distance: 100
-            startSV: 0.01
-            endSV: 1
-            avgSV: 1
-            svPoints: 16
-            finalSVIndex: 2
-            customSV: 1
-            distanceMode: 1
-        bezier:
-            p1:
-                - 0
-                - 0
-            p2:
-                - 1
-                - 1
-            verticalShift: 0
-            avgSV: 1
-            svPoints: 16
-            finalSVIndex: 2
-            customSV: 1
-        hermite:
-            startSV: 0
-            endSV: 0
-            verticalShift: 0
-            avgSV: 1
-            svPoints: 16
-            finalSVIndex: 2
-            customSV: 1
-        sinusoidal:
-            startSV: 1
-            endSV: 1
-            curveSharpness: 50
-            verticalShift: 0
-            periods: 1
-            periodsShift: 0.25
-            svsPerQuarterPeriod: 8
-            svPoints: 16
-            finalSVIndex: 2
-            customSV: 1
-        circular:
-            behaviorIndex: 1
-            arcPercent: 50
-            avgSV: 1
-            verticalShift: 0
-            svPoints: 16
-            finalSVIndex: 2
-            customSV: 1
-            dontNormalize: false
-        random:
-            svMultipliers:
-                -
-            randomTypeIndex: 1
-            randomScale: 2
-            svPoints: 16
-            finalSVIndex: 2
-            customSV: 1
-            dontNormalize: false
-            avgSV: 1
-            verticalShift: 0
-        custom:
-            svMultipliers:
-                - 0
-            selectedMultiplierIndex: 1
-            svPoints: 1
-            finalSVIndex: 2
-            customSV: 1
-        chinchilla:
-            behaviorIndex: 1
-            chinchillaTypeIndex: 1
-            chinchillaIntensity: 0.5
-            avgSV: 1
-            verticalShift: 0
-            svPoints: 16
-            finalSVIndex: 2
-            customSV: 1
-        combo:
-            svType1Index: 1
-            svType2Index: 2
-            comboPhase: 0
-            comboTypeIndex: 1
-            comboMultiplier1: 1
-            comboMultiplier2: 1
-            finalSVIndex: 2
-            customSV: 1
-            dontNormalize: false
-            avgSV: 1
-            verticalShift: 0
-        code:
-            code: >-
-                return function (x)
-                    local startPeriod = 4
-                    local endPeriod = -1
-                    local height = 1.5
-                    return height * math.sin(2 * math.pi * (startPeriod * x + (endPeriod - startPeriod) / 2 * x^2))
-                end
-            svPoints: 64
-            finalSVIndex: 2
-            customSV: 1
-        stutter:
-            startSV: 5
-            endSV: 0.5
-            stutterDuration: 15
-            stuttersPerSection: 1
-            avgSV: 1
-            finalSVIndex: 2
-            customSV: 1
-            linearlyChange: false
-            controlLastSV: false
-            svMultipliers:
-                -
-            svDistances:
-                -
-            svGraphStats:
-                minScale: 0
-                maxScale: 0
-                distMinScale: 0
-                distMaxScale: 0
-            svMultipliers2:
-                -
-            svDistances2:
-                -
-            svGraph2Stats:
-                minScale: 0
-                maxScale: 0
-                distMinScale: 0
-                distMaxScale: 0
-        teleportStutter:
-            svPercent: 90
-            svPercent2: 0
-            distance: 50
-            mainSV: 0.10000000149011612
-            mainSV2: 0
-            useDistance: false
-            linearlyChange: false
-            avgSV: 1
-            finalSVIndex: 2
-            customSV: 1
-        framesSetup:
-            menuStep: 1
-            numFrames: 5
-            frameDistance: 2000
-            distance: 2000
-            reverseFrameOrder: false
-            noteSkinTypeIndex: 1
-            frameTimes:
-                -
-            selectedTimeIndex: 1
-            currentFrame: 1
-        penis:
-            bWidth: 50
-            sWidth: 100
-            sCurvature: 100
-            bCurvature: 100
-        automate:
-            copiedSVs:
-                -
-            maintainMs: true
-            ms: 500
-            scaleSVs: false
-            initialSV: 1
-            optimizeTGs: true
-        animationPalette:
-            instructions: ""
-    menu:
-        placeStandard:
-            svTypeIndex: 1
-            svMultipliers:
-                -
-            svDistances:
-                -
-            svGraphStats:
-                minScale: 0
-                maxScale: 0
-                distMinScale: 0
-                distMaxScale: 0
-            svStats:
-                minSV: 0
-                maxSV: 0
-                avgSV: 0
-            interlace: false
-            interlaceRatio: -0.5
-            overrideFinal: false
-        placeSpecial:
-            svTypeIndex: 1
-        placeStill:
-            svTypeIndex: 1
-            noteSpacing: 1
-            stillTypeIndex: 1
-            stillDistance: 0
-            stillBehavior: 1
-            prePlaceDistances:
-                -
-            svMultipliers:
-                -
-            svDistances:
-                -
-            svGraphStats:
-                minScale: 0
-                maxScale: 0
-                distMinScale: 0
-                distMaxScale: 0
-            svStats:
-                minSV: 0
-                maxSV: 0
-                avgSV: 0
-            interlace: false
-            interlaceRatio: -0.5
-            overrideFinal: false
-        placeVibrato:
-            svTypeIndex: 1
-            vibratoMode: 1
-            vibratoQuality: 3
-            sides: 2
-        delete:
-            deleteTable:
-                - true
-                - true
-                - true
-                - true
-        addTeleport:
-            distance: 10727
-            teleportBeforeHand: false
-        changeGroups:
-            designatedTimingGroup: $Default
-            changeSVs: true
-            changeSSFs: true
-        convertSVSSF:
-            conversionDirection: true
-        copy:
-            copyTable:
-                - true
-                - true
-                - true
-                - true
-            copiedLines:
-                -
-            copiedSVs:
-                -
-            copiedSSFs:
-                -
-            copiedBMs:
-                -
-            tryAlign: true
-            alignWindow: 3
-        directSV:
-            selectableIndex: 1
-            startTime: 0
-            multiplier: 0
-            pageNumber: 1
-        displaceNote:
-            distance: 200
-            distance1: 0
-            distance2: 200
-            linearlyChange: false
-        displaceView:
-            distance: 200
-        dynamicScale:
-            noteTimes:
-                -
-            svTypeIndex: 1
-            svMultipliers:
-                -
-            svDistances:
-                -
-            svGraphStats:
-                minScale: 0
-                maxScale: 0
-                distMinScale: 0
-                distMaxScale: 0
-            svStats:
-                minSV: 0
-                maxSV: 0
-                avgSV: 0
-        flicker:
-            flickerTypeIndex: 1
-            distance: -69420.726999999999
-            distance1: 0
-            distance2: -69420.726999999999
-            numFlickers: 1
-            linearlyChange: false
-            flickerPosition: 0.5
-        measure:
-            unrounded: false
-            nsvDistance: ""
-            svDistance: ""
-            avgSV: ""
-            startDisplacement: ""
-            endDisplacement: ""
-            avgSVDisplaceless: ""
-            roundedNSVDistance: 0
-            roundedSVDistance: 0
-            roundedAvgSV: 0
-            roundedStartDisplacement: 0
-            roundedEndDisplacement: 0
-            roundedAvgSVDisplaceless: 0
-        reverseScroll:
-            distance: 400
-        scaleDisplace:
-            scaleSpotIndex: 1
-            scaleTypeIndex: 1
-            avgSV: 0.59999999999999998
-            distance: 100
-            ratio: 0.59999999999999998
-        scaleMultiply:
-            scaleTypeIndex: 1
-            avgSV: 0.59999999999999998
-            distance: 100
-            ratio: 0.59999999999999998
-        verticalShift:
-            verticalShift: 1
-        selectAlternating:
-            every: 1
-            offset: 0
-        selectChordSize:
-            single: true
-            jump: false
-            hand: false
-            quad: false
-        selectNoteType:
-            rice: true
-            ln: false
-        selectBySnap:
-            snap: 1
+  settings:
+    linearVibratoSV:
+      startMsx: 100
+      endMsx: 0
+    exponentialVibratoSV:
+      startMsx: 100
+      endMsx: 0
+      curvatureIndex: 5
+    sinusoidalVibratoSV:
+      startMsx: 100
+      endMsx: 0
+      verticalShift: 0
+      periods: 1
+      periodsShift: 0.25
+    sigmoidalVibratoSV:
+      startMsx: 100
+      endMsx: 0
+      curvatureIndex: 5
+    customVibratoSV:
+      code: >-
+        return function (x)
+            local maxHeight = 150
+            heightFactor = maxHeight * math.exp((1 - math.sqrt(17)) / 2) / (31 - 7 * math.sqrt(17)) * 16
+            primaryCoefficient = (x^2 - x^3) * math.exp(2 * x)
+            sinusoidalCoefficient = math.sin(8 * math.pi * x)
+            return heightFactor * primaryCoefficient * sinusoidalCoefficient
+        end
+    linearVibratoSSF:
+      lowerStart: 0.5
+      lowerEnd: 0.5
+      higherStart: 1
+      higherEnd: 1
+    exponentialVibratoSSF:
+      lowerStart: 0.5
+      lowerEnd: 0.5
+      higherStart: 1
+      higherEnd: 1
+      curvatureIndex: 10
+    sinusoidalVibratoSSF:
+      lowerStart: 0.5
+      lowerEnd: 0.5
+      higherStart: 1
+      higherEnd: 1
+      verticalShift: 0
+      periods: 1
+      periodsShift: 0.25
+      applyToHigher: false
+    sigmoidalVibratoSSF:
+      lowerStart: 0.5
+      lowerEnd: 0.5
+      higherStart: 1
+      higherEnd: 1
+      curvatureIndex: 5
+    customVibratoSSF:
+      code1: return function (x) return 0.69 end
+      code2: return function (x) return 1.420 end
+    linear:
+      startSV: -1.5
+      endSV: 1.5
+      svPoints: 16
+      finalSVIndex: 2
+      customSV: 1
+    exponential:
+      behaviorIndex: 1
+      intensity: 20
+      verticalShift: 0
+      distance: 100
+      startSV: 0.01
+      endSV: 1
+      avgSV: 1
+      svPoints: 16
+      finalSVIndex: 2
+      customSV: 1
+      distanceMode: 1
+    bezier:
+      p1:
+      - 0
+      - 0
+      p2:
+      - 1
+      - 1
+      verticalShift: 0
+      avgSV: 1
+      svPoints: 16
+      finalSVIndex: 2
+      customSV: 1
+    hermite:
+      startSV: 0
+      endSV: 0
+      verticalShift: 0
+      avgSV: 1
+      svPoints: 16
+      finalSVIndex: 2
+      customSV: 1
+    sinusoidal:
+      startSV: 1
+      endSV: 1
+      curveSharpness: 50
+      verticalShift: 0
+      periods: 1
+      periodsShift: 0.25
+      svsPerQuarterPeriod: 8
+      svPoints: 16
+      finalSVIndex: 2
+      customSV: 1
+    circular:
+      behaviorIndex: 1
+      arcPercent: 50
+      avgSV: 1
+      verticalShift: 0
+      svPoints: 16
+      finalSVIndex: 2
+      customSV: 1
+      dontNormalize: false
+    random:
+      svMultipliers:
+      - 
+      randomTypeIndex: 1
+      randomScale: 2
+      svPoints: 16
+      finalSVIndex: 2
+      customSV: 1
+      dontNormalize: false
+      avgSV: 1
+      verticalShift: 0
+    custom:
+      svMultipliers:
+      - 0
+      selectedMultiplierIndex: 1
+      svPoints: 1
+      finalSVIndex: 2
+      customSV: 1
+    chinchilla:
+      behaviorIndex: 1
+      chinchillaTypeIndex: 1
+      chinchillaIntensity: 0.5
+      avgSV: 1
+      verticalShift: 0
+      svPoints: 16
+      finalSVIndex: 2
+      customSV: 1
+    combo:
+      svType1Index: 1
+      svType2Index: 2
+      comboPhase: 0
+      comboTypeIndex: 1
+      comboMultiplier1: 1
+      comboMultiplier2: 1
+      finalSVIndex: 2
+      customSV: 1
+      dontNormalize: false
+      avgSV: 1
+      verticalShift: 0
+    code:
+      code: >-
+        return function (x)
+            local startPeriod = 4
+            local endPeriod = -1
+            local height = 1.5
+            return height * math.sin(2 * math.pi * (startPeriod * x + (endPeriod - startPeriod) / 2 * x^2))
+        end
+      svPoints: 64
+      finalSVIndex: 2
+      customSV: 1
+    stutter:
+      startSV: 5
+      endSV: 0.5
+      stutterDuration: 15
+      stuttersPerSection: 1
+      avgSV: 1
+      finalSVIndex: 2
+      customSV: 1
+      linearlyChange: false
+      controlLastSV: false
+      svMultipliers:
+      - 
+      svDistances:
+      - 
+      svGraphStats:
+        minScale: 0
+        maxScale: 0
+        distMinScale: 0
+        distMaxScale: 0
+      svMultipliers2:
+      - 
+      svDistances2:
+      - 
+      svGraph2Stats:
+        minScale: 0
+        maxScale: 0
+        distMinScale: 0
+        distMaxScale: 0
+    teleportStutter:
+      svPercent: 90
+      svPercent2: 0
+      distance: 50
+      mainSV: 0.10000000149011612
+      mainSV2: 0
+      useDistance: false
+      linearlyChange: false
+      avgSV: 1
+      finalSVIndex: 2
+      customSV: 1
+    framesSetup:
+      menuStep: 1
+      numFrames: 5
+      frameDistance: 2000
+      distance: 2000
+      reverseFrameOrder: false
+      noteSkinTypeIndex: 1
+      frameTimes:
+      - 
+      selectedTimeIndex: 1
+      currentFrame: 1
+    penis:
+      bWidth: 50
+      sWidth: 100
+      sCurvature: 100
+      bCurvature: 100
+    automate:
+      copiedSVs:
+      - 
+      maintainMs: true
+      ms: 500
+      scaleSVs: false
+      initialSV: 1
+      optimizeTGs: true
+    animationPalette:
+      instructions: ''
+  menu:
+    placeStandard:
+      svTypeIndex: 1
+      svMultipliers:
+      - 
+      svDistances:
+      - 
+      svGraphStats:
+        minScale: 0
+        maxScale: 0
+        distMinScale: 0
+        distMaxScale: 0
+      svStats:
+        minSV: 0
+        maxSV: 0
+        avgSV: 0
+      interlace: false
+      interlaceRatio: -0.5
+      overrideFinal: false
+    placeSpecial:
+      svTypeIndex: 1
+    placeStill:
+      svTypeIndex: 1
+      noteSpacing: 1
+      stillTypeIndex: 1
+      stillDistance: 0
+      stillBehavior: 1
+      prePlaceDistances:
+      - 
+      svMultipliers:
+      - 
+      svDistances:
+      - 
+      svGraphStats:
+        minScale: 0
+        maxScale: 0
+        distMinScale: 0
+        distMaxScale: 0
+      svStats:
+        minSV: 0
+        maxSV: 0
+        avgSV: 0
+      interlace: false
+      interlaceRatio: -0.5
+      overrideFinal: false
+    placeVibrato:
+      svTypeIndex: 1
+      vibratoMode: 1
+      vibratoQuality: 3
+      sides: 2
+    delete:
+      deleteTable:
+      - true
+      - true
+      - true
+      - true
+    addTeleport:
+      distance: 10727
+      teleportBeforeHand: false
+    changeGroups:
+      designatedTimingGroup: $Default
+      changeSVs: true
+      changeSSFs: true
+    convertSVSSF:
+      conversionDirection: true
+    copy:
+      copyTable:
+      - true
+      - true
+      - true
+      - true
+      copied:
+        lines:
+        - - 
+        SVs:
+        - - 
+        SSFs:
+        - - 
+        BMs:
+        - - 
+      tryAlign: true
+      alignWindow: 3
+      curSlot: 1
+    directSV:
+      selectableIndex: 1
+      startTime: 0
+      multiplier: 0
+      pageNumber: 1
+    displaceNote:
+      distance: 200
+      distance1: 0
+      distance2: 200
+      linearlyChange: false
+    displaceView:
+      distance: 200
+    dynamicScale:
+      noteTimes:
+      - 
+      svTypeIndex: 1
+      svMultipliers:
+      - 
+      svDistances:
+      - 
+      svGraphStats:
+        minScale: 0
+        maxScale: 0
+        distMinScale: 0
+        distMaxScale: 0
+      svStats:
+        minSV: 0
+        maxSV: 0
+        avgSV: 0
+    flicker:
+      flickerTypeIndex: 1
+      distance: -69420.726999999999
+      distance1: 0
+      distance2: -69420.726999999999
+      numFlickers: 1
+      linearlyChange: false
+      flickerPosition: 0.5
+    measure:
+      unrounded: false
+      nsvDistance: ''
+      svDistance: ''
+      avgSV: ''
+      startDisplacement: ''
+      endDisplacement: ''
+      avgSVDisplaceless: ''
+      roundedNSVDistance: 0
+      roundedSVDistance: 0
+      roundedAvgSV: 0
+      roundedStartDisplacement: 0
+      roundedEndDisplacement: 0
+      roundedAvgSVDisplaceless: 0
+    reverseScroll:
+      distance: 400
+    scaleDisplace:
+      scaleSpotIndex: 1
+      scaleTypeIndex: 1
+      avgSV: 0.59999999999999998
+      distance: 100
+      ratio: 0.59999999999999998
+    scaleMultiply:
+      scaleTypeIndex: 1
+      avgSV: 0.59999999999999998
+      distance: 100
+      ratio: 0.59999999999999998
+    verticalShift:
+      verticalShift: 1
+    selectAlternating:
+      every: 1
+      offset: 0
+    selectChordSize:
+      single: true
+      jump: false
+      hand: false
+      quad: false
+    selectNoteType:
+      rice: true
+      ln: false
+    selectBySnap:
+      snap: 1
 presets:
-    -
+- 
 ignoreNotes: false
