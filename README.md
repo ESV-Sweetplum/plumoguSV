@@ -13,7 +13,7 @@ This is a plugin for [Quaver](https://github.com/Quaver), the ultimate community
 
 ## Tech Stack
 
-[![Tech Stack](https://skillicons.dev/icons?i=ts,js,lua)](https://skillicons.dev)
+[![Tech Stack](https://skillicons.dev/icons?i=js,ts,lua,md)](https://skillicons.dev)
 
 ## Plugin Overview 
 plumoguSV makes working with SVs quick and easy!
