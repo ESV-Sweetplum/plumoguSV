@@ -32,5 +32,7 @@ function changeGroupsMenu()
 
     AddSeparator()
 
+    saveVariables("changeGroupsMenu", menuVars)
+
     simpleActionMenu("Move items to " .. menuVars.designatedTimingGroup, 2, changeGroups, menuVars)
 end

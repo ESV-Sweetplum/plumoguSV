@@ -90,14 +90,14 @@ function showDefaultPropertiesSettings()
         saveVariables("addTeleportPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Change Group Settings")) then
-        local menuVars = getMenuVars("changeGroup", "Property")
+        local menuVars = getMenuVars("changeGroups", "Property")
 
         _, menuVars.changeSVs = imgui.Checkbox("Change SVs?", menuVars.changeSVs)
         KeepSameLine()
         _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
 
-        saveMenuPropertiesButton(menuVars, "changeGroup")
-        saveVariables("changeGroupPropertyMenu", menuVars)
+        saveMenuPropertiesButton(menuVars, "changeGroups")
+        saveVariables("changeGroupsPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Convert SV <-> SSF Settings")) then
         local menuVars = getMenuVars("convertSVSSF", "Property")

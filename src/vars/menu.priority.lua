@@ -49,10 +49,10 @@ DEFAULT_STARTING_MENU_VARS = {
     copy = {
         copyTable = { true, true, true, true }, -- 1: timing lines, 2: svs, 3: ssfs, 4: bookmarks
         copied = {
-            lines = {{}},
-            SVs = {{}},
-            SSFs = {{}},
-            BMs = {{}},
+            lines = { {} },
+            SVs = { {} },
+            SSFs = { {} },
+            BMs = { {} },
         },
         tryAlign = true,
         alignWindow = 3,
