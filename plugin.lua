@@ -184,9 +184,11 @@ function pluralize(str, val, pos)
     local lastLetter = str:sub(-1):upper()
     local secondToLastLetter = str:charAt(-2):upper()
     if (lastLetter == "Y" and table.contains(CONSONANTS, secondToLastLetter)) then
+        finalStrTbl[1] = finalStrTbl[1]:sub(1, -2)
         finalStrTbl[2] = "ies"
     end
     if (str:sub(-3):lower() == "quy") then
+        finalStrTbl[1] = finalStrTbl[1]:sub(1, -2)
         finalStrTbl[2] = "ies"
     end
     if (table.contains({ "J", "S", "X", "Z" }, lastLetter) or table.contains({ "SH", "CH" }, str:sub(-2))) then
