@@ -11,6 +11,10 @@ This is a plugin for [Quaver](https://github.com/Quaver), the ultimate community
 2. Extract the downloaded `.zip` file to get the plumoguSV-main folder.
 3. Move the plumoguSV-main folder into the `/Plugins` folder (located in the `/Quaver` folder).
 
+## Tech Stack
+
+[![Tech Stack](https://skillicons.dev/icons?i=js,ts,lua,md)](https://skillicons.dev)
+
 ## Plugin Overview 
 plumoguSV makes working with SVs quick and easy!
 
