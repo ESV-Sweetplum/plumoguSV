@@ -19,16 +19,20 @@ function renderReactiveSingularities()
     if (dim.x < 100) then return end
 
     if (not truthy(#particles)) then
-        createParticles(particles, 500)
+        createParticles(particles, 200)
     end
     updateParticles(particles, dim, state.DeltaTime)
+
+    local lerp = function(w, l, h)
+        return w * h + (1 - w) * l
+    end
 
     for _, p in ipairs(particles) do
         local s = sqrt(p.vx ^ 2 + p.vy ^ 2)
         local clampedSpeed = clamp(s / 5, 0, 1)
-        local r = math.lerp(clampedSpeed, slowSpeedR, fastSpeedR)
-        local g = math.lerp(clampedSpeed, slowSpeedG, fastSpeedG)
-        local b = math.lerp(clampedSpeed, slowSpeedB, fastSpeedB)
+        local r = lerp(clampedSpeed, slowSpeedR, fastSpeedR)
+        local g = lerp(clampedSpeed, slowSpeedG, fastSpeedG)
+        local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
         local pos = { p.x + topLeft.x, p.y + topLeft.y }
         ctx.AddCircleFilled(pos, 1.5,
             rgbaToUint(r, g, b, 255))

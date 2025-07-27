@@ -16,7 +16,9 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
         colorList[newListIndex]:gsub("(%d+)", function(c)
             table.insert(rgb, c)
         end)
-        imgui.PushStyleColor(imgui_col.Text, vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, 1))
+        local alpha = globalVars.customStyle.text.w or 1
+        imgui.PushStyleColor(imgui_col.Text,
+            vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, alpha))
     end
 
     if not imgui.BeginCombo(label, currentComboItem, comboFlag) then

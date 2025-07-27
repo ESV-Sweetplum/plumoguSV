@@ -77,14 +77,6 @@ function math.hermite(m1, m2, y2, t)
     return a * t * t * t + b * t * t + c * t
 end
 matrix = {}
----Returns a number that is `(weight * 100)%` of the way from travelling between `lowerBound` and `upperBound`.
----@param weight number
----@param lowerBound number
----@param upperBound number
----@return number
-function math.lerp(weight, lowerBound, upperBound)
-    return upperBound * weight + lowerBound * (1 - weight)
-end
 ---Returns the weight of a number between `lowerBound` and `upperBound`.
 ---@param num number
 ---@param lowerBound number
@@ -3135,16 +3127,19 @@ function renderReactiveSingularities()
     local fastSpeedB = 117
     if (dim.x < 100) then return end
     if (not truthy(#particles)) then
-        createParticles(particles, 500)
+        createParticles(particles, 200)
     end
     updateParticles(particles, dim, state.DeltaTime)
+    local lerp = function(w, l, h)
+        return w * h + (1 - w) * l
+    end
     for k = 1, #particles do
         local p = particles[k]
         local s = sqrt(p.vx ^ 2 + p.vy ^ 2)
         local clampedSpeed = clamp(s / 5, 0, 1)
-        local r = math.lerp(clampedSpeed, slowSpeedR, fastSpeedR)
-        local g = math.lerp(clampedSpeed, slowSpeedG, fastSpeedG)
-        local b = math.lerp(clampedSpeed, slowSpeedB, fastSpeedB)
+        local r = lerp(clampedSpeed, slowSpeedR, fastSpeedR)
+        local g = lerp(clampedSpeed, slowSpeedG, fastSpeedG)
+        local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
         local pos = { p.x + topLeft.x, p.y + topLeft.y }
         ctx.AddCircleFilled(pos, 1.5,
             rgbaToUint(r, g, b, 255))
@@ -4534,7 +4529,9 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
         colorList[newListIndex]:gsub("(%d+)", function(c)
             rgb[#rgb + 1] = c
         end)
-        imgui.PushStyleColor(imgui_col.Text, vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, 1))
+        local alpha = globalVars.customStyle.text.w or 1
+        imgui.PushStyleColor(imgui_col.Text,
+            vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, alpha))
     end
     if not imgui.BeginCombo(label, currentComboItem, comboFlag) then
         if (colorList) then imgui.PopStyleColor() end
