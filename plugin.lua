@@ -3112,6 +3112,99 @@ function selectBySnap(menuVars)
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
+function renderReactiveSingularities()
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    local particles = state.GetValue("particles", {}) ---@type Particle[]
+    local singularities = { { pos = dim / 2, v = vector.New(0.1, 0.1) } }
+    local slowSpeed = vector.New(89, 0, 255)
+    local fastSpeed = vector.New(255, 165, 117)
+    if (dim.x < 100) then return end
+    if (not truthy(#particles)) then
+        createParticles(particles, 500)
+    end
+    updateParticles(particles, singularities, state.DeltaTime)
+    for k = 1, #particles do
+        local p = particles[k]
+        local color = vector.Lerp(slowSpeed, fastSpeed, math.clamp(vector2Length(p.v) / 5, 0, 1))
+        ctx.AddCircleFilled(p.pos + topLeft, 1.5,
+            rgbaToUint(math.floor(color.x), math.floor(color.y), math.floor(color.z), 255))
+    end
+    for k = 1, #singularities do
+        local sg = singularities[k]
+        ctx.AddCircleFilled(sg.pos + topLeft, 15, rgbaToUint(0, 0, 0, 255))
+        ctx.AddCircle(sg.pos + topLeft, 16, rgbaToUint(255, 255, 255, 255))
+    end
+    state.SetValue("particles", particles)
+end
+function createParticles(particles, n)
+    local dim = imgui.GetWindowSize()
+    for i = 1, n do
+        local pos = vector.New(math.random() * dim.x, math.random() * dim.y)
+        table.insert(particles, {
+            pos = pos,
+            v = vector2(0),
+            a = vector2(0),
+        })
+    end
+end
+function updateParticles(particles, singularities, dt)
+    local dim = imgui.GetWindowSize()
+    for k = 1, #particles do
+        local p = particles[k]
+        local movementSpeed = 0.1
+        p.v = p.v + p.a * dt * movementSpeed
+        p.pos = p.pos + p.v * dt * movementSpeed
+        boundObject(p, 0.8)
+        p.a = vector2(0)
+        for _, sg in pairs(singularities) do
+            local distVec = sg.pos - p.pos
+            local g = distVec / (math.clamp(vector2Length(distVec), 10, 1e69) ^ 3) * 500
+            p.a = p.a + g
+            p.a = p.a + vector.New(g.y, -g.x) / math.sqrt(vector2Length(distVec)) * 10
+        end
+        p.v = vector.Clamp(p.v * (1 - dt / 1000 * 2), vector2(-5), vector2(5))
+    end
+end
+function vector2Length(v)
+    return math.sqrt(v.x ^ 2 + v.y ^ 2)
+end
+function boundObject(o, bounceCoefficient)
+    local dim = imgui.GetWindowSize()
+    if (o.pos.x < 0 or o.pos.x > dim.x) then
+        o.v.x = -o.v.x * bounceCoefficient
+        o.pos.x = math.clamp(o.pos.x, 1, dim.x - 1)
+    end
+    if (o.pos.y < 0 or o.pos.y > dim.y) then
+        o.v.y = -o.v.y * bounceCoefficient
+        o.pos.y = math.clamp(o.pos.y, 1, dim.y - 1)
+    end
+end
+stars = {}
+function updateStars()
+    local dim = imgui.GetWindowSize()
+    for k = 1, #stars do
+        local star = stars[k]
+        local starWrapped = false
+        while (star.pos.x > dim.x + 10) do
+            starWrapped = true
+            star.pos.x = star.pos.x - dim.x - 20
+        end
+        while (star.pos.x < -10) do
+            starWrapped = true
+            star.pos.x = star.pos.x + dim.x + 20
+        end
+        if (starWrapped) then
+            star.pos.y = math.random() * dim.y
+            star.v.x = math.random() * 3 + 1
+            star.size = math.random(3) * 0.5
+        else
+            star.pos = star.pos + star.v * state.DeltaTime * 0.05 *
+                math.clamp(2 * getSVMultiplierAt(state.SongTime), -50, 50)
+        end
+    end
+end
 function drawCapybaraParent()
     drawCapybara()
     drawCapybara2()
@@ -4284,54 +4377,8 @@ end
 ---@class Particle: PhysicsObject
 ---@field col Vector4
 ---@field size integer
-stars = {}
-function updateStars()
-    local dim = imgui.GetWindowSize()
-    for k = 1, #stars do
-        local star = stars[k]
-        local starWrapped = false
-        while (star.pos.x > dim.x + 10) do
-            starWrapped = true
-            star.pos.x = star.pos.x - dim.x - 20
-        end
-        while (star.pos.x < -10) do
-            starWrapped = true
-            star.pos.x = star.pos.x + dim.x + 20
-        end
-        if (starWrapped) then
-            star.pos.y = math.random() * dim.y
-            star.v.x = math.random() * 3 + 1
-            star.size = math.random(3) * 0.5
-        else
-            star.pos = star.pos + star.v * state.DeltaTime * 0.05 *
-                math.clamp(2 * getSVMultiplierAt(state.SongTime), -50, 50)
-        end
-    end
-end
 function renderBackground()
-    local stars = stars
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    if (not truthy(#stars)) then
-        for _ = 1, 100 do
-            table.insert(stars,
-                {
-                    pos = vector.New(math.random() * 500, math.random() * 500),
-                    v = vector.New(math.random() * 3 + 1, 0),
-                    size = math.random(3) * 0.5,
-                })
-        end
-    else
-        updateStars()
-    end
-    for k = 1, #stars do
-        local star = stars[k]
-        local progress = star.pos.x / dim.x
-        local brightness = math.clamp(-8 * progress * (progress - 1), 0, 1)
-        ctx.AddCircleFilled(star.pos + topLeft, star.size, rgbaToUint(255, 255, 255, math.floor(brightness * 255)))
-    end
-    local colorValue = math.floor(50 * (1 + state.GetValue("borderPulseStatus", 0)))
+    renderReactiveSingularities()
 end
 function setPluginAppearance()
     local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
