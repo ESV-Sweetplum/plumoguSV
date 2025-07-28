@@ -3130,6 +3130,7 @@ function renderReactiveSingularities()
     local vyList = state.GetValue("vyList", {})
     local axList = state.GetValue("axList", {})
     local ayList = state.GetValue("ayList", {})
+    local pulseStatus = state.GetValue("pulseStatus", 0)
     local slowSpeedR = 89
     local slowSpeedG = 0
     local slowSpeedB = 255
@@ -3140,7 +3141,7 @@ function renderReactiveSingularities()
     if (not truthy(#xList)) then
         createParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
     end
-    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, state.DeltaTime)
+    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, state.DeltaTime * (pulseStatus + 0.5))
     local lerp = function(w, l, h)
         return w * h + (1 - w) * l
     end
@@ -3158,10 +3159,11 @@ function renderReactiveSingularities()
         local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
         local pos = { x + topLeft.x, y + topLeft.y }
         ctx.AddCircleFilled(pos, 2,
-            rgbaToUint(r, g, b, 200))
+            rgbaToUint(r, g, b, 55 + math.floor(pulseStatus * 200)))
     end
     ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
-    ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295)
+    ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
+    ctx.AddCircle(dim / 2 + topLeft, 24 - pulseStatus * 8, 16777215 + math.floor(pulseStatus * 255) * 16777216)
     state.SetValue("xList", xList)
     state.SetValue("yList", yList)
     state.SetValue("vxList", vxList)
@@ -4386,26 +4388,26 @@ function getCurrentRGBColors(rgbPeriod)
 end
 function pulseController()
     local prevVal = state.GetValue("prevVal", 0)
-    local colStatus = state.GetValue("colStatus", 0)
+    local pulseStatus = state.GetValue("pulseStatus", 0)
     local timeOffset = 50
     local timeSinceLastPulse = ((state.SongTime + timeOffset) - getTimingPointAt(state.SongTime).StartTime) %
         ((60000 / getTimingPointAt(state.SongTime).Bpm))
     if ((timeSinceLastPulse < prevVal)) then
-        colStatus = 1
+        pulseStatus = 1
     else
-        colStatus = (colStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm) * 1.2)
+        pulseStatus = (pulseStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm) * 1.2)
     end
     local futureTime = state.SongTime + state.DeltaTime * 2 + timeOffset
     if ((futureTime - getTimingPointAt(futureTime).StartTime) < 0) then
-        colStatus = 0
+        pulseStatus = 0
     end
-    state.SetValue("colStatus", math.max(colStatus, 0))
+    state.SetValue("pulseStatus", math.max(pulseStatus, 0))
     state.SetValue("prevVal", timeSinceLastPulse)
-    colStatus = colStatus * (globalVars.pulseCoefficient or 0)
+    pulseStatus = pulseStatus * (globalVars.pulseCoefficient or 0)
     local borderColor = state.GetValue("baseBorderColor") or vector4(1)
     local negatedBorderColor = vector4(1) - borderColor
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
-    imgui.PushStyleColor(imgui_col.Border, pulseColor * colStatus + borderColor * (1 - colStatus))
+    imgui.PushStyleColor(imgui_col.Border, pulseColor * pulseStatus + borderColor * (1 - pulseStatus))
 end
 ---@class PhysicsObject
 ---@field pos Vector2

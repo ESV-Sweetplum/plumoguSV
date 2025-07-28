@@ -20,6 +20,8 @@ function renderReactiveSingularities()
     local axList = state.GetValue("axList", {})
     local ayList = state.GetValue("ayList", {})
 
+    local pulseStatus = state.GetValue("pulseStatus", 0)
+
     local slowSpeedR = 89
     local slowSpeedG = 0
     local slowSpeedB = 255
@@ -33,7 +35,7 @@ function renderReactiveSingularities()
     if (not truthy(#xList)) then
         createParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
     end
-    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, state.DeltaTime)
+    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, state.DeltaTime * (pulseStatus + 0.5))
 
     local lerp = function(w, l, h)
         return w * h + (1 - w) * l
@@ -54,10 +56,12 @@ function renderReactiveSingularities()
         local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
         local pos = { x + topLeft.x, y + topLeft.y }
         ctx.AddCircleFilled(pos, 2,
-            rgbaToUint(r, g, b, 200))
+            rgbaToUint(r, g, b, 55 + math.floor(pulseStatus * 200)))
     end
+
     ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
-    ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295)
+    ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
+    ctx.AddCircle(dim / 2 + topLeft, 24 - pulseStatus * 8, 16777215 + math.floor(pulseStatus * 255) * 16777216)
 
     state.SetValue("xList", xList)
     state.SetValue("yList", yList)
