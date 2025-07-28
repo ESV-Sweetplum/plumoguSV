@@ -1,5 +1,6 @@
 function showCustomThemeSettings()
     local settingsChanged = false
+    imgui.SeparatorText("Custom Theme Actions")
     if (imgui.Button("Reset")) then
         globalVars.customStyle = table.duplicate(DEFAULT_STYLE)
         write()
@@ -28,6 +29,10 @@ function showCustomThemeSettings()
             state.SetValue("importingCustomTheme", false)
         end
     end
+    imgui.SeparatorText("Search")
+    local searchText = state.GetValue("customTheme_searchText", "")
+    _, searchText = imgui.InputText("##CustomThemeSearch", searchText, 100)
+    state.SetValue("customTheme_searchText", searchText)
     settingsChanged = ColorInput(globalVars.customStyle, "windowBg", "Window BG") or
         settingsChanged
     settingsChanged = ColorInput(globalVars.customStyle, "popupBg", "Popup BG") or
@@ -116,7 +121,7 @@ function setCustomStyleString(str)
 
     local customStyle = {}
 
-    for kvPair in str:gmatch("[0-9#:a-zA-Z]+") do
+    for kvPair in str:gmatch("[0-9#:a-zA-Z]+") do -- Equivalent to validate, no need to change
         local keyId = kvPair:match("[a-zA-Z]+:"):sub(1, -2)
         local hexa = kvPair:match(":[a-f0-9]+"):sub(2)
         local key = table.indexOf(keyIdDict, keyId)

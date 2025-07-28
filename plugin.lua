@@ -2970,6 +2970,7 @@ function checkForGlobalHotkeys()
     if (exclusiveKeyPressed(globalVars.hotkeyList[10])) then changeNoteLockMode() end
 end
 function jumpToTg()
+    if (not truthy(#state.SelectedHitObjects)) then return end
     local tgId = state.SelectedHitObjects[1].TimingGroup
     for _, ho in pairs(state.SelectedHitObjects) do
         if (ho.TimingGroup ~= tgId) then return end
@@ -5202,33 +5203,19 @@ end
 function customVibratoMenu(menuVars, settingVars, separateWindow)
     local typingCode = false
     if (menuVars.vibratoMode == 1) then
-        CodeInput(settingVars, "code", "##code",
+        typingCode = CodeInput(settingVars, "code", "##code",
             "This input should return a function that takes in a number t=[0-1], and returns a value corresponding to the msx value of the vibrato at (100t)% of the way through the first and last selected note times.")
-        if imgui.IsItemActive() then
-            typingCode = true
-        else
-            typingCode = false
-        end
         local func = eval(settingVars.code)
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
         end, menuVars, false, typingCode, separateWindow and globalVars.hotkeyList[8] or nil)
     else
-        CodeInput(settingVars, "code1", "##code1",
+        typingCode = CodeInput(settingVars, "code1", "##code1",
             "This input should return a function that takes in a number t=[0-1], and returns a value corresponding to the msx value of the vibrato at (100t)% of the way through the first and last selected note times.")
-        if imgui.IsItemActive() then
-            typingCode = true
-        else
-            typingCode = false
-        end
-        CodeInput(settingVars, "code2", "##code2",
-            "This input should return a function that takes in a number t=[0-1], and returns a value corresponding to the msx value of the vibrato at (100t)% of the way through the first and last selected note times.")
-        if imgui.IsItemActive() then
-            typingCode = true
-        else
-            typingCode = typingCode or false
-        end
+        typingCode = CodeInput(settingVars, "code2", "##code2",
+            "This input should return a function that takes in a number t=[0-1], and returns a value corresponding to the msx value of the vibrato at (100t)% of the way through the first and last selected note times.") or
+        typingCode
         local func1 = eval(settingVars.code1)
         local func2 = eval(settingVars.code2)
         AddSeparator()
@@ -6095,6 +6082,7 @@ function showAppearanceSettings()
 end
 function showCustomThemeSettings()
     local settingsChanged = false
+    imgui.SeparatorText("Custom Theme Actions")
     if (imgui.Button("Reset")) then
         globalVars.customStyle = table.duplicate(DEFAULT_STYLE)
         write()
@@ -6123,6 +6111,10 @@ function showCustomThemeSettings()
             state.SetValue("importingCustomTheme", false)
         end
     end
+    imgui.SeparatorText("Search")
+    local searchText = state.GetValue("customTheme_searchText", "")
+    _, searchText = imgui.InputText("##CustomThemeSearch", searchText, 100)
+    state.SetValue("customTheme_searchText", searchText)
     settingsChanged = ColorInput(globalVars.customStyle, "windowBg", "Window BG") or
         settingsChanged
     settingsChanged = ColorInput(globalVars.customStyle, "popupBg", "Popup BG") or
@@ -6204,7 +6196,7 @@ function setCustomStyleString(str)
         keyIdDict[key] = convertStrToShort(key)
     end
     local customStyle = {}
-    for kvPair in str:gmatch("[0-9#:a-zA-Z]+") do
+    for kvPair in str:gmatch("[0-9#:a-zA-Z]+") do -- Equivalent to validate, no need to change
         local keyId = kvPair:match("[a-zA-Z]+:"):sub(1, -2)
         local hexa = kvPair:match(":[a-f0-9]+"):sub(2)
         local key = table.indexOf(keyIdDict, keyId)
