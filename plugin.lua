@@ -3143,9 +3143,7 @@ function renderReactiveSingularities()
     local fastSpeedG = 165
     local fastSpeedB = 117
     if (dimX < 100 or imgui.GetTime() < 0.3) then return end
-    if (not truthy(#xList)) then
-        createParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
-    end
+    createParticle(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
     local speed = clamp(math.abs(getSVMultiplierAt(state.SongTime)), 0, 4)
     updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
         state.DeltaTime * speed)
@@ -3178,15 +3176,14 @@ function renderReactiveSingularities()
     state.SetValue("axList", axList)
     state.SetValue("ayList", ayList)
 end
-function createParticles(x, y, vx, vy, ax, ay, dimX, dimY, n)
-    for i = 1, n do
-        x[#x + 1] = math.random() * dimX
-        y[#y + 1] = math.random() * dimY
-        vx[#vx + 1] = 0
-        vy[#vy + 1] = 0
-        ax[#ax + 1] = 0
-        ay[#ay + 1] = 0
-    end
+function createParticle(x, y, vx, vy, ax, ay, dimX, dimY, n)
+    if (#x >= 150) then return end
+    x[#x + 1] = math.random() * dimX
+    y[#y + 1] = math.random() * dimY
+    vx[#vx + 1] = 0
+    vy[#vy + 1] = 0
+    ax[#ax + 1] = 0
+    ay[#ay + 1] = 0
 end
 function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt)
     local sqrt = math.sqrt
