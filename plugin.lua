@@ -3132,7 +3132,7 @@ function renderReactiveSingularities()
     local fastSpeedB = 117
     if (dim.x < 100) then return end
     if (not truthy(#xList)) then
-        createParticles(xList, yList, vxList, vyList, axList, ayList, 200)
+        createParticles(xList, yList, vxList, vyList, axList, ayList, 300)
     end
     updateParticles(xList, yList, vxList, vyList, axList, ayList, dim, state.DeltaTime)
     local lerp = function(w, l, h)
