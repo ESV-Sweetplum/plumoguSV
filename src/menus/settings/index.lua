@@ -56,7 +56,7 @@ function showPluginSettingsWindow()
     end
     if (state.GetValue("activateCrazy")) then
         imgui.TextWrapped(text)
-        if (clock.listen("crazy", 10 + 10 * math.exp(- #text / 10))) then
+        if (clock.listen("crazy", 10 * math.exp(- #text / 100))) then
             local curIdx = state.GetValue("crazyIdx", 1)
             if (curIdx > #full) then curIdx = curIdx - #full end
             text = text .. full:charAt(curIdx)
