@@ -627,10 +627,10 @@ end
 
 -- Sets plugin colors to the "Classic" theme
 function setCustomColors()
-    local borderColor = vector.New(0.81, 0.88, 1.00, 0.30)
     if (globalVars.customStyle == nil) then
         return setClassicColors()
     end
+    local borderColor = globalVars.customStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
     imgui.PushStyleColor(imgui_col.WindowBg, globalVars.customStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00))
     imgui.PushStyleColor(imgui_col.PopupBg, globalVars.customStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94))
     imgui.PushStyleColor(imgui_col.FrameBg, globalVars.customStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00))

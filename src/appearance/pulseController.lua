@@ -11,7 +11,7 @@ function pulseController()
     if ((timeSinceLastPulse < prevVal)) then
         colStatus = 1
     else
-        colStatus = (colStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm))
+        colStatus = (colStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm) * 1.2)
     end
 
     local futureTime = state.SongTime + state.DeltaTime * 2 + timeOffset

@@ -195,6 +195,11 @@ customStyle:
   - 0.57999998331069946
   - 0.69999998807907104
   - 1
+  border:
+  - 0
+  - 0
+  - 0
+  - 1
 dontPrintCreation: false
 equalizeLinear: true
 defaultProperties:

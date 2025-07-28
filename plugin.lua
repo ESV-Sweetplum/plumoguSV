@@ -827,6 +827,7 @@ VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2,
 DEFAULT_STYLE = {
     windowBg = vector.New(0.00, 0.00, 0.00, 1.00),
     popupBg = vector.New(0.08, 0.08, 0.08, 0.94),
+    border = vector.New(0, 0, 0, 1),
     frameBg = vector.New(0.14, 0.24, 0.28, 1.00),
     frameBgHovered =
         vector.New(0.24, 0.34, 0.38, 1.00),
@@ -3119,6 +3120,8 @@ function renderReactiveSingularities()
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
+    local dimX = dim.x
+    local dimY = dim.y
     local sqrt = math.sqrt
     local clamp = math.clamp
     local xList = state.GetValue("xList", {})
@@ -3133,11 +3136,11 @@ function renderReactiveSingularities()
     local fastSpeedR = 255
     local fastSpeedG = 165
     local fastSpeedB = 117
-    if (dim.x < 100) then return end
+    if (dimX < 100) then return end
     if (not truthy(#xList)) then
-        createParticles(xList, yList, vxList, vyList, axList, ayList, 300)
+        createParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
     end
-    updateParticles(xList, yList, vxList, vyList, axList, ayList, dim, state.DeltaTime)
+    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, state.DeltaTime)
     local lerp = function(w, l, h)
         return w * h + (1 - w) * l
     end
@@ -3154,8 +3157,8 @@ function renderReactiveSingularities()
         local g = lerp(clampedSpeed, slowSpeedG, fastSpeedG)
         local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
         local pos = { x + topLeft.x, y + topLeft.y }
-        ctx.AddCircleFilled(pos, 1.5,
-            rgbaToUint(r, g, b, 255))
+        ctx.AddCircleFilled(pos, 2,
+            rgbaToUint(r, g, b, 200))
     end
     ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
     ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295)
@@ -3166,18 +3169,17 @@ function renderReactiveSingularities()
     state.SetValue("axList", axList)
     state.SetValue("ayList", ayList)
 end
-function createParticles(x, y, vx, vy, ax, ay, n)
-    local dim = imgui.GetWindowSize()
+function createParticles(x, y, vx, vy, ax, ay, dimX, dimY, n)
     for i = 1, n do
-        x[#x + 1] = math.random() * dim.x
-        y[#y + 1] = math.random() * dim.y
+        x[#x + 1] = math.random() * dimX
+        y[#y + 1] = math.random() * dimY
         vx[#vx + 1] = 0
         vy[#vy + 1] = 0
         ax[#ax + 1] = 0
         ay[#ay + 1] = 0
     end
 end
-function updateParticles(xl, yl, vxl, vyl, axl, ayl, dim, dt)
+function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt)
     local sqrt = math.sqrt
     local clamp = math.clamp
     local movementSpeed = 0.1
@@ -3189,8 +3191,8 @@ function updateParticles(xl, yl, vxl, vyl, axl, ayl, dim, dt)
         local ax = axl[i]
         local ay = ayl[i]
         local bounceCoefficient = 0.8
-        local sgPosx = dim.x / 2
-        local sgPosy = dim.y / 2
+        local sgPosx = dimX / 2
+        local sgPosy = dimY / 2
         local xDist = sgPosx - x
         local yDist = sgPosy - y
         local dist = sqrt(xDist ^ 2 + yDist ^ 2)
@@ -3204,13 +3206,13 @@ function updateParticles(xl, yl, vxl, vyl, axl, ayl, dim, dt)
         vyl[i] = vy + ay * dt * movementSpeed
         xl[i] = x + vx * dt * movementSpeed
         yl[i] = y + vy * dt * movementSpeed
-        if (x < 0 or x > dim.x) then
+        if (x < 0 or x > dimX) then
             vxl[i] = -vxl[i] * bounceCoefficient
-            xl[i] = clamp(xl[i], 1, dim.x - 1)
+            xl[i] = clamp(xl[i], 1, dimX - 1)
         end
-        if (y < 0 or y > dim.y) then
+        if (y < 0 or y > dimY) then
             vyl[i] = -vyl[i] * bounceCoefficient
-            yl[i] = clamp(yl[i], 1, dim.y - 1)
+            yl[i] = clamp(yl[i], 1, dimY - 1)
         end
         vxl[i] = clamp(vxl[i] * (1 - dt / 1000 * 2), -5, 5)
         vyl[i] = clamp(vyl[i] * (1 - dt / 1000 * 2), -5, 5)
@@ -4300,10 +4302,10 @@ function setInvertedIncognitoColors()
     return blackTint
 end
 function setCustomColors()
-    local borderColor = vector.New(0.81, 0.88, 1.00, 0.30)
     if (globalVars.customStyle == nil) then
         return setClassicColors()
     end
+    local borderColor = globalVars.customStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
     imgui.PushStyleColor(imgui_col.WindowBg, globalVars.customStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00))
     imgui.PushStyleColor(imgui_col.PopupBg, globalVars.customStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94))
     imgui.PushStyleColor(imgui_col.FrameBg, globalVars.customStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00))
@@ -4391,7 +4393,7 @@ function pulseController()
     if ((timeSinceLastPulse < prevVal)) then
         colStatus = 1
     else
-        colStatus = (colStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm))
+        colStatus = (colStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm) * 1.2)
     end
     local futureTime = state.SongTime + state.DeltaTime * 2 + timeOffset
     if ((futureTime - getTimingPointAt(futureTime).StartTime) < 0) then
@@ -6116,6 +6118,8 @@ function showCustomThemeSettings()
     settingsChanged = ColorInput(globalVars.customStyle, "windowBg", "Window BG") or
         settingsChanged
     settingsChanged = ColorInput(globalVars.customStyle, "popupBg", "Popup BG") or
+        settingsChanged
+    settingsChanged = ColorInput(globalVars.customStyle, "border", "Border") or
         settingsChanged
     settingsChanged = ColorInput(globalVars.customStyle, "frameBg", "Frame BG") or
         settingsChanged

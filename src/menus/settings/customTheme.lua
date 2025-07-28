@@ -32,6 +32,8 @@ function showCustomThemeSettings()
         settingsChanged
     settingsChanged = ColorInput(globalVars.customStyle, "popupBg", "Popup BG") or
         settingsChanged
+    settingsChanged = ColorInput(globalVars.customStyle, "border", "Border") or
+        settingsChanged
     settingsChanged = ColorInput(globalVars.customStyle, "frameBg", "Frame BG") or
         settingsChanged
     settingsChanged = ColorInput(globalVars.customStyle, "frameBgHovered", "Frame BG\n(Hovered)") or settingsChanged
