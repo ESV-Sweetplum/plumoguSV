@@ -1033,8 +1033,10 @@ function setGlobalVars(tempGlobalVars)
     globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
     globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
     globalVars.customStyle = tempGlobalVars.customStyle or table.construct()
-    if (globalVars.customStyle.border) then globalVars.customStyle.border = table.vectorize4(globalVars.customStyle
-        .border) end
+    if (globalVars.customStyle.border) then
+        globalVars.customStyle.border = table.vectorize4(globalVars.customStyle
+            .border)
+    end
     globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear)
 end
 DEFAULT_STARTING_MENU_VARS = {
@@ -3139,12 +3141,13 @@ function renderReactiveSingularities()
     local fastSpeedR = 255
     local fastSpeedG = 165
     local fastSpeedB = 117
-    if (dimX < 100) then return end
+    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
     if (not truthy(#xList)) then
         createParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
     end
+    local speed = clamp(math.abs(getSVMultiplierAt(state.SongTime)), 0, 4)
     updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
-        state.DeltaTime * (clamp(getSVMultiplierAt(state.SongTime), -2, 2)))
+        state.DeltaTime * speed)
     local lerp = function(w, l, h)
         return w * h + (1 - w) * l
     end

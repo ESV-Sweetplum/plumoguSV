@@ -30,13 +30,14 @@ function renderReactiveSingularities()
     local fastSpeedG = 165
     local fastSpeedB = 117
 
-    if (dimX < 100) then return end
+    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
 
     if (not truthy(#xList)) then
         createParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
     end
+    local speed = clamp(math.abs(getSVMultiplierAt(state.SongTime)), 0, 4)
     updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
-        state.DeltaTime * (clamp(getSVMultiplierAt(state.SongTime), -2, 2)))
+        state.DeltaTime * speed)
 
     local lerp = function(w, l, h)
         return w * h + (1 - w) * l

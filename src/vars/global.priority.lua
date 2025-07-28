@@ -71,7 +71,9 @@ function setGlobalVars(tempGlobalVars)
     globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
     globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
     globalVars.customStyle = tempGlobalVars.customStyle or table.construct()
-    if (globalVars.customStyle.border) then globalVars.customStyle.border = table.vectorize4(globalVars.customStyle
-        .border) end
+    if (globalVars.customStyle.border) then
+        globalVars.customStyle.border = table.vectorize4(globalVars.customStyle
+            .border)
+    end
     globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear)
 end
