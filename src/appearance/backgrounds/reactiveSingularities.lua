@@ -35,7 +35,8 @@ function renderReactiveSingularities()
     if (not truthy(#xList)) then
         createParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
     end
-    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, state.DeltaTime * (pulseStatus + 0.5))
+    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
+        state.DeltaTime * (clamp(getSVMultiplierAt(state.SongTime), -2, 2)))
 
     local lerp = function(w, l, h)
         return w * h + (1 - w) * l
