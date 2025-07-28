@@ -18,7 +18,7 @@ selectTypeIndex: 1
 placeTypeIndex: 1
 editToolIndex: 1
 showPresetMenu: false
-scrollGroupIndex: 1
+scrollGroupIndex: 9
 hideSVInfo: true
 showVibratoWidget: true
 showNoteDataWidget: true
@@ -74,7 +74,7 @@ customStyle:
   - 0
   - 0
   - 0
-  - 1
+  - 0.51764708757400513
   titleBgActive:
   - 0.11764705926179886
   - 0.015686275437474251
