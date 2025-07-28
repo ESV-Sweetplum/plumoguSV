@@ -3113,6 +3113,9 @@ function selectBySnap(menuVars)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
 function renderReactiveSingularities()
+    local imgui = imgui
+    local math = math
+    local state = state
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
