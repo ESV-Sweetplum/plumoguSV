@@ -1,3 +1,71 @@
+local customStyleIds = {
+    "windowBg",
+    "popupBg",
+    "border",
+    "frameBg",
+    "frameBgHovered",
+    "frameBgActive",
+    "titleBg",
+    "titleBgActive",
+    "titleBgCollapsed",
+    "checkMark",
+    "sliderGrab",
+    "sliderGrabActive",
+    "button",
+    "buttonHovered",
+    "buttonActive",
+    "tab",
+    "tabHovered",
+    "tabActive",
+    "header",
+    "headerHovered",
+    "headerActive",
+    "separator",
+    "text",
+    "textSelectedBg",
+    "scrollbarGrab",
+    "scrollbarGrabHovered",
+    "scrollbarGrabActive",
+    "plotLines",
+    "plotLinesHovered",
+    "plotHistogram",
+    "plotHistogramHovered",
+}
+
+local customStyleNames = {
+    "Window BG",
+    "Popup BG",
+    "Border",
+    "Frame BG",
+    "Frame BG (Hovered)",
+    "Frame BG (Active)",
+    "Title BG",
+    "Title BG (Active)",
+    "Title BG (Collapsed)",
+    "Checkmark",
+    "Slider Grab",
+    "Slider Grab (Active)",
+    "Button",
+    "Button (Hovered)",
+    "Button (Active)",
+    "Tab",
+    "Tab (Hovered)",
+    "Tab (Active)",
+    "Header",
+    "Header (Hovered)",
+    "Header (Active)",
+    "Separator",
+    "Text",
+    "Text Selected (BG)",
+    "Scrollbar Grab",
+    "Scrollbar Grab (Hovered)",
+    "Scrollbar Grab (Active)",
+    "Plot Lines",
+    "Plot Lines (Hovered)",
+    "Plot Histogram",
+    "Plot Histogram (Hovered)"
+}
+
 function showCustomThemeSettings()
     local settingsChanged = false
     imgui.SeparatorText("Custom Theme Actions")
@@ -30,54 +98,15 @@ function showCustomThemeSettings()
         end
     end
     imgui.SeparatorText("Search")
-    local searchText = state.GetValue("customTheme_searchText", "")
-    _, searchText = imgui.InputText("##CustomThemeSearch", searchText, 100)
+    imgui.PushItemWidth(imgui.GetWindowWidth() - 25)
+    local oldSearchText = state.GetValue("customTheme_searchText", "")
+    _, searchText = imgui.InputText("##CustomThemeSearch", oldSearchText, 100)
+    if (searchText ~= oldSearchText) then print("hi") end
     state.SetValue("customTheme_searchText", searchText)
-    settingsChanged = ColorInput(globalVars.customStyle, "windowBg", "Window BG") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "popupBg", "Popup BG") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "border", "Border") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "frameBg", "Frame BG") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "frameBgHovered", "Frame BG\n(Hovered)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "frameBgActive", "Frame BG\n(Active)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "titleBg", "Title BG") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "titleBgActive", "Title BG\n(Active)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "titleBgCollapsed", "Title BG\n(Collapsed)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "checkMark", "Checkmark") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "sliderGrab", "Slider Grab") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "sliderGrabActive", "Slider Grab\n(Active)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "button", "Button") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "buttonHovered", "Button\n(Hovered)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "buttonActive", "Button\n(Active)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "tab", "Tab") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "tabHovered", "Tab\n(Hovered)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "tabActive", "Tab\n(Active)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "header", "Header") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "headerHovered", "Header\n(Hovered)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "headerActive", "Header\n(Active)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "separator", "Separator") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "text", "Text") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "textSelectedBg", "Text Selected\n(BG)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "scrollbarGrab", "Scrollbar Grab") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "scrollbarGrabHovered", "Scrollbar Grab\n(Hovered)") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "scrollbarGrabActive", "Scrollbar Grab\n(Active)") or
-        settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "plotLines", "Plot Lines") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "plotLinesHovered", "Plot Lines\n(Hovered)") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "plotHistogram", "Plot Histogram") or settingsChanged
-    settingsChanged = ColorInput(globalVars.customStyle, "plotHistogramHovered", "Plot Histogram\n(Hovered)") or
-        settingsChanged
+    imgui.PopItemWidth()
+    for idx, id in ipairs(customStyleIds) do
+        settingsChanged = ColorInput(globalVars.customStyle, id, customStyleNames[idx]) or settingsChanged
+    end
     if (settingsChanged) then
         write(globalVars)
     end
