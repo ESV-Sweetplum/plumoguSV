@@ -37,52 +37,56 @@ local customStyleNames = {
     "Popup BG",
     "Border",
     "Frame BG",
-    "Frame BG (Hovered)",
-    "Frame BG (Active)",
+    "Frame BG\n(Hovered)",
+    "Frame BG\n(Active)",
     "Title BG",
-    "Title BG (Active)",
-    "Title BG (Collapsed)",
+    "Title BG\n(Active)",
+    "Title BG\n(Collapsed)",
     "Checkmark",
     "Slider Grab",
-    "Slider Grab (Active)",
+    "Slider Grab\n(Active)",
     "Button",
-    "Button (Hovered)",
-    "Button (Active)",
+    "Button\n(Hovered)",
+    "Button\n(Active)",
     "Tab",
-    "Tab (Hovered)",
-    "Tab (Active)",
+    "Tab\n(Hovered)",
+    "Tab\n(Active)",
     "Header",
-    "Header (Hovered)",
-    "Header (Active)",
+    "Header\n(Hovered)",
+    "Header\n(Active)",
     "Separator",
     "Text",
-    "Text Selected (BG)",
+    "Text Selected\n(BG)",
     "Scrollbar Grab",
-    "Scrollbar Grab (Hovered)",
-    "Scrollbar Grab (Active)",
+    "Scrollbar Grab\n(Hovered)",
+    "Scrollbar Grab\n(Active)",
     "Plot Lines",
-    "Plot Lines (Hovered)",
+    "Plot Lines\n(Hovered)",
     "Plot Histogram",
-    "Plot Histogram (Hovered)"
+    "Plot Histogram\n(Hovered)"
 }
 
 function showCustomThemeSettings()
     local settingsChanged = false
     imgui.SeparatorText("Custom Theme Actions")
+
     if (imgui.Button("Reset")) then
         globalVars.customStyle = table.duplicate(DEFAULT_STYLE)
         write()
     end
     KeepSameLine()
+
     if (imgui.Button("Import")) then
         state.SetValue("importingCustomTheme", true)
     end
     KeepSameLine()
+
     if (imgui.Button("Export")) then
         local str = stringifyCustomStyle(globalVars.customStyle)
         imgui.SetClipboardText(str)
         print("i!", "Exported custom theme to your clipboard.")
     end
+
     if (state.GetValue("importingCustomTheme")) then
         local input = state.GetValue("importingCustomThemeInput", "")
         _, input = imgui.InputText("##customThemeStr", input, 69420)
@@ -97,15 +101,19 @@ function showCustomThemeSettings()
             state.SetValue("importingCustomTheme", false)
         end
     end
+
     imgui.SeparatorText("Search")
     imgui.PushItemWidth(imgui.GetWindowWidth() - 25)
-    local oldSearchText = state.GetValue("customTheme_searchText", "")
-    _, searchText = imgui.InputText("##CustomThemeSearch", oldSearchText, 100)
-    if (searchText ~= oldSearchText) then print("hi") end
+    local searchText = state.GetValue("customTheme_searchText", "")
+    _, searchText = imgui.InputText("##CustomThemeSearch", searchText, 100)
     state.SetValue("customTheme_searchText", searchText)
     imgui.PopItemWidth()
+
     for idx, id in ipairs(customStyleIds) do
-        settingsChanged = ColorInput(globalVars.customStyle, id, customStyleNames[idx]) or settingsChanged
+        local name = customStyleNames[idx]
+        if (not name:lower():find(searchText:lower())) then goto skip end
+        settingsChanged = ColorInput(globalVars.customStyle, id, name) or settingsChanged
+        ::skip::
     end
     if (settingsChanged) then
         write(globalVars)
