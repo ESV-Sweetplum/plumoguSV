@@ -11,6 +11,8 @@ local RGB_SNAP_MAP = {
 }
 
 function renderSynthesis()
+    local circleSize = 10
+
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
@@ -28,8 +30,8 @@ function renderSynthesis()
 
     local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
 
-    if (#snapTable >= maxDim / 10) then
-        state.SetValue("synthesis_snapOffset", 5)
+    if (#snapTable >= (maxDim / 1.6) / circleSize) then
+        state.SetValue("synthesis_snapOffset", circleSize)
         table.remove(snapTable, 1)
     end
 
@@ -47,7 +49,7 @@ function renderSynthesis()
     for idx, snap in pairs(snapTable) do
         local colTbl = RGB_SNAP_MAP[snap]
 
-        ctx.AddCircle(dim / 2 + topLeft, 5 * (idx - 1) + snapOffset,
+        ctx.AddCircle(dim / 2 + topLeft, circleSize * (idx - 1) + snapOffset,
             rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
     end
 
