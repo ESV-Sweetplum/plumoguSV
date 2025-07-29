@@ -6,13 +6,14 @@ clock = {}
 function clock.listen(id, interval)
     local currentTime = state
         .UnixTime
-    if (not state.GetValue(table.concat({ "clock-", id }))) then
-        state.SetValue(table.concat({ "clock-", id }),
+    local stateId = table.concat({ "clock_", id })
+    if (not state.GetValue(stateId)) then
+        state.SetValue(stateId,
             currentTime)
     end
-    local previousExecutionTime = state.GetValue("clock-" .. id)
+    local previousExecutionTime = state.GetValue(stateId)
     if (currentTime - previousExecutionTime > interval) then
-        state.SetValue("clock-" .. id, currentTime)
+        state.SetValue(stateId, currentTime)
         return true
     end
     return false
@@ -4392,13 +4393,13 @@ function getCurrentRGBColors(rgbPeriod)
     return { red = red, green = green, blue = blue }
 end
 function pulseController()
-    local prevVal = state.GetValue("prevVal", 0)
+    local previousBar = state.GetValue("pulse_previousBar", 0)
     local pulseStatus = state.GetValue("pulseStatus", 0)
     local timeOffset = 50
-    local timeSinceLastPulse = ((state.SongTime + timeOffset) - getTimingPointAt(state.SongTime).StartTime) %
+    local timeSinceLastBar = ((state.SongTime + timeOffset) - getTimingPointAt(state.SongTime).StartTime) %
         ((60000 / getTimingPointAt(state.SongTime).Bpm))
     state.SetValue("pulsedThisFrame", false)
-    if ((timeSinceLastPulse < prevVal)) then
+    if ((timeSinceLastBar < previousBar)) then
         pulseStatus = 1
         state.SetValue("pulsedThisFrame", true)
     else
@@ -4409,7 +4410,7 @@ function pulseController()
         pulseStatus = 0
     end
     state.SetValue("pulseStatus", math.max(pulseStatus, 0))
-    state.SetValue("prevVal", timeSinceLastPulse)
+    state.SetValue("pulse_previousBar", timeSinceLastBar)
     pulseStatus = pulseStatus * (globalVars.pulseCoefficient or 0)
     local borderColor = state.GetValue("baseBorderColor") or vector4(1)
     local negatedBorderColor = vector4(1) - borderColor
@@ -8574,7 +8575,7 @@ function bezierSettingsMenu(settingVars, skipFinalSV, svPointsForce)
 end
 function provideBezierWebsiteLink(settingVars)
     local coordinateParsed = false
-    local bezierText = state.GetValue("bezierText") or "https://cubic-bezier.com/"
+    local bezierText = state.GetValue("bezier_text") or "https://cubic-bezier.com/"
     _, bezierText = imgui.InputText("##bezierWebsite", bezierText, 100, imgui_input_text_flags.AutoSelectAll)
     KeepSameLine()
     if imgui.Button("Parse##bezierValues", SECONDARY_BUTTON_SIZE) then
@@ -8590,7 +8591,7 @@ function provideBezierWebsiteLink(settingVars)
         end
         bezierText = "https://cubic-bezier.com/"
     end
-    state.SetValue("bezierText", bezierText)
+    state.SetValue("bezier_text", bezierText)
     HelpMarker(
         "This site lets you play around with a cubic bezier whose graph represents the motion/path of notes. After finding a good shape for note motion, paste the resulting url into the input box and hit the parse button to import the coordinate values. Alternatively, enter 4 numbers to use as the coordinates using the given inputs.")
     return coordinateParsed
@@ -8673,7 +8674,7 @@ function customSettingsMenu(settingVars, skipFinalSV, svPointsForce)
 end
 function importCustomSVs(settingVars)
     local svsParsed = false
-    local customSVText = state.GetValue("customSVText") or "Import SV values here"
+    local customSVText = state.GetValue("import_customText") or "Import SV values here"
     local imguiFlag = imgui_input_text_flags.AutoSelectAll
     _, customSVText = imgui.InputText("##customSVs", customSVText, 99999, imguiFlag)
     KeepSameLine()
@@ -8691,7 +8692,7 @@ function importCustomSVs(settingVars)
         end
         customSVText = "Import SV values here"
     end
-    state.SetValue("customSVText", customSVText)
+    state.SetValue("import_customText", customSVText)
     HelpMarker("Paste custom SV values in the box then hit the parse button (ex. 2 -1 2 -1)")
     return svsParsed
 end
@@ -8786,7 +8787,7 @@ end
 local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---Gets the snap color from a given time.
 ---@param time number The time to reference.
----@param dontPrintInaccuracy boolean If set to true, will not print warning messages on unconfident guesses.
+---@param dontPrintInaccuracy? boolean If set to true, will not print warning messages on unconfident guesses.
 ---@return SnapNumber
 function getSnapFromTime(time, dontPrintInaccuracy)
     local previousBar = map.GetNearestSnapTimeFromTime(false, 1, time)
@@ -8889,7 +8890,7 @@ function renderMeasureDataWidget()
     local startOffset = uniqueDict[1]
     local endOffset = uniqueDict[2] or uniqueDict[1]
     if (math.abs(endOffset - startOffset) < 1e-10) then return end
-    if (endOffset ~= state.GetValue("oldEndOffset", -69) or startOffset ~= state.GetValue("oldStartOffset", -69)) then
+    if (endOffset ~= state.GetValue("measure_oldEndOffset", -69) or startOffset ~= state.GetValue("measure_oldStartOffset", -69)) then
         svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
         nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
@@ -8911,6 +8912,6 @@ function renderMeasureDataWidget()
     imgui.Text(table.concat({"SV Distance = ", roundedSVDistance, " msx"}))
     imgui.Text(table.concat({"Avg SV = ", roundedAvgSV, "x"}))
     imgui.EndTooltip()
-    state.SetValue("oldStartOffset", startOffset)
-    state.SetValue("oldEndOffset", endOffset)
+    state.SetValue("measure_oldStartOffset", startOffset)
+    state.SetValue("measure_oldEndOffset", endOffset)
 end

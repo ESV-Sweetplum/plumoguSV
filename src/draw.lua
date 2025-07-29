@@ -69,7 +69,7 @@ function renderMeasureDataWidget()
     local startOffset = uniqueDict[1]
     local endOffset = uniqueDict[2] or uniqueDict[1]
     if (math.abs(endOffset - startOffset) < 1e-10) then return end
-    if (endOffset ~= state.GetValue("oldEndOffset", -69) or startOffset ~= state.GetValue("oldStartOffset", -69)) then
+    if (endOffset ~= state.GetValue("measure_oldEndOffset", -69) or startOffset ~= state.GetValue("measure_oldStartOffset", -69)) then
         svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
         nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
@@ -92,6 +92,6 @@ function renderMeasureDataWidget()
     imgui.Text("SV Distance = " .. roundedSVDistance .. " msx")
     imgui.Text("Avg SV = " .. roundedAvgSV .. "x")
     imgui.EndTooltip()
-    state.SetValue("oldStartOffset", startOffset)
-    state.SetValue("oldEndOffset", endOffset)
+    state.SetValue("measure_oldStartOffset", startOffset)
+    state.SetValue("measure_oldEndOffset", endOffset)
 end

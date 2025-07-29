@@ -7,13 +7,14 @@ clock = {}
 function clock.listen(id, interval)
     local currentTime = state
         .UnixTime -- Avoid calling state global multiple times, which causes a heavy load on performance
-    if (not state.GetValue(table.concat({ "clock-", id }))) then
-        state.SetValue(table.concat({ "clock-", id }),
+    local stateId = table.concat({ "clock_", id })
+    if (not state.GetValue(stateId)) then
+        state.SetValue(stateId,
             currentTime)
     end
-    local previousExecutionTime = state.GetValue("clock-" .. id)
+    local previousExecutionTime = state.GetValue(stateId)
     if (currentTime - previousExecutionTime > interval) then
-        state.SetValue("clock-" .. id, currentTime)
+        state.SetValue(stateId, currentTime)
         return true
     end
     return false

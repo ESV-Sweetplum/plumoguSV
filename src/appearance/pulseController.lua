@@ -1,14 +1,14 @@
 function pulseController()
-    local prevVal = state.GetValue("prevVal", 0)
+    local previousBar = state.GetValue("pulse_previousBar", 0)
     local pulseStatus = state.GetValue("pulseStatus", 0)
 
     local timeOffset = 50 -- [`state.SongTime`](lua://state.SongTime) isn't entirely accurate while the song is playing, so this aims to correct that.
 
-    local timeSinceLastPulse = ((state.SongTime + timeOffset) - getTimingPointAt(state.SongTime).StartTime) %
+    local timeSinceLastBar = ((state.SongTime + timeOffset) - getTimingPointAt(state.SongTime).StartTime) %
         ((60000 / getTimingPointAt(state.SongTime).Bpm))
 
     state.SetValue("pulsedThisFrame", false)
-    if ((timeSinceLastPulse < prevVal)) then
+    if ((timeSinceLastBar < previousBar)) then
         pulseStatus = 1
         state.SetValue("pulsedThisFrame", true)
     else
@@ -22,7 +22,7 @@ function pulseController()
     end
 
     state.SetValue("pulseStatus", math.max(pulseStatus, 0))
-    state.SetValue("prevVal", timeSinceLastPulse)
+    state.SetValue("pulse_previousBar", timeSinceLastBar)
 
     pulseStatus = pulseStatus * (globalVars.pulseCoefficient or 0)
 

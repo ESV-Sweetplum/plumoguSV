@@ -11,7 +11,7 @@ end
 
 function provideBezierWebsiteLink(settingVars)
     local coordinateParsed = false
-    local bezierText = state.GetValue("bezierText") or "https://cubic-bezier.com/"
+    local bezierText = state.GetValue("bezier_text") or "https://cubic-bezier.com/"
     _, bezierText = imgui.InputText("##bezierWebsite", bezierText, 100, imgui_input_text_flags.AutoSelectAll)
     KeepSameLine()
     if imgui.Button("Parse##bezierValues", SECONDARY_BUTTON_SIZE) then
@@ -27,7 +27,7 @@ function provideBezierWebsiteLink(settingVars)
         end
         bezierText = "https://cubic-bezier.com/"
     end
-    state.SetValue("bezierText", bezierText)
+    state.SetValue("bezier_text", bezierText)
     HelpMarker(
         "This site lets you play around with a cubic bezier whose graph represents the motion/path of notes. After finding a good shape for note motion, paste the resulting url into the input box and hit the parse button to import the coordinate values. Alternatively, enter 4 numbers to use as the coordinates using the given inputs.")
     return coordinateParsed
