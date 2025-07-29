@@ -1,9 +1,10 @@
 local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 
 ---Gets the snap color from a given time.
----@param time number # The time to reference.
+---@param time number The time to reference.
+---@param dontPrintInaccuracy boolean If set to true, will not print warning messages on unconfident guesses.
 ---@return SnapNumber
-function getSnapFromTime(time)
+function getSnapFromTime(time, dontPrintInaccuracy)
     local previousBar = map.GetNearestSnapTimeFromTime(false, 1, time)
     local barTime = 60000 / getTimingPointAt(time).Bpm
 
@@ -23,7 +24,7 @@ function getSnapFromTime(time)
         local approximateError = math.abs(guessedSnap - currentSnap) / currentSnap
 
         if (approximateError < 0.05) then
-            if (approximateError > 0.03) then
+            if (approximateError > 0.03 and not dontPrintInaccuracy) then
                 print("w!",
                     "The snap for the note at time " ..
                     time .. " could be incorrect (confidence < 97%). Please double check to see if it's correct.")

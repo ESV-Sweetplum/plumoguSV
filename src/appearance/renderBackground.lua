@@ -9,5 +9,6 @@
 
 function renderBackground()
     -- renderReactiveStars()
-    renderReactiveSingularities()
+    -- renderReactiveSingularities()
+    renderSynthesis()
 end

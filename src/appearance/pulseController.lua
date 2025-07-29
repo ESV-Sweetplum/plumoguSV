@@ -7,9 +7,10 @@ function pulseController()
     local timeSinceLastPulse = ((state.SongTime + timeOffset) - getTimingPointAt(state.SongTime).StartTime) %
         ((60000 / getTimingPointAt(state.SongTime).Bpm))
 
-
+    state.SetValue("pulsedThisFrame", false)
     if ((timeSinceLastPulse < prevVal)) then
         pulseStatus = 1
+        state.SetValue("pulsedThisFrame", true)
     else
         pulseStatus = (pulseStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm) * 1.2)
     end

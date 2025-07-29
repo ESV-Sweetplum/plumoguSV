@@ -10,11 +10,7 @@ function alignTimingLines()
     local mspb = 60000 / bpm
     local msptl = mspb * signature
 
-    local noteTimes = {}
-
-    for _, n in ipairs(map.HitObjects) do
-        table.insert(noteTimes, n.StartTime)
-    end
+    local noteTimes = table.property(map.HitObjects, "StartTime")
 
     local times = {}
     local timingpoints = {}

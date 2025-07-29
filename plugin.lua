@@ -459,8 +459,9 @@ end
 ---In an array of numbers, searches for the closest number to `item`.
 ---@param tbl number[] The array of numbers to search in.
 ---@param item number The number to search for.
+---@param searchMode? 0|1|2 `0`: Search before and after. `1`: Search only before. `2`: Search only after.
 ---@return number num, integer index The number that is the closest to the given item, and the index of that number in the given table.
-function table.searchClosest(tbl, item)
+function table.searchClosest(tbl, item, searchMode)
     local leftIdx = 1
     local rightIdx = #tbl
     while rightIdx - leftIdx > 1 do
@@ -473,7 +474,7 @@ function table.searchClosest(tbl, item)
     end
     local leftDifference = item - tbl[leftIdx]
     local rightDifference = tbl[rightIdx] - item
-    if (leftDifference < rightDifference) then
+    if ((leftDifference < rightDifference or searchMode == 1) and searchMode ~= 2) then
         return tbl[leftIdx], leftIdx
     else
         return tbl[rightIdx], rightIdx
@@ -2113,10 +2114,7 @@ function alignTimingLines()
     local bpm = currentTP.Bpm
     local mspb = 60000 / bpm
     local msptl = mspb * signature
-    local noteTimes = {}
-    for _, n in ipairs(map.HitObjects) do
-        noteTimes[#noteTimes + 1] = n.StartTime
-    end
+    local noteTimes = table.property(map.HitObjects, "StartTime")
     local times = {}
     local timingpoints = {}
     for time = starttime, endtime, msptl do
@@ -2934,11 +2932,11 @@ function changeNoteLockMode()
     end
     if (mode == 2) then
         print("w",
-            "Notes can no longer be placed, only moved. To change the lock mode, press" .. globalVars.hotkeyList[10])
+            "Notes can no longer be placed, only moved. To change the lock mode, press " .. globalVars.hotkeyList[10])
     end
     if (mode == 3) then
         print("w",
-            "Notes can no longer be moved, only placed and deleted. To change the lock mode, press" ..
+            "Notes can no longer be moved, only placed and deleted. To change the lock mode, press " ..
             globalVars.hotkeyList[10])
     end
     state.SetValue("note-lock-mode", mode)
@@ -3118,62 +3116,6 @@ function selectBySnap(menuVars)
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
-function renderReactiveSingularities()
-    local imgui = imgui
-    local math = math
-    local state = state
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    local dimX = dim.x
-    local dimY = dim.y
-    local sqrt = math.sqrt
-    local clamp = math.clamp
-    local xList = state.GetValue("xList", {})
-    local yList = state.GetValue("yList", {})
-    local vxList = state.GetValue("vxList", {})
-    local vyList = state.GetValue("vyList", {})
-    local axList = state.GetValue("axList", {})
-    local ayList = state.GetValue("ayList", {})
-    local pulseStatus = state.GetValue("pulseStatus", 0)
-    local slowSpeedR = 89
-    local slowSpeedG = 0
-    local slowSpeedB = 255
-    local fastSpeedR = 255
-    local fastSpeedG = 165
-    local fastSpeedB = 117
-    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
-    createParticle(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
-    local speed = clamp(math.abs(getSVMultiplierAt(state.SongTime)), 0, 4)
-    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
-        state.DeltaTime * speed)
-    local lerp = function(w, l, h)
-        return w * h + (1 - w) * l
-    end
-    for i = 1, #xList do
-        local x = xList[i]
-        local y = yList[i]
-        local vx = vxList[i]
-        local vy = vyList[i]
-        local s = sqrt(vx ^ 2 + vy ^ 2)
-        local clampedSpeed = clamp(s / 5, 0, 1)
-        local r = lerp(clampedSpeed, slowSpeedR, fastSpeedR)
-        local g = lerp(clampedSpeed, slowSpeedG, fastSpeedG)
-        local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
-        local pos = { x + topLeft.x, y + topLeft.y }
-        ctx.AddCircleFilled(pos, 2,
-            rgbaToUint(r, g, b, 55 + pulseStatus * 200))
-    end
-    ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
-    ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
-    ctx.AddCircle(dim / 2 + topLeft, 24 - pulseStatus * 8, 16777215 + math.floor(pulseStatus * 255) * 16777216)
-    state.SetValue("xList", xList)
-    state.SetValue("yList", yList)
-    state.SetValue("vxList", vxList)
-    state.SetValue("vyList", vyList)
-    state.SetValue("axList", axList)
-    state.SetValue("ayList", ayList)
-end
 function createParticle(x, y, vx, vy, ax, ay, dimX, dimY, n)
     if (#x >= 150) then return end
     x[#x + 1] = math.random() * dimX
@@ -3245,6 +3187,48 @@ function updateStars()
                 math.clamp(2 * getSVMultiplierAt(state.SongTime), -50, 50)
         end
     end
+end
+local RGB_SNAP_MAP = {
+    [1] = { 255, 0, 0 },
+    [2] = { 0, 0, 255 },
+    [3] = { 120, 0, 255 },
+    [4] = { 255, 255, 0 },
+    [5] = { 255, 255, 255 },
+    [6] = { 255, 0, 255 },
+    [8] = { 255, 120, 0 },
+    [12] = { 0, 120, 255 },
+    [16] = { 0, 255, 0 },
+}
+function renderSynthesis()
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    local maxDim = math.sqrt(dim.x ^ 2 + dim.y ^ 2)
+    local curTime = state.SongTime
+    local tl = getTimingPointAt(curTime)
+    local msptl = 60000 / tl.Bpm * math.toNumber(tl.Signature)
+    local snapTable = state.GetValue("synthesis_snapTable", {})
+    local pulseCount = state.GetValue("synthesis_pulseCount", 0)
+    local mostRecentStart = getHitObjectStartTimeAt(curTime)
+    local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
+    if (#snapTable >= maxDim / 10) then
+        state.SetValue("synthesis_snapOffset", 5)
+        table.remove(snapTable, 1)
+    end
+    local snapOffset = state.GetValue("synthesis_snapOffset", 0)
+    snapOffset = snapOffset * 0.95
+    local lastDifference = state.GetValue("synthesis_lastDifference", 0)
+    if (curTime - mostRecentStart < lastDifference) then
+        table.insert(snapTable, getSnapFromTime(mostRecentStart, true))
+    end
+    state.SetValue("synthesis_lastDifference", curTime - mostRecentStart)
+    state.SetValue("synthesis_snapTable", snapTable)
+    for idx, snap in pairs(snapTable) do
+        local colTbl = RGB_SNAP_MAP[snap]
+        ctx.AddCircle(dim / 2 + topLeft, 5 * (idx - 1) + snapOffset,
+            rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
+    end
+    state.SetValue("synthesis_snapOffset", snapOffset)
 end
 function drawCapybaraParent()
     drawCapybara()
@@ -4388,8 +4372,10 @@ function pulseController()
     local timeOffset = 50
     local timeSinceLastPulse = ((state.SongTime + timeOffset) - getTimingPointAt(state.SongTime).StartTime) %
         ((60000 / getTimingPointAt(state.SongTime).Bpm))
+    state.SetValue("pulsedThisFrame", false)
     if ((timeSinceLastPulse < prevVal)) then
         pulseStatus = 1
+        state.SetValue("pulsedThisFrame", true)
     else
         pulseStatus = (pulseStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm) * 1.2)
     end
@@ -4413,7 +4399,7 @@ end
 ---@field col Vector4
 ---@field size integer
 function renderBackground()
-    renderReactiveSingularities()
+    renderSynthesis()
 end
 function setPluginAppearance()
     local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
@@ -8073,6 +8059,14 @@ function getTimingPointAt(offset)
     if line then return line end
     return { StartTime = -69420, Bpm = 42.69 }
 end
+function getHitObjectStartTimeAt(offset, forward)
+    local startTimes = state.GetValue("hoStartTimes", {})
+    if (not truthy(#startTimes)) then return -1 end
+    if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
+    if (state.SongTime < startTimes[1]) then return startTimes[1] end
+    local startTime = table.searchClosest(startTimes, offset, forward and 2 or 1)
+    return startTime
+end
 ---Returns a list of [hit objects](lua://HitObject) between two times, inclusive.
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
@@ -8766,9 +8760,10 @@ function sinusoidalSettingsMenu(settingVars, skipFinalSV)
 end
 local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---Gets the snap color from a given time.
----@param time number # The time to reference.
+---@param time number The time to reference.
+---@param dontPrintInaccuracy boolean If set to true, will not print warning messages on unconfident guesses.
 ---@return SnapNumber
-function getSnapFromTime(time)
+function getSnapFromTime(time, dontPrintInaccuracy)
     local previousBar = map.GetNearestSnapTimeFromTime(false, 1, time)
     local barTime = 60000 / getTimingPointAt(time).Bpm
     local distance = time - previousBar
@@ -8780,7 +8775,7 @@ function getSnapFromTime(time)
         guessedSnap = table.searchClosest(SPECIAL_SNAPS, currentSnap)
         local approximateError = math.abs(guessedSnap - currentSnap) / currentSnap
         if (approximateError < 0.05) then
-            if (approximateError > 0.03) then
+            if (approximateError > 0.03 and not dontPrintInaccuracy) then
                 print("w!",
                     "The snap for the note at time " ..
                     time .. " could be incorrect (confidence < 97%). Please double check to see if it's correct.")
@@ -8799,7 +8794,16 @@ function awake()
     loadDefaultProperties(tempGlobalVars.defaultProperties)
     setPresets(tempGlobalVars.presets or {})
     initializeNoteLockMode()
+    listenForHitObjectChanges()
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
+end
+function listenForHitObjectChanges()
+    state.SetValue("hoStartTimes", table.dedupe(table.property(map.HitObjects, "StartTime")))
+    listen(function(action, type, fromLua)
+        if (fromLua) then return end
+        if (tonumber(action.Type) > 9) then return end
+        state.SetValue("hoStartTimes", table.dedupe(table.property(map.HitObjects, "StartTime")))
+    end)
 end
 function draw()
     state.SetValue("ComputableInputFloatIndex", 1)
@@ -8820,6 +8824,7 @@ function draw()
         imgui.Begin("plumoguSV-Vibrato", imgui_window_flags.AlwaysAutoResize)
         imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
         placeVibratoSVMenu(true)
+        renderBackground()
         imgui.End()
     end
     if (globalVars.showNoteDataWidget) then
