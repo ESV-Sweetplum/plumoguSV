@@ -47,8 +47,8 @@ function renderReactiveSingularities()
         local y = yList[i]
         local vx = vxList[i]
         local vy = vyList[i]
-        local ax = axList[i]
-        local ay = ayList[i]
+        -- local ax = axList[i]
+        -- local ay = ayList[i]
 
         local s = sqrt(vx ^ 2 + vy ^ 2)
         local clampedSpeed = clamp(s / 5, 0, 1)
