@@ -222,10 +222,7 @@ function drawCapybara312()
     local o = imgui.GetForegroundDrawList()
     --local sz = state.WindowSize
     local rgbColors = getCurrentRGBColors(globalVars.rgbPeriod)
-    local redRounded = math.round(255 * rgbColors.red, 0)
-    local greenRounded = math.round(255 * rgbColors.green, 0)
-    local blueRounded = math.round(255 * rgbColors.blue, 0)
-    local outlineColor = rgbaToUint(redRounded, greenRounded, blueRounded, 255)
+    local outlineColor = rgbaToUint(rgbColors.red, rgbColors.green, rgbColors.blue, 255)
 
     local p1 = vector.New(42, 32)
     local p2 = vector.New(100, 78)

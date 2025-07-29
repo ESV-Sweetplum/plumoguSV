@@ -185,9 +185,6 @@ end
 --    dustSize      : size of a dust particle [Int/Float]
 function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustSize)
     local currentRGBColors = getCurrentRGBColors(rgbPeriod)
-    local currentRed = math.round(255 * currentRGBColors.red, 0)
-    local currentGreen = math.round(255 * currentRGBColors.green, 0)
-    local currentBlue = math.round(255 * currentRGBColors.blue, 0)
     for i = 1, #dustParticles do
         local dustParticle = dustParticles[i]
         if dustParticle.showParticle then
@@ -197,7 +194,7 @@ function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustS
             local dustY = dustParticle.y + dy
             local dustCoords = vector.New(dustX, dustY)
             local alpha = math.round(255 * (1 - time), 0)
-            local dustColor = rgbaToUint(currentRed, currentGreen, currentBlue, alpha)
+            local dustColor = rgbaToUint(currentRGBColors.red, currentRGBColors.green, currentRGBColors.blue, alpha)
             o.AddCircleFilled(dustCoords, dustSize, dustColor)
         end
     end

@@ -57,7 +57,7 @@ function renderReactiveSingularities()
         local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
         local pos = { x + topLeft.x, y + topLeft.y }
         ctx.AddCircleFilled(pos, 2,
-            rgbaToUint(r, g, b, 55 + math.floor(pulseStatus * 200)))
+            rgbaToUint(r, g, b, 55 + pulseStatus * 200))
     end
 
     ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)

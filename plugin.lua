@@ -3162,7 +3162,7 @@ function renderReactiveSingularities()
         local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
         local pos = { x + topLeft.x, y + topLeft.y }
         ctx.AddCircleFilled(pos, 2,
-            rgbaToUint(r, g, b, 55 + math.floor(pulseStatus * 200)))
+            rgbaToUint(r, g, b, 55 + pulseStatus * 200))
     end
     ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
     ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
@@ -3441,10 +3441,7 @@ function drawCapybara312()
     if not globalVars.drawCapybara312 then return end
     local o = imgui.GetForegroundDrawList()
     local rgbColors = getCurrentRGBColors(globalVars.rgbPeriod)
-    local redRounded = math.round(255 * rgbColors.red, 0)
-    local greenRounded = math.round(255 * rgbColors.green, 0)
-    local blueRounded = math.round(255 * rgbColors.blue, 0)
-    local outlineColor = rgbaToUint(redRounded, greenRounded, blueRounded, 255)
+    local outlineColor = rgbaToUint(rgbColors.red, rgbColors.green, rgbColors.blue, 255)
     local p1 = vector.New(42, 32)
     local p2 = vector.New(100, 78)
     local p3 = vector.New(141, 32)
@@ -3621,9 +3618,6 @@ function updateDustParticles(t, m, dustParticles, dustDuration, dustSize)
 end
 function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustSize)
     local currentRGBColors = getCurrentRGBColors(rgbPeriod)
-    local currentRed = math.round(255 * currentRGBColors.red, 0)
-    local currentGreen = math.round(255 * currentRGBColors.green, 0)
-    local currentBlue = math.round(255 * currentRGBColors.blue, 0)
     for i = 1, #dustParticles do
         local dustParticle = dustParticles[i]
         if dustParticle.showParticle then
@@ -3633,7 +3627,7 @@ function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustS
             local dustY = dustParticle.y + dy
             local dustCoords = vector.New(dustX, dustY)
             local alpha = math.round(255 * (1 - time), 0)
-            local dustColor = rgbaToUint(currentRed, currentGreen, currentBlue, alpha)
+            local dustColor = rgbaToUint(currentRGBColors.red, currentRGBColors.green, currentRGBColors.blue, alpha)
             o.AddCircleFilled(dustCoords, dustSize, dustColor)
         end
     end
