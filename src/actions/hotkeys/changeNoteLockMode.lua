@@ -9,11 +9,11 @@ function changeNoteLockMode()
     end
     if (mode == 2) then
         print("w",
-            "Notes can no longer be placed, only moved. To change the lock mode, press" .. globalVars.hotkeyList[10])
+            "Notes can no longer be placed, only moved. To change the lock mode, press " .. globalVars.hotkeyList[10])
     end
     if (mode == 3) then
         print("w",
-            "Notes can no longer be moved, only placed and deleted. To change the lock mode, press" ..
+            "Notes can no longer be moved, only placed and deleted. To change the lock mode, press " ..
             globalVars.hotkeyList[10])
     end
     state.SetValue("note-lock-mode", mode)
