@@ -16,7 +16,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
         colorList[newListIndex]:gsub("(%d+)", function(c)
             table.insert(rgb, c)
         end)
-        local alpha = globalVars.customStyle.text.w or 1
+        local alpha = math.floor(imgui.GetColorU32(imgui_col.Text) / 16777216) / 255 or 1
         imgui.PushStyleColor(imgui_col.Text,
             vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, alpha))
     end
