@@ -46,6 +46,7 @@ Also, some cursor effects were inspired (stolen) from https://github.com/tholman
 
 ## Support
 If you want any custom features or rush orders, check out the link below.
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X11IU1C3)
 
 ## TO-DO
