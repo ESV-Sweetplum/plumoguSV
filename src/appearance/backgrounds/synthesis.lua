@@ -36,7 +36,9 @@ function renderSynthesis()
     end
 
     local snapOffset = state.GetValue("synthesis_snapOffset", 0)
-    snapOffset = snapOffset * 0.95
+    if (snapOffset > 0.001) then
+        snapOffset = snapOffset * 0.99 ^ state.DeltaTime
+    end
 
     local lastDifference = state.GetValue("synthesis_lastDifference", 0)
     if (curTime - mostRecentStart < lastDifference) then

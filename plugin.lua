@@ -3116,6 +3116,62 @@ function selectBySnap(menuVars)
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
+function renderReactiveSingularities()
+    local imgui = imgui
+    local math = math
+    local state = state
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    local dimX = dim.x
+    local dimY = dim.y
+    local sqrt = math.sqrt
+    local clamp = math.clamp
+    local xList = state.GetValue("xList", {})
+    local yList = state.GetValue("yList", {})
+    local vxList = state.GetValue("vxList", {})
+    local vyList = state.GetValue("vyList", {})
+    local axList = state.GetValue("axList", {})
+    local ayList = state.GetValue("ayList", {})
+    local pulseStatus = state.GetValue("pulseStatus", 0)
+    local slowSpeedR = 89
+    local slowSpeedG = 0
+    local slowSpeedB = 255
+    local fastSpeedR = 255
+    local fastSpeedG = 165
+    local fastSpeedB = 117
+    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
+    createParticle(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
+    local speed = clamp(math.abs(getSVMultiplierAt(state.SongTime)), 0, 4)
+    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
+        state.DeltaTime * speed)
+    local lerp = function(w, l, h)
+        return w * h + (1 - w) * l
+    end
+    for i = 1, #xList do
+        local x = xList[i]
+        local y = yList[i]
+        local vx = vxList[i]
+        local vy = vyList[i]
+        local s = sqrt(vx ^ 2 + vy ^ 2)
+        local clampedSpeed = clamp(s / 5, 0, 1)
+        local r = lerp(clampedSpeed, slowSpeedR, fastSpeedR)
+        local g = lerp(clampedSpeed, slowSpeedG, fastSpeedG)
+        local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
+        local pos = { x + topLeft.x, y + topLeft.y }
+        ctx.AddCircleFilled(pos, 2,
+            rgbaToUint(r, g, b, 55 + pulseStatus * 200))
+    end
+    ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
+    ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
+    ctx.AddCircle(dim / 2 + topLeft, 24 - pulseStatus * 8, 16777215 + math.floor(pulseStatus * 255) * 16777216)
+    state.SetValue("xList", xList)
+    state.SetValue("yList", yList)
+    state.SetValue("vxList", vxList)
+    state.SetValue("vyList", vyList)
+    state.SetValue("axList", axList)
+    state.SetValue("ayList", ayList)
+end
 function createParticle(x, y, vx, vy, ax, ay, dimX, dimY, n)
     if (#x >= 150) then return end
     x[#x + 1] = math.random() * dimX
@@ -3199,38 +3255,6 @@ local RGB_SNAP_MAP = {
     [12] = { 0, 120, 255 },
     [16] = { 0, 255, 0 },
 }
-function renderSynthesis()
-    local circleSize = 10
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    local maxDim = math.sqrt(dim.x ^ 2 + dim.y ^ 2)
-    local curTime = state.SongTime
-    local tl = getTimingPointAt(curTime)
-    local msptl = 60000 / tl.Bpm * math.toNumber(tl.Signature)
-    local snapTable = state.GetValue("synthesis_snapTable", {})
-    local pulseCount = state.GetValue("synthesis_pulseCount", 0)
-    local mostRecentStart = getHitObjectStartTimeAt(curTime)
-    local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
-    if (#snapTable >= (maxDim / 1.6) / circleSize) then
-        state.SetValue("synthesis_snapOffset", circleSize)
-        table.remove(snapTable, 1)
-    end
-    local snapOffset = state.GetValue("synthesis_snapOffset", 0)
-    snapOffset = snapOffset * 0.95
-    local lastDifference = state.GetValue("synthesis_lastDifference", 0)
-    if (curTime - mostRecentStart < lastDifference) then
-        table.insert(snapTable, getSnapFromTime(mostRecentStart, true))
-    end
-    state.SetValue("synthesis_lastDifference", curTime - mostRecentStart)
-    state.SetValue("synthesis_snapTable", snapTable)
-    for idx, snap in pairs(snapTable) do
-        local colTbl = RGB_SNAP_MAP[snap]
-        ctx.AddCircle(dim / 2 + topLeft, circleSize * (idx - 1) + snapOffset,
-            rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
-    end
-    state.SetValue("synthesis_snapOffset", snapOffset)
-end
 function drawCapybaraParent()
     drawCapybara()
     drawCapybara2()
@@ -4400,7 +4424,7 @@ end
 ---@field col Vector4
 ---@field size integer
 function renderBackground()
-    renderSynthesis()
+    renderReactiveSingularities()
 end
 function setPluginAppearance()
     local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
@@ -8824,7 +8848,6 @@ function draw()
         imgui.Begin("plumoguSV-Vibrato", imgui_window_flags.AlwaysAutoResize)
         imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
         placeVibratoSVMenu(true)
-        renderBackground()
         imgui.End()
     end
     if (globalVars.showNoteDataWidget) then
