@@ -15,7 +15,6 @@ function listenForHitObjectChanges()
     state.SetValue("hoStartTimes", table.dedupe(table.property(map.HitObjects, "StartTime")))
 
     listen(function(action, type, fromLua)
-        if (fromLua) then return end
         if (tonumber(action.Type) > 9) then return end
 
         state.SetValue("hoStartTimes", table.dedupe(table.property(map.HitObjects, "StartTime")))
