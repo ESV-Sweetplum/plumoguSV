@@ -1,5 +1,5 @@
 function ssfVibrato(menuVars, func1, func2)
-    local offsets = uniqueSelectedNoteOffsets()
+    local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startTime = offsets[1]
     local endTime = offsets[#offsets]

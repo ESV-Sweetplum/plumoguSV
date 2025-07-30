@@ -5,7 +5,7 @@ function displaceNotesForAnimationFrames(settingVars)
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local selectedStartTime = uniqueSelectedNoteOffsets()[1]
+    local selectedStartTime = game.uniqueSelectedNoteOffsets()[1]
     local firstFrameTimeTime = settingVars.frameTimes[1].time
     local lastFrameTimeTime = settingVars.frameTimes[#settingVars.frameTimes].time
     local firstOffset = math.min(selectedStartTime, firstFrameTimeTime)

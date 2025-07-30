@@ -3,7 +3,7 @@ function displaceNoteSVsParent(menuVars)
         displaceNoteSVs(menuVars)
         return
     end
-    local offsets = uniqueSelectedNoteOffsets()
+    local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local svsToRemove = {}
     local svsToAdd = {}
@@ -26,7 +26,7 @@ function displaceNoteSVs(menuVars, place, optionalOffset)
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local offsets = uniqueSelectedNoteOffsets()
+    local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return { svsToRemove = {}, svsToAdd = {} } end
     if (place == false) then offsets = { optionalOffset } end
     local startOffset = offsets[1]

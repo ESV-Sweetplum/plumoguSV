@@ -1,5 +1,5 @@
 function updateDirectEdit()
-    local offsets = uniqueSelectedNoteOffsets()
+    local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]

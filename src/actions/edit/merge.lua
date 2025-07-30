@@ -1,5 +1,5 @@
 function mergeSVs()
-    local offsets = uniqueSelectedNoteOffsets()
+    local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]

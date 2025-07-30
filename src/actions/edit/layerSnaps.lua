@@ -26,7 +26,8 @@ REVERSE_COLOR_MAP = {
 function layerSnaps()
     local layerDict = {}
     local layerNames = table.property(map.EditorLayers, "Name")
-    for _, ho in ipairs(uniqueNotesBetweenSelected()) do
+    local notes = game.uniqueNotesBetweenSelected()
+    for _, ho in ipairs(notes) do
         local color = COLOR_MAP[game.getSnapAt(ho.StartTime)]
         if (ho.EditorLayer == 0) then
             layer = { Name = "Default", ColorRgb = "255,255,255", Hidden = false }

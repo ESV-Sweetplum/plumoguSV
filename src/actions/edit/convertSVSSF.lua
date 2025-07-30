@@ -1,5 +1,5 @@
 function convertSVSSF(menuVars)
-    local offsets = uniqueSelectedNoteOffsets()
+    local offsets = game.uniqueSelectedNoteOffsets()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local objects = {}

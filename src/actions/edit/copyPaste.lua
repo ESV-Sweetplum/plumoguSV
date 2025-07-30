@@ -1,11 +1,15 @@
 function copyItems(menuVars)
     clearCopiedItems(menuVars)
-    local offsets = uniqueSelectedNoteOffsets()
+    local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     if (not menuVars.copyTable[1]) then goto continue1 end
-    for _, line in ipairs(game.getLinesBetweenOffsets(startOffset, endOffset)) do
+    local lines = game.getLinesBetweenOffsets(startOffset, endOffset)
+    local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset)
+    local bms = game.getBookmarksBetweenOffsets(startOffset, endOffset)
+    for _, line in ipairs(lines) do
         local copiedLine = {
             relativeOffset = line.StartTime - startOffset,
             bpm = line.Bpm,
@@ -16,7 +20,7 @@ function copyItems(menuVars)
     end
     ::continue1::
     if (not menuVars.copyTable[2]) then goto continue2 end
-    for _, sv in ipairs(game.getSVsBetweenOffsets(startOffset, endOffset)) do
+    for _, sv in ipairs(svs) do
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
             multiplier = sv.Multiplier
@@ -25,7 +29,7 @@ function copyItems(menuVars)
     end
     ::continue2::
     if (not menuVars.copyTable[3]) then goto continue3 end
-    for _, ssf in ipairs(game.getSSFsBetweenOffsets(startOffset, endOffset)) do
+    for _, ssf in ipairs(ssfs) do
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
             multiplier = ssf.Multiplier
@@ -34,7 +38,7 @@ function copyItems(menuVars)
     end
     ::continue3::
     if (not menuVars.copyTable[4]) then goto continue4 end
-    for _, bm in ipairs(game.getBookmarksBetweenOffsets(startOffset, endOffset)) do
+    for _, bm in ipairs(bms) do
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
             note = bm.Note
@@ -70,7 +74,7 @@ function clearCopiedItems(menuVars)
 end
 
 function pasteItems(menuVars)
-    local offsets = uniqueSelectedNoteOffsets()
+    local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]

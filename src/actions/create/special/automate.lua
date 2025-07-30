@@ -1,6 +1,6 @@
 function automateCopySVs(settingVars)
     settingVars.copiedSVs = {}
-    local offsets = uniqueSelectedNoteOffsets()
+    local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -10,7 +10,8 @@ function automateCopySVs(settingVars)
         return
     end
     local firstSVTime = svs[1].StartTime
-    for _, sv in ipairs(game.getSVsBetweenOffsets(startOffset, endOffset)) do
+    local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
+    for _, sv in ipairs(svs) do
         local copiedSV = {
             relativeOffset = sv.StartTime - firstSVTime,
             multiplier = sv.Multiplier

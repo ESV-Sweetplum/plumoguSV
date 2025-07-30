@@ -2,7 +2,7 @@
 ---@param includeLN? boolean
 ---@return number[]
 function game.uniqueNoteOffsetsBetweenSelected(includeLN)
-    local selectedNoteOffsets = uniqueSelectedNoteOffsets()
+    local selectedNoteOffsets = game.uniqueSelectedNoteOffsets()
     if (not selectedNoteOffsets) then
         toggleablePrint("e!",
             "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
@@ -21,7 +21,7 @@ end
 
 ---Returns a list of unique offsets (in increasing order) of selected notes [Table]
 ---@return number[]
-function uniqueSelectedNoteOffsets()
+function game.uniqueSelectedNoteOffsets()
     local offsets = {}
     for i, ho in pairs(state.SelectedHitObjects) do
         offsets[i] = ho.StartTime
@@ -32,8 +32,8 @@ function uniqueSelectedNoteOffsets()
     return offsets
 end
 
-function uniqueNotesBetweenSelected()
-    local selectedNoteOffsets = uniqueSelectedNoteOffsets()
+function game.uniqueNotesBetweenSelected()
+    local selectedNoteOffsets = game.uniqueSelectedNoteOffsets()
     if (not selectedNoteOffsets) then
         toggleablePrint("e!",
             "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")

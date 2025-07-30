@@ -6,7 +6,7 @@ function placeStutterSVs(settingVars)
         lastFirstStutter = settingVars.endSV
         lastMultiplier = settingVars.svMultipliers2[3]
     end
-    local offsets = uniqueSelectedNoteOffsets()
+    local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
@@ -46,7 +46,7 @@ function placeStutterSSFs(settingVars)
         lastFirstStutter = settingVars.endSV
         lastMultiplier = settingVars.svMultipliers2[3]
     end
-    local offsets = uniqueSelectedNoteOffsets()
+    local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]

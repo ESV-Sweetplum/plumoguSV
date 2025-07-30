@@ -3,7 +3,7 @@ function changeGroups(menuVars)
         print("w!", "Moving from one timing group to the same timing group will do nothing.")
         return
     end
-    local offsets = uniqueSelectedNoteOffsets()
+    local offsets = game.uniqueSelectedNoteOffsets()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
 
