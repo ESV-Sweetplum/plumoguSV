@@ -17,5 +17,6 @@ function clock.listen(id, interval)
         state.SetValue(stateId, currentTime)
         return true
     end
+
     return false
 end

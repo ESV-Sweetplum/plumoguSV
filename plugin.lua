@@ -3117,62 +3117,6 @@ function selectBySnap(menuVars)
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
-function renderReactiveSingularities()
-    local imgui = imgui
-    local math = math
-    local state = state
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    local dimX = dim.x
-    local dimY = dim.y
-    local sqrt = math.sqrt
-    local clamp = math.clamp
-    local xList = state.GetValue("xList", {})
-    local yList = state.GetValue("yList", {})
-    local vxList = state.GetValue("vxList", {})
-    local vyList = state.GetValue("vyList", {})
-    local axList = state.GetValue("axList", {})
-    local ayList = state.GetValue("ayList", {})
-    local pulseStatus = state.GetValue("pulseStatus", 0)
-    local slowSpeedR = 89
-    local slowSpeedG = 0
-    local slowSpeedB = 255
-    local fastSpeedR = 255
-    local fastSpeedG = 165
-    local fastSpeedB = 117
-    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
-    createParticle(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
-    local speed = clamp(math.abs(getSVMultiplierAt(state.SongTime)), 0, 4)
-    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
-        state.DeltaTime * speed)
-    local lerp = function(w, l, h)
-        return w * h + (1 - w) * l
-    end
-    for i = 1, #xList do
-        local x = xList[i]
-        local y = yList[i]
-        local vx = vxList[i]
-        local vy = vyList[i]
-        local s = sqrt(vx ^ 2 + vy ^ 2)
-        local clampedSpeed = clamp(s / 5, 0, 1)
-        local r = lerp(clampedSpeed, slowSpeedR, fastSpeedR)
-        local g = lerp(clampedSpeed, slowSpeedG, fastSpeedG)
-        local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
-        local pos = { x + topLeft.x, y + topLeft.y }
-        ctx.AddCircleFilled(pos, 2,
-            rgbaToUint(r, g, b, 55 + pulseStatus * 200))
-    end
-    ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
-    ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
-    ctx.AddCircle(dim / 2 + topLeft, 24 - pulseStatus * 8, 16777215 + math.floor(pulseStatus * 255) * 16777216)
-    state.SetValue("xList", xList)
-    state.SetValue("yList", yList)
-    state.SetValue("vxList", vxList)
-    state.SetValue("vyList", vyList)
-    state.SetValue("axList", axList)
-    state.SetValue("ayList", ayList)
-end
 function createParticle(x, y, vx, vy, ax, ay, dimX, dimY, n)
     if (#x >= 150) then return end
     x[#x + 1] = math.random() * dimX
@@ -3256,6 +3200,44 @@ local RGB_SNAP_MAP = {
     [12] = { 0, 120, 255 },
     [16] = { 0, 255, 0 },
 }
+function renderSynthesis()
+    local bgVars = {
+        snapTable = {},
+        pulseCount = 0,
+        snapOffset = 0,
+        lastDifference = 0
+    }
+    getVariables("synthesis", bgVars)
+    local circleSize = 10
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    local maxDim = math.sqrt(dim.x ^ 2 + dim.y ^ 2)
+    local curTime = state.SongTime
+    local tl = getTimingPointAt(curTime)
+    local msptl = 60000 / tl.Bpm * math.toNumber(tl.Signature)
+    local snapTable = bgVars.snapTable
+    local pulseCount = bgVars.pulseCount
+    local mostRecentStart = getHitObjectStartTimeAt(curTime)
+    local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
+    if (#snapTable >= (maxDim / 1.6) / circleSize) then
+        bgVars.snapOffset = circleSize
+        table.remove(snapTable, 1)
+    end
+    if (bgVars.snapOffset > 0.001) then
+        bgVars.snapOffset = bgVars.snapOffset * 0.99 ^ state.DeltaTime
+    end
+    if (curTime - mostRecentStart < bgVars.lastDifference) then
+        table.insert(snapTable, getSnapFromTime(mostRecentStart, true))
+    end
+    bgVars.lastDifference = curTime - mostRecentStart
+    for idx, snap in pairs(snapTable) do
+        local colTbl = RGB_SNAP_MAP[snap]
+        ctx.AddCircle(dim / 2 + topLeft, circleSize * (idx - 1) + bgVars.snapOffset,
+            rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
+    end
+    saveVariables("synthesis", bgVars)
+end
 function drawCapybaraParent()
     drawCapybara()
     drawCapybara2()
@@ -3751,6 +3733,84 @@ function drawGlare(o, coords, size, glareColor, auraColor)
     local circleSize2 = size / 3
     o.AddCircleFilled(coords, circleSize1, auraColor, circlePoints)
     o.AddCircleFilled(coords, circleSize2, auraColor, circlePoints)
+end
+function pulseController()
+    local previousBar = state.GetValue("pulse_previousBar", 0)
+    local pulseStatus = state.GetValue("pulseStatus", 0)
+    local timeOffset = 50
+    local timeSinceLastBar = ((state.SongTime + timeOffset) - getTimingPointAt(state.SongTime).StartTime) %
+        ((60000 / getTimingPointAt(state.SongTime).Bpm))
+    state.SetValue("pulsedThisFrame", false)
+    if ((timeSinceLastBar < previousBar)) then
+        pulseStatus = 1
+        state.SetValue("pulsedThisFrame", true)
+    else
+        pulseStatus = (pulseStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm) * 1.2)
+    end
+    local futureTime = state.SongTime + state.DeltaTime * 2 + timeOffset
+    if ((futureTime - getTimingPointAt(futureTime).StartTime) < 0) then
+        pulseStatus = 0
+    end
+    state.SetValue("pulseStatus", math.max(pulseStatus, 0))
+    state.SetValue("pulse_previousBar", timeSinceLastBar)
+    pulseStatus = pulseStatus * (globalVars.pulseCoefficient or 0)
+    local borderColor = state.GetValue("baseBorderColor") or vector4(1)
+    local negatedBorderColor = vector4(1) - borderColor
+    local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
+    imgui.PushStyleColor(imgui_col.Border, pulseColor * pulseStatus + borderColor * (1 - pulseStatus))
+end
+---@class PhysicsObject
+---@field pos Vector2
+---@field v Vector2
+---@field a Vector2
+---@class Particle: PhysicsObject
+---@field col Vector4
+---@field size integer
+function renderBackground()
+    renderSynthesis()
+end
+function setPluginAppearance()
+    local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
+    local styleTheme = STYLE_THEMES[globalVars.styleThemeIndex]
+    setPluginAppearanceStyles(styleTheme)
+    setPluginAppearanceColors(colorTheme)
+end
+function setPluginAppearanceStyles(styleTheme)
+    local cornerRoundnessValue = (styleTheme == "Boxed" or
+        styleTheme == "Boxed + Border") and 0 or 5
+    local borderSize = (styleTheme == "Rounded + Border" or
+        styleTheme == "Boxed + Border") and 1 or 0
+    imgui.PushStyleVar(imgui_style_var.FrameBorderSize, borderSize)
+    imgui.PushStyleVar(imgui_style_var.WindowPadding, vector.New(PADDING_WIDTH, 8))
+    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
+    imgui.PushStyleVar(imgui_style_var.ItemSpacing, vector.New(DEFAULT_WIDGET_HEIGHT * 0.5 - 1, 4))
+    imgui.PushStyleVar(imgui_style_var.ItemInnerSpacing, vector.New(SAMELINE_SPACING, 6))
+    imgui.PushStyleVar(imgui_style_var.WindowRounding, cornerRoundnessValue)
+    imgui.PushStyleVar(imgui_style_var.ChildRounding, cornerRoundnessValue)
+    imgui.PushStyleVar(imgui_style_var.FrameRounding, cornerRoundnessValue)
+    imgui.PushStyleVar(imgui_style_var.GrabRounding, cornerRoundnessValue)
+    imgui.PushStyleVar(imgui_style_var.ScrollbarRounding, cornerRoundnessValue)
+    imgui.PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessValue)
+end
+function setPluginAppearanceColors(colorTheme)
+    local borderColor = vector4(1)
+    if colorTheme == "Classic" then borderColor = setClassicColors() end
+    if colorTheme == "Strawberry" then borderColor = setStrawberryColors() end
+    if colorTheme == "Amethyst" then borderColor = setAmethystColors() end
+    if colorTheme == "Tree" then borderColor = setTreeColors() end
+    if colorTheme == "Barbie" then borderColor = setBarbieColors() end
+    if colorTheme == "Incognito" then borderColor = setIncognitoColors() end
+    if colorTheme == "Incognito + RGB" then borderColor = setIncognitoRGBColors(globalVars.rgbPeriod) end
+    if colorTheme == "Tobi's Glass" then borderColor = setTobiGlassColors() end
+    if colorTheme == "Tobi's RGB Glass" then borderColor = setTobiRGBGlassColors(globalVars.rgbPeriod) end
+    if colorTheme == "Glass" then borderColor = setGlassColors() end
+    if colorTheme == "Glass + RGB" then borderColor = setGlassRGBColors(globalVars.rgbPeriod) end
+    if colorTheme == "RGB Gamer Mode" then borderColor = setRGBGamerColors(globalVars.rgbPeriod) end
+    if colorTheme == "edom remag BGR" then borderColor = setInvertedRGBGamerColors(globalVars.rgbPeriod) end
+    if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
+    if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
+    if colorTheme == "CUSTOM" then borderColor = setCustomColors() end
+    state.SetValue("baseBorderColor", borderColor)
 end
 function setClassicColors()
     local borderColor = vector.New(0.81, 0.88, 1.00, 0.30)
@@ -4391,84 +4451,6 @@ function getCurrentRGBColors(rgbPeriod)
         green = 1
     end
     return { red = red, green = green, blue = blue }
-end
-function pulseController()
-    local previousBar = state.GetValue("pulse_previousBar", 0)
-    local pulseStatus = state.GetValue("pulseStatus", 0)
-    local timeOffset = 50
-    local timeSinceLastBar = ((state.SongTime + timeOffset) - getTimingPointAt(state.SongTime).StartTime) %
-        ((60000 / getTimingPointAt(state.SongTime).Bpm))
-    state.SetValue("pulsedThisFrame", false)
-    if ((timeSinceLastBar < previousBar)) then
-        pulseStatus = 1
-        state.SetValue("pulsedThisFrame", true)
-    else
-        pulseStatus = (pulseStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm) * 1.2)
-    end
-    local futureTime = state.SongTime + state.DeltaTime * 2 + timeOffset
-    if ((futureTime - getTimingPointAt(futureTime).StartTime) < 0) then
-        pulseStatus = 0
-    end
-    state.SetValue("pulseStatus", math.max(pulseStatus, 0))
-    state.SetValue("pulse_previousBar", timeSinceLastBar)
-    pulseStatus = pulseStatus * (globalVars.pulseCoefficient or 0)
-    local borderColor = state.GetValue("baseBorderColor") or vector4(1)
-    local negatedBorderColor = vector4(1) - borderColor
-    local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
-    imgui.PushStyleColor(imgui_col.Border, pulseColor * pulseStatus + borderColor * (1 - pulseStatus))
-end
----@class PhysicsObject
----@field pos Vector2
----@field v Vector2
----@field a Vector2
----@class Particle: PhysicsObject
----@field col Vector4
----@field size integer
-function renderBackground()
-    renderReactiveSingularities()
-end
-function setPluginAppearance()
-    local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
-    local styleTheme = STYLE_THEMES[globalVars.styleThemeIndex]
-    setPluginAppearanceStyles(styleTheme)
-    setPluginAppearanceColors(colorTheme)
-end
-function setPluginAppearanceStyles(styleTheme)
-    local cornerRoundnessValue = (styleTheme == "Boxed" or
-        styleTheme == "Boxed + Border") and 0 or 5
-    local borderSize = (styleTheme == "Rounded + Border" or
-        styleTheme == "Boxed + Border") and 1 or 0
-    imgui.PushStyleVar(imgui_style_var.FrameBorderSize, borderSize)
-    imgui.PushStyleVar(imgui_style_var.WindowPadding, vector.New(PADDING_WIDTH, 8))
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushStyleVar(imgui_style_var.ItemSpacing, vector.New(DEFAULT_WIDGET_HEIGHT * 0.5 - 1, 4))
-    imgui.PushStyleVar(imgui_style_var.ItemInnerSpacing, vector.New(SAMELINE_SPACING, 6))
-    imgui.PushStyleVar(imgui_style_var.WindowRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.ChildRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.FrameRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.GrabRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.ScrollbarRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessValue)
-end
-function setPluginAppearanceColors(colorTheme)
-    local borderColor = vector4(1)
-    if colorTheme == "Classic" then borderColor = setClassicColors() end
-    if colorTheme == "Strawberry" then borderColor = setStrawberryColors() end
-    if colorTheme == "Amethyst" then borderColor = setAmethystColors() end
-    if colorTheme == "Tree" then borderColor = setTreeColors() end
-    if colorTheme == "Barbie" then borderColor = setBarbieColors() end
-    if colorTheme == "Incognito" then borderColor = setIncognitoColors() end
-    if colorTheme == "Incognito + RGB" then borderColor = setIncognitoRGBColors(globalVars.rgbPeriod) end
-    if colorTheme == "Tobi's Glass" then borderColor = setTobiGlassColors() end
-    if colorTheme == "Tobi's RGB Glass" then borderColor = setTobiRGBGlassColors(globalVars.rgbPeriod) end
-    if colorTheme == "Glass" then borderColor = setGlassColors() end
-    if colorTheme == "Glass + RGB" then borderColor = setGlassRGBColors(globalVars.rgbPeriod) end
-    if colorTheme == "RGB Gamer Mode" then borderColor = setRGBGamerColors(globalVars.rgbPeriod) end
-    if colorTheme == "edom remag BGR" then borderColor = setInvertedRGBGamerColors(globalVars.rgbPeriod) end
-    if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
-    if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
-    if colorTheme == "CUSTOM" then borderColor = setCustomColors() end
-    state.SetValue("baseBorderColor", borderColor)
 end
 ---Creates an imgui button.
 ---@param text string The text that the button should have.

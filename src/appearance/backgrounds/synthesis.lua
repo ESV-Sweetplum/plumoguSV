@@ -11,6 +11,15 @@ local RGB_SNAP_MAP = {
 }
 
 function renderSynthesis()
+    local bgVars = {
+        snapTable = {},
+        pulseCount = 0,
+        snapOffset = 0,
+        lastDifference = 0
+    }
+
+    getVariables("synthesis", bgVars)
+
     local circleSize = 10
 
     local ctx = imgui.GetWindowDrawList()
@@ -24,36 +33,33 @@ function renderSynthesis()
     local tl = getTimingPointAt(curTime)
     local msptl = 60000 / tl.Bpm * math.toNumber(tl.Signature)
 
-    local snapTable = state.GetValue("synthesis_snapTable", {})
-    local pulseCount = state.GetValue("synthesis_pulseCount", 0)
+    local snapTable = bgVars.snapTable
+    local pulseCount = bgVars.pulseCount
     local mostRecentStart = getHitObjectStartTimeAt(curTime)
 
     local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
 
     if (#snapTable >= (maxDim / 1.6) / circleSize) then
-        state.SetValue("synthesis_snapOffset", circleSize)
+        bgVars.snapOffset = circleSize
         table.remove(snapTable, 1)
     end
 
-    local snapOffset = state.GetValue("synthesis_snapOffset", 0)
-    if (snapOffset > 0.001) then
-        snapOffset = snapOffset * 0.99 ^ state.DeltaTime
+    if (bgVars.snapOffset > 0.001) then
+        bgVars.snapOffset = bgVars.snapOffset * 0.99 ^ state.DeltaTime
     end
 
-    local lastDifference = state.GetValue("synthesis_lastDifference", 0)
-    if (curTime - mostRecentStart < lastDifference) then
+    if (curTime - mostRecentStart < bgVars.lastDifference) then
         table.insert(snapTable, getSnapFromTime(mostRecentStart, true))
     end
 
-    state.SetValue("synthesis_lastDifference", curTime - mostRecentStart)
-    state.SetValue("synthesis_snapTable", snapTable)
+    bgVars.lastDifference = curTime - mostRecentStart
 
     for idx, snap in pairs(snapTable) do
         local colTbl = RGB_SNAP_MAP[snap]
 
-        ctx.AddCircle(dim / 2 + topLeft, circleSize * (idx - 1) + snapOffset,
+        ctx.AddCircle(dim / 2 + topLeft, circleSize * (idx - 1) + bgVars.snapOffset,
             rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
     end
 
-    state.SetValue("synthesis_snapOffset", snapOffset)
+    saveVariables("synthesis", bgVars)
 end
