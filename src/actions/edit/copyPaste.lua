@@ -4,11 +4,11 @@ function copyItems(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    if (not menuVars.copyTable[1]) then goto continue1 end
     local lines = game.getLinesBetweenOffsets(startOffset, endOffset)
     local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
     local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset)
     local bms = game.getBookmarksBetweenOffsets(startOffset, endOffset)
+    if (not menuVars.copyTable[1]) then goto continue1 end
     for _, line in ipairs(lines) do
         local copiedLine = {
             relativeOffset = line.StartTime - startOffset,
