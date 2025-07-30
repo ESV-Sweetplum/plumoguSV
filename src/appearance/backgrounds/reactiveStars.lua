@@ -18,7 +18,7 @@ function updateStars()
             star.size = math.random(3) * 0.5
         else
             star.pos = star.pos + star.v * state.DeltaTime * 0.05 *
-                math.clamp(2 * getSVMultiplierAt(state.SongTime), -50, 50)
+                math.clamp(2 * game.getSVMultiplierAt(state.SongTime), -50, 50)
         end
     end
 end

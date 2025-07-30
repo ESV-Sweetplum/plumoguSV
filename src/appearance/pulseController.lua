@@ -9,8 +9,8 @@ function pulseController()
 
     local timeOffset = 50 -- [`state.SongTime`](lua://state.SongTime) isn't entirely accurate while the song is playing, so this aims to correct that.
 
-    local timeSinceLastBar = ((state.SongTime + timeOffset) - getTimingPointAt(state.SongTime).StartTime) %
-        ((60000 / getTimingPointAt(state.SongTime).Bpm))
+    local timeSinceLastBar = ((state.SongTime + timeOffset) - game.getTimingPointAt(state.SongTime).StartTime) %
+        ((60000 / game.getTimingPointAt(state.SongTime).Bpm))
 
 
     pulseVars.pulsedThisFrame = false
@@ -19,14 +19,14 @@ function pulseController()
         pulseVars.pulseStatus = 1
         pulseVars.pulsedThisFrame = true
     else
-        pulseVars.pulseStatus = (pulseVars.pulseStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm) * 1.2)
+        pulseVars.pulseStatus = (pulseVars.pulseStatus - state.DeltaTime / (60000 / game.getTimingPointAt(state.SongTime).Bpm) * 1.2)
     end
 
     pulseVars.previousBar = timeSinceLastBar
 
     local futureTime = state.SongTime + state.DeltaTime * 2 + timeOffset
 
-    if ((futureTime - getTimingPointAt(futureTime).StartTime) < 0) then
+    if ((futureTime - game.getTimingPointAt(futureTime).StartTime) < 0) then
         pulseVars.pulseStatus = 0
     end
 

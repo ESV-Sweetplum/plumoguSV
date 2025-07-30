@@ -36,7 +36,7 @@ function renderReactiveSingularities()
 
     createParticle(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
 
-    local speed = clamp(math.abs(getSVMultiplierAt(state.SongTime)), 0, 4)
+    local speed = clamp(math.abs(game.getSVMultiplierAt(state.SongTime)), 0, 4)
     updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
         state.DeltaTime * speed)
 

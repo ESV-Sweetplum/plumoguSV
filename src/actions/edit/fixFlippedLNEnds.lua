@@ -7,7 +7,7 @@ function fixFlippedLNEnds()
     for _, ho in ipairs(map.HitObjects) do
         local lnEndTime = ho.EndTime
         local isLN = lnEndTime ~= 0
-        local endHasNegativeSV = (getSVMultiplierAt(lnEndTime) <= 0)
+        local endHasNegativeSV = (game.getSVMultiplierAt(lnEndTime) <= 0)
         local hasntAlreadyBeenFixed = lnEndTimeFixed[lnEndTime] == nil
         if isLN and endHasNegativeSV and hasntAlreadyBeenFixed then
             lnEndTimeFixed[lnEndTime] = true
@@ -19,9 +19,9 @@ function fixFlippedLNEnds()
             svTimeIsAdded[timeAt] = true
             svTimeIsAdded[timeAfter] = true
             svTimeIsAdded[timeAfterAfter] = true
-            local svMultiplierAt = getSVMultiplierAt(timeAt)
-            local svMultiplierAfter = getSVMultiplierAt(timeAfter)
-            local svMultiplierAfterAfter = getSVMultiplierAt(timeAfterAfter)
+            local svMultiplierAt = game.getSVMultiplierAt(timeAt)
+            local svMultiplierAfter = game.getSVMultiplierAt(timeAfter)
+            local svMultiplierAfterAfter = game.getSVMultiplierAt(timeAfterAfter)
             local newMultiplierAt = 0.001
             local newMultiplierAfter = svMultiplierAt + svMultiplierAfter
             local newMultiplierAfterAfter = svMultiplierAfterAfter

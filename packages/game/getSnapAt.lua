@@ -6,7 +6,7 @@ local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---@return SnapNumber
 function game.getSnapAt(time, dontPrintInaccuracy)
     local previousBar = map.GetNearestSnapTimeFromTime(false, 1, time)
-    local barTime = 60000 / getTimingPointAt(time).Bpm
+    local barTime = 60000 / game.getTimingPointAt(time).Bpm
 
     local distance = time - previousBar
 

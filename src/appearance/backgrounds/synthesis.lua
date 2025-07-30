@@ -30,12 +30,12 @@ function renderSynthesis()
 
     local curTime = state.SongTime
 
-    local tl = getTimingPointAt(curTime)
+    local tl = game.getTimingPointAt(curTime)
     local msptl = 60000 / tl.Bpm * math.toNumber(tl.Signature)
 
     local snapTable = bgVars.snapTable
     local pulseCount = bgVars.pulseCount
-    local mostRecentStart = getHitObjectStartTimeAt(curTime)
+    local mostRecentStart = game.getHitObjectStartTimeAt(curTime)
 
     local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
 

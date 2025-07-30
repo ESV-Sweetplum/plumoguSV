@@ -21,8 +21,8 @@ function measureSVs(menuVars)
     local durationStart = 1 / getUsableDisplacementMultiplier(startOffset)
     local timeAt = startOffset
     local timeAfter = startOffset + durationStart
-    local multiplierAt = getSVMultiplierAt(timeAt)
-    local multiplierAfter = getSVMultiplierAt(timeAfter)
+    local multiplierAt = game.getSVMultiplierAt(timeAt)
+    local multiplierAfter = game.getSVMultiplierAt(timeAfter)
     local startDisplacement = -(multiplierAt - multiplierAfter) * durationStart
     menuVars.roundedStartDisplacement = math.round(startDisplacement, roundingDecimalPlaces)
     menuVars.startDisplacement = tostring(startDisplacement)
@@ -30,8 +30,8 @@ function measureSVs(menuVars)
     local durationEnd = 1 / getUsableDisplacementMultiplier(startOffset)
     local timeBefore = endOffset - durationEnd
     local timeBeforeBefore = timeBefore - durationEnd
-    local multiplierBefore = getSVMultiplierAt(timeBefore)
-    local multiplierBeforeBefore = getSVMultiplierAt(timeBeforeBefore)
+    local multiplierBefore = game.getSVMultiplierAt(timeBefore)
+    local multiplierBeforeBefore = game.getSVMultiplierAt(timeBeforeBefore)
     local endDisplacement = (multiplierBefore - multiplierBeforeBefore) * durationEnd
     menuVars.roundedEndDisplacement = math.round(endDisplacement, roundingDecimalPlaces)
     menuVars.endDisplacement = tostring(endDisplacement)

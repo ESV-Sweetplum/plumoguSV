@@ -36,13 +36,13 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
         local multiplier = getUsableDisplacementMultiplier(firstOffset)
         local duration = 1 / multiplier
         local timeBefore = firstOffset - duration
-        multiplierBefore = getSVMultiplierAt(timeBefore)
+        multiplierBefore = game.getSVMultiplierAt(timeBefore)
         stillDistance = multiplierBefore * duration
     elseif stillType == "Otua" then
         local multiplier = getUsableDisplacementMultiplier(lastOffset)
         local duration = 1 / multiplier
         local timeAt = lastOffset
-        local multiplierAt = getSVMultiplierAt(timeAt)
+        local multiplierAt = game.getSVMultiplierAt(timeAt)
         stillDistance = -multiplierAt * duration
     end
     local svsToAdd = {}

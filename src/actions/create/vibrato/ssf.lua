@@ -7,7 +7,7 @@ function ssfVibrato(menuVars, func1, func2)
     local delta = 1000 / fps
     local time = startTime
     local ssfs = { createSSF(startTime - 1 / getUsableDisplacementMultiplier(startTime),
-        getSSFMultiplierAt(time)) }
+        game.getSSFMultiplierAt(time)) }
     while time < endTime do
         local x = math.inverseLerp(time, startTime, endTime)
         local y = math.inverseLerp(time + delta, startTime, endTime)
@@ -23,7 +23,7 @@ function ssfVibrato(menuVars, func1, func2)
         time = time + 2 * delta
     end
 
-    addFinalSSF(ssfs, endTime, getSSFMultiplierAt(endTime))
+    addFinalSSF(ssfs, endTime, game.getSSFMultiplierAt(endTime))
 
     actions.PerformBatch({
         utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfs)

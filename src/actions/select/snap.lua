@@ -5,7 +5,7 @@ function selectBySnap(menuVars)
     local endOffset = offsets[#offsets]
     local notes = getNotesBetweenOffsets(startOffset, endOffset)
 
-    local timingPoint = getTimingPointAt(startOffset)
+    local timingPoint = game.getTimingPointAt(startOffset)
     local bpm = timingPoint.Bpm
     local times = {}
     local disallowedTimes = {}

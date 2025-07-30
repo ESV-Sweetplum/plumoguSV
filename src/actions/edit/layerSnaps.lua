@@ -80,7 +80,7 @@ function collapseSnaps()
         if (not hoLayer.Name:find("plumoguSV")) then goto continue end
         color = hoLayer.Name:match("-([a-zA-Z]+)$")
         snap = REVERSE_COLOR_MAP[color]
-        mostRecentTP = getTimingPointAt(ho.StartTime)
+        mostRecentTP = game.getTimingPointAt(ho.StartTime)
         if (snap == 1) then
             table.insert(snapTpsToAdd,
                 utils.CreateTimingPoint(ho.StartTime, mostRecentTP.Bpm, mostRecentTP.Signature, true))

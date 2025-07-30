@@ -29,8 +29,8 @@ function alignTimingLines()
         end
     end
     for _, time in ipairs(times) do
-        if (getTimingPointAt(time).StartTime == time) then
-            table.insert(tpsToRemove, getTimingPointAt(time))
+        if (game.getTimingPointAt(time).StartTime == time) then
+            table.insert(tpsToRemove, game.getTimingPointAt(time))
         end
         table.insert(timingpoints, utils.CreateTimingPoint(time, bpm, signature))
     end

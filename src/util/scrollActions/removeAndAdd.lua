@@ -5,7 +5,7 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
     local tolerance = 0.035
     if #svsToAdd == 0 then return end
     for idx, sv in pairs(svsToRemove) do
-        local baseSV = getSVStartTimeAt(sv.StartTime)
+        local baseSV = game.getSVStartTimeAt(sv.StartTime)
         if (math.abs(baseSV - sv.StartTime) > tolerance) then
             table.remove(svsToRemove, idx)
         end

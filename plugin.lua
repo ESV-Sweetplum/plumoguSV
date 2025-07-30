@@ -18,7 +18,7 @@ function clock.listen(id, interval)
     end
     return false
 end
-function getHitObjectStartTimeAt(offset, forward)
+function game.getHitObjectStartTimeAt(offset, forward)
     local startTimes = state.GetValue("hoStartTimes", {})
     if (not truthy(#startTimes)) then return -1 end
     if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
@@ -26,17 +26,17 @@ function getHitObjectStartTimeAt(offset, forward)
     local startTime = table.searchClosest(startTimes, offset, forward and 2 or 1)
     return startTime
 end
-function getSSFMultiplierAt(offset)
+function game.getSSFMultiplierAt(offset)
     local ssf = map.GetScrollSpeedFactorAt(offset)
     if ssf then return ssf.Multiplier end
     return 1
 end
-function getSVStartTimeAt(offset)
+function game.getSVStartTimeAt(offset)
     local sv = map.GetScrollVelocityAt(offset)
     if sv then return sv.StartTime end
     return -1
 end
-function getSVMultiplierAt(offset)
+function game.getSVMultiplierAt(offset)
     local sv = map.GetScrollVelocityAt(offset)
     if sv then return sv.Multiplier end
     if (map.InitialScrollVelocity == 0) then return 1 end
@@ -49,7 +49,7 @@ local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---@return SnapNumber
 function game.getSnapAt(time, dontPrintInaccuracy)
     local previousBar = map.GetNearestSnapTimeFromTime(false, 1, time)
-    local barTime = 60000 / getTimingPointAt(time).Bpm
+    local barTime = 60000 / game.getTimingPointAt(time).Bpm
     local distance = time - previousBar
     if (math.abs(distance) / barTime < 0.02) then return 1 end
     local absoluteSnap = barTime / distance
@@ -71,8 +71,8 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     if (not foundCorrectSnap) then return 5 end
     return guessedSnap
 end
-function getTimingPointAt(offset)
-    local line = map.GetTimingPointAt(offset)
+function game.getTimingPointAt(offset)
+    local line = map.game.getTimingPointAt(offset)
     if line then return line end
     return { StartTime = -69420, Bpm = 42.69 }
 end
@@ -1958,13 +1958,13 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
         local multiplier = getUsableDisplacementMultiplier(firstOffset)
         local duration = 1 / multiplier
         local timeBefore = firstOffset - duration
-        multiplierBefore = getSVMultiplierAt(timeBefore)
+        multiplierBefore = game.getSVMultiplierAt(timeBefore)
         stillDistance = multiplierBefore * duration
     elseif stillType == "Otua" then
         local multiplier = getUsableDisplacementMultiplier(lastOffset)
         local duration = 1 / multiplier
         local timeAt = lastOffset
-        local multiplierAt = getSVMultiplierAt(timeAt)
+        local multiplierAt = game.getSVMultiplierAt(timeAt)
         stillDistance = -multiplierAt * duration
     end
     local svsToAdd = {}
@@ -2006,7 +2006,7 @@ function ssfVibrato(menuVars, func1, func2)
     local delta = 1000 / fps
     local time = startTime
     local ssfs = { createSSF(startTime - 1 / getUsableDisplacementMultiplier(startTime),
-        getSSFMultiplierAt(time)) }
+        game.getSSFMultiplierAt(time)) }
     while time < endTime do
         local x = math.inverseLerp(time, startTime, endTime)
         local y = math.inverseLerp(time + delta, startTime, endTime)
@@ -2021,7 +2021,7 @@ function ssfVibrato(menuVars, func1, func2)
             createSSF(time + delta + 1 / getUsableDisplacementMultiplier(time), func2(y)))
         time = time + 2 * delta
     end
-    addFinalSSF(ssfs, endTime, getSSFMultiplierAt(endTime))
+    addFinalSSF(ssfs, endTime, game.getSSFMultiplierAt(endTime))
     actions.PerformBatch({
         utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfs)
     })
@@ -2192,8 +2192,8 @@ function alignTimingLines()
     end
     for k = 1, #times do
         local time = times[k]
-        if (getTimingPointAt(time).StartTime == time) then
-            tpsToRemove[#tpsToRemove + 1] = getTimingPointAt(time)
+        if (game.getTimingPointAt(time).StartTime == time) then
+            tpsToRemove[#tpsToRemove + 1] = game.getTimingPointAt(time)
         end
         table.insert(timingpoints, utils.CreateTimingPoint(time, bpm, signature))
     end
@@ -2576,7 +2576,7 @@ function fixFlippedLNEnds()
     for _, ho in ipairs(map.HitObjects) do
         local lnEndTime = ho.EndTime
         local isLN = lnEndTime ~= 0
-        local endHasNegativeSV = (getSVMultiplierAt(lnEndTime) <= 0)
+        local endHasNegativeSV = (game.getSVMultiplierAt(lnEndTime) <= 0)
         local hasntAlreadyBeenFixed = lnEndTimeFixed[lnEndTime] == nil
         if isLN and endHasNegativeSV and hasntAlreadyBeenFixed then
             lnEndTimeFixed[lnEndTime] = true
@@ -2588,9 +2588,9 @@ function fixFlippedLNEnds()
             svTimeIsAdded[timeAt] = true
             svTimeIsAdded[timeAfter] = true
             svTimeIsAdded[timeAfterAfter] = true
-            local svMultiplierAt = getSVMultiplierAt(timeAt)
-            local svMultiplierAfter = getSVMultiplierAt(timeAfter)
-            local svMultiplierAfterAfter = getSVMultiplierAt(timeAfterAfter)
+            local svMultiplierAt = game.getSVMultiplierAt(timeAt)
+            local svMultiplierAfter = game.getSVMultiplierAt(timeAfter)
+            local svMultiplierAfterAfter = game.getSVMultiplierAt(timeAfterAfter)
             local newMultiplierAt = 0.001
             local newMultiplierAfter = svMultiplierAt + svMultiplierAfter
             local newMultiplierAfterAfter = svMultiplierAfterAfter
@@ -2729,7 +2729,7 @@ function collapseSnaps()
         if (not hoLayer.Name:find("plumoguSV")) then goto continue end
         color = hoLayer.Name:match("-([a-zA-Z]+)$")
         snap = REVERSE_COLOR_MAP[color]
-        mostRecentTP = getTimingPointAt(ho.StartTime)
+        mostRecentTP = game.getTimingPointAt(ho.StartTime)
         if (snap == 1) then
             table.insert(snapTpsToAdd,
                 utils.CreateTimingPoint(ho.StartTime, mostRecentTP.Bpm, mostRecentTP.Signature, true))
@@ -2792,16 +2792,16 @@ function measureSVs(menuVars)
     local durationStart = 1 / getUsableDisplacementMultiplier(startOffset)
     local timeAt = startOffset
     local timeAfter = startOffset + durationStart
-    local multiplierAt = getSVMultiplierAt(timeAt)
-    local multiplierAfter = getSVMultiplierAt(timeAfter)
+    local multiplierAt = game.getSVMultiplierAt(timeAt)
+    local multiplierAfter = game.getSVMultiplierAt(timeAfter)
     local startDisplacement = -(multiplierAt - multiplierAfter) * durationStart
     menuVars.roundedStartDisplacement = math.round(startDisplacement, roundingDecimalPlaces)
     menuVars.startDisplacement = tostring(startDisplacement)
     local durationEnd = 1 / getUsableDisplacementMultiplier(startOffset)
     local timeBefore = endOffset - durationEnd
     local timeBeforeBefore = timeBefore - durationEnd
-    local multiplierBefore = getSVMultiplierAt(timeBefore)
-    local multiplierBeforeBefore = getSVMultiplierAt(timeBeforeBefore)
+    local multiplierBefore = game.getSVMultiplierAt(timeBefore)
+    local multiplierBeforeBefore = game.getSVMultiplierAt(timeBeforeBefore)
     local endDisplacement = (multiplierBefore - multiplierBeforeBefore) * durationEnd
     menuVars.roundedEndDisplacement = math.round(endDisplacement, roundingDecimalPlaces)
     menuVars.endDisplacement = tostring(endDisplacement)
@@ -2908,7 +2908,7 @@ function scaleDisplaceSVs(menuVars)
                 atDisplacement, nil)
         end
     end
-    if isStartDisplace then addFinalSV(svsToAdd, endOffset, getSVMultiplierAt(endOffset)) end
+    if isStartDisplace then addFinalSV(svsToAdd, endOffset, game.getSVMultiplierAt(endOffset)) end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
@@ -3129,7 +3129,7 @@ function selectBySnap(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local notes = getNotesBetweenOffsets(startOffset, endOffset)
-    local timingPoint = getTimingPointAt(startOffset)
+    local timingPoint = game.getTimingPointAt(startOffset)
     local bpm = timingPoint.Bpm
     local times = {}
     local disallowedTimes = {}
@@ -3244,7 +3244,7 @@ function updateStars()
             star.size = math.random(3) * 0.5
         else
             star.pos = star.pos + star.v * state.DeltaTime * 0.05 *
-                math.clamp(2 * getSVMultiplierAt(state.SongTime), -50, 50)
+                math.clamp(2 * game.getSVMultiplierAt(state.SongTime), -50, 50)
         end
     end
 end
@@ -3273,11 +3273,11 @@ function renderSynthesis()
     local dim = imgui.GetWindowSize()
     local maxDim = math.sqrt(dim.x ^ 2 + dim.y ^ 2)
     local curTime = state.SongTime
-    local tl = getTimingPointAt(curTime)
+    local tl = game.getTimingPointAt(curTime)
     local msptl = 60000 / tl.Bpm * math.toNumber(tl.Signature)
     local snapTable = bgVars.snapTable
     local pulseCount = bgVars.pulseCount
-    local mostRecentStart = getHitObjectStartTimeAt(curTime)
+    local mostRecentStart = game.getHitObjectStartTimeAt(curTime)
     local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
     if (#snapTable >= (maxDim / 1.6) / circleSize) then
         bgVars.snapOffset = circleSize
@@ -3801,18 +3801,18 @@ function pulseController()
     }
     getVariables("pulseController", pulseVars)
     local timeOffset = 50
-    local timeSinceLastBar = ((state.SongTime + timeOffset) - getTimingPointAt(state.SongTime).StartTime) %
-        ((60000 / getTimingPointAt(state.SongTime).Bpm))
+    local timeSinceLastBar = ((state.SongTime + timeOffset) - game.getTimingPointAt(state.SongTime).StartTime) %
+        ((60000 / game.getTimingPointAt(state.SongTime).Bpm))
     pulseVars.pulsedThisFrame = false
     if ((timeSinceLastBar < pulseVars.previousBar)) then
         pulseVars.pulseStatus = 1
         pulseVars.pulsedThisFrame = true
     else
-        pulseVars.pulseStatus = (pulseVars.pulseStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm) * 1.2)
+        pulseVars.pulseStatus = (pulseVars.pulseStatus - state.DeltaTime / (60000 / game.getTimingPointAt(state.SongTime).Bpm) * 1.2)
     end
     pulseVars.previousBar = timeSinceLastBar
     local futureTime = state.SongTime + state.DeltaTime * 2 + timeOffset
-    if ((futureTime - getTimingPointAt(futureTime).StartTime) < 0) then
+    if ((futureTime - game.getTimingPointAt(futureTime).StartTime) < 0) then
         pulseVars.pulseStatus = 0
     end
     pulseVars.pulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
@@ -7597,7 +7597,7 @@ function getUsableDisplacementMultiplier(offset)
 end
 function prepareDisplacingSV(svsToAdd, svTimeIsAdded, svTime, displacement, displacementMultiplier, hypothetical, svs)
     svTimeIsAdded[svTime] = true
-    local currentSVMultiplier = getSVMultiplierAt(svTime)
+    local currentSVMultiplier = game.getSVMultiplierAt(svTime)
     if (hypothetical == true) then
         currentSVMultiplier = getHypotheticalSVMultiplierAt(svs, svTime)
     end
@@ -8510,7 +8510,7 @@ function addInitialSSF(ssfsToAdd, startOffset)
 end
 function addStartSVIfMissing(svs, startOffset)
     if #svs ~= 0 and svs[1].StartTime == startOffset then return end
-    addSVToList(svs, startOffset, getSVMultiplierAt(startOffset), false)
+    addSVToList(svs, startOffset, game.getSVMultiplierAt(startOffset), false)
 end
 function addSVToList(svList, offset, multiplier, endOfList)
     local newSV = createSV(offset, multiplier)
@@ -8552,7 +8552,7 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
     local tolerance = 0.035
     if #svsToAdd == 0 then return end
     for idx, sv in pairs(svsToRemove) do
-        local baseSV = getSVStartTimeAt(sv.StartTime)
+        local baseSV = game.getSVStartTimeAt(sv.StartTime)
         if (math.abs(baseSV - sv.StartTime) > tolerance) then
             table.remove(svsToRemove, idx)
         end
