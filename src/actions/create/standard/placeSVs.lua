@@ -5,10 +5,10 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance)
     local offsets = uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     if placingStillSVs then
-        offsets = uniqueNoteOffsetsBetweenSelected()
+        offsets = game.uniqueNoteOffsetsBetweenSelected()
         if (not truthy(offsets)) then return end
         if (place == false) then
-            offsets = uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
+            offsets = game.uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
         end
     end
     local firstOffset = offsets[1]

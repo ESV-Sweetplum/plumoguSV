@@ -1,5 +1,5 @@
 function reverseScrollSVs(menuVars)
-    local offsets = uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.uniqueNoteOffsetsBetweenSelected()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {}

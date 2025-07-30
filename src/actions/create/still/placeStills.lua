@@ -28,7 +28,7 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
     local stillType = STILL_TYPES[menuVars.stillTypeIndex]
     local noteSpacing = menuVars.noteSpacing
     local stillDistance = menuVars.stillDistance
-    local noteOffsets = uniqueNoteOffsetsBetween(optionalStart, optionalEnd, true)
+    local noteOffsets = game.uniqueNoteOffsetsBetween(optionalStart, optionalEnd, true)
     if (not noteOffsets) then return { svsToRemove = {}, svsToAdd = {} } end
     local firstOffset = noteOffsets[1]
     local lastOffset = noteOffsets[#noteOffsets]

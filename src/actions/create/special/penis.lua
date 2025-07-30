@@ -1,5 +1,5 @@
 function placePenisSV(settingVars)
-    local startTime = uniqueNoteOffsetsBetweenSelected()[1]
+    local startTime = game.uniqueNoteOffsetsBetweenSelected()[1]
 
     local svs = {}
 

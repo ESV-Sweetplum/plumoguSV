@@ -147,6 +147,32 @@ function game.getLinesBetweenOffsets(startOffset, endOffset)
     end
     return sort(linesBetweenoffsets, sortAscendingStartTime)
 end
+---Finds and returns a list of all unique offsets of notes between a start and an end time [Table]
+---@param startOffset number
+---@param endOffset number
+---@param includeLN? boolean
+---@return number[]
+function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
+    local noteOffsetsBetween = {}
+    for _, ho in ipairs(map.HitObjects) do
+        if ho.StartTime >= startOffset and ho.StartTime <= endOffset then
+            local skipNote = false
+            if (state.SelectedScrollGroupId ~= ho.TimingGroup and globalVars.ignoreNotesOutsideTg) then skipNote = true end
+            if (ho.StartTime == startOffset or ho.StartTime == endOffset) then skipNote = false end
+            if (skipNote) then goto skip end
+            noteOffsetsBetween[#noteOffsetsBetween + 1] = ho.StartTime
+            if (ho.EndTime ~= 0 and ho.EndTime <= endOffset and includeLN) then
+                table.insert(noteOffsetsBetween,
+                    ho.EndTime)
+            end
+            ::skip::
+        end
+    end
+    noteOffsetsBetween = table.dedupe(noteOffsetsBetween)
+    noteOffsetsBetween = sort(noteOffsetsBetween, sortAscending)
+    return noteOffsetsBetween
+end
+game.getUniqueNoteOffsetsBetween = game.getUniqueNoteOffsetsBetween
 game = {}
 ---Evaluates a simplified one-dimensional cubic bezier expression with points (0, p2, p3, 1).
 ---@param p2 number The second point in the cubic bezier.
@@ -1721,7 +1747,7 @@ function automateSVs(settingVars)
     toggleablePrint("w!", "Automated.")
 end
 function placePenisSV(settingVars)
-    local startTime = uniqueNoteOffsetsBetweenSelected()[1]
+    local startTime = game.uniqueNoteOffsetsBetweenSelected()[1]
     local svs = {}
     for j = 0, 1 do
         for i = 0, 100 do
@@ -1827,7 +1853,7 @@ function placeTeleportStutterSVs(settingVars)
         lastSVPercent = settingVars.svPercent2 * 0.01
         lastMainSV = settingVars.mainSV2
     end
-    local offsets = uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.uniqueNoteOffsetsBetweenSelected()
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local numTeleportSets = #offsets - 1
@@ -1873,7 +1899,7 @@ function placeTeleportStutterSSFs(settingVars)
         lastSVPercent = settingVars.svPercent2 * 0.01
         lastMainSV = settingVars.mainSV2
     end
-    local offsets = uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.uniqueNoteOffsetsBetweenSelected()
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local numTeleportSets = #offsets - 1
@@ -1948,10 +1974,10 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance)
     local offsets = uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     if placingStillSVs then
-        offsets = uniqueNoteOffsetsBetweenSelected()
+        offsets = game.uniqueNoteOffsetsBetweenSelected()
         if (not truthy(offsets)) then return end
         if (place == false) then
-            offsets = uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
+            offsets = game.uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
         end
     end
     local firstOffset = offsets[1]
@@ -2021,7 +2047,7 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
     local stillType = STILL_TYPES[menuVars.stillTypeIndex]
     local noteSpacing = menuVars.noteSpacing
     local stillDistance = menuVars.stillDistance
-    local noteOffsets = uniqueNoteOffsetsBetween(optionalStart, optionalEnd, true)
+    local noteOffsets = game.uniqueNoteOffsetsBetween(optionalStart, optionalEnd, true)
     if (not noteOffsets) then return { svsToRemove = {}, svsToAdd = {} } end
     local firstOffset = noteOffsets[1]
     local lastOffset = noteOffsets[#noteOffsets]
@@ -2099,7 +2125,7 @@ function ssfVibrato(menuVars, func1, func2)
     toggleablePrint("s!", table.concat({"Created ", #ssfs, pluralize(" SSF.", #ssfs, -2)}))
 end
 function svVibrato(menuVars, heightFunc)
-    local offsets = uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.uniqueNoteOffsetsBetweenSelected()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {} ---@type ScrollVelocity[]
@@ -2607,7 +2633,7 @@ function displaceViewSVs(menuVars)
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local offsets = uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.uniqueNoteOffsetsBetweenSelected()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local displaceAmount = menuVars.distance
@@ -2910,7 +2936,7 @@ function mergeSVs()
     actions.Perform(utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove))
 end
 function reverseScrollSVs(menuVars)
-    local offsets = uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.uniqueNoteOffsetsBetweenSelected()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {}
@@ -8205,35 +8231,10 @@ function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     end
     return sort(svsBetweenOffsets, sortAscendingStartTime)
 end
----Finds and returns a list of all unique offsets of notes between a start and an end time [Table]
----@param startOffset number
----@param endOffset number
----@param includeLN? boolean
----@return number[]
-function uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
-    local noteOffsetsBetween = {}
-    for _, ho in ipairs(map.HitObjects) do
-        if ho.StartTime >= startOffset and ho.StartTime <= endOffset then
-            local skipNote = false
-            if (state.SelectedScrollGroupId ~= ho.TimingGroup and globalVars.ignoreNotesOutsideTg) then skipNote = true end
-            if (ho.StartTime == startOffset or ho.StartTime == endOffset) then skipNote = false end
-            if (skipNote) then goto skip end
-            noteOffsetsBetween[#noteOffsetsBetween + 1] = ho.StartTime
-            if (ho.EndTime ~= 0 and ho.EndTime <= endOffset and includeLN) then
-                table.insert(noteOffsetsBetween,
-                    ho.EndTime)
-            end
-            ::skip::
-        end
-    end
-    noteOffsetsBetween = table.dedupe(noteOffsetsBetween)
-    noteOffsetsBetween = sort(noteOffsetsBetween, sortAscending)
-    return noteOffsetsBetween
-end
 ---Finds and returns a list of all unique offsets of notes between selected notes [Table]
 ---@param includeLN? boolean
 ---@return number[]
-function uniqueNoteOffsetsBetweenSelected(includeLN)
+function game.uniqueNoteOffsetsBetweenSelected(includeLN)
     local selectedNoteOffsets = uniqueSelectedNoteOffsets()
     if (not selectedNoteOffsets) then
         toggleablePrint("e!",
@@ -8242,7 +8243,7 @@ function uniqueNoteOffsetsBetweenSelected(includeLN)
     end
     local startOffset = selectedNoteOffsets[1]
     local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
-    local offsets = uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
+    local offsets = game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     if (#offsets < 2) then
         toggleablePrint("e!",
             "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")

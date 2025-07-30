@@ -7,7 +7,7 @@ function placeTeleportStutterSVs(settingVars)
         lastSVPercent = settingVars.svPercent2 * 0.01
         lastMainSV = settingVars.mainSV2
     end
-    local offsets = uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.uniqueNoteOffsetsBetweenSelected()
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local numTeleportSets = #offsets - 1
@@ -55,7 +55,7 @@ function placeTeleportStutterSSFs(settingVars)
         lastSVPercent = settingVars.svPercent2 * 0.01
         lastMainSV = settingVars.mainSV2
     end
-    local offsets = uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.uniqueNoteOffsetsBetweenSelected()
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local numTeleportSets = #offsets - 1

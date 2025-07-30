@@ -3,7 +3,7 @@
 ---@param endOffset number
 ---@param includeLN? boolean
 ---@return number[]
-function uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
+function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     local noteOffsetsBetween = {}
     for _, ho in ipairs(map.HitObjects) do
         if ho.StartTime >= startOffset and ho.StartTime <= endOffset then
@@ -24,3 +24,5 @@ function uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     noteOffsetsBetween = sort(noteOffsetsBetween, sortAscending)
     return noteOffsetsBetween
 end
+
+game.getUniqueNoteOffsetsBetween = game.getUniqueNoteOffsetsBetween
