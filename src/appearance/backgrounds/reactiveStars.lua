@@ -48,6 +48,4 @@ function renderReactiveStars()
         local brightness = math.clamp(-8 * progress * (progress - 1), 0, 1)
         ctx.AddCircleFilled(star.pos + topLeft, star.size, rgbaToUint(255, 255, 255, brightness * 255))
     end
-
-    local colorValue = math.floor(50 * (1 + state.GetValue("borderPulseStatus", 0)))
 end

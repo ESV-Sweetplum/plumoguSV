@@ -13,6 +13,8 @@ function renderReactiveSingularities()
     local sqrt = math.sqrt
     local clamp = math.clamp
 
+    -- DOES NOT USE GETVARIABLES PARADIGM DUE TO FRAME RATE INEFFICIENCY
+
     local xList = state.GetValue("xList", {})
     local yList = state.GetValue("yList", {})
     local vxList = state.GetValue("vxList", {})

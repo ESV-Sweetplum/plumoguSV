@@ -8818,6 +8818,7 @@ function listenForHitObjectChanges()
 end
 function draw()
     state.SetValue("ComputableInputFloatIndex", 1)
+    state.SetValue("StatedInputTextIndex", 1)
     state.IsWindowHovered = imgui.IsWindowHovered()
     drawCapybaraParent()
     drawCursorTrail()
