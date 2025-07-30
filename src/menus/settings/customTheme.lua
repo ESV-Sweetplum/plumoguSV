@@ -94,11 +94,14 @@ function showCustomThemeSettings()
         KeepSameLine()
         if (imgui.Button("Send")) then
             setCustomStyleString(input)
+            settingsChanged = true
             state.SetValue("importingCustomTheme", false)
+            state.SetValue("importingCustomThemeInput", "")
         end
         KeepSameLine()
         if (imgui.Button("X")) then
             state.SetValue("importingCustomTheme", false)
+            state.SetValue("importingCustomThemeInput", "")
         end
     end
 
@@ -134,7 +137,7 @@ end
 
 function stringifyCustomStyle(customStyle)
     local keys = table.keys(customStyle)
-    local resultStr = ""
+    local resultStr = "v2 "
 
     for _, key in ipairs(keys) do
         local value = customStyle[key]
@@ -143,7 +146,7 @@ function stringifyCustomStyle(customStyle)
         local g = math.floor(value.y * 255)
         local b = math.floor(value.z * 255)
         local a = math.floor(value.w * 255)
-        resultStr = resultStr .. keyId .. ":" .. rgbaToHexa(r, g, b, a) .. ","
+        resultStr = resultStr .. keyId .. "" .. rgbaToNdua(r, g, b, a) .. " "
     end
 
     return resultStr:sub(1, -2)
@@ -151,11 +154,40 @@ end
 
 function setCustomStyleString(str)
     local keyIdDict = {}
-
     for _, key in ipairs(table.keys(DEFAULT_STYLE)) do
         keyIdDict[key] = convertStrToShort(key)
     end
 
+    if (str:sub(1, 3) == "v2 ") then
+        parseCustomStyleV2(str:sub(4), keyIdDict)
+    else
+        parseCustomStyleV1(str, keyIdDict)
+    end
+end
+
+function parseCustomStyleV2(str, keyIdDict)
+    local customStyle = {}
+
+    for kvPair in str:gmatch("[^ ]+") do -- Equivalent to validate, no need to change
+        local keyId = nil
+        local keyValue = nil
+        if (kvPair:len() == 8) then
+            keyId = kvPair:sub(1, 3)
+            keyValue = kvPair:sub(4)
+        else
+            keyId = kvPair:sub(1, 2)
+            keyValue = kvPair:sub(3)
+        end
+        local key = table.indexOf(keyIdDict, keyId)
+        if (not keyId or key == -1) then goto skip end
+        customStyle[key] = nduaToRgba(keyValue) / 255
+        ::skip::
+    end
+
+    globalVars.customStyle = table.duplicate(customStyle)
+end
+
+function parseCustomStyleV1(str, keyIdDict)
     local customStyle = {}
 
     for kvPair in str:gmatch("[0-9#:a-zA-Z]+") do -- Equivalent to validate, no need to change
