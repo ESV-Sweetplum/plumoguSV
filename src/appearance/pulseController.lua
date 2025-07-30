@@ -40,4 +40,5 @@ function pulseController()
     imgui.PushStyleColor(imgui_col.Border, pulseColor * pulseVars.pulseStatus + borderColor * (1 - pulseVars.pulseStatus))
 
     saveVariables("pulseController", pulseVars)
+    state.SetValue("cache_pulseStatus", pulseVars.pulseStatus)
 end
