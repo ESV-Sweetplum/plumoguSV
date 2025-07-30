@@ -30,7 +30,9 @@ export default async function transpiler(
     ];
     if (!devMode) ignoredFiles.push(`src${separator}dev`);
 
-    const files = getFilesRecursively('packages');
+    const files = getFilesRecursively('packages').sort(
+        (a, b) => +b.includes('priority') - +a.includes('priority')
+    );
     files.push(
         ...getFilesRecursively('src')
             .sort((a, b) => +b.includes('priority') - +a.includes('priority'))

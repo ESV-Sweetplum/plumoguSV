@@ -1,3 +1,5 @@
+game = {}
+matrix = {}
 clock = {}
 ---Returns true every `interval` ms.
 ---@param id string The unique identifier of the clock.
@@ -19,7 +21,7 @@ function clock.listen(id, interval)
     return false
 end
 function game.getTimingPointAt(offset)
-    local line = map.game.getTimingPointAt(offset)
+    local line = map.getTimingPointAt(offset)
     if line then return line end
     return { StartTime = -69420, Bpm = 42.69 }
 end
@@ -173,7 +175,6 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     return noteOffsetsBetween
 end
 game.getUniqueNoteOffsetsBetween = game.getUniqueNoteOffsetsBetween
-game = {}
 ---Evaluates a simplified one-dimensional cubic bezier expression with points (0, p2, p3, 1).
 ---@param p2 number The second point in the cubic bezier.
 ---@param p3 number The third point in the cubic bezier.
@@ -233,7 +234,6 @@ function math.hermite(m1, m2, y2, t)
     local c = m1
     return a * t * t * t + b * t * t + c * t
 end
-matrix = {}
 ---Returns the weight of a number between `lowerBound` and `upperBound`.
 ---@param num number
 ---@param lowerBound number
