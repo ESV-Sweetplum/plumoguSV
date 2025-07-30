@@ -18,29 +18,18 @@ function clock.listen(id, interval)
     end
     return false
 end
-function game.getHitObjectStartTimeAt(offset, forward)
+function game.getTimingPointAt(offset)
+    local line = map.game.getTimingPointAt(offset)
+    if line then return line end
+    return { StartTime = -69420, Bpm = 42.69 }
+end
+function game.getNoteOffsetAt(offset, forward)
     local startTimes = state.GetValue("hoStartTimes", {})
     if (not truthy(#startTimes)) then return -1 end
     if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
     if (state.SongTime < startTimes[1]) then return startTimes[1] end
     local startTime = table.searchClosest(startTimes, offset, forward and 2 or 1)
     return startTime
-end
-function game.getSSFMultiplierAt(offset)
-    local ssf = map.GetScrollSpeedFactorAt(offset)
-    if ssf then return ssf.Multiplier end
-    return 1
-end
-function game.getSVStartTimeAt(offset)
-    local sv = map.GetScrollVelocityAt(offset)
-    if sv then return sv.StartTime end
-    return -1
-end
-function game.getSVMultiplierAt(offset)
-    local sv = map.GetScrollVelocityAt(offset)
-    if sv then return sv.Multiplier end
-    if (map.InitialScrollVelocity == 0) then return 1 end
-    return map.InitialScrollVelocity or 1
 end
 local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---Gets the snap color from a given time.
@@ -71,10 +60,21 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     if (not foundCorrectSnap) then return 5 end
     return guessedSnap
 end
-function game.getTimingPointAt(offset)
-    local line = map.game.getTimingPointAt(offset)
-    if line then return line end
-    return { StartTime = -69420, Bpm = 42.69 }
+function game.getSSFMultiplierAt(offset)
+    local ssf = map.GetScrollSpeedFactorAt(offset)
+    if ssf then return ssf.Multiplier end
+    return 1
+end
+function game.getSVStartTimeAt(offset)
+    local sv = map.GetScrollVelocityAt(offset)
+    if sv then return sv.StartTime end
+    return -1
+end
+function game.getSVMultiplierAt(offset)
+    local sv = map.GetScrollVelocityAt(offset)
+    if sv then return sv.Multiplier end
+    if (map.InitialScrollVelocity == 0) then return 1 end
+    return map.InitialScrollVelocity or 1
 end
 ---Returns a list of [bookmarks](lua://Bookmark) between two times, inclusive.
 ---@param startOffset number The lower bound of the search area.
@@ -87,6 +87,18 @@ function game.getBookmarksBetweenOffsets(startOffset, endOffset)
         if bmIsInRange then bookmarksBetweenOffsets[#bookmarksBetweenOffsets + 1] = bm end
     end
     return sort(bookmarksBetweenOffsets, sortAscendingStartTime)
+end
+---Returns a list of [timing points](lua://TimingPoint) between two times, inclusive.
+---@param startOffset number The lower bound of the search area.
+---@param endOffset number The upper bound of the search area.
+---@return TimingPoint[] tps All of the [timing points](lua://TimingPoint) within the area.
+function game.getLinesBetweenOffsets(startOffset, endOffset)
+    local linesBetweenoffsets = {} ---@type TimingPoint[]
+    for _, line in ipairs(map.TimingPoints) do
+        local lineIsInRange = line.StartTime >= startOffset and line.StartTime < endOffset
+        if lineIsInRange then linesBetweenoffsets[#linesBetweenoffsets + 1] = line end
+    end
+    return sort(linesBetweenoffsets, sortAscendingStartTime)
 end
 ---Returns a list of [hit objects](lua://HitObject) between two times, inclusive.
 ---@param startOffset number The lower bound of the search area.
@@ -134,18 +146,6 @@ function game.getSVsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
     end
     if (dontSort) then return svsBetweenOffsets end
     return sort(svsBetweenOffsets, sortAscendingStartTime)
-end
----Returns a list of [timing points](lua://TimingPoint) between two times, inclusive.
----@param startOffset number The lower bound of the search area.
----@param endOffset number The upper bound of the search area.
----@return TimingPoint[] tps All of the [timing points](lua://TimingPoint) within the area.
-function game.getLinesBetweenOffsets(startOffset, endOffset)
-    local linesBetweenoffsets = {} ---@type TimingPoint[]
-    for _, line in ipairs(map.TimingPoints) do
-        local lineIsInRange = line.StartTime >= startOffset and line.StartTime < endOffset
-        if lineIsInRange then linesBetweenoffsets[#linesBetweenoffsets + 1] = line end
-    end
-    return sort(linesBetweenoffsets, sortAscendingStartTime)
 end
 ---Finds and returns a list of all unique offsets of notes between a start and an end time [Table]
 ---@param startOffset number
@@ -3386,7 +3386,7 @@ function renderSynthesis()
     local msptl = 60000 / tl.Bpm * math.toNumber(tl.Signature)
     local snapTable = bgVars.snapTable
     local pulseCount = bgVars.pulseCount
-    local mostRecentStart = game.getHitObjectStartTimeAt(curTime)
+    local mostRecentStart = game.getNoteOffsetAt(curTime)
     local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
     if (#snapTable >= (maxDim / 1.6) / circleSize) then
         bgVars.snapOffset = circleSize

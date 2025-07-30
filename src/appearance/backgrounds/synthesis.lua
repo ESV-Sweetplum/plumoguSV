@@ -35,7 +35,7 @@ function renderSynthesis()
 
     local snapTable = bgVars.snapTable
     local pulseCount = bgVars.pulseCount
-    local mostRecentStart = game.getHitObjectStartTimeAt(curTime)
+    local mostRecentStart = game.getNoteOffsetAt(curTime)
 
     local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
 

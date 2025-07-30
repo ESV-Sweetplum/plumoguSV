@@ -1,4 +1,4 @@
-function game.getHitObjectStartTimeAt(offset, forward)
+function game.getNoteOffsetAt(offset, forward)
     local startTimes = state.GetValue("hoStartTimes", {})
     if (not truthy(#startTimes)) then return -1 end
     if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
