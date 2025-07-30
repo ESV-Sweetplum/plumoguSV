@@ -9,7 +9,7 @@ function updateDirectEdit()
         return
     end
 
-    local svs = getSVsBetweenOffsets(firstOffset, lastOffset)
+    local svs = game.getSVsBetweenOffsets(firstOffset, lastOffset)
 
     state.SetValue("directSVList", svs)
 end

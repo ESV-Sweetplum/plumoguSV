@@ -81,7 +81,7 @@ function renderMeasureDataWidget()
     local endOffset = uniqueDict[2] or uniqueDict[1]
     if (math.abs(endOffset - startOffset) < 1e-10) then return end
     if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset) then
-        svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+        svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
         widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)

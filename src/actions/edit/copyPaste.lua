@@ -5,7 +5,7 @@ function copyItems(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     if (not menuVars.copyTable[1]) then goto continue1 end
-    for _, line in ipairs(getLinesBetweenOffsets(startOffset, endOffset)) do
+    for _, line in ipairs(game.getLinesBetweenOffsets(startOffset, endOffset)) do
         local copiedLine = {
             relativeOffset = line.StartTime - startOffset,
             bpm = line.Bpm,
@@ -16,7 +16,7 @@ function copyItems(menuVars)
     end
     ::continue1::
     if (not menuVars.copyTable[2]) then goto continue2 end
-    for _, sv in ipairs(getSVsBetweenOffsets(startOffset, endOffset)) do
+    for _, sv in ipairs(game.getSVsBetweenOffsets(startOffset, endOffset)) do
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
             multiplier = sv.Multiplier
@@ -25,7 +25,7 @@ function copyItems(menuVars)
     end
     ::continue2::
     if (not menuVars.copyTable[3]) then goto continue3 end
-    for _, ssf in ipairs(getSSFsBetweenOffsets(startOffset, endOffset)) do
+    for _, ssf in ipairs(game.getSSFsBetweenOffsets(startOffset, endOffset)) do
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
             multiplier = ssf.Multiplier
@@ -34,7 +34,7 @@ function copyItems(menuVars)
     end
     ::continue3::
     if (not menuVars.copyTable[4]) then goto continue4 end
-    for _, bm in ipairs(getBookmarksBetweenOffsets(startOffset, endOffset)) do
+    for _, bm in ipairs(game.getBookmarksBetweenOffsets(startOffset, endOffset)) do
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
             note = bm.Note
@@ -42,10 +42,22 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.BMs[menuVars.curSlot], copiedBM)
     end
     ::continue4::
-    if (#menuVars.copied.BMs[menuVars.curSlot] > 0) then toggleablePrint("s!", "Copied " .. #menuVars.copied.BMs[menuVars.curSlot] .. " Bookmarks.") end
-    if (#menuVars.copied.SSFs[menuVars.curSlot] > 0) then toggleablePrint("s!", "Copied " .. #menuVars.copied.SSFs[menuVars.curSlot] .. " SSFs.") end
-    if (#menuVars.copied.SVs[menuVars.curSlot] > 0) then toggleablePrint("s!", "Copied " .. #menuVars.copied.SVs[menuVars.curSlot] .. " SVs.") end
-    if (#menuVars.copied.lines[menuVars.curSlot] > 0) then toggleablePrint("s!", "Copied " .. #menuVars.copied.lines[menuVars.curSlot] .. " Lines.") end
+    if (#menuVars.copied.BMs[menuVars.curSlot] > 0) then
+        toggleablePrint("s!",
+            "Copied " .. #menuVars.copied.BMs[menuVars.curSlot] .. " Bookmarks.")
+    end
+    if (#menuVars.copied.SSFs[menuVars.curSlot] > 0) then
+        toggleablePrint("s!",
+            "Copied " .. #menuVars.copied.SSFs[menuVars.curSlot] .. " SSFs.")
+    end
+    if (#menuVars.copied.SVs[menuVars.curSlot] > 0) then
+        toggleablePrint("s!",
+            "Copied " .. #menuVars.copied.SVs[menuVars.curSlot] .. " SVs.")
+    end
+    if (#menuVars.copied.lines[menuVars.curSlot] > 0) then
+        toggleablePrint("s!",
+            "Copied " .. #menuVars.copied.lines[menuVars.curSlot] .. " Lines.")
+    end
 end
 
 function clearCopiedItems(menuVars)
@@ -73,10 +85,10 @@ function pasteItems(menuVars)
     end
 
     local endRemoveOffset = endOffset + lastCopiedValue.relativeOffset + 1 / 128
-    local linesToRemove = menuVars.copyTable[1] and getLinesBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local svsToRemove = menuVars.copyTable[2] and getSVsBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local ssfsToRemove = menuVars.copyTable[3] and getSSFsBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local bmsToRemove = menuVars.copyTable[4] and getBookmarksBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local linesToRemove = menuVars.copyTable[1] and game.getLinesBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local svsToRemove = menuVars.copyTable[2] and game.getSVsBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local ssfsToRemove = menuVars.copyTable[3] and game.getSSFsBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local bmsToRemove = menuVars.copyTable[4] and game.getBookmarksBetweenOffsets(startOffset, endRemoveOffset) or {}
     if globalVars.dontReplaceSV then
         linesToRemove = {}
         svsToRemove = {}

@@ -2,7 +2,7 @@
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@return TimingPoint[] tps All of the [timing points](lua://TimingPoint) within the area.
-function getLinesBetweenOffsets(startOffset, endOffset)
+function game.getLinesBetweenOffsets(startOffset, endOffset)
     local linesBetweenoffsets = {} ---@type TimingPoint[]
     for _, line in ipairs(map.TimingPoints) do
         local lineIsInRange = line.StartTime >= startOffset and line.StartTime < endOffset

@@ -15,7 +15,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance)
     local lastOffset = offsets[#offsets]
     if placingStillSVs then offsets = { firstOffset, lastOffset } end
     local svsToAdd = {}
-    local svsToRemove = getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local svsToRemove = game.getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
     if (not placingStillSVs) and globalVars.dontReplaceSV then
         svsToRemove = {}
     end

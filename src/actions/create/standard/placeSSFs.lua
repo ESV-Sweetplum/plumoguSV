@@ -5,7 +5,7 @@ function placeSSFs(menuVars)
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local ssfsToAdd = {}
-    local ssfsToRemove = getSSFsBetweenOffsets(firstOffset, lastOffset)
+    local ssfsToRemove = game.getSSFsBetweenOffsets(firstOffset, lastOffset)
     if globalVars.dontReplaceSV then
         ssfsToRemove = {}
     end

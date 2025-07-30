@@ -10,7 +10,7 @@ function scaleDisplaceSVs(menuVars)
     for i = 1, (#offsets - 1) do
         local note1Offset = offsets[i]
         local note2Offset = offsets[i + 1]
-        local svsBetweenOffsets = getSVsBetweenOffsets(note1Offset, note2Offset)
+        local svsBetweenOffsets = game.getSVsBetweenOffsets(note1Offset, note2Offset)
         addStartSVIfMissing(svsBetweenOffsets, note1Offset)
         local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
@@ -45,11 +45,11 @@ function scaleMultiplySVs(menuVars)
     local offsets = uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local svsToAdd = {}
-    local svsToRemove = getSVsBetweenOffsets(offsets[1], offsets[#offsets])
+    local svsToRemove = game.getSVsBetweenOffsets(offsets[1], offsets[#offsets])
     for i = 1, (#offsets - 1) do
         local startOffset = offsets[i]
         local endOffset = offsets[i + 1]
-        local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+        local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         local scalingFactor = menuVars.ratio
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,

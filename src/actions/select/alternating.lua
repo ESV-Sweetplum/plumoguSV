@@ -3,7 +3,7 @@ function selectAlternating(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local notes = getNotesBetweenOffsets(startOffset, endOffset)
+    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
     local times = {}
     for _, ho in ipairs(notes) do
         table.insert(times, ho.StartTime)

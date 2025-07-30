@@ -3,7 +3,7 @@
 ---@param endOffset number The upper bound of the search area.
 ---@param includeEnd? boolean Whether or not to include any SVs on the end time.
 ---@return ScrollSpeedFactor[] ssfs All of the [scroll speed factors](lua://ScrollSpeedFactor) within the area.
-function getSSFsBetweenOffsets(startOffset, endOffset, includeEnd)
+function game.getSSFsBetweenOffsets(startOffset, endOffset, includeEnd)
     local ssfsBetweenOffsets = {} ---@type ScrollSpeedFactor[]
     local ssfs = map.ScrollSpeedFactors
     if (ssfs == nil) then

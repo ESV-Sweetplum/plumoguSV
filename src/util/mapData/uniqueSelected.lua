@@ -41,7 +41,7 @@ function uniqueNotesBetweenSelected()
     end
     local startOffset = selectedNoteOffsets[1]
     local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
-    local offsets = getNotesBetweenOffsets(startOffset, endOffset)
+    local offsets = game.getNotesBetweenOffsets(startOffset, endOffset)
     if (#offsets < 2) then
         toggleablePrint("e!",
             "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")

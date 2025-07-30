@@ -4,7 +4,7 @@ function selectByChordSizes(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
 
-    local notes = getNotesBetweenOffsets(startOffset, endOffset)
+    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
 
     local noteTimeTable = {}
 

@@ -80,7 +80,7 @@ end
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@return Bookmark[] bms All of the [bookmarks](lua://Bookmark) within the area.
-function getBookmarksBetweenOffsets(startOffset, endOffset)
+function game.getBookmarksBetweenOffsets(startOffset, endOffset)
     local bookmarksBetweenOffsets = {} ---@type Bookmark[]
     for _, bm in ipairs(map.Bookmarks) do
         local bmIsInRange = bm.StartTime >= startOffset and bm.StartTime < endOffset
@@ -92,7 +92,7 @@ end
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@return HitObject[] objs All of the [hit objects](lua://HitObject) within the area.
-function getNotesBetweenOffsets(startOffset, endOffset)
+function game.getNotesBetweenOffsets(startOffset, endOffset)
     local notesBetweenOffsets = {} ---@type HitObject[]
     for _, note in ipairs(map.HitObjects) do
         local noteIsInRange = note.StartTime >= startOffset and note.StartTime <= endOffset
@@ -105,7 +105,7 @@ end
 ---@param endOffset number The upper bound of the search area.
 ---@param includeEnd? boolean Whether or not to include any SVs on the end time.
 ---@return ScrollSpeedFactor[] ssfs All of the [scroll speed factors](lua://ScrollSpeedFactor) within the area.
-function getSSFsBetweenOffsets(startOffset, endOffset, includeEnd)
+function game.getSSFsBetweenOffsets(startOffset, endOffset, includeEnd)
     local ssfsBetweenOffsets = {} ---@type ScrollSpeedFactor[]
     local ssfs = map.ScrollSpeedFactors
     if (ssfs == nil) then
@@ -125,7 +125,7 @@ end
 ---@param includeEnd? boolean Whether or not to include any SVs on the end time.
 ---@paramk dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
-function getSVsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
+function game.getSVsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
     for _, sv in ipairs(map.ScrollVelocities) do
         local svIsInRange = sv.StartTime >= startOffset and sv.StartTime < endOffset
@@ -139,7 +139,7 @@ end
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@return TimingPoint[] tps All of the [timing points](lua://TimingPoint) within the area.
-function getLinesBetweenOffsets(startOffset, endOffset)
+function game.getLinesBetweenOffsets(startOffset, endOffset)
     local linesBetweenoffsets = {} ---@type TimingPoint[]
     for _, line in ipairs(map.TimingPoints) do
         local lineIsInRange = line.StartTime >= startOffset and line.StartTime < endOffset
@@ -1618,7 +1618,7 @@ function displaceNotesForAnimationFrames(settingVars)
         local position = frameTime.position
         local startOffset = math.min(selectedStartTime, noteOffset)
         local endOffset = math.max(selectedStartTime, noteOffset)
-        local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+        local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         local distanceBetweenOffsets = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
             endOffset)
@@ -1644,13 +1644,13 @@ function automateCopySVs(settingVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svs = getSVsBetweenOffsets(startOffset, endOffset)
+    local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
     if (not #svs or #svs == 0) then
         toggleablePrint("w!", "No SVs found within the copiable region.")
         return
     end
     local firstSVTime = svs[1].StartTime
-    for _, sv in ipairs(getSVsBetweenOffsets(startOffset, endOffset)) do
+    for _, sv in ipairs(game.getSVsBetweenOffsets(startOffset, endOffset)) do
         local copiedSV = {
             relativeOffset = sv.StartTime - firstSVTime,
             multiplier = sv.Multiplier
@@ -1737,7 +1737,7 @@ function placePenisSV(settingVars)
         local trueVal = settingVars.sCurvature * 0.01 * circVal + (3.75 - settingVars.sCurvature * 0.01)
         table.insert(svs, createSV(time, trueVal))
     end
-    removeAndAddSVs(getSVsBetweenOffsets(startTime, startTime + settingVars.sWidth + settingVars.bWidth * 2), svs)
+    removeAndAddSVs(game.getSVsBetweenOffsets(startTime, startTime + settingVars.sWidth + settingVars.bWidth * 2), svs)
 end
 function placeStutterSVs(settingVars)
     local finalSVType = FINAL_SV_TYPES[settingVars.finalSVIndex]
@@ -1755,7 +1755,7 @@ function placeStutterSVs(settingVars)
     local firstStutterSVs = generateLinearSet(settingVars.startSV, lastFirstStutter,
         totalNumStutters)
     local svsToAdd = {}
-    local svsToRemove = getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local svsToRemove = game.getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
     local stutterIndex = 1
     for i = 1, #offsets - 1 do
         local startOffset = offsets[i]
@@ -1794,7 +1794,7 @@ function placeStutterSSFs(settingVars)
     local firstStutterSVs = generateLinearSet(settingVars.startSV, lastFirstStutter,
         totalNumStutters)
     local ssfsToAdd = {}
-    local ssfsToRemove = getSSFsBetweenOffsets(firstOffset, lastOffset)
+    local ssfsToRemove = game.getSSFsBetweenOffsets(firstOffset, lastOffset)
     local stutterIndex = 1
     for i = 1, #offsets - 1 do
         local startOffset = offsets[i]
@@ -1832,7 +1832,7 @@ function placeTeleportStutterSVs(settingVars)
     local lastOffset = offsets[#offsets]
     local numTeleportSets = #offsets - 1
     local svsToAdd = {}
-    local svsToRemove = getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local svsToRemove = game.getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
     local svPercents = generateLinearSet(svPercent, lastSVPercent, numTeleportSets)
     local mainSVs = generateLinearSet(settingVars.mainSV, lastMainSV, numTeleportSets)
     removeAndAddSVs(svsToRemove, svsToAdd)
@@ -1878,7 +1878,7 @@ function placeTeleportStutterSSFs(settingVars)
     local lastOffset = offsets[#offsets]
     local numTeleportSets = #offsets - 1
     local ssfsToAdd = {}
-    local ssfsToRemove = getSSFsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local ssfsToRemove = game.getSSFsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
     local ssfPercents = generateLinearSet(svPercent, lastSVPercent, numTeleportSets)
     local mainSSFs = generateLinearSet(settingVars.mainSV, lastMainSV, numTeleportSets)
     removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
@@ -1922,7 +1922,7 @@ function placeSSFs(menuVars)
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local ssfsToAdd = {}
-    local ssfsToRemove = getSSFsBetweenOffsets(firstOffset, lastOffset)
+    local ssfsToRemove = game.getSSFsBetweenOffsets(firstOffset, lastOffset)
     if globalVars.dontReplaceSV then
         ssfsToRemove = {}
     end
@@ -1958,7 +1958,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance)
     local lastOffset = offsets[#offsets]
     if placingStillSVs then offsets = { firstOffset, lastOffset } end
     local svsToAdd = {}
-    local svsToRemove = getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local svsToRemove = game.getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
     if (not placingStillSVs) and globalVars.dontReplaceSV then
         svsToRemove = {}
     end
@@ -2178,10 +2178,10 @@ function deleteItems(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local linesToRemove = getLinesBetweenOffsets(startOffset, endOffset)
-    local svsToRemove = getSVsBetweenOffsets(startOffset, endOffset)
-    local ssfsToRemove = getSSFsBetweenOffsets(startOffset, endOffset)
-    local bmsToRemove = getBookmarksBetweenOffsets(startOffset, endOffset)
+    local linesToRemove = game.getLinesBetweenOffsets(startOffset, endOffset)
+    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local ssfsToRemove = game.getSSFsBetweenOffsets(startOffset, endOffset)
+    local bmsToRemove = game.getBookmarksBetweenOffsets(startOffset, endOffset)
     if (not menuVars.deleteTable[1]) then linesToRemove = {} end
     if (not menuVars.deleteTable[2]) then svsToRemove = {} end
     if (not menuVars.deleteTable[3]) then ssfsToRemove = {} end
@@ -2283,8 +2283,8 @@ function changeGroups(menuVars)
     local offsets = uniqueSelectedNoteOffsets()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svsToRemove = getSVsBetweenOffsets(startOffset, endOffset, true)
-    local ssfsToRemove = getSSFsBetweenOffsets(startOffset, endOffset, true)
+    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset, true)
+    local ssfsToRemove = game.getSSFsBetweenOffsets(startOffset, endOffset, true)
     local svsToAdd = {}
     local ssfsToAdd = {}
     local oldGroup = state.SelectedScrollGroupId
@@ -2333,14 +2333,14 @@ function convertSVSSF(menuVars)
     local objects = {}
     local editorActions = {}
     if (menuVars.conversionDirection) then
-        local svs = getSVsBetweenOffsets(startOffset, endOffset, false)
+        local svs = game.getSVsBetweenOffsets(startOffset, endOffset, false)
         for k = 1, #svs do
             local sv = svs[k]
             table.insert(objects, { StartTime = sv.StartTime, Multiplier = sv.Multiplier })
         end
         table.insert(editorActions, utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svs))
     else
-        local ssfs = getSSFsBetweenOffsets(startOffset, endOffset, false)
+        local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset, false)
         for k = 1, #ssfs do
             local ssf = ssfs[k]
             table.insert(objects, { StartTime = ssf.StartTime, Multiplier = ssf.Multiplier })
@@ -2372,7 +2372,7 @@ function copyItems(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     if (not menuVars.copyTable[1]) then goto continue1 end
-    for _, line in ipairs(getLinesBetweenOffsets(startOffset, endOffset)) do
+    for _, line in ipairs(game.getLinesBetweenOffsets(startOffset, endOffset)) do
         local copiedLine = {
             relativeOffset = line.StartTime - startOffset,
             bpm = line.Bpm,
@@ -2383,7 +2383,7 @@ function copyItems(menuVars)
     end
     ::continue1::
     if (not menuVars.copyTable[2]) then goto continue2 end
-    for _, sv in ipairs(getSVsBetweenOffsets(startOffset, endOffset)) do
+    for _, sv in ipairs(game.getSVsBetweenOffsets(startOffset, endOffset)) do
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
             multiplier = sv.Multiplier
@@ -2392,7 +2392,7 @@ function copyItems(menuVars)
     end
     ::continue2::
     if (not menuVars.copyTable[3]) then goto continue3 end
-    for _, ssf in ipairs(getSSFsBetweenOffsets(startOffset, endOffset)) do
+    for _, ssf in ipairs(game.getSSFsBetweenOffsets(startOffset, endOffset)) do
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
             multiplier = ssf.Multiplier
@@ -2401,7 +2401,7 @@ function copyItems(menuVars)
     end
     ::continue3::
     if (not menuVars.copyTable[4]) then goto continue4 end
-    for _, bm in ipairs(getBookmarksBetweenOffsets(startOffset, endOffset)) do
+    for _, bm in ipairs(game.getBookmarksBetweenOffsets(startOffset, endOffset)) do
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
             note = bm.Note
@@ -2409,10 +2409,22 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.BMs[menuVars.curSlot], copiedBM)
     end
     ::continue4::
-    if (#menuVars.copied.BMs[menuVars.curSlot] > 0) then toggleablePrint("s!", table.concat({"Copied ", #menuVars.copied.BMs[menuVars.curSlot], " Bookmarks."})) end
-    if (#menuVars.copied.SSFs[menuVars.curSlot] > 0) then toggleablePrint("s!", table.concat({"Copied ", #menuVars.copied.SSFs[menuVars.curSlot], " SSFs."})) end
-    if (#menuVars.copied.SVs[menuVars.curSlot] > 0) then toggleablePrint("s!", table.concat({"Copied ", #menuVars.copied.SVs[menuVars.curSlot], " SVs."})) end
-    if (#menuVars.copied.lines[menuVars.curSlot] > 0) then toggleablePrint("s!", table.concat({"Copied ", #menuVars.copied.lines[menuVars.curSlot], " Lines."})) end
+    if (#menuVars.copied.BMs[menuVars.curSlot] > 0) then
+        toggleablePrint("s!",
+            table.concat({"Copied ", #menuVars.copied.BMs[menuVars.curSlot], " Bookmarks."}))
+    end
+    if (#menuVars.copied.SSFs[menuVars.curSlot] > 0) then
+        toggleablePrint("s!",
+            table.concat({"Copied ", #menuVars.copied.SSFs[menuVars.curSlot], " SSFs."}))
+    end
+    if (#menuVars.copied.SVs[menuVars.curSlot] > 0) then
+        toggleablePrint("s!",
+            table.concat({"Copied ", #menuVars.copied.SVs[menuVars.curSlot], " SVs."}))
+    end
+    if (#menuVars.copied.lines[menuVars.curSlot] > 0) then
+        toggleablePrint("s!",
+            table.concat({"Copied ", #menuVars.copied.lines[menuVars.curSlot], " Lines."}))
+    end
 end
 function clearCopiedItems(menuVars)
     local newCopied = table.duplicate(menuVars.copied)
@@ -2436,10 +2448,10 @@ function pasteItems(menuVars)
         lastCopiedValue = lastCopiedSSF or lastCopiedLine or lastCopiedBM or { relativeOffset = 0 }
     end
     local endRemoveOffset = endOffset + lastCopiedValue.relativeOffset + 1 / 128
-    local linesToRemove = menuVars.copyTable[1] and getLinesBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local svsToRemove = menuVars.copyTable[2] and getSVsBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local ssfsToRemove = menuVars.copyTable[3] and getSSFsBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local bmsToRemove = menuVars.copyTable[4] and getBookmarksBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local linesToRemove = menuVars.copyTable[1] and game.getLinesBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local svsToRemove = menuVars.copyTable[2] and game.getSVsBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local ssfsToRemove = menuVars.copyTable[3] and game.getSSFsBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local bmsToRemove = menuVars.copyTable[4] and game.getBookmarksBetweenOffsets(startOffset, endRemoveOffset) or {}
     if globalVars.dontReplaceSV then
         linesToRemove = {}
         svsToRemove = {}
@@ -2619,12 +2631,12 @@ function dynamicScaleSVs(menuVars)
     local offsets = menuVars.noteTimes
     local targetAvgSVs = menuVars.svMultipliers
     local svsToAdd = {}
-    local svsToRemove = getSVsBetweenOffsets(offsets[1], offsets[#offsets])
+    local svsToRemove = game.getSVsBetweenOffsets(offsets[1], offsets[#offsets])
     for i = 1, (#offsets - 1) do
         local startOffset = offsets[i]
         local endOffset = offsets[i + 1]
         local targetAvgSV = targetAvgSVs[i]
-        local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+        local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
             endOffset)
@@ -2850,7 +2862,7 @@ function measureSVs(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
     menuVars.roundedNSVDistance = endOffset - startOffset
     menuVars.nsvDistance = tostring(menuVars.roundedNSVDistance)
@@ -2888,7 +2900,7 @@ function mergeSVs()
     local endOffset = offsets[#offsets]
     local svTimeDict = {}
     local svsToRemove = {}
-    for _, sv in ipairs(table.reverse(getSVsBetweenOffsets(startOffset, endOffset, true, true))) do
+    for _, sv in ipairs(table.reverse(game.getSVsBetweenOffsets(startOffset, endOffset, true, true))) do
         if (svTimeDict[sv.StartTime]) then
             svsToRemove[#svsToRemove + 1] = sv
         else
@@ -2904,9 +2916,9 @@ function reverseScrollSVs(menuVars)
     local svsToAdd = {}
     local almostSVsToAdd = {}
     local extraOffset = 2 / getUsableDisplacementMultiplier(endOffset)
-    local svsToRemove = getSVsBetweenOffsets(startOffset, endOffset + extraOffset)
+    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset + extraOffset)
     local svTimeIsAdded = {}
-    local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
     local sectionDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
     local msxSeparatingDistance = -10000
@@ -2953,7 +2965,7 @@ function scaleDisplaceSVs(menuVars)
     for i = 1, (#offsets - 1) do
         local note1Offset = offsets[i]
         local note2Offset = offsets[i + 1]
-        local svsBetweenOffsets = getSVsBetweenOffsets(note1Offset, note2Offset)
+        local svsBetweenOffsets = game.getSVsBetweenOffsets(note1Offset, note2Offset)
         addStartSVIfMissing(svsBetweenOffsets, note1Offset)
         local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
@@ -2987,11 +2999,11 @@ function scaleMultiplySVs(menuVars)
     local offsets = uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local svsToAdd = {}
-    local svsToRemove = getSVsBetweenOffsets(offsets[1], offsets[#offsets])
+    local svsToRemove = game.getSVsBetweenOffsets(offsets[1], offsets[#offsets])
     for i = 1, (#offsets - 1) do
         local startOffset = offsets[i]
         local endOffset = offsets[i + 1]
-        local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+        local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         local scalingFactor = menuVars.ratio
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
@@ -3019,7 +3031,7 @@ function swapNoteSVs()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
     local oldSVDisplacements = calculateDisplacementsFromSVs(svsBetweenOffsets, offsets)
     for i = 1, #offsets do
@@ -3042,8 +3054,8 @@ function verticalShiftSVs(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {}
-    local svsToRemove = getSVsBetweenOffsets(startOffset, endOffset)
-    local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
     for k = 1, #svsBetweenOffsets do
         local sv = svsBetweenOffsets[k]
@@ -3111,7 +3123,7 @@ function selectAlternating(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local notes = getNotesBetweenOffsets(startOffset, endOffset)
+    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
     local times = {}
     for k = 1, #notes do
         local ho = notes[k]
@@ -3145,7 +3157,7 @@ function selectByChordSizes(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local notes = getNotesBetweenOffsets(startOffset, endOffset)
+    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
     local noteTimeTable = {}
     for k = 1, #notes do
         local note = notes[k]
@@ -3184,7 +3196,7 @@ function selectByNoteType(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local totalNotes = getNotesBetweenOffsets(startOffset, endOffset)
+    local totalNotes = game.getNotesBetweenOffsets(startOffset, endOffset)
     local notesToSelect = {}
     for k = 1, #totalNotes do
         local note = totalNotes[k]
@@ -3199,7 +3211,7 @@ function selectBySnap(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local notes = getNotesBetweenOffsets(startOffset, endOffset)
+    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
     local timingPoint = game.getTimingPointAt(startOffset)
     local bpm = timingPoint.Bpm
     local times = {}
@@ -5651,7 +5663,7 @@ function updateDirectEdit()
         state.SetValue("directSVList", {})
         return
     end
-    local svs = getSVsBetweenOffsets(firstOffset, lastOffset)
+    local svs = game.getSVsBetweenOffsets(firstOffset, lastOffset)
     state.SetValue("directSVList", svs)
 end
 function directSVMenu()
@@ -8259,7 +8271,7 @@ function uniqueNotesBetweenSelected()
     end
     local startOffset = selectedNoteOffsets[1]
     local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
-    local offsets = getNotesBetweenOffsets(startOffset, endOffset)
+    local offsets = game.getNotesBetweenOffsets(startOffset, endOffset)
     if (#offsets < 2) then
         toggleablePrint("e!",
             "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
@@ -8887,7 +8899,7 @@ function renderMeasureDataWidget()
     local endOffset = uniqueDict[2] or uniqueDict[1]
     if (math.abs(endOffset - startOffset) < 1e-10) then return end
     if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset) then
-        svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+        svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
         widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)

@@ -5,7 +5,7 @@ function mergeSVs()
     local endOffset = offsets[#offsets]
     local svTimeDict = {}
     local svsToRemove = {}
-    for _, sv in ipairs(table.reverse(getSVsBetweenOffsets(startOffset, endOffset, true, true))) do -- reverse to prioritize second sv in list
+    for _, sv in ipairs(table.reverse(game.getSVsBetweenOffsets(startOffset, endOffset, true, true))) do -- reverse to prioritize second sv in list
         if (svTimeDict[sv.StartTime]) then
             table.insert(svsToRemove, sv)
         else

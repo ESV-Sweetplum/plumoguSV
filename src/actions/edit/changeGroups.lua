@@ -7,8 +7,8 @@ function changeGroups(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
 
-    local svsToRemove = getSVsBetweenOffsets(startOffset, endOffset, true)
-    local ssfsToRemove = getSSFsBetweenOffsets(startOffset, endOffset, true)
+    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset, true)
+    local ssfsToRemove = game.getSSFsBetweenOffsets(startOffset, endOffset, true)
 
     local svsToAdd = {}
     local ssfsToAdd = {}

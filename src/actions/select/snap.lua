@@ -3,7 +3,7 @@ function selectBySnap(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local notes = getNotesBetweenOffsets(startOffset, endOffset)
+    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
 
     local timingPoint = game.getTimingPointAt(startOffset)
     local bpm = timingPoint.Bpm

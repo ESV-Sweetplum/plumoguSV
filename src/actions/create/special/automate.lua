@@ -4,13 +4,13 @@ function automateCopySVs(settingVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svs = getSVsBetweenOffsets(startOffset, endOffset)
+    local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
     if (not #svs or #svs == 0) then
         toggleablePrint("w!", "No SVs found within the copiable region.")
         return
     end
     local firstSVTime = svs[1].StartTime
-    for _, sv in ipairs(getSVsBetweenOffsets(startOffset, endOffset)) do
+    for _, sv in ipairs(game.getSVsBetweenOffsets(startOffset, endOffset)) do
         local copiedSV = {
             relativeOffset = sv.StartTime - firstSVTime,
             multiplier = sv.Multiplier

@@ -5,9 +5,9 @@ function reverseScrollSVs(menuVars)
     local svsToAdd = {}
     local almostSVsToAdd = {}
     local extraOffset = 2 / getUsableDisplacementMultiplier(endOffset)
-    local svsToRemove = getSVsBetweenOffsets(startOffset, endOffset + extraOffset)
+    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset + extraOffset)
     local svTimeIsAdded = {}
-    local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
     local sectionDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
     -- opposite-sign distances and displacements b/c flips SV multiplier signs at the end

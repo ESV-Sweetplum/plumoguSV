@@ -4,7 +4,7 @@ function selectByNoteType(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
 
-    local totalNotes = getNotesBetweenOffsets(startOffset, endOffset)
+    local totalNotes = game.getNotesBetweenOffsets(startOffset, endOffset)
 
     local notesToSelect = {}
 

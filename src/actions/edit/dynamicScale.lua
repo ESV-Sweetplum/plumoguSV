@@ -2,12 +2,12 @@ function dynamicScaleSVs(menuVars)
     local offsets = menuVars.noteTimes
     local targetAvgSVs = menuVars.svMultipliers
     local svsToAdd = {}
-    local svsToRemove = getSVsBetweenOffsets(offsets[1], offsets[#offsets])
+    local svsToRemove = game.getSVsBetweenOffsets(offsets[1], offsets[#offsets])
     for i = 1, (#offsets - 1) do
         local startOffset = offsets[i]
         local endOffset = offsets[i + 1]
         local targetAvgSV = targetAvgSVs[i]
-        local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+        local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
             endOffset)

@@ -4,8 +4,8 @@ function verticalShiftSVs(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {}
-    local svsToRemove = getSVsBetweenOffsets(startOffset, endOffset)
-    local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
     for _, sv in ipairs(svsBetweenOffsets) do
         local newSVMultiplier = sv.Multiplier + menuVars.verticalShift

@@ -7,7 +7,7 @@ function swapNoteSVs()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
     local oldSVDisplacements = calculateDisplacementsFromSVs(svsBetweenOffsets, offsets)
     for i = 1, #offsets do

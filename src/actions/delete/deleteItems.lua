@@ -3,10 +3,10 @@ function deleteItems(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local linesToRemove = getLinesBetweenOffsets(startOffset, endOffset)
-    local svsToRemove = getSVsBetweenOffsets(startOffset, endOffset)
-    local ssfsToRemove = getSSFsBetweenOffsets(startOffset, endOffset)
-    local bmsToRemove = getBookmarksBetweenOffsets(startOffset, endOffset)
+    local linesToRemove = game.getLinesBetweenOffsets(startOffset, endOffset)
+    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local ssfsToRemove = game.getSSFsBetweenOffsets(startOffset, endOffset)
+    local bmsToRemove = game.getBookmarksBetweenOffsets(startOffset, endOffset)
     if (not menuVars.deleteTable[1]) then linesToRemove = {} end
     if (not menuVars.deleteTable[2]) then svsToRemove = {} end
     if (not menuVars.deleteTable[3]) then ssfsToRemove = {} end

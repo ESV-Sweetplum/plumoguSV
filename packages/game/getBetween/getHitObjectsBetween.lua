@@ -2,7 +2,7 @@
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@return HitObject[] objs All of the [hit objects](lua://HitObject) within the area.
-function getNotesBetweenOffsets(startOffset, endOffset)
+function game.getNotesBetweenOffsets(startOffset, endOffset)
     local notesBetweenOffsets = {} ---@type HitObject[]
     for _, note in ipairs(map.HitObjects) do
         local noteIsInRange = note.StartTime >= startOffset and note.StartTime <= endOffset

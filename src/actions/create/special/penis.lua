@@ -22,5 +22,5 @@ function placePenisSV(settingVars)
         table.insert(svs, createSV(time, trueVal))
     end
 
-    removeAndAddSVs(getSVsBetweenOffsets(startTime, startTime + settingVars.sWidth + settingVars.bWidth * 2), svs)
+    removeAndAddSVs(game.getSVsBetweenOffsets(startTime, startTime + settingVars.sWidth + settingVars.bWidth * 2), svs)
 end

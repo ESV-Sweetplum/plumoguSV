@@ -6,13 +6,13 @@ function convertSVSSF(menuVars)
     local editorActions = {}
 
     if (menuVars.conversionDirection) then
-        local svs = getSVsBetweenOffsets(startOffset, endOffset, false)
+        local svs = game.getSVsBetweenOffsets(startOffset, endOffset, false)
         for _, sv in ipairs(svs) do
             table.insert(objects, { StartTime = sv.StartTime, Multiplier = sv.Multiplier })
         end
         table.insert(editorActions, utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svs))
     else
-        local ssfs = getSSFsBetweenOffsets(startOffset, endOffset, false)
+        local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset, false)
         for _, ssf in ipairs(ssfs) do
             table.insert(objects, { StartTime = ssf.StartTime, Multiplier = ssf.Multiplier })
         end

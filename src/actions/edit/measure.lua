@@ -4,7 +4,7 @@ function measureSVs(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
 
     menuVars.roundedNSVDistance = endOffset - startOffset
