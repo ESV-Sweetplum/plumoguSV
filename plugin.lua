@@ -18,6 +18,65 @@ function clock.listen(id, interval)
     end
     return false
 end
+function getHitObjectStartTimeAt(offset, forward)
+    local startTimes = state.GetValue("hoStartTimes", {})
+    if (not truthy(#startTimes)) then return -1 end
+    if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
+    if (state.SongTime < startTimes[1]) then return startTimes[1] end
+    local startTime = table.searchClosest(startTimes, offset, forward and 2 or 1)
+    return startTime
+end
+function getSSFMultiplierAt(offset)
+    local ssf = map.GetScrollSpeedFactorAt(offset)
+    if ssf then return ssf.Multiplier end
+    return 1
+end
+function getSVStartTimeAt(offset)
+    local sv = map.GetScrollVelocityAt(offset)
+    if sv then return sv.StartTime end
+    return -1
+end
+function getSVMultiplierAt(offset)
+    local sv = map.GetScrollVelocityAt(offset)
+    if sv then return sv.Multiplier end
+    if (map.InitialScrollVelocity == 0) then return 1 end
+    return map.InitialScrollVelocity or 1
+end
+local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
+---Gets the snap color from a given time.
+---@param time number The time to reference.
+---@param dontPrintInaccuracy? boolean If set to true, will not print warning messages on unconfident guesses.
+---@return SnapNumber
+function game.getSnapAt(time, dontPrintInaccuracy)
+    local previousBar = map.GetNearestSnapTimeFromTime(false, 1, time)
+    local barTime = 60000 / getTimingPointAt(time).Bpm
+    local distance = time - previousBar
+    if (math.abs(distance) / barTime < 0.02) then return 1 end
+    local absoluteSnap = barTime / distance
+    local foundCorrectSnap = false
+    for i = 1, math.ceil(16 / absoluteSnap) do
+        local currentSnap = absoluteSnap * i
+        guessedSnap = table.searchClosest(SPECIAL_SNAPS, currentSnap)
+        local approximateError = math.abs(guessedSnap - currentSnap) / currentSnap
+        if (approximateError < 0.05) then
+            if (approximateError > 0.03 and not dontPrintInaccuracy) then
+                print("w!",
+                    "The snap for the note at time " ..
+                    time .. " could be incorrect (confidence < 97%). Please double check to see if it's correct.")
+            end
+            foundCorrectSnap = true
+            break
+        end
+    end
+    if (not foundCorrectSnap) then return 5 end
+    return guessedSnap
+end
+function getTimingPointAt(offset)
+    local line = map.GetTimingPointAt(offset)
+    if line then return line end
+    return { StartTime = -69420, Bpm = 42.69 }
+end
+game = {}
 ---Evaluates a simplified one-dimensional cubic bezier expression with points (0, p2, p3, 1).
 ---@param p2 number The second point in the cubic bezier.
 ---@param p3 number The third point in the cubic bezier.
@@ -2622,7 +2681,7 @@ function layerSnaps()
     local layerDict = {}
     local layerNames = table.property(map.EditorLayers, "Name")
     for _, ho in ipairs(uniqueNotesBetweenSelected()) do
-        local color = COLOR_MAP[getSnapFromTime(ho.StartTime)]
+        local color = COLOR_MAP[game.getSnapAt(ho.StartTime)]
         if (ho.EditorLayer == 0) then
             layer = { Name = "Default", ColorRgb = "255,255,255", Hidden = false }
         else
@@ -3228,7 +3287,7 @@ function renderSynthesis()
         bgVars.snapOffset = bgVars.snapOffset * 0.99 ^ state.DeltaTime
     end
     if (curTime - mostRecentStart < bgVars.lastDifference) then
-        table.insert(snapTable, getSnapFromTime(mostRecentStart, true))
+        table.insert(snapTable, game.getSnapAt(mostRecentStart, true))
     end
     bgVars.lastDifference = curTime - mostRecentStart
     for idx, snap in pairs(snapTable) do
@@ -8050,35 +8109,6 @@ function getHypotheticalSVMultiplierAt(svs, offset)
     end
     return 1
 end
-function getSVStartTimeAt(offset)
-    local sv = map.GetScrollVelocityAt(offset)
-    if sv then return sv.StartTime end
-    return -1
-end
-function getSVMultiplierAt(offset)
-    local sv = map.GetScrollVelocityAt(offset)
-    if sv then return sv.Multiplier end
-    if (map.InitialScrollVelocity == 0) then return 1 end
-    return map.InitialScrollVelocity or 1
-end
-function getSSFMultiplierAt(offset)
-    local ssf = map.GetScrollSpeedFactorAt(offset)
-    if ssf then return ssf.Multiplier end
-    return 1
-end
-function getTimingPointAt(offset)
-    local line = map.GetTimingPointAt(offset)
-    if line then return line end
-    return { StartTime = -69420, Bpm = 42.69 }
-end
-function getHitObjectStartTimeAt(offset, forward)
-    local startTimes = state.GetValue("hoStartTimes", {})
-    if (not truthy(#startTimes)) then return -1 end
-    if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
-    if (state.SongTime < startTimes[1]) then return startTimes[1] end
-    local startTime = table.searchClosest(startTimes, offset, forward and 2 or 1)
-    return startTime
-end
 ---Returns a list of [hit objects](lua://HitObject) between two times, inclusive.
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
@@ -8769,35 +8799,6 @@ function sinusoidalSettingsMenu(settingVars, skipFinalSV)
     settingsChanged = chooseSVPerQuarterPeriod(settingVars) or settingsChanged
     settingsChanged = chooseFinalSV(settingVars, skipFinalSV) or settingsChanged
     return settingsChanged
-end
-local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
----Gets the snap color from a given time.
----@param time number The time to reference.
----@param dontPrintInaccuracy? boolean If set to true, will not print warning messages on unconfident guesses.
----@return SnapNumber
-function getSnapFromTime(time, dontPrintInaccuracy)
-    local previousBar = map.GetNearestSnapTimeFromTime(false, 1, time)
-    local barTime = 60000 / getTimingPointAt(time).Bpm
-    local distance = time - previousBar
-    if (math.abs(distance) / barTime < 0.02) then return 1 end
-    local absoluteSnap = barTime / distance
-    local foundCorrectSnap = false
-    for i = 1, math.ceil(16 / absoluteSnap) do
-        local currentSnap = absoluteSnap * i
-        guessedSnap = table.searchClosest(SPECIAL_SNAPS, currentSnap)
-        local approximateError = math.abs(guessedSnap - currentSnap) / currentSnap
-        if (approximateError < 0.05) then
-            if (approximateError > 0.03 and not dontPrintInaccuracy) then
-                print("w!",
-                    "The snap for the note at time " ..
-                    time .. " could be incorrect (confidence < 97%). Please double check to see if it's correct.")
-            end
-            foundCorrectSnap = true
-            break
-        end
-    end
-    if (not foundCorrectSnap) then return 5 end
-    return guessedSnap
 end
 function awake()
     local tempGlobalVars = read()

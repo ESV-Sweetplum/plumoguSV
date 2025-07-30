@@ -27,7 +27,7 @@ function layerSnaps()
     local layerDict = {}
     local layerNames = table.property(map.EditorLayers, "Name")
     for _, ho in ipairs(uniqueNotesBetweenSelected()) do
-        local color = COLOR_MAP[getSnapFromTime(ho.StartTime)]
+        local color = COLOR_MAP[game.getSnapAt(ho.StartTime)]
         if (ho.EditorLayer == 0) then
             layer = { Name = "Default", ColorRgb = "255,255,255", Hidden = false }
         else

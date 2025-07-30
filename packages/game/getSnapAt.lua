@@ -4,7 +4,7 @@ local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---@param time number The time to reference.
 ---@param dontPrintInaccuracy? boolean If set to true, will not print warning messages on unconfident guesses.
 ---@return SnapNumber
-function getSnapFromTime(time, dontPrintInaccuracy)
+function game.getSnapAt(time, dontPrintInaccuracy)
     local previousBar = map.GetNearestSnapTimeFromTime(false, 1, time)
     local barTime = 60000 / getTimingPointAt(time).Bpm
 

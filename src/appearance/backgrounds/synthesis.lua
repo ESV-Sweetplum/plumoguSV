@@ -49,7 +49,7 @@ function renderSynthesis()
     end
 
     if (curTime - mostRecentStart < bgVars.lastDifference) then
-        table.insert(snapTable, getSnapFromTime(mostRecentStart, true))
+        table.insert(snapTable, game.getSnapAt(mostRecentStart, true))
     end
 
     bgVars.lastDifference = curTime - mostRecentStart

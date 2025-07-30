@@ -31,38 +31,3 @@ function getHypotheticalSVTimeAt(svs, offset)
     end
     return -69
 end
-
-function getSVStartTimeAt(offset)
-    local sv = map.GetScrollVelocityAt(offset)
-    if sv then return sv.StartTime end
-    return -1
-end
-
-function getSVMultiplierAt(offset)
-    local sv = map.GetScrollVelocityAt(offset)
-    if sv then return sv.Multiplier end
-    if (map.InitialScrollVelocity == 0) then return 1 end
-    return map.InitialScrollVelocity or 1
-end
-
-function getSSFMultiplierAt(offset)
-    local ssf = map.GetScrollSpeedFactorAt(offset)
-    if ssf then return ssf.Multiplier end
-    return 1
-end
-
-function getTimingPointAt(offset)
-    local line = map.GetTimingPointAt(offset)
-    if line then return line end
-    return { StartTime = -69420, Bpm = 42.69 }
-end
-
-function getHitObjectStartTimeAt(offset, forward)
-    local startTimes = state.GetValue("hoStartTimes", {})
-    if (not truthy(#startTimes)) then return -1 end
-    if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
-    if (state.SongTime < startTimes[1]) then return startTimes[1] end
-
-    local startTime = table.searchClosest(startTimes, offset, forward and 2 or 1)
-    return startTime
-end
