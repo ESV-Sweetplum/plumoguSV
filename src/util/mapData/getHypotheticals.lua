@@ -31,3 +31,16 @@ function getHypotheticalSVTimeAt(svs, offset)
     end
     return -69
 end
+
+---Given a predetermined set of SVs, returns a list of [scroll velocities](lua://ScrollVelocity) within a temporal boundary.
+---@param startOffset number The lower bound of the search area.
+---@param endOffset number The upper bound of the search area.
+---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
+function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
+    local svsBetweenOffsets = {} ---@type ScrollVelocity[]
+    for _, sv in ipairs(svs) do
+        local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
+        if svIsInRange then table.insert(svsBetweenOffsets, sv) end
+    end
+    return sort(svsBetweenOffsets, sortAscendingStartTime)
+end
