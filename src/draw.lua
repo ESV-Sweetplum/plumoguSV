@@ -57,6 +57,16 @@ function renderNoteDataWidget()
 end
 
 function renderMeasureDataWidget()
+    local widgetVars = {
+        oldStartOffset = -69,
+        oldEndOffset = -69,
+        nsvDistance = 0,
+        roundedSVDistance = 0,
+        roundedAvgSV = 0
+    }
+
+    getVariables("measureWidget", widgetVars)
+
     if #state.SelectedHitObjects < 2 then return end
     local uniqueDict = {}
     for _, ho in ipairs(state.SelectedHitObjects) do -- uniqueSelectedNoteOffsets was not used here because this approach exits the function faster
@@ -69,29 +79,22 @@ function renderMeasureDataWidget()
     local startOffset = uniqueDict[1]
     local endOffset = uniqueDict[2] or uniqueDict[1]
     if (math.abs(endOffset - startOffset) < 1e-10) then return end
-    if (endOffset ~= state.GetValue("measure_oldEndOffset", -69) or startOffset ~= state.GetValue("measure_oldStartOffset", -69)) then
+    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset) then
         svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
-        nsvDistance = endOffset - startOffset
+        widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
-        roundedSVDistance = math.round(totalDistance, 3)
+        widgetVars.roundedSVDistance = math.round(totalDistance, 3)
         avgSV = totalDistance / (endOffset - startOffset)
-        roundedAvgSV = math.round(avgSV, 3)
-        state.SetValue("tooltip_nsvDistance", nsvDistance)
-        state.SetValue("tooltip_roundedSVDistance", roundedSVDistance)
-        state.SetValue("tooltip_roundedAvgSV", roundedAvgSV)
-    else
-        nsvDistance = state.GetValue("tooltip_nsvDistance", 0)
-        roundedSVDistance = state.GetValue("tooltip_roundedSVDistance", 0)
-        roundedAvgSV = state.GetValue("tooltip_roundedAvgSV", 0)
+        widgetVars.roundedAvgSV = math.round(avgSV, 3)
     end
 
     imgui.BeginTooltip()
     imgui.Text("Measure Info:")
-    imgui.Text("NSV Distance = " .. nsvDistance .. " ms")
-    imgui.Text("SV Distance = " .. roundedSVDistance .. " msx")
-    imgui.Text("Avg SV = " .. roundedAvgSV .. "x")
+    imgui.Text("NSV Distance = " .. widgetVars.nsvDistance .. " ms")
+    imgui.Text("SV Distance = " .. widgetVars.roundedSVDistance .. " msx")
+    imgui.Text("Avg SV = " .. widgetVars.roundedAvgSV .. "x")
     imgui.EndTooltip()
-    state.SetValue("measure_oldStartOffset", startOffset)
-    state.SetValue("measure_oldEndOffset", endOffset)
+
+    saveVariables("measureWidget", widgetVars)
 end

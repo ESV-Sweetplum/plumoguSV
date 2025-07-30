@@ -3735,29 +3735,33 @@ function drawGlare(o, coords, size, glareColor, auraColor)
     o.AddCircleFilled(coords, circleSize2, auraColor, circlePoints)
 end
 function pulseController()
-    local previousBar = state.GetValue("pulse_previousBar", 0)
-    local pulseStatus = state.GetValue("pulseStatus", 0)
+    local pulseVars = {
+        previousBar = 0,
+        pulseStatus = 0,
+        pulsedThisFrame = false
+    }
+    getVariables("pulseController", pulseVars)
     local timeOffset = 50
     local timeSinceLastBar = ((state.SongTime + timeOffset) - getTimingPointAt(state.SongTime).StartTime) %
         ((60000 / getTimingPointAt(state.SongTime).Bpm))
-    state.SetValue("pulsedThisFrame", false)
-    if ((timeSinceLastBar < previousBar)) then
-        pulseStatus = 1
-        state.SetValue("pulsedThisFrame", true)
+    pulseVars.pulsedThisFrame = false
+    if ((timeSinceLastBar < pulseVars.previousBar)) then
+        pulseVars.pulseStatus = 1
+        pulseVars.pulsedThisFrame = true
     else
-        pulseStatus = (pulseStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm) * 1.2)
+        pulseVars.pulseStatus = (pulseVars.pulseStatus - state.DeltaTime / (60000 / getTimingPointAt(state.SongTime).Bpm) * 1.2)
     end
+    pulseVars.previousBar = timeSinceLastBar
     local futureTime = state.SongTime + state.DeltaTime * 2 + timeOffset
     if ((futureTime - getTimingPointAt(futureTime).StartTime) < 0) then
-        pulseStatus = 0
+        pulseVars.pulseStatus = 0
     end
-    state.SetValue("pulseStatus", math.max(pulseStatus, 0))
-    state.SetValue("pulse_previousBar", timeSinceLastBar)
-    pulseStatus = pulseStatus * (globalVars.pulseCoefficient or 0)
+    pulseVars.pulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
     local borderColor = state.GetValue("baseBorderColor") or vector4(1)
     local negatedBorderColor = vector4(1) - borderColor
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
-    imgui.PushStyleColor(imgui_col.Border, pulseColor * pulseStatus + borderColor * (1 - pulseStatus))
+    imgui.PushStyleColor(imgui_col.Border, pulseColor * pulseVars.pulseStatus + borderColor * (1 - pulseVars.pulseStatus))
+    saveVariables("pulseController", pulseVars)
 end
 ---@class PhysicsObject
 ---@field pos Vector2
@@ -8860,6 +8864,14 @@ function renderNoteDataWidget()
     imgui.EndTooltip()
 end
 function renderMeasureDataWidget()
+    local widgetVars = {
+        oldStartOffset = -69,
+        oldEndOffset = -69,
+        nsvDistance = 0,
+        roundedSVDistance = 0,
+        roundedAvgSV = 0
+    }
+    getVariables("measureWidget", widgetVars)
     if #state.SelectedHitObjects < 2 then return end
     local uniqueDict = {}
     for _, ho in ipairs(state.SelectedHitObjects) do
@@ -8872,28 +8884,20 @@ function renderMeasureDataWidget()
     local startOffset = uniqueDict[1]
     local endOffset = uniqueDict[2] or uniqueDict[1]
     if (math.abs(endOffset - startOffset) < 1e-10) then return end
-    if (endOffset ~= state.GetValue("measure_oldEndOffset", -69) or startOffset ~= state.GetValue("measure_oldStartOffset", -69)) then
+    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset) then
         svsBetweenOffsets = getSVsBetweenOffsets(startOffset, endOffset)
-        nsvDistance = endOffset - startOffset
+        widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
-        roundedSVDistance = math.round(totalDistance, 3)
+        widgetVars.roundedSVDistance = math.round(totalDistance, 3)
         avgSV = totalDistance / (endOffset - startOffset)
-        roundedAvgSV = math.round(avgSV, 3)
-        state.SetValue("tooltip_nsvDistance", nsvDistance)
-        state.SetValue("tooltip_roundedSVDistance", roundedSVDistance)
-        state.SetValue("tooltip_roundedAvgSV", roundedAvgSV)
-    else
-        nsvDistance = state.GetValue("tooltip_nsvDistance", 0)
-        roundedSVDistance = state.GetValue("tooltip_roundedSVDistance", 0)
-        roundedAvgSV = state.GetValue("tooltip_roundedAvgSV", 0)
+        widgetVars.roundedAvgSV = math.round(avgSV, 3)
     end
     imgui.BeginTooltip()
     imgui.Text("Measure Info:")
-    imgui.Text(table.concat({"NSV Distance = ", nsvDistance, " ms"}))
-    imgui.Text(table.concat({"SV Distance = ", roundedSVDistance, " msx"}))
-    imgui.Text(table.concat({"Avg SV = ", roundedAvgSV, "x"}))
+    imgui.Text(table.concat({"NSV Distance = ", widgetVars.nsvDistance, " ms"}))
+    imgui.Text(table.concat({"SV Distance = ", widgetVars.roundedSVDistance, " msx"}))
+    imgui.Text(table.concat({"Avg SV = ", widgetVars.roundedAvgSV, "x"}))
     imgui.EndTooltip()
-    state.SetValue("measure_oldStartOffset", startOffset)
-    state.SetValue("measure_oldEndOffset", endOffset)
+    saveVariables("measureWidget", widgetVars)
 end
