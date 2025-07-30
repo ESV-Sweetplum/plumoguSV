@@ -20,10 +20,10 @@ function showKeybindSettings()
     end, nil, true, true)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
     if (awaitingIndex == 0) then return end
-    local prefixes, key = listenForAnyKeyPressed()
+    local prefixes, key = kb.listenForAnyKeyPressed()
     if (key == -1) then return end
     globalVars.hotkeyList[awaitingIndex] = table.concat(prefixes, "+") ..
-        (truthy(prefixes) and "+" or "") .. keyNumToKey(key)
+        (truthy(prefixes) and "+" or "") .. kb.numToKey(key)
     awaitingIndex = 0
     write(globalVars)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)

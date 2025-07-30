@@ -35,7 +35,7 @@ function NegatableComputableInputFloat(label, var, decimalPlaces, suffix)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
     local newValue = ComputableInputFloat(label, var, decimalPlaces, suffix)
     imgui.PopItemWidth()
-    if ((negateButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[4])) and newValue ~= 0) then
+    if ((negateButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[4])) and newValue ~= 0) then
         newValue = -newValue
     end
     return newValue, oldValue ~= newValue
@@ -60,15 +60,15 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     imgui.PopItemWidth()
     varsTable[lowerName] = newValues.x
     varsTable[higherName] = newValues.y
-    if (swapButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[3])) then
+    if (swapButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[3])) then
         varsTable[lowerName] = oldValues.y
         varsTable[higherName] = oldValues.x
     end
-    if (negateButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[4])) then
+    if (negateButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[4])) then
         varsTable[lowerName] = -oldValues.x
         varsTable[higherName] = -oldValues.y
     end
-    return swapButtonPressed or negateButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[3]) or
-        exclusiveKeyPressed(globalVars.hotkeyList[4]) or
+    return swapButtonPressed or negateButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[3]) or
+        kb.pressedKeyCombo(globalVars.hotkeyList[4]) or
         oldValues ~= newValues
 end

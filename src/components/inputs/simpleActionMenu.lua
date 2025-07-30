@@ -18,15 +18,15 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     if (disableKeyInput) then return end
     if (hideNoteReq) then
         ToolTip("Press \'" .. globalVars.hotkeyList[2] .. "\' on your keyboard to do the same thing as this button")
-        executeFunctionIfTrue(exclusiveKeyPressed(globalVars.hotkeyList[2]), actionfunc, menuVars)
+        executeFunctionIfTrue(kb.pressedKeyCombo(globalVars.hotkeyList[2]), actionfunc, menuVars)
     else
         if (optionalKeyOverride) then
             ToolTip("Press \'" .. optionalKeyOverride .. "\' on your keyboard to do the same thing as this button")
-            executeFunctionIfTrue(exclusiveKeyPressed(optionalKeyOverride), actionfunc, menuVars)
+            executeFunctionIfTrue(kb.pressedKeyCombo(optionalKeyOverride), actionfunc, menuVars)
             return
         end
         ToolTip("Press \'" .. globalVars.hotkeyList[1] .. "\' on your keyboard to do the same thing as this button")
-        executeFunctionIfTrue(exclusiveKeyPressed(globalVars.hotkeyList[1]), actionfunc, menuVars)
+        executeFunctionIfTrue(kb.pressedKeyCombo(globalVars.hotkeyList[1]), actionfunc, menuVars)
     end
 end
 

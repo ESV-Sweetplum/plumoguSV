@@ -1,4 +1,5 @@
 game = {}
+kb = {}
 matrix = {}
 clock = {}
 ---Returns true every `interval` ms.
@@ -224,6 +225,49 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     return noteOffsetsBetween
 end
 game.getUniqueNoteOffsetsBetween = game.getUniqueNoteOffsetsBetween
+function kb.listenForAnyKeyPressed()
+    local isCtrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
+    local isShiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)
+    local isAltHeld = utils.IsKeyDown(keys.LeftAlt) or utils.IsKeyDown(keys.RightAlt)
+    local key = -1
+    local prefixes = {}
+    if (isCtrlHeld) then prefixes[#prefixes + 1] = "Ctrl" end
+    if (isShiftHeld) then prefixes[#prefixes + 1] = "Shift" end
+    if (isAltHeld) then prefixes[#prefixes + 1] = "Alt" end
+    for i = 65, 90 do
+        if (utils.IsKeyPressed(i)) then
+            key = i
+        end
+    end
+    return prefixes, key
+end
+ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
+    "V", "W", "X", "Y", "Z" }
+function kb.numToKey(num)
+    return ALPHABET_LIST[math.clamp(num - 64, 1, #ALPHABET_LIST)]
+end
+function kb.pressedKeyCombo(keyCombo)
+    keyCombo = keyCombo:upper()
+    local comboList = {}
+    for v in keyCombo:gmatch("%u+") do
+        comboList[#comboList + 1] = v
+    end
+    local keyReq = comboList[#comboList]
+    local ctrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
+    local shiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)
+    local altHeld = utils.IsKeyDown(keys.LeftAlt) or utils.IsKeyDown(keys.RightAlt)
+    if (table.contains(comboList, "CTRL") ~= ctrlHeld) then
+        return false
+    end
+    if (table.contains(comboList, "SHIFT") ~= shiftHeld) then
+        return false
+    end
+    if (table.contains(comboList, "ALT") ~= altHeld) then
+        return false
+    end
+    return utils.IsKeyPressed(keys[keyReq])
+end
+kb.executedKeyCombo = kb.pressedKeyCombo
 ---Evaluates a simplified one-dimensional cubic bezier expression with points (0, p2, p3, 1).
 ---@param p2 number The second point in the cubic bezier.
 ---@param p3 number The third point in the cubic bezier.
@@ -3194,8 +3238,8 @@ function initializeNoteLockMode()
     end)
 end
 function checkForGlobalHotkeys()
-    if (exclusiveKeyPressed(globalVars.hotkeyList[9])) then jumpToTg() end
-    if (exclusiveKeyPressed(globalVars.hotkeyList[10])) then changeNoteLockMode() end
+    if (kb.pressedKeyCombo(globalVars.hotkeyList[9])) then jumpToTg() end
+    if (kb.pressedKeyCombo(globalVars.hotkeyList[10])) then changeNoteLockMode() end
 end
 function jumpToTg()
     if (not truthy(#state.SelectedHitObjects)) then return end
@@ -4829,7 +4873,7 @@ function NegatableComputableInputFloat(label, var, decimalPlaces, suffix)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
     local newValue = ComputableInputFloat(label, var, decimalPlaces, suffix)
     imgui.PopItemWidth()
-    if ((negateButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[4])) and newValue ~= 0) then
+    if ((negateButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[4])) and newValue ~= 0) then
         newValue = -newValue
     end
     return newValue, oldValue ~= newValue
@@ -4853,16 +4897,16 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     imgui.PopItemWidth()
     varsTable[lowerName] = newValues.x
     varsTable[higherName] = newValues.y
-    if (swapButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[3])) then
+    if (swapButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[3])) then
         varsTable[lowerName] = oldValues.y
         varsTable[higherName] = oldValues.x
     end
-    if (negateButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[4])) then
+    if (negateButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[4])) then
         varsTable[lowerName] = -oldValues.x
         varsTable[higherName] = -oldValues.y
     end
-    return swapButtonPressed or negateButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[3]) or
-        exclusiveKeyPressed(globalVars.hotkeyList[4]) or
+    return swapButtonPressed or negateButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[3]) or
+        kb.pressedKeyCombo(globalVars.hotkeyList[4]) or
         oldValues ~= newValues
 end
 ---Creates an `imgui.inputInt` element.
@@ -4921,15 +4965,15 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     if (disableKeyInput) then return end
     if (hideNoteReq) then
         ToolTip(table.concat({"Press \'", globalVars.hotkeyList[2], "\' on your keyboard to do the same thing as this button"}))
-        executeFunctionIfTrue(exclusiveKeyPressed(globalVars.hotkeyList[2]), actionfunc, menuVars)
+        executeFunctionIfTrue(kb.pressedKeyCombo(globalVars.hotkeyList[2]), actionfunc, menuVars)
     else
         if (optionalKeyOverride) then
             ToolTip(table.concat({"Press \'", optionalKeyOverride, "\' on your keyboard to do the same thing as this button"}))
-            executeFunctionIfTrue(exclusiveKeyPressed(optionalKeyOverride), actionfunc, menuVars)
+            executeFunctionIfTrue(kb.pressedKeyCombo(optionalKeyOverride), actionfunc, menuVars)
             return
         end
         ToolTip(table.concat({"Press \'", globalVars.hotkeyList[1], "\' on your keyboard to do the same thing as this button"}))
-        executeFunctionIfTrue(exclusiveKeyPressed(globalVars.hotkeyList[1]), actionfunc, menuVars)
+        executeFunctionIfTrue(kb.pressedKeyCombo(globalVars.hotkeyList[1]), actionfunc, menuVars)
     end
 end
 ---Runs a function with the given parameters if the given `condition` is true.
@@ -7022,10 +7066,10 @@ function showKeybindSettings()
     end, nil, true, true)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
     if (awaitingIndex == 0) then return end
-    local prefixes, key = listenForAnyKeyPressed()
+    local prefixes, key = kb.listenForAnyKeyPressed()
     if (key == -1) then return end
     globalVars.hotkeyList[awaitingIndex] = table.concat(prefixes, "+") ..
-        (truthy(prefixes) and "+" or "") .. keyNumToKey(key)
+        (truthy(prefixes) and "+" or "") .. kb.numToKey(key)
     awaitingIndex = 0
     write(globalVars)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
@@ -7110,7 +7154,7 @@ function chooseConstantShift(settingVars, defaultShift)
     local oldShift = settingVars.verticalShift
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[5])) then
+    if (resetButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[5])) then
         settingVars.verticalShift = defaultShift
     end
     ToolTip("Reset vertical shift to initial values")
@@ -7133,7 +7177,7 @@ function chooseMsxVerticalShift(settingVars, defaultShift)
     local oldShift = settingVars.verticalShift
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[5])) then
+    if (resetButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[5])) then
         settingVars.verticalShift = defaultShift or 0
     end
     ToolTip("Reset vertical shift to initial values")
@@ -7459,10 +7503,10 @@ function chooseCurrentScrollGroup()
     imgui.PushItemWidth(155)
     globalVars.scrollGroupIndex = Combo("##scrollGroup", groups, globalVars.scrollGroupIndex, cols, hiddenGroups)
     imgui.PopItemWidth()
-    if (exclusiveKeyPressed(globalVars.hotkeyList[6])) then
+    if (kb.pressedKeyCombo(globalVars.hotkeyList[6])) then
         globalVars.scrollGroupIndex = math.clamp(globalVars.scrollGroupIndex - 1, 1, #groups)
     end
-    if (exclusiveKeyPressed(globalVars.hotkeyList[7])) then
+    if (kb.pressedKeyCombo(globalVars.hotkeyList[7])) then
         globalVars.scrollGroupIndex = math.clamp(globalVars.scrollGroupIndex + 1, 1, #groups)
     end
     AddSeparator()
@@ -7621,7 +7665,7 @@ function chooseSVBehavior(settingVars)
     local oldBehaviorIndex = settingVars.behaviorIndex
     settingVars.behaviorIndex = Combo("Behavior", SV_BEHAVIORS, oldBehaviorIndex)
     imgui.PopItemWidth()
-    if (swapButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[3])) then
+    if (swapButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[3])) then
         settingVars.behaviorIndex = oldBehaviorIndex == 1 and 2 or 1
     end
     return oldBehaviorIndex ~= settingVars.behaviorIndex
@@ -8220,48 +8264,6 @@ function createFrameTime(thisTime, thisLanes, thisFrame, thisPosition)
         position = thisPosition
     }
     return frameTime
-end
-function exclusiveKeyPressed(keyCombo)
-    keyCombo = keyCombo:upper()
-    local comboList = {}
-    for v in keyCombo:gmatch("%u+") do
-        comboList[#comboList + 1] = v
-    end
-    local keyReq = comboList[#comboList]
-    local ctrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
-    local shiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)
-    local altHeld = utils.IsKeyDown(keys.LeftAlt) or utils.IsKeyDown(keys.RightAlt)
-    if (table.contains(comboList, "CTRL") ~= ctrlHeld) then
-        return false
-    end
-    if (table.contains(comboList, "SHIFT") ~= shiftHeld) then
-        return false
-    end
-    if (table.contains(comboList, "ALT") ~= altHeld) then
-        return false
-    end
-    return utils.IsKeyPressed(keys[keyReq])
-end
-ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
-    "V", "W", "X", "Y", "Z" }
-function keyNumToKey(num)
-    return ALPHABET_LIST[math.clamp(num - 64, 1, #ALPHABET_LIST)]
-end
-function listenForAnyKeyPressed()
-    local isCtrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
-    local isShiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)
-    local isAltHeld = utils.IsKeyDown(keys.LeftAlt) or utils.IsKeyDown(keys.RightAlt)
-    local key = -1
-    local prefixes = {}
-    if (isCtrlHeld) then prefixes[#prefixes + 1] = "Ctrl" end
-    if (isShiftHeld) then prefixes[#prefixes + 1] = "Shift" end
-    if (isAltHeld) then prefixes[#prefixes + 1] = "Alt" end
-    for i = 65, 90 do
-        if (utils.IsKeyPressed(i)) then
-            key = i
-        end
-    end
-    return prefixes, key
 end
 ---Returns the SV multiplier in a given array of SVs.
 ---@param svs ScrollVelocity[]

@@ -81,7 +81,7 @@ function chooseConstantShift(settingVars, defaultShift)
 
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[5])) then
+    if (resetButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[5])) then
         settingVars.verticalShift = defaultShift
     end
     ToolTip("Reset vertical shift to initial values")
@@ -111,7 +111,7 @@ function chooseMsxVerticalShift(settingVars, defaultShift)
 
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[5])) then
+    if (resetButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[5])) then
         settingVars.verticalShift = defaultShift or 0
     end
     ToolTip("Reset vertical shift to initial values")
@@ -484,10 +484,10 @@ function chooseCurrentScrollGroup()
     imgui.PushItemWidth(155)
     globalVars.scrollGroupIndex = Combo("##scrollGroup", groups, globalVars.scrollGroupIndex, cols, hiddenGroups)
     imgui.PopItemWidth()
-    if (exclusiveKeyPressed(globalVars.hotkeyList[6])) then
+    if (kb.pressedKeyCombo(globalVars.hotkeyList[6])) then
         globalVars.scrollGroupIndex = math.clamp(globalVars.scrollGroupIndex - 1, 1, #groups)
     end
-    if (exclusiveKeyPressed(globalVars.hotkeyList[7])) then
+    if (kb.pressedKeyCombo(globalVars.hotkeyList[7])) then
         globalVars.scrollGroupIndex = math.clamp(globalVars.scrollGroupIndex + 1, 1, #groups)
     end
     AddSeparator()
@@ -668,7 +668,7 @@ function chooseSVBehavior(settingVars)
     local oldBehaviorIndex = settingVars.behaviorIndex
     settingVars.behaviorIndex = Combo("Behavior", SV_BEHAVIORS, oldBehaviorIndex)
     imgui.PopItemWidth()
-    if (swapButtonPressed or exclusiveKeyPressed(globalVars.hotkeyList[3])) then
+    if (swapButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[3])) then
         settingVars.behaviorIndex = oldBehaviorIndex == 1 and 2 or 1
     end
     return oldBehaviorIndex ~= settingVars.behaviorIndex

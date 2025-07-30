@@ -1,4 +1,4 @@
-function exclusiveKeyPressed(keyCombo)
+function kb.pressedKeyCombo(keyCombo)
     keyCombo = keyCombo:upper()
     local comboList = {}
     for v in keyCombo:gmatch("%u+") do
@@ -19,3 +19,5 @@ function exclusiveKeyPressed(keyCombo)
     end
     return utils.IsKeyPressed(keys[keyReq])
 end
+
+kb.executedKeyCombo = kb.pressedKeyCombo
