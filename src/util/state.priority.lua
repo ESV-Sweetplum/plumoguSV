@@ -1,6 +1,6 @@
 ---#### (NOTE: This function is impure and has no return value. This should be changed eventually.)
 ---Gets a list of variables.
----@param listName string An identifier to avoid statee collisions.
+---@param listName string An identifier to avoid state collisions.
 ---@param variables { [string]: any } The key-value table to get data for.
 function getVariables(listName, variables)
     for key, _ in pairs(variables) do

@@ -734,25 +734,6 @@ end
 ---@param a number
 ---@param b number
 function sortAscending(a, b) return a < b end
----Sorting function for sorting objects by their `startTime` property. Should be passed into [`table.sort`](lua://table.sort).
----@param a { StartTime: number }
----@param b { StartTime: number }
-function sortAscendingStartTime(a, b) return a.StartTime < b.StartTime end
----Sorting function for sorting objects by their `time` property. Should be passed into [`table.sort`](lua://table.sort).
----@param a { time: number }
----@param b { time: number }
----@return boolean
-function sortAscendingTime(a, b) return a.time < b.time end
----Sorts a table given a sorting function. Should be passed into [`table.sort`](lua://table.sort).
----@generic T
----@param tbl T[] The table to sort.
----@param compFn fun(a: T, b: T): boolean A comparison function. Given two elements `a` and `b`, how should they be sorted?
----@return T[] sortedTbl A sorted table.
-function sort(tbl, compFn)
-    newTbl = table.duplicate(tbl)
-    table.sort(newTbl, compFn)
-    return newTbl
-end
 ---Converts a table (or any other primitive values) to a string.
 ---@param var any
 ---@return string
@@ -855,14 +836,14 @@ end
 ---@return boolean truthy The truthy value of the parameter.
 function truthy(param)
     local t = type(param)
-    if (t == "string") then
-        return param:lower() == "true" and true or false
+    if t == "string" then
+        return param:lower() == "true"
     end
     if t == "number" then
-        return param > 0 and true or false
+        return param > 0
     end
     if t == "table" or t == "userdata" then
-        return #param > 0 and true or false
+        return #param > 0
     end
     if t == "boolean" then
         return param
@@ -886,6 +867,9 @@ end
 ---@return Vector2 vctr The resultant vector of style `<n, n>`.
 function vector2(n)
     return vector.New(n, n)
+end
+function unit2(theta)
+    return vector.New(math.cos(theta), math.sin(theta))
 end
 imgui_disable_vector_packing = true
 DEFAULT_WIDGET_HEIGHT = 26
@@ -1151,7 +1135,7 @@ function createSVStats()
 end
 ---#### (NOTE: This function is impure and has no return value. This should be changed eventually.)
 ---Gets a list of variables.
----@param listName string An identifier to avoid statee collisions.
+---@param listName string An identifier to avoid state collisions.
 ---@param variables { [string]: any } The key-value table to get data for.
 function getVariables(listName, variables)
     for key, _ in pairs(variables) do

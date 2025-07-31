@@ -139,12 +139,6 @@ For more information, please refer to <https://unlicense.org>
 ---##### (READ-ONLY)
 ---#### The type of action that was performed.
 ---@field Type userdata
----##### (READ-ONLY)
----#### Performs the action.
----@field Perform fun(): nil
----##### (READ-ONLY)
----#### Undoes the action.
----@field Undo fun(): nil
 
 ---@class (exact) Vector2
 ---@field x number The first component of the vector.
@@ -153,6 +147,7 @@ For more information, please refer to <https://unlicense.org>
 ---@operator sub(Vector2): Vector2
 ---@operator mul(Vector2 | number): Vector2
 ---@operator div(Vector2 | number): Vector2
+---@operator unm(Vector2): Vector2
 
 ---@class (exact) Vector3
 ---@field x number The first component of the vector.
@@ -162,6 +157,7 @@ For more information, please refer to <https://unlicense.org>
 ---@operator sub(Vector3): Vector3
 ---@operator mul(Vector3 | number): Vector3
 ---@operator div(Vector3 | number): Vector3
+---@operator unm(Vector3): Vector3
 
 ---@class (exact) Vector4
 ---@field x number The first component of the vector.
@@ -172,6 +168,7 @@ For more information, please refer to <https://unlicense.org>
 ---@operator sub(Vector4): Vector4
 ---@operator mul(Vector4 | number): Vector4
 ---@operator div(Vector4 | number): Vector4
+---@operator unm(Vector4): Vector4
 
 vector = {}
 
@@ -248,9 +245,9 @@ function vector.Dot(v1, v2) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
 ---##### (READ-ONLY)
----#### Determines the length of a vector.
+---#### Determines the literal length of a vector. DOES NOT DETERMINE ITS MAGNITUDE.
 ---@param v T The vector to measure.
----@return number length The magnitude of the vector.
+---@return 2|3|4 length `4` if the input is a [`Vector4`](lua://Vector4), `3` if the input is a [`Vector3`](lua://Vector3), and `2` otherwise.
 ---@nodiscard
 function vector.Length(v) end
 

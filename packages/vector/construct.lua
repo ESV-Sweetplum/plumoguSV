@@ -18,3 +18,7 @@ end
 function vector2(n)
     return vector.New(n, n)
 end
+
+function unit2(theta)
+    return vector.New(math.cos(theta), math.sin(theta))
+end
