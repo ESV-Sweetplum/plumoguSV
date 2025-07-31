@@ -224,7 +224,7 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     noteOffsetsBetween = sort(noteOffsetsBetween, sortAscending)
     return noteOffsetsBetween
 end
-game.getUniqueNoteOffsetsBetween = game.getUniqueNoteOffsetsBetween
+game.getUniqueNoteOffsetsBetween = game.uniqueNoteOffsetsBetween
 function kb.listenForAnyKeyPressed()
     local isCtrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
     local isShiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)
@@ -8321,6 +8321,96 @@ function createFrameTime(thisTime, thisLanes, thisFrame, thisPosition)
     }
     return frameTime
 end
+function createSV(startTime, multiplier)
+    return utils.CreateScrollVelocity(startTime, multiplier)
+end
+function createSSF(startTime, multiplier)
+    return utils.CreateScrollSpeedFactor(startTime, multiplier)
+end
+---Removes and adds SVs.
+---@param svsToRemove ScrollVelocity[]
+---@param svsToAdd ScrollVelocity[]
+function removeAndAddSVs(svsToRemove, svsToAdd)
+    local tolerance = 0.035
+    if #svsToAdd == 0 then return end
+    for idx, sv in pairs(svsToRemove) do
+        local baseSV = game.getSVStartTimeAt(sv.StartTime)
+        if (math.abs(baseSV - sv.StartTime) > tolerance) then
+            table.remove(svsToRemove, idx)
+        end
+    end
+    local editorActions = {
+        utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
+        utils.CreateEditorAction(action_type.AddScrollVelocityBatch, svsToAdd)
+    }
+    actions.PerformBatch(editorActions)
+    toggleablePrint("s!", table.concat({"Created ", #svsToAdd, pluralize(" SV.", #svsToAdd, -2)}))
+end
+function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
+    if #ssfsToAdd == 0 then return end
+    local editorActions = {
+        utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
+        utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)
+    }
+    actions.PerformBatch(editorActions)
+    toggleablePrint("s!", table.concat({"Created ", #ssfsToAdd, pluralize(" SSF.", #ssfsToAdd, -2)}))
+end
+function addFinalSV(svsToAdd, endOffset, svMultiplier, force)
+    local sv = map.GetScrollVelocityAt(endOffset)
+    local svExistsAtEndOffset = sv and (sv.StartTime == endOffset)
+    if svExistsAtEndOffset and not force then return end
+    addSVToList(svsToAdd, endOffset, svMultiplier, true)
+end
+function addFinalSSF(ssfsToAdd, endOffset, ssfMultiplier, force)
+    local ssf = map.GetScrollSpeedFactorAt(endOffset)
+    local ssfExistsAtEndOffset = ssf and (ssf.StartTime == endOffset)
+    if ssfExistsAtEndOffset and not force then return end
+    addSSFToList(ssfsToAdd, endOffset, ssfMultiplier, true)
+end
+function addInitialSSF(ssfsToAdd, startOffset)
+    local ssf = map.GetScrollSpeedFactorAt(startOffset)
+    if (ssf == nil) then return end
+    local ssfExistsAtStartOffset = ssf and (ssf.StartTime == startOffset)
+    if ssfExistsAtStartOffset then return end
+    addSSFToList(ssfsToAdd, startOffset, ssf.Multiplier, true)
+end
+function addStartSVIfMissing(svs, startOffset)
+    if #svs ~= 0 and svs[1].StartTime == startOffset then return end
+    addSVToList(svs, startOffset, game.getSVMultiplierAt(startOffset), false)
+end
+function addSVToList(svList, offset, multiplier, endOfList)
+    local newSV = createSV(offset, multiplier)
+    if endOfList then
+        svList[#svList + 1] = newSV
+        return
+    end
+    table.insert(svList, 1, newSV)
+end
+function addSSFToList(ssfList, offset, multiplier, endOfList)
+    local newSSF = createSSF(offset, multiplier)
+    if endOfList then
+        ssfList[#ssfList + 1] = newSSF
+        return
+    end
+    table.insert(ssfList, 1, newSSF)
+end
+function getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset, retroactiveSVRemovalTable)
+    for _, sv in ipairs(map.ScrollVelocities) do
+        local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime <= endOffset + 1
+        if svIsInRange then
+            local svIsRemovable = svTimeIsAdded[sv.StartTime]
+            if svIsRemovable then svsToRemove[#svsToRemove + 1] = sv end
+        end
+    end
+    if (not retroactiveSVRemovalTable) then return end
+    for idx, sv in pairs(retroactiveSVRemovalTable) do
+        local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime <= endOffset + 1
+        if svIsInRange then
+            local svIsRemovable = svTimeIsAdded[sv.StartTime]
+            if svIsRemovable then table.remove(retroactiveSVRemovalTable, idx) end
+        end
+    end
+end
 ---Returns the SV multiplier in a given array of SVs.
 ---@param svs ScrollVelocity[]
 ---@param offset number
@@ -8571,96 +8661,6 @@ function displayStutterSVWindows(settingVars)
         makeSVInfoWindow("SV Info", settingVars.svGraphStats, nil, settingVars.svDistances,
             settingVars.svMultipliers, settingVars.stutterDuration, false)
     end
-end
-function addFinalSV(svsToAdd, endOffset, svMultiplier, force)
-    local sv = map.GetScrollVelocityAt(endOffset)
-    local svExistsAtEndOffset = sv and (sv.StartTime == endOffset)
-    if svExistsAtEndOffset and not force then return end
-    addSVToList(svsToAdd, endOffset, svMultiplier, true)
-end
-function addFinalSSF(ssfsToAdd, endOffset, ssfMultiplier, force)
-    local ssf = map.GetScrollSpeedFactorAt(endOffset)
-    local ssfExistsAtEndOffset = ssf and (ssf.StartTime == endOffset)
-    if ssfExistsAtEndOffset and not force then return end
-    addSSFToList(ssfsToAdd, endOffset, ssfMultiplier, true)
-end
-function addInitialSSF(ssfsToAdd, startOffset)
-    local ssf = map.GetScrollSpeedFactorAt(startOffset)
-    if (ssf == nil) then return end
-    local ssfExistsAtStartOffset = ssf and (ssf.StartTime == startOffset)
-    if ssfExistsAtStartOffset then return end
-    addSSFToList(ssfsToAdd, startOffset, ssf.Multiplier, true)
-end
-function addStartSVIfMissing(svs, startOffset)
-    if #svs ~= 0 and svs[1].StartTime == startOffset then return end
-    addSVToList(svs, startOffset, game.getSVMultiplierAt(startOffset), false)
-end
-function addSVToList(svList, offset, multiplier, endOfList)
-    local newSV = createSV(offset, multiplier)
-    if endOfList then
-        svList[#svList + 1] = newSV
-        return
-    end
-    table.insert(svList, 1, newSV)
-end
-function addSSFToList(ssfList, offset, multiplier, endOfList)
-    local newSSF = createSSF(offset, multiplier)
-    if endOfList then
-        ssfList[#ssfList + 1] = newSSF
-        return
-    end
-    table.insert(ssfList, 1, newSSF)
-end
-function getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset, retroactiveSVRemovalTable)
-    for _, sv in ipairs(map.ScrollVelocities) do
-        local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime <= endOffset + 1
-        if svIsInRange then
-            local svIsRemovable = svTimeIsAdded[sv.StartTime]
-            if svIsRemovable then svsToRemove[#svsToRemove + 1] = sv end
-        end
-    end
-    if (not retroactiveSVRemovalTable) then return end
-    for idx, sv in pairs(retroactiveSVRemovalTable) do
-        local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime <= endOffset + 1
-        if svIsInRange then
-            local svIsRemovable = svTimeIsAdded[sv.StartTime]
-            if svIsRemovable then table.remove(retroactiveSVRemovalTable, idx) end
-        end
-    end
-end
----Removes and adds SVs.
----@param svsToRemove ScrollVelocity[]
----@param svsToAdd ScrollVelocity[]
-function removeAndAddSVs(svsToRemove, svsToAdd)
-    local tolerance = 0.035
-    if #svsToAdd == 0 then return end
-    for idx, sv in pairs(svsToRemove) do
-        local baseSV = game.getSVStartTimeAt(sv.StartTime)
-        if (math.abs(baseSV - sv.StartTime) > tolerance) then
-            table.remove(svsToRemove, idx)
-        end
-    end
-    local editorActions = {
-        utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
-        utils.CreateEditorAction(action_type.AddScrollVelocityBatch, svsToAdd)
-    }
-    actions.PerformBatch(editorActions)
-    toggleablePrint("s!", table.concat({"Created ", #svsToAdd, pluralize(" SV.", #svsToAdd, -2)}))
-end
-function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
-    if #ssfsToAdd == 0 then return end
-    local editorActions = {
-        utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
-        utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)
-    }
-    actions.PerformBatch(editorActions)
-    toggleablePrint("s!", table.concat({"Created ", #ssfsToAdd, pluralize(" SSF.", #ssfsToAdd, -2)}))
-end
-function createSSF(startTime, multiplier)
-     return utils.CreateScrollSpeedFactor(startTime, multiplier)
-end
-function createSV(startTime, multiplier)
-     return utils.CreateScrollVelocity(startTime, multiplier)
 end
 function bezierSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     local settingsChanged = false

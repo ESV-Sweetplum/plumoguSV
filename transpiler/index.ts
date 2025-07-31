@@ -10,6 +10,7 @@ import { getFilesRecursively } from './getFilesRecursively.js';
 import fuckifyOutput from './fuckify.js';
 import getFunctionList from './getFunctionList.js';
 import getUnusedFunctions from './getUnusedFunctions.js';
+import { join } from 'path';
 
 export default async function transpiler(
     devMode = false,
@@ -20,15 +21,14 @@ export default async function transpiler(
 
     let output = '';
 
-    const separator = process.platform === 'win32' ? '\\' : '/';
     const entryPoints = ['draw.lua', 'awake.lua'];
     const ignoredFiles = [
         'classes.lua',
         'intellisense.lua',
         'init.lua',
-        `packages${separator}tests`,
+        join('packages', 'tests'),
     ];
-    if (!devMode) ignoredFiles.push(`src${separator}dev`);
+    if (!devMode) ignoredFiles.push(join('src', 'dev'));
 
     const files = getFilesRecursively('packages').sort(
         (a, b) => +b.includes('priority') - +a.includes('priority')

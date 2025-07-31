@@ -25,4 +25,4 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     return noteOffsetsBetween
 end
 
-game.getUniqueNoteOffsetsBetween = game.getUniqueNoteOffsetsBetween
+game.getUniqueNoteOffsetsBetween = game.uniqueNoteOffsetsBetween
