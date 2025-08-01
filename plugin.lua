@@ -5112,6 +5112,11 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             saveVariables(table.concat({"place", preset.type, "Menu"}), data.menuVars)
             globalVars.showPresetMenu = false
         end
+        if (imgui.IsItemClicked("Right")) then
+            imgui.SetClipboardText(preset.data)
+            print("i!", "Exported preset to your clipboard.")
+        end
+        ToolTip("Left-click to select this preset. Right-click to copy this preset to your clipboard.")
         KeepSameLine()
         if (imgui.Button("X##Preset" .. idx)) then
             table.remove(globalVars.presets, idx)
