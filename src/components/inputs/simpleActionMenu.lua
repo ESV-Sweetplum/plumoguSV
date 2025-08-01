@@ -24,13 +24,13 @@ end
 
 ---Runs a function with the given parameters if the given `condition` is true.
 ---@param condition boolean The condition that is used.
----@param func fun(...): nil The function to run if the condition is true.
+---@param fn fun(...): nil The function to run if the condition is true.
 ---@param menuVars? { [string]: any } Optional menu variable parameter.
-function executeFunctionIfTrue(condition, func, menuVars)
+function executeFunctionIfTrue(condition, fn, menuVars)
     if not condition then return end
     if menuVars then
-        func(menuVars)
+        fn(menuVars)
         return
     end
-    func()
+    fn()
 end

@@ -4729,15 +4729,15 @@ end
 ---Creates an imgui button.
 ---@param text string The text that the button should have.
 ---@param size Vector2 The size of the button.
----@param func fun(menuVars?: table): nil The function that the button should run upon being clicked.
+---@param fn fun(menuVars?: table): nil The function that the button should run upon being clicked.
 ---@param menuVars? table A set of variables to be passed into the function.
-function FunctionButton(text, size, func, menuVars)
+function FunctionButton(text, size, fn, menuVars)
     if not imgui.Button(text, size) then return end
     if menuVars then
-        func(menuVars)
+        fn(menuVars)
         return
     end
-    func()
+    fn()
 end
 function PresetButton()
     local buttonText = ": )"
@@ -4967,15 +4967,15 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
 end
 ---Runs a function with the given parameters if the given `condition` is true.
 ---@param condition boolean The condition that is used.
----@param func fun(...): nil The function to run if the condition is true.
+---@param fn fun(...): nil The function to run if the condition is true.
 ---@param menuVars? { [string]: any } Optional menu variable parameter.
-function executeFunctionIfTrue(condition, func, menuVars)
+function executeFunctionIfTrue(condition, fn, menuVars)
     if not condition then return end
     if menuVars then
-        func(menuVars)
+        fn(menuVars)
         return
     end
-    func()
+    fn()
 end
 function KeepSameLine()
     return imgui.SameLine(0, SAMELINE_SPACING)
@@ -8305,9 +8305,9 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
             settingVars.avgSV, settingVars.verticalShift)
     elseif svType == "Code" then
         multipliers = {}
-        local func = eval(settingVars.code)
+        local fn = eval(settingVars.code) ---@type fun(t: number): number
         for i = 0, settingVars.svPoints do
-            multipliers[#multipliers + 1] = func(i / settingVars.svPoints)
+            multipliers[#multipliers + 1] = fn(i / settingVars.svPoints)
         end
     elseif svType == "Stutter1" then
         multipliers = generateStutterSet(settingVars.startSV, settingVars.stutterDuration,
