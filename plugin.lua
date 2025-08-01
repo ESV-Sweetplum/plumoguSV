@@ -2215,7 +2215,7 @@ function ssfVibrato(menuVars, func1, func2)
     })
     toggleablePrint("s!", table.concat({"Created ", #ssfs, pluralize(" SSF.", #ssfs, -2)}))
 end
-function svVibrato(menuVars, heightFunc)
+function svVibrato(menuVars, heightFn)
     local offsets = game.uniqueNoteOffsetsBetweenSelected()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -2235,7 +2235,7 @@ function svVibrato(menuVars, heightFunc)
             for tp = 1, teleportCount do
                 local x = (tp - 1) / (teleportCount)
                 local offset = next * x + start * (1 - x)
-                local height = heightFunc(((math.floor((tp - 1) * 0.5) * 2) / (teleportCount - 2)) * posDifference +
+                local height = heightFn(((math.floor((tp - 1) * 0.5) * 2) / (teleportCount - 2)) * posDifference +
                     startPos, tp)
                 if (tp % 2 == 1) then
                     height = -height
@@ -2245,13 +2245,13 @@ function svVibrato(menuVars, heightFunc)
             end
         elseif (menuVars.sides == 2) then
             prepareDisplacingSVs(start, svsToAdd, svTimeIsAdded, nil,
-                -heightFunc(startPos, 1), 0)
+                -heightFn(startPos, 1), 0)
             for tp = 1, teleportCount - 2 do
                 local x = tp / (teleportCount - 1)
                 local offset = next * x + start * (1 - x)
-                local initHeight = heightFunc(tp / (teleportCount - 1) * posDifference +
+                local initHeight = heightFn(tp / (teleportCount - 1) * posDifference +
                     startPos, tp - 1)
-                local newHeight = heightFunc((tp + 1) / (teleportCount - 1) * posDifference +
+                local newHeight = heightFn((tp + 1) / (teleportCount - 1) * posDifference +
                     startPos, tp)
                 local height = initHeight + newHeight
                 if (tp % 2 == 0) then
@@ -2261,16 +2261,16 @@ function svVibrato(menuVars, heightFunc)
                     height, 0)
             end
             prepareDisplacingSVs(next, svsToAdd, svTimeIsAdded,
-                heightFunc(endPos, teleportCount), 0, nil)
+                heightFn(endPos, teleportCount), 0, nil)
         else
             prepareDisplacingSVs(start, svsToAdd, svTimeIsAdded, nil,
-                -heightFunc(startPos, 1), 0)
+                -heightFn(startPos, 1), 0)
             prepareDisplacingSVs(start, svsToAdd, svTimeIsAdded, nil,
-                heightFunc(startPos + 2 / (teleportCount - 1) * posDifference, 3) + heightFunc(startPos, 1), 0)
+                heightFn(startPos + 2 / (teleportCount - 1) * posDifference, 3) + heightFn(startPos, 1), 0)
             for tp = 3, teleportCount - 3, 3 do
                 local x = (tp - 1) / (teleportCount - 1)
                 local offset = next * x + start * (1 - x)
-                local height = heightFunc(startPos + tp / (teleportCount - 1) * posDifference, tp)
+                local height = heightFn(startPos + tp / (teleportCount - 1) * posDifference, tp)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     -height, 0)
                 x = tp / (teleportCount - 1)
@@ -2279,12 +2279,12 @@ function svVibrato(menuVars, heightFunc)
                     -height, 0)
                 x = (tp + 1) / (teleportCount - 1)
                 offset = next * x + start * (1 - x)
-                local newHeight = heightFunc(startPos + (tp + 3) / (teleportCount - 1) * posDifference, tp + 2)
+                local newHeight = heightFn(startPos + (tp + 3) / (teleportCount - 1) * posDifference, tp + 2)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     height + newHeight, 0)
             end
             prepareDisplacingSVs(next, svsToAdd, svTimeIsAdded,
-                heightFunc(endPos, teleportCount), 0, nil)
+                heightFn(endPos, teleportCount), 0, nil)
         end
     end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
