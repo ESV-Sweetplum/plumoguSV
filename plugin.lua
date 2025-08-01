@@ -476,6 +476,21 @@ function removeTrailingTag(str)
     end
     return table.concat(newStr)
 end
+function string.removeVowels(str)
+    local VOWELS = { "a", "e", "i", "o", "u", "y" }
+    local newStr = ""
+    for i = 1, str:len() do
+        local char = str:charAt(i)
+        if (not table.contains(VOWELS, char)) then
+            newStr = newStr .. char
+        end
+    end
+    return newStr
+end
+function string.shorten(str)
+    local consonants = str:removeVowels()
+    return table.concat({ consonants:charAt(1), consonants:charAt(2), consonants:charAt(-1) })
+end
 ---Returns the average value of an array.
 ---@param values number[] The list of numbers.
 ---@param includeLastValue? boolean Whether or not to include the last value in the table.
@@ -3390,62 +3405,6 @@ function selectBySnap(menuVars)
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
-function renderReactiveSingularities()
-    local imgui = imgui
-    local math = math
-    local state = state
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    local dimX = dim.x
-    local dimY = dim.y
-    local sqrt = math.sqrt
-    local clamp = math.clamp
-    local xList = state.GetValue("xList", {})
-    local yList = state.GetValue("yList", {})
-    local vxList = state.GetValue("vxList", {})
-    local vyList = state.GetValue("vyList", {})
-    local axList = state.GetValue("axList", {})
-    local ayList = state.GetValue("ayList", {})
-    local pulseStatus = state.GetValue("cache_pulseStatus", 0)
-    local slowSpeedR = 89
-    local slowSpeedG = 0
-    local slowSpeedB = 255
-    local fastSpeedR = 255
-    local fastSpeedG = 165
-    local fastSpeedB = 117
-    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
-    createParticle(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
-    local speed = clamp(math.abs(game.getSVMultiplierAt(state.SongTime)), 0, 4)
-    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
-        state.DeltaTime * speed)
-    local lerp = function(w, l, h)
-        return w * h + (1 - w) * l
-    end
-    for i = 1, #xList do
-        local x = xList[i]
-        local y = yList[i]
-        local vx = vxList[i]
-        local vy = vyList[i]
-        local s = sqrt(vx ^ 2 + vy ^ 2)
-        local clampedSpeed = clamp(s / 5, 0, 1)
-        local r = lerp(clampedSpeed, slowSpeedR, fastSpeedR)
-        local g = lerp(clampedSpeed, slowSpeedG, fastSpeedG)
-        local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
-        local pos = { x + topLeft.x, y + topLeft.y }
-        ctx.AddCircleFilled(pos, 2,
-            rgbaToUint(r, g, b, 55 + pulseStatus * 200))
-    end
-    ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
-    ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
-    ctx.AddCircle(dim / 2 + topLeft, 24 - pulseStatus * 8, 16777215 + math.floor(pulseStatus * 255) * 16777216)
-    state.SetValue("xList", xList)
-    state.SetValue("yList", yList)
-    state.SetValue("vxList", vxList)
-    state.SetValue("vyList", vyList)
-    state.SetValue("axList", axList)
-    state.SetValue("ayList", ayList)
-end
 function createParticle(x, y, vx, vy, ax, ay, dimX, dimY, n)
     if (#x >= 150) then return end
     x[#x + 1] = math.random() * dimX
@@ -3529,6 +3488,44 @@ local RGB_SNAP_MAP = {
     [12] = { 0, 120, 255 },
     [16] = { 0, 255, 0 },
 }
+function renderSynthesis()
+    local bgVars = {
+        snapTable = {},
+        pulseCount = 0,
+        snapOffset = 0,
+        lastDifference = 0
+    }
+    getVariables("synthesis", bgVars)
+    local circleSize = 10
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    local maxDim = math.sqrt(dim.x ^ 2 + dim.y ^ 2)
+    local curTime = state.SongTime
+    local tl = game.getTimingPointAt(curTime)
+    local msptl = 60000 / tl.Bpm * math.toNumber(tl.Signature)
+    local snapTable = bgVars.snapTable
+    local pulseCount = bgVars.pulseCount
+    local mostRecentStart = game.getNoteOffsetAt(curTime)
+    local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
+    if (#snapTable >= (maxDim / 1.6) / circleSize) then
+        bgVars.snapOffset = circleSize
+        table.remove(snapTable, 1)
+    end
+    if (bgVars.snapOffset > 0.001) then
+        bgVars.snapOffset = bgVars.snapOffset * 0.99 ^ state.DeltaTime
+    end
+    if (curTime - mostRecentStart < bgVars.lastDifference) then
+        table.insert(snapTable, game.getSnapAt(mostRecentStart, true))
+    end
+    bgVars.lastDifference = curTime - mostRecentStart
+    for idx, snap in pairs(snapTable) do
+        local colTbl = RGB_SNAP_MAP[snap]
+        ctx.AddCircle(dim / 2 + topLeft, circleSize * (idx - 1) + bgVars.snapOffset,
+            rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
+    end
+    saveVariables("synthesis", bgVars)
+end
 function drawCapybaraParent()
     drawCapybara()
     drawCapybara2()
@@ -4063,7 +4060,7 @@ end
 ---@field col Vector4
 ---@field size integer
 function renderBackground()
-    renderReactiveSingularities()
+    renderSynthesis()
 end
 function setPluginAppearance()
     local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
@@ -5089,9 +5086,11 @@ end
 function renderPresetMenu(menuLabel, menuVars, settingVars)
     local newPresetName = state.GetValue("newPresetName", "")
     imgui.AlignTextToFramePadding()
-    imgui.Text("Name:")
+    imgui.Text("New Preset Name:")
     KeepSameLine()
+    imgui.PushItemWidth(90)
     _, newPresetName = imgui.InputText("##PresetName", newPresetName, 4096)
+    imgui.PopItemWidth()
     imgui.SameLine()
     if (imgui.Button("Save") and newPresetName:len() > 0) then
         preset = {}
@@ -5112,23 +5111,20 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         write(globalVars)
     end
     state.SetValue("newPresetName", newPresetName)
-    imgui.Columns(4)
+    imgui.Columns(3)
     imgui.Text("Name")
     imgui.NextColumn()
     imgui.Text("Menu")
     imgui.NextColumn()
-    imgui.Text("Details")
-    imgui.NextColumn()
-    imgui.Text("Select")
+    imgui.Text("Actions")
     imgui.NextColumn()
     imgui.Separator()
     for idx, preset in pairs(globalVars.presets) do
+        imgui.AlignTextToFramePadding()
         imgui.Text(preset.name)
         imgui.NextColumn()
-        imgui.Text(table.concat({ preset.type, " > ", removeTrailingTag(preset.menu) }))
-        imgui.NextColumn()
-        imgui.TextDisabled("(?)")
-        ToolTip(preset.data)
+        imgui.AlignTextToFramePadding()
+        imgui.Text(table.concat({ preset.type:shorten(), " > ", removeTrailingTag(preset.menu):sub(1, 3) }))
         imgui.NextColumn()
         if (imgui.Button("Select##Preset" .. idx)) then
             local data = table.parse(preset.data)
@@ -5137,15 +5133,15 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             saveVariables(table.concat({"place", preset.type, "Menu"}), data.menuVars)
             globalVars.showPresetMenu = false
         end
-        if (imgui.IsItemClicked("Right")) then
+        KeepSameLine()
+        if (imgui.Button("X##Preset" .. idx)) then
             table.remove(globalVars.presets, idx)
             write(globalVars)
         end
     end
-    imgui.SetColumnWidth(0, 50)
-    imgui.SetColumnWidth(1, 100)
-    imgui.SetColumnWidth(2, 60)
-    imgui.SetColumnWidth(3, 60)
+    imgui.SetColumnWidth(0, 90)
+    imgui.SetColumnWidth(1, 73)
+    imgui.SetColumnWidth(2, 95)
     imgui.Columns(1)
 end
 function animationFramesSetupMenu(settingVars)
