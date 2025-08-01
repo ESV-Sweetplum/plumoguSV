@@ -1,7 +1,7 @@
 function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End##Vibrato", " msx", 0, 7 / 8)
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func = function(t)
             t = math.clamp(t, 0, 1) * 2
@@ -28,7 +28,7 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
     else
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
 
         local func1 = function(t)

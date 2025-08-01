@@ -5659,7 +5659,7 @@ end
 function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End##Vibrato", " msx", 0, 0.875)
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func = function(t)
             t = math.clamp(t, 0, 1)
@@ -5678,7 +5678,7 @@ function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
     else
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func1 = function(t)
             t = math.clamp(t, 0, 1)
@@ -5764,7 +5764,7 @@ end
 function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End##Vibrato", " msx", 0, 7 / 8)
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func = function(t)
             t = math.clamp(t, 0, 1) * 2
@@ -5790,7 +5790,7 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
     else
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func1 = function(t)
             t = math.clamp(t, 0, 1)
@@ -7072,7 +7072,7 @@ function showDefaultPropertiesSettings()
     if (imgui.CollapsingHeader("Exponential Vibrato SV Settings")) then
         local settingVars = getSettingVars("ExponentialVibratoSV", "Property")
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End", " msx", 0, 0.875)
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
         saveSettingPropertiesButton(settingVars, "ExponentialVibratoSV")
         saveVariables("ExponentialVibratoSVPropertySettings", settingVars)
     end
@@ -7088,7 +7088,7 @@ function showDefaultPropertiesSettings()
     if (imgui.CollapsingHeader("Sigmoidal Vibrato SV Settings")) then
         local settingVars = getSettingVars("SigmoidalVibratoSV", "Property")
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End", " msx", 0, 0.875)
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         saveSettingPropertiesButton(settingVars, "SigmoidalVibratoSV")
         saveVariables("SigmoidalVibratoSVPropertySettings", settingVars)
     end
@@ -7104,7 +7104,7 @@ function showDefaultPropertiesSettings()
         local settingVars = getSettingVars("ExponentialVibratoSSF", "Property")
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs", "x")
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
         saveSettingPropertiesButton(settingVars, "ExponentialVibratoSSF")
         saveVariables("ExponentialVibratoSSFPropertySettings", settingVars)
     end
@@ -7117,6 +7117,14 @@ function showDefaultPropertiesSettings()
         choosePeriodShift(settingVars)
         saveSettingPropertiesButton(settingVars, "SinusoidalVibratoSSF")
         saveVariables("SinusoidalVibratoSSFPropertySettings", settingVars)
+    end
+    if (imgui.CollapsingHeader("Sigmoidal Vibrato SSF Settings")) then
+        local settingVars = getSettingVars("SigmoidalVibratoSSF", "Property")
+        SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs", "x")
+        SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs", "x")
+        chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
+        saveSettingPropertiesButton(settingVars, "SigmoidalVibratoSSF")
+        saveVariables("SigmoidalVibratoSSFPropertySettings", settingVars)
     end
 end
 function showGeneralSettings()
@@ -7774,8 +7782,8 @@ function chooseVibratoQuality(menuVars)
     menuVars.vibratoQuality = Combo("Vibrato Quality", VIBRATO_DETAILED_QUALITIES, menuVars.vibratoQuality)
     ToolTip("Note that higher FPS will look worse on lower refresh rate monitors.")
 end
-function chooseCurvatureCoefficient(settingVars)
-    plotExponentialCurvature(settingVars)
+function chooseCurvatureCoefficient(settingVars, plotFn)
+    plotFn(settingVars)
     imgui.SameLine(0, 0)
     _, settingVars.curvatureIndex = imgui.SliderInt("Curvature", settingVars.curvatureIndex, 1, #VIBRATO_CURVATURES,
         tostring(VIBRATO_CURVATURES[settingVars.curvatureIndex]))

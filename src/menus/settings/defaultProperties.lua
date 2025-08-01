@@ -465,7 +465,7 @@ function showDefaultPropertiesSettings()
         local settingVars = getSettingVars("ExponentialVibratoSV", "Property")
 
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End", " msx", 0, 0.875)
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
 
         saveSettingPropertiesButton(settingVars, "ExponentialVibratoSV")
         saveVariables("ExponentialVibratoSVPropertySettings", settingVars)
@@ -485,7 +485,7 @@ function showDefaultPropertiesSettings()
         local settingVars = getSettingVars("SigmoidalVibratoSV", "Property")
 
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End", " msx", 0, 0.875)
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
 
         saveSettingPropertiesButton(settingVars, "SigmoidalVibratoSV")
         saveVariables("SigmoidalVibratoSVPropertySettings", settingVars)
@@ -507,7 +507,7 @@ function showDefaultPropertiesSettings()
 
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs", "x")
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
 
         saveSettingPropertiesButton(settingVars, "ExponentialVibratoSSF")
         saveVariables("ExponentialVibratoSSFPropertySettings", settingVars)
@@ -523,5 +523,15 @@ function showDefaultPropertiesSettings()
 
         saveSettingPropertiesButton(settingVars, "SinusoidalVibratoSSF")
         saveVariables("SinusoidalVibratoSSFPropertySettings", settingVars)
+    end
+    if (imgui.CollapsingHeader("Sigmoidal Vibrato SSF Settings")) then
+        local settingVars = getSettingVars("SigmoidalVibratoSSF", "Property")
+
+        SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs", "x")
+        SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs", "x")
+        chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
+
+        saveSettingPropertiesButton(settingVars, "SigmoidalVibratoSSF")
+        saveVariables("SigmoidalVibratoSSFPropertySettings", settingVars)
     end
 end
