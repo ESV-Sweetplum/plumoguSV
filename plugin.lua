@@ -63,6 +63,11 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     if (not foundCorrectSnap) then return 5 end
     return guessedSnap
 end
+function game.getSSFStartTimeAt(offset, tgId)
+    local sv = map.GetScrollSpeedFactorAt(offset, tgId)
+    if sv then return sv.StartTime end
+    return -1
+end
 function game.getSSFMultiplierAt(offset)
     local ssf = map.GetScrollSpeedFactorAt(offset)
     if ssf then return ssf.Multiplier end
@@ -283,6 +288,13 @@ end
 function math.quadraticBezier(p2, t)
     return 2 * t * (1 - t) * p2 + t * t
 end
+---Returns n choose r, or nCr.
+---@param n integer
+---@param r integer
+---@return integer
+function math.binom(n, r)
+    return math.factorial(n) / (math.factorial(r) * math.factorial(n - r))
+end
 ---Restricts a number to be within a chosen bound.
 ---@param number number
 ---@param lowerBound number
@@ -326,6 +338,52 @@ function math.hermite(m1, m2, y2, t)
     local b = 3 * y2 - 2 * m1 - m2
     local c = m1
     return a * t * t * t + b * t * t + c * t
+end
+---Interpolates circular parameters of the form (x-h)^2+(y-k)^2=r^2 with three, non-colinear points.
+---@param p1 Vector2
+---@param p2 Vector2
+---@param p3 Vector2
+---@return number, number, number
+function math.interpolateCircle(p1, p2, p3)
+    local mtrx = {
+        vector.Table(2 * (p2 - p1)),
+        vector.Table(2 * (p3 - p1))
+    }
+    local vctr = {
+        vector.Length(p2) ^ 2 - vector.Length(p1) ^ 2,
+        vector.Length(p3) ^ 2 - vector.Length(p1) ^ 2
+    }
+    h, k = matrix.solve(mtrx, vctr)
+    r = math.sqrt((p1.x) ^ 2 + (p1.y) ^ 2 + h * h + k * k - 2 * h * p1.x - 2 * k * p1.y)
+    ---@type number, number, number
+    return h, k, r
+end
+---Interpolates quadratic parameters of the form y=ax^2+bx+c with three, non-colinear points.
+---@param p1 Vector2
+---@param p2 Vector2
+---@param p3 Vector2
+---@return number, number, number
+function math.interpolateQuadratic(p1, p2, p3)
+    local mtrx = {
+        (p2.x) ^ 2 - (p1.x) ^ 2, (p2 - p1).x,
+        (p3.x) ^ 2 - (p1.x) ^ 2, (p3 - p1).x,
+    }
+    local vctr = {
+        (p2 - p1).y,
+        (p3 - p1).y
+    }
+    a, b = matrix.solve(mtrx, vctr)
+    c = p1.y - p1.x * b - (p1.x) ^ 2 * a
+    ---@type number, number, number
+    return a, b, c
+end
+---Returns a number that is `(weight * 100)%` of the way from travelling between `lowerBound` and `upperBound`.
+---@param weight number
+---@param lowerBound number
+---@param upperBound number
+---@return number
+function math.lerp(weight, lowerBound, upperBound)
+    return upperBound * weight + lowerBound * (1 - weight)
 end
 ---Returns the weight of a number between `lowerBound` and `upperBound`.
 ---@param num number
@@ -384,6 +442,11 @@ function matrix.solve(mtrx, vctr)
         end
     end
     return table.unpack(table.property(augMtrx, #mtrx + 1))
+end
+function matrix.swapRows(mtrx, rowIdx1, rowIdx2)
+    local temp = mtrx[rowIdx1]
+    mtrx[rowIdx1] = mtrx[rowIdx2]
+    mtrx[rowIdx2] = temp
 end
 ---Rounds a number to a given amount of decimal places.
 ---@param number number
@@ -749,6 +812,25 @@ end
 ---@param a number
 ---@param b number
 function sortAscending(a, b) return a < b end
+---Sorting function for sorting objects by their `startTime` property. Should be passed into [`table.sort`](lua://table.sort).
+---@param a { StartTime: number }
+---@param b { StartTime: number }
+function sortAscendingStartTime(a, b) return a.StartTime < b.StartTime end
+---Sorting function for sorting objects by their `time` property. Should be passed into [`table.sort`](lua://table.sort).
+---@param a { time: number }
+---@param b { time: number }
+---@return boolean
+function sortAscendingTime(a, b) return a.time < b.time end
+---Sorts a table given a sorting function. Should be passed into [`table.sort`](lua://table.sort).
+---@generic T
+---@param tbl T[] The table to sort.
+---@param compFn fun(a: T, b: T): boolean A comparison function. Given two elements `a` and `b`, how should they be sorted?
+---@return T[] sortedTbl A sorted table.
+function sort(tbl, compFn)
+    newTbl = table.duplicate(tbl)
+    table.sort(newTbl, compFn)
+    return newTbl
+end
 ---Converts a table (or any other primitive values) to a string.
 ---@param var any
 ---@return string
@@ -3389,6 +3471,62 @@ function selectBySnap(menuVars)
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
+function renderReactiveSingularities()
+    local imgui = imgui
+    local math = math
+    local state = state
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    local dimX = dim.x
+    local dimY = dim.y
+    local sqrt = math.sqrt
+    local clamp = math.clamp
+    local xList = state.GetValue("xList", {})
+    local yList = state.GetValue("yList", {})
+    local vxList = state.GetValue("vxList", {})
+    local vyList = state.GetValue("vyList", {})
+    local axList = state.GetValue("axList", {})
+    local ayList = state.GetValue("ayList", {})
+    local pulseStatus = state.GetValue("cache_pulseStatus", 0)
+    local slowSpeedR = 89
+    local slowSpeedG = 0
+    local slowSpeedB = 255
+    local fastSpeedR = 255
+    local fastSpeedG = 165
+    local fastSpeedB = 117
+    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
+    createParticle(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
+    local speed = clamp(math.abs(game.getSVMultiplierAt(state.SongTime)), 0, 4)
+    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
+        state.DeltaTime * speed)
+    local lerp = function(w, l, h)
+        return w * h + (1 - w) * l
+    end
+    for i = 1, #xList do
+        local x = xList[i]
+        local y = yList[i]
+        local vx = vxList[i]
+        local vy = vyList[i]
+        local s = sqrt(vx ^ 2 + vy ^ 2)
+        local clampedSpeed = clamp(s / 5, 0, 1)
+        local r = lerp(clampedSpeed, slowSpeedR, fastSpeedR)
+        local g = lerp(clampedSpeed, slowSpeedG, fastSpeedG)
+        local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
+        local pos = { x + topLeft.x, y + topLeft.y }
+        ctx.AddCircleFilled(pos, 2,
+            rgbaToUint(r, g, b, 55 + pulseStatus * 200))
+    end
+    ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
+    ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
+    ctx.AddCircle(dim / 2 + topLeft, 24 - pulseStatus * 8, 16777215 + math.floor(pulseStatus * 255) * 16777216)
+    state.SetValue("xList", xList)
+    state.SetValue("yList", yList)
+    state.SetValue("vxList", vxList)
+    state.SetValue("vyList", vyList)
+    state.SetValue("axList", axList)
+    state.SetValue("ayList", ayList)
+end
 function createParticle(x, y, vx, vy, ax, ay, dimX, dimY, n)
     if (#x >= 150) then return end
     x[#x + 1] = math.random() * dimX
@@ -3459,6 +3597,30 @@ function updateStars()
             star.pos = star.pos + star.v * state.DeltaTime * 0.05 *
                 math.clamp(2 * game.getSVMultiplierAt(state.SongTime), -50, 50)
         end
+    end
+end
+function renderReactiveStars()
+    local stars = stars
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    if (not truthy(#stars)) then
+        for _ = 1, 100 do
+            table.insert(stars,
+                {
+                    pos = vector.New(math.random() * 500, math.random() * 500),
+                    v = vector.New(math.random() * 3 + 1, 0),
+                    size = math.random(3) * 0.5,
+                })
+        end
+    else
+        updateStars()
+    end
+    for k = 1, #stars do
+        local star = stars[k]
+        local progress = star.pos.x / dim.x
+        local brightness = math.clamp(-8 * progress * (progress - 1), 0, 1)
+        ctx.AddCircleFilled(star.pos + topLeft, star.size, rgbaToUint(255, 255, 255, brightness * 255))
     end
 end
 local RGB_SNAP_MAP = {
@@ -4844,6 +5006,8 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
     imgui.EndCombo()
     return newListIndex
 end
+function BasicInputFloat(label, var, decimalPlaces, suffix, step)
+end
 function ComputableInputFloat(label, var, decimalPlaces, suffix)
     local computableStateIndex = state.GetValue("ComputableInputFloatIndex") or 1
     local previousValue = var
@@ -4987,6 +5151,12 @@ function executeFunctionIfTrue(condition, func, menuVars)
         return
     end
     func()
+end
+function StatedInputText(label, input)
+    local statedInputTextIndex = state.GetValue("StatedInputTextIndex", 1)
+    local _, out = imgui.InputText(table.concat({ label, "##", statedInputTextIndex }), input, 4096)
+    state.SetValue("StatedInputTextIndex", statedInputTextIndex + 1)
+    return out, input ~= out
 end
 function KeepSameLine()
     return imgui.SameLine(0, SAMELINE_SPACING)
@@ -5293,6 +5463,9 @@ function addSelectedNoteTimesToList(menuVars)
     end
     menuVars.noteTimes = table.dedupe(menuVars.noteTimes)
     menuVars.noteTimes = sort(menuVars.noteTimes, sortAscending)
+end
+function animationPaletteMenu(settingVars)
+    CodeInput(settingVars, "instructions", "", "Write instructions here.")
 end
 function automateSVMenu(settingVars)
     local copiedSVCount = #settingVars.copiedSVs
@@ -7769,6 +7942,14 @@ function uintToRgba(n)
     end
     return table.vectorize4(tbl)
 end
+function rgbaToHexa(r, g, b, a)
+    local flr = math.floor
+    local hexaStr = ""
+    for _, col in ipairs({ r, g, b, a }) do
+        hexaStr = hexaStr .. HEXADECIMAL[math.floor(col / 16) + 1] .. HEXADECIMAL[flr(col) % 16 + 1]
+    end
+    return hexaStr
+end
 function hexaToRgba(hexa)
     local rgbaTable = {}
     for i = 1, 8, 2 do
@@ -8333,6 +8514,22 @@ function getHypotheticalSVMultiplierAt(svs, offset)
     end
     return 1
 end
+---Returns the SV time in a given array of SVs.
+---@param svs ScrollVelocity[]
+---@param offset number
+---@return number
+function getHypotheticalSVTimeAt(svs, offset)
+    if (#svs == 1) then return svs[1].StartTime end
+    local index = #svs
+    while (index >= 1) do
+        if (svs[index].StartTime > offset) then
+            index = index - 1
+        else
+            return svs[index].StartTime
+        end
+    end
+    return -69
+end
 ---Given a predetermined set of SVs, returns a list of [scroll velocities](lua://ScrollVelocity) within a temporal boundary.
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
@@ -8472,6 +8669,40 @@ function plotExponentialCurvature(settingVars)
         else
             value = (1 - (1 - t) ^ (1 / curvature))
         end
+        if ((settingVars.startMsx or settingVars.lowerStart) > (settingVars.endMsx or settingVars.lowerEnd)) then
+            value = 1 - value
+        elseif ((settingVars.startMsx or settingVars.lowerStart) == (settingVars.endMsx or settingVars.lowerEnd)) then
+            value = 0.5
+        end
+        values:insert(value)
+    end
+    imgui.PlotLines("##CurvaturePlot", values, #values, 0, "", 0, 1)
+    imgui.PopStyleColor()
+    imgui.PopItemWidth()
+end
+function plotSigmoidalCurvature(settingVars)
+    imgui.PushItemWidth(28)
+    imgui.PushStyleColor(imgui_col.FrameBg, 0)
+    local RESOLUTION = 32
+    local values = table.construct()
+    for i = 1, RESOLUTION do
+        local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
+        local t = i / RESOLUTION * 2
+        local value = t
+        if (curvature >= 1) then
+            if (t <= 1) then
+                value = t ^ curvature
+            else
+                value = 2 - (2 - t) ^ curvature
+            end
+        else
+            if (t <= 1) then
+                value = (1 - (1 - t) ^ (1 / curvature))
+            else
+                value = (t - 1) ^ (1 / curvature) + 1
+            end
+        end
+        value = value / 2
         if ((settingVars.startMsx or settingVars.lowerStart) > (settingVars.endMsx or settingVars.lowerEnd)) then
             value = 1 - value
         elseif ((settingVars.startMsx or settingVars.lowerStart) == (settingVars.endMsx or settingVars.lowerEnd)) then
