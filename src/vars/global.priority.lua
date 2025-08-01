@@ -35,7 +35,8 @@ globalVars = {
     dontPrintCreation = false,
     equalizeLinear = false,
     defaultProperties = { settings = {}, menu = {} },
-    presets = {}
+    presets = {},
+    dynamicBackgroundIndex = 1,
 }
 
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
@@ -76,4 +77,5 @@ function setGlobalVars(tempGlobalVars)
             .border)
     end
     globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear)
+    globalVars.dynamicBackgroundIndex = math.toNumber(tempGlobalVars.dynamicBackgroundIndex)
 end

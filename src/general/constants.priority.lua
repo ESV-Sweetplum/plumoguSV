@@ -65,6 +65,12 @@ COLOR_THEME_COLORS = { -- colors of theme dropdown
     "255,255,255",
     "0,0,0",
 }
+DYNAMIC_BACKGROUND_TYPES = {
+    "None",
+    "Reactive Stars",
+    "Reactive Singularity",
+    "Synthesis",
+}
 COMBO_SV_TYPE = { -- options for overlapping combo SVs
     "Add",
     "Cross Multiply",

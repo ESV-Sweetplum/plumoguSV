@@ -31,4 +31,8 @@ function showAppearanceSettings()
         imgui.EndDisabled()
         state.SetValue("showColorPicker", false)
     end
+    AddSeparator()
+    local oldDynamicBgIndex = globalVars.dynamicBackgroundIndex
+    globalVars.dynamicBackgroundIndex = Combo("Dynamic BG", DYNAMIC_BACKGROUND_TYPES, oldDynamicBgIndex)
+    if (oldDynamicBgIndex ~= globalVars.dynamicBackgroundIndex) then write(globalVars) end
 end

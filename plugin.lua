@@ -1032,6 +1032,12 @@ COLOR_THEME_COLORS = {
     "255,255,255",
     "0,0,0",
 }
+DYNAMIC_BACKGROUND_TYPES = {
+    "None",
+    "Reactive Stars",
+    "Reactive Singularity",
+    "Synthesis",
+}
 COMBO_SV_TYPE = {
     "Add",
     "Cross Multiply",
@@ -1331,7 +1337,8 @@ globalVars = {
     dontPrintCreation = false,
     equalizeLinear = false,
     defaultProperties = { settings = {}, menu = {} },
-    presets = {}
+    presets = {},
+    dynamicBackgroundIndex = 1,
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
@@ -1370,6 +1377,7 @@ function setGlobalVars(tempGlobalVars)
             .border)
     end
     globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear)
+    globalVars.dynamicBackgroundIndex = math.toNumber(tempGlobalVars.dynamicBackgroundIndex)
 end
 DEFAULT_STARTING_MENU_VARS = {
     placeStandard = {
@@ -4206,7 +4214,15 @@ end
 ---@field col Vector4
 ---@field size integer
 function renderBackground()
-    renderSynthesis()
+    if (DYNAMIC_BACKGROUND_TYPES[globalVars.dynamicBackgroundIndex] == "Reactive Stars") then
+        renderReactiveStars()
+    end
+    if (DYNAMIC_BACKGROUND_TYPES[globalVars.dynamicBackgroundIndex] == "Reactive Singularity") then
+        renderReactiveSingularities()
+    end
+    if (DYNAMIC_BACKGROUND_TYPES[globalVars.dynamicBackgroundIndex] == "Synthesis") then
+        renderSynthesis()
+    end
 end
 function setPluginAppearance()
     local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
@@ -6530,6 +6546,10 @@ function showAppearanceSettings()
         imgui.EndDisabled()
         state.SetValue("showColorPicker", false)
     end
+    AddSeparator()
+    local oldDynamicBgIndex = globalVars.dynamicBackgroundIndex
+    globalVars.dynamicBackgroundIndex = Combo("Dynamic BG", DYNAMIC_BACKGROUND_TYPES, oldDynamicBgIndex)
+    if (oldDynamicBgIndex ~= globalVars.dynamicBackgroundIndex) then write(globalVars) end
 end
 local customStyleIds = {
     "windowBg",
