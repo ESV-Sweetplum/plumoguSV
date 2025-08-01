@@ -5782,6 +5782,7 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
                 end
             end
             t = t * 0.5
+            return settingVars.startMsx + t * (settingVars.endMsx - settingVars.startMsx)
         end
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
@@ -5793,21 +5794,39 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
         chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func1 = function(t)
-            t = math.clamp(t, 0, 1)
-            if (curvature < 10) then
-                t = 1 - (1 - t) ^ (1 / curvature)
+            t = math.clamp(t, 0, 1) * 2
+            if (curvature >= 1) then
+                if (t <= 1) then
+                    t = t ^ curvature
+                else
+                    t = 2 - (2 - t) ^ curvature
+                end
             else
-                t = t ^ curvature
+                if (t <= 1) then
+                    t = (1 - (1 - t) ^ (1 / curvature))
+                else
+                    t = (t - 1) ^ (1 / curvature) + 1
+                end
             end
+            t = t * 0.5
             return settingVars.lowerStart + t * (settingVars.lowerEnd - settingVars.lowerStart)
         end
         local func2 = function(t)
-            t = math.clamp(t, 0, 1)
-            if (curvature < 10) then
-                t = 1 - (1 - t) ^ (1 / curvature)
+            t = math.clamp(t, 0, 1) * 2
+            if (curvature >= 1) then
+                if (t <= 1) then
+                    t = t ^ curvature
+                else
+                    t = 2 - (2 - t) ^ curvature
+                end
             else
-                t = t ^ curvature
+                if (t <= 1) then
+                    t = (1 - (1 - t) ^ (1 / curvature))
+                else
+                    t = (t - 1) ^ (1 / curvature) + 1
+                end
             end
+            t = t * 0.5
             return settingVars.higherStart + t * (settingVars.higherEnd - settingVars.higherStart)
         end
         AddSeparator()
