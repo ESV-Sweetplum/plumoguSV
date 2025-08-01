@@ -106,21 +106,23 @@ export default async function transpiler(
         const splitOutput = output.split('\n');
 
         let [functions, fnIndices] = getFunctionList(splitOutput);
+        const spliceIndices = [];
         for (let i = 0; i < functions.length; i++) {
             const fn = functions[i];
             const cond = fn.startsWith('string') || fn.startsWith('table');
             if (cond) {
-                functions.splice(i, 1);
-                fnIndices.splice(i, 1);
+                spliceIndices.unshift(i);
             }
         }
+        spliceIndices.forEach((idx) => {
+            functions.splice(idx, 1);
+            fnIndices.splice(idx, 1);
+        });
         const [_, unusedIndexes] = getUnusedFunctions(
             splitOutput,
             functions,
             fnIndices
         );
-
-        console.log(_, unusedIndexes);
 
         // unusedIndexes.reverse().forEach((idx) => {
         //     let startIdx = idx;
