@@ -3,14 +3,14 @@
 ---@return boolean truthy The truthy value of the parameter.
 function truthy(param)
     local t = type(param)
-    if (t == "string") then
-        return param:lower() == "true" and true or false
+    if t == "string" then
+        return param:lower() == "true"
     end
     if t == "number" then
-        return param > 0 and true or false
+        return param > 0
     end
     if t == "table" or t == "userdata" then
-        return #param > 0 and true or false
+        return #param > 0
     end
     if t == "boolean" then
         return param
