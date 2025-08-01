@@ -7,15 +7,15 @@
 ---Creates an imgui button.
 ---@param text string The text that the button should have.
 ---@param size Vector2 The size of the button.
----@param func fun(menuVars?: table): nil The function that the button should run upon being clicked.
+---@param fn fun(menuVars?: table): nil The function that the button should run upon being clicked.
 ---@param menuVars? table A set of variables to be passed into the function.
-function FunctionButton(text, size, func, menuVars)
+function FunctionButton(text, size, fn, menuVars)
     if not imgui.Button(text, size) then return end
     if menuVars then
-        func(menuVars)
+        fn(menuVars)
         return
     end
-    func()
+    fn()
 end
 
 function PresetButton()

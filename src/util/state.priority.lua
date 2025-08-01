@@ -5,7 +5,7 @@
 function getVariables(listName, variables)
     for key, _ in pairs(variables) do
         if (state.GetValue(listName .. key) ~= nil) then
-            variables[key] = state.GetValue(listName .. key) -- Changed because default setting of true would always override
+            variables[key] = state.GetValue(listName .. key)
         end
     end
 end

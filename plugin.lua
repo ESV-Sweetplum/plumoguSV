@@ -63,11 +63,6 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     if (not foundCorrectSnap) then return 5 end
     return guessedSnap
 end
-function game.getSSFStartTimeAt(offset, tgId)
-    local sv = map.GetScrollSpeedFactorAt(offset, tgId)
-    if sv then return sv.StartTime end
-    return -1
-end
 function game.getSSFMultiplierAt(offset)
     local ssf = map.GetScrollSpeedFactorAt(offset)
     if ssf then return ssf.Multiplier end
@@ -229,7 +224,7 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     noteOffsetsBetween = sort(noteOffsetsBetween, sortAscending)
     return noteOffsetsBetween
 end
-game.getUniqueNoteOffsetsBetween = game.getUniqueNoteOffsetsBetween
+game.getUniqueNoteOffsetsBetween = game.uniqueNoteOffsetsBetween
 function kb.listenForAnyKeyPressed()
     local isCtrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
     local isShiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)
@@ -288,13 +283,6 @@ end
 function math.quadraticBezier(p2, t)
     return 2 * t * (1 - t) * p2 + t * t
 end
----Returns n choose r, or nCr.
----@param n integer
----@param r integer
----@return integer
-function math.binom(n, r)
-    return math.factorial(n) / (math.factorial(r) * math.factorial(n - r))
-end
 ---Restricts a number to be within a chosen bound.
 ---@param number number
 ---@param lowerBound number
@@ -338,52 +326,6 @@ function math.hermite(m1, m2, y2, t)
     local b = 3 * y2 - 2 * m1 - m2
     local c = m1
     return a * t * t * t + b * t * t + c * t
-end
----Interpolates circular parameters of the form (x-h)^2+(y-k)^2=r^2 with three, non-colinear points.
----@param p1 Vector2
----@param p2 Vector2
----@param p3 Vector2
----@return number, number, number
-function math.interpolateCircle(p1, p2, p3)
-    local mtrx = {
-        vector.Table(2 * (p2 - p1)),
-        vector.Table(2 * (p3 - p1))
-    }
-    local vctr = {
-        vector.Length(p2) ^ 2 - vector.Length(p1) ^ 2,
-        vector.Length(p3) ^ 2 - vector.Length(p1) ^ 2
-    }
-    h, k = matrix.solve(mtrx, vctr)
-    r = math.sqrt((p1.x) ^ 2 + (p1.y) ^ 2 + h * h + k * k - 2 * h * p1.x - 2 * k * p1.y)
-    ---@type number, number, number
-    return h, k, r
-end
----Interpolates quadratic parameters of the form y=ax^2+bx+c with three, non-colinear points.
----@param p1 Vector2
----@param p2 Vector2
----@param p3 Vector2
----@return number, number, number
-function math.interpolateQuadratic(p1, p2, p3)
-    local mtrx = {
-        (p2.x) ^ 2 - (p1.x) ^ 2, (p2 - p1).x,
-        (p3.x) ^ 2 - (p1.x) ^ 2, (p3 - p1).x,
-    }
-    local vctr = {
-        (p2 - p1).y,
-        (p3 - p1).y
-    }
-    a, b = matrix.solve(mtrx, vctr)
-    c = p1.y - p1.x * b - (p1.x) ^ 2 * a
-    ---@type number, number, number
-    return a, b, c
-end
----Returns a number that is `(weight * 100)%` of the way from travelling between `lowerBound` and `upperBound`.
----@param weight number
----@param lowerBound number
----@param upperBound number
----@return number
-function math.lerp(weight, lowerBound, upperBound)
-    return upperBound * weight + lowerBound * (1 - weight)
 end
 ---Returns the weight of a number between `lowerBound` and `upperBound`.
 ---@param num number
@@ -443,11 +385,6 @@ function matrix.solve(mtrx, vctr)
     end
     return table.unpack(table.property(augMtrx, #mtrx + 1))
 end
-function matrix.swapRows(mtrx, rowIdx1, rowIdx2)
-    local temp = mtrx[rowIdx1]
-    mtrx[rowIdx1] = mtrx[rowIdx2]
-    mtrx[rowIdx2] = temp
-end
 ---Rounds a number to a given amount of decimal places.
 ---@param number number
 ---@param decimalPlaces? integer
@@ -464,10 +401,12 @@ function math.sign(number)
     if number >= 0 then return 1 end
     return -1
 end
----Alias of [tonumber](lua://tonumber) for type coercion.
----@param x string | number
+---Alias of [tonumber](lua://tonumber) for type coercion. Converts boolean values into their respective binary digits.
+---@param x? string | number | boolean
 ---@return number
 function math.toNumber(x)
+    if (not x) then return 0 end
+    if (x == true) then return 1 end
     local result = tonumber(x)
     if (not result or type(result) ~= "number") then return 0 end
     return result
@@ -783,30 +722,6 @@ function table.reverse(tbl)
         reverseTbl[#reverseTbl + 1] = tbl[#tbl + 1 - i]
     end
     return reverseTbl
-end
----In an array of numbers, searches for the closest number to `item`.
----@param tbl number[] The array of numbers to search in.
----@param item number The number to search for.
----@param searchMode? 0|1|2 `0`: Search before and after. `1`: Search only before. `2`: Search only after.
----@return number num, integer index The number that is the closest to the given item, and the index of that number in the given table.
-function table.searchClosest(tbl, item, searchMode)
-    local leftIdx = 1
-    local rightIdx = #tbl
-    while rightIdx - leftIdx > 1 do
-        local middleIdx = math.floor((leftIdx + rightIdx) * 0.5)
-        if (item >= tbl[middleIdx]) then
-            leftIdx = middleIdx
-        else
-            rightIdx = middleIdx
-        end
-    end
-    local leftDifference = item - tbl[leftIdx]
-    local rightDifference = tbl[rightIdx] - item
-    if ((leftDifference < rightDifference or searchMode == 1) and searchMode ~= 2) then
-        return tbl[leftIdx], leftIdx
-    else
-        return tbl[rightIdx], rightIdx
-    end
 end
 ---Sorting function for sorting objects by their numerical value. Should be passed into [`table.sort`](lua://table.sort).
 ---@param a number
@@ -2308,7 +2223,7 @@ function ssfVibrato(menuVars, func1, func2)
     })
     toggleablePrint("s!", table.concat({"Created ", #ssfs, pluralize(" SSF.", #ssfs, -2)}))
 end
-function svVibrato(menuVars, heightFunc)
+function svVibrato(menuVars, heightFn)
     local offsets = game.uniqueNoteOffsetsBetweenSelected()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -2328,7 +2243,7 @@ function svVibrato(menuVars, heightFunc)
             for tp = 1, teleportCount do
                 local x = (tp - 1) / (teleportCount)
                 local offset = next * x + start * (1 - x)
-                local height = heightFunc(((math.floor((tp - 1) * 0.5) * 2) / (teleportCount - 2)) * posDifference +
+                local height = heightFn(((math.floor((tp - 1) * 0.5) * 2) / (teleportCount - 2)) * posDifference +
                     startPos, tp)
                 if (tp % 2 == 1) then
                     height = -height
@@ -2338,13 +2253,13 @@ function svVibrato(menuVars, heightFunc)
             end
         elseif (menuVars.sides == 2) then
             prepareDisplacingSVs(start, svsToAdd, svTimeIsAdded, nil,
-                -heightFunc(startPos, 1), 0)
+                -heightFn(startPos, 1), 0)
             for tp = 1, teleportCount - 2 do
                 local x = tp / (teleportCount - 1)
                 local offset = next * x + start * (1 - x)
-                local initHeight = heightFunc(tp / (teleportCount - 1) * posDifference +
+                local initHeight = heightFn(tp / (teleportCount - 1) * posDifference +
                     startPos, tp - 1)
-                local newHeight = heightFunc((tp + 1) / (teleportCount - 1) * posDifference +
+                local newHeight = heightFn((tp + 1) / (teleportCount - 1) * posDifference +
                     startPos, tp)
                 local height = initHeight + newHeight
                 if (tp % 2 == 0) then
@@ -2354,16 +2269,16 @@ function svVibrato(menuVars, heightFunc)
                     height, 0)
             end
             prepareDisplacingSVs(next, svsToAdd, svTimeIsAdded,
-                heightFunc(endPos, teleportCount), 0, nil)
+                heightFn(endPos, teleportCount), 0, nil)
         else
             prepareDisplacingSVs(start, svsToAdd, svTimeIsAdded, nil,
-                -heightFunc(startPos, 1), 0)
+                -heightFn(startPos, 1), 0)
             prepareDisplacingSVs(start, svsToAdd, svTimeIsAdded, nil,
-                heightFunc(startPos + 2 / (teleportCount - 1) * posDifference, 3) + heightFunc(startPos, 1), 0)
+                heightFn(startPos + 2 / (teleportCount - 1) * posDifference, 3) + heightFn(startPos, 1), 0)
             for tp = 3, teleportCount - 3, 3 do
                 local x = (tp - 1) / (teleportCount - 1)
                 local offset = next * x + start * (1 - x)
-                local height = heightFunc(startPos + tp / (teleportCount - 1) * posDifference, tp)
+                local height = heightFn(startPos + tp / (teleportCount - 1) * posDifference, tp)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     -height, 0)
                 x = tp / (teleportCount - 1)
@@ -2372,12 +2287,12 @@ function svVibrato(menuVars, heightFunc)
                     -height, 0)
                 x = (tp + 1) / (teleportCount - 1)
                 offset = next * x + start * (1 - x)
-                local newHeight = heightFunc(startPos + (tp + 3) / (teleportCount - 1) * posDifference, tp + 2)
+                local newHeight = heightFn(startPos + (tp + 3) / (teleportCount - 1) * posDifference, tp + 2)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     height + newHeight, 0)
             end
             prepareDisplacingSVs(next, svsToAdd, svTimeIsAdded,
-                heightFunc(endPos, teleportCount), 0, nil)
+                heightFn(endPos, teleportCount), 0, nil)
         end
     end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
@@ -3479,62 +3394,6 @@ function selectBySnap(menuVars)
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
-function renderReactiveSingularities()
-    local imgui = imgui
-    local math = math
-    local state = state
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    local dimX = dim.x
-    local dimY = dim.y
-    local sqrt = math.sqrt
-    local clamp = math.clamp
-    local xList = state.GetValue("xList", {})
-    local yList = state.GetValue("yList", {})
-    local vxList = state.GetValue("vxList", {})
-    local vyList = state.GetValue("vyList", {})
-    local axList = state.GetValue("axList", {})
-    local ayList = state.GetValue("ayList", {})
-    local pulseStatus = state.GetValue("cache_pulseStatus", 0)
-    local slowSpeedR = 89
-    local slowSpeedG = 0
-    local slowSpeedB = 255
-    local fastSpeedR = 255
-    local fastSpeedG = 165
-    local fastSpeedB = 117
-    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
-    createParticle(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
-    local speed = clamp(math.abs(game.getSVMultiplierAt(state.SongTime)), 0, 4)
-    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
-        state.DeltaTime * speed)
-    local lerp = function(w, l, h)
-        return w * h + (1 - w) * l
-    end
-    for i = 1, #xList do
-        local x = xList[i]
-        local y = yList[i]
-        local vx = vxList[i]
-        local vy = vyList[i]
-        local s = sqrt(vx ^ 2 + vy ^ 2)
-        local clampedSpeed = clamp(s / 5, 0, 1)
-        local r = lerp(clampedSpeed, slowSpeedR, fastSpeedR)
-        local g = lerp(clampedSpeed, slowSpeedG, fastSpeedG)
-        local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
-        local pos = { x + topLeft.x, y + topLeft.y }
-        ctx.AddCircleFilled(pos, 2,
-            rgbaToUint(r, g, b, 55 + pulseStatus * 200))
-    end
-    ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
-    ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
-    ctx.AddCircle(dim / 2 + topLeft, 24 - pulseStatus * 8, 16777215 + math.floor(pulseStatus * 255) * 16777216)
-    state.SetValue("xList", xList)
-    state.SetValue("yList", yList)
-    state.SetValue("vxList", vxList)
-    state.SetValue("vyList", vyList)
-    state.SetValue("axList", axList)
-    state.SetValue("ayList", ayList)
-end
 function createParticle(x, y, vx, vy, ax, ay, dimX, dimY, n)
     if (#x >= 150) then return end
     x[#x + 1] = math.random() * dimX
@@ -3605,30 +3464,6 @@ function updateStars()
             star.pos = star.pos + star.v * state.DeltaTime * 0.05 *
                 math.clamp(2 * game.getSVMultiplierAt(state.SongTime), -50, 50)
         end
-    end
-end
-function renderReactiveStars()
-    local stars = stars
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    if (not truthy(#stars)) then
-        for _ = 1, 100 do
-            table.insert(stars,
-                {
-                    pos = vector.New(math.random() * 500, math.random() * 500),
-                    v = vector.New(math.random() * 3 + 1, 0),
-                    size = math.random(3) * 0.5,
-                })
-        end
-    else
-        updateStars()
-    end
-    for k = 1, #stars do
-        local star = stars[k]
-        local progress = star.pos.x / dim.x
-        local brightness = math.clamp(-8 * progress * (progress - 1), 0, 1)
-        ctx.AddCircleFilled(star.pos + topLeft, star.size, rgbaToUint(255, 255, 255, brightness * 255))
     end
 end
 local RGB_SNAP_MAP = {
@@ -4910,15 +4745,15 @@ end
 ---Creates an imgui button.
 ---@param text string The text that the button should have.
 ---@param size Vector2 The size of the button.
----@param func fun(menuVars?: table): nil The function that the button should run upon being clicked.
+---@param fn fun(menuVars?: table): nil The function that the button should run upon being clicked.
 ---@param menuVars? table A set of variables to be passed into the function.
-function FunctionButton(text, size, func, menuVars)
+function FunctionButton(text, size, fn, menuVars)
     if not imgui.Button(text, size) then return end
     if menuVars then
-        func(menuVars)
+        fn(menuVars)
         return
     end
-    func()
+    fn()
 end
 function PresetButton()
     local buttonText = ": )"
@@ -5021,8 +4856,6 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
     end
     imgui.EndCombo()
     return newListIndex
-end
-function BasicInputFloat(label, var, decimalPlaces, suffix, step)
 end
 function ComputableInputFloat(label, var, decimalPlaces, suffix)
     local computableStateIndex = state.GetValue("ComputableInputFloatIndex") or 1
@@ -5143,36 +4976,22 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     end
     FunctionButton(buttonText, ACTION_BUTTON_SIZE, actionfunc, menuVars)
     if (disableKeyInput) then return end
-    if (hideNoteReq) then
-        ToolTip(table.concat({"Press \'", globalVars.hotkeyList[2], "\' on your keyboard to do the same thing as this button"}))
-        executeFunctionIfTrue(kb.pressedKeyCombo(globalVars.hotkeyList[2]), actionfunc, menuVars)
-    else
-        if (optionalKeyOverride) then
-            ToolTip(table.concat({"Press \'", optionalKeyOverride, "\' on your keyboard to do the same thing as this button"}))
-            executeFunctionIfTrue(kb.pressedKeyCombo(optionalKeyOverride), actionfunc, menuVars)
-            return
-        end
-        ToolTip(table.concat({"Press \'", globalVars.hotkeyList[1], "\' on your keyboard to do the same thing as this button"}))
-        executeFunctionIfTrue(kb.pressedKeyCombo(globalVars.hotkeyList[1]), actionfunc, menuVars)
-    end
+    local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + math.toNumber(hideNoteReq)]
+    local tooltip = ToolTip("Press \'" .. keyCombo ..
+        "\' on your keyboard to do the same thing as this button")
+    executeFunctionIfTrue(kb.pressedKeyCombo(keyCombo), actionfunc, menuVars)
 end
 ---Runs a function with the given parameters if the given `condition` is true.
 ---@param condition boolean The condition that is used.
----@param func fun(...): nil The function to run if the condition is true.
+---@param fn fun(...): nil The function to run if the condition is true.
 ---@param menuVars? { [string]: any } Optional menu variable parameter.
-function executeFunctionIfTrue(condition, func, menuVars)
+function executeFunctionIfTrue(condition, fn, menuVars)
     if not condition then return end
     if menuVars then
-        func(menuVars)
+        fn(menuVars)
         return
     end
-    func()
-end
-function StatedInputText(label, input)
-    local statedInputTextIndex = state.GetValue("StatedInputTextIndex", 1)
-    local _, out = imgui.InputText(table.concat({ label, "##", statedInputTextIndex }), input, 4096)
-    state.SetValue("StatedInputTextIndex", statedInputTextIndex + 1)
-    return out, input ~= out
+    fn()
 end
 function KeepSameLine()
     return imgui.SameLine(0, SAMELINE_SPACING)
@@ -5303,6 +5122,11 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             saveVariables(table.concat({"place", preset.type, "Menu"}), data.menuVars)
             globalVars.showPresetMenu = false
         end
+        if (imgui.IsItemClicked("Right")) then
+            imgui.SetClipboardText(preset.data)
+            print("i!", "Exported preset to your clipboard.")
+        end
+        ToolTip("Left-click to select this preset. Right-click to copy this preset to your clipboard.")
         KeepSameLine()
         if (imgui.Button("X##Preset" .. idx)) then
             table.remove(globalVars.presets, idx)
@@ -5479,9 +5303,6 @@ function addSelectedNoteTimesToList(menuVars)
     end
     menuVars.noteTimes = table.dedupe(menuVars.noteTimes)
     menuVars.noteTimes = sort(menuVars.noteTimes, sortAscending)
-end
-function animationPaletteMenu(settingVars)
-    CodeInput(settingVars, "instructions", "", "Write instructions here.")
 end
 function automateSVMenu(settingVars)
     local copiedSVCount = #settingVars.copiedSVs
@@ -7989,14 +7810,6 @@ function uintToRgba(n)
     end
     return table.vectorize4(tbl)
 end
-function rgbaToHexa(r, g, b, a)
-    local flr = math.floor
-    local hexaStr = ""
-    for _, col in ipairs({ r, g, b, a }) do
-        hexaStr = hexaStr .. HEXADECIMAL[math.floor(col / 16) + 1] .. HEXADECIMAL[flr(col) % 16 + 1]
-    end
-    return hexaStr
-end
 function hexaToRgba(hexa)
     local rgbaTable = {}
     for i = 1, 8, 2 do
@@ -8512,9 +8325,9 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
             settingVars.avgSV, settingVars.verticalShift)
     elseif svType == "Code" then
         multipliers = {}
-        local func = eval(settingVars.code)
+        local fn = eval(settingVars.code) ---@type fun(t: number): number
         for i = 0, settingVars.svPoints do
-            multipliers[#multipliers + 1] = func(i / settingVars.svPoints)
+            multipliers[#multipliers + 1] = fn(i / settingVars.svPoints)
         end
     elseif svType == "Stutter1" then
         multipliers = generateStutterSet(settingVars.startSV, settingVars.stutterDuration,
@@ -8545,6 +8358,96 @@ function createFrameTime(thisTime, thisLanes, thisFrame, thisPosition)
     }
     return frameTime
 end
+function createSV(startTime, multiplier)
+    return utils.CreateScrollVelocity(startTime, multiplier)
+end
+function createSSF(startTime, multiplier)
+    return utils.CreateScrollSpeedFactor(startTime, multiplier)
+end
+---Removes and adds SVs.
+---@param svsToRemove ScrollVelocity[]
+---@param svsToAdd ScrollVelocity[]
+function removeAndAddSVs(svsToRemove, svsToAdd)
+    local tolerance = 0.035
+    if #svsToAdd == 0 then return end
+    for idx, sv in pairs(svsToRemove) do
+        local baseSV = game.getSVStartTimeAt(sv.StartTime)
+        if (math.abs(baseSV - sv.StartTime) > tolerance) then
+            table.remove(svsToRemove, idx)
+        end
+    end
+    local editorActions = {
+        utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
+        utils.CreateEditorAction(action_type.AddScrollVelocityBatch, svsToAdd)
+    }
+    actions.PerformBatch(editorActions)
+    toggleablePrint("s!", table.concat({"Created ", #svsToAdd, pluralize(" SV.", #svsToAdd, -2)}))
+end
+function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
+    if #ssfsToAdd == 0 then return end
+    local editorActions = {
+        utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
+        utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)
+    }
+    actions.PerformBatch(editorActions)
+    toggleablePrint("s!", table.concat({"Created ", #ssfsToAdd, pluralize(" SSF.", #ssfsToAdd, -2)}))
+end
+function addFinalSV(svsToAdd, endOffset, svMultiplier, force)
+    local sv = map.GetScrollVelocityAt(endOffset)
+    local svExistsAtEndOffset = sv and (sv.StartTime == endOffset)
+    if svExistsAtEndOffset and not force then return end
+    addSVToList(svsToAdd, endOffset, svMultiplier, true)
+end
+function addFinalSSF(ssfsToAdd, endOffset, ssfMultiplier, force)
+    local ssf = map.GetScrollSpeedFactorAt(endOffset)
+    local ssfExistsAtEndOffset = ssf and (ssf.StartTime == endOffset)
+    if ssfExistsAtEndOffset and not force then return end
+    addSSFToList(ssfsToAdd, endOffset, ssfMultiplier, true)
+end
+function addInitialSSF(ssfsToAdd, startOffset)
+    local ssf = map.GetScrollSpeedFactorAt(startOffset)
+    if (ssf == nil) then return end
+    local ssfExistsAtStartOffset = ssf and (ssf.StartTime == startOffset)
+    if ssfExistsAtStartOffset then return end
+    addSSFToList(ssfsToAdd, startOffset, ssf.Multiplier, true)
+end
+function addStartSVIfMissing(svs, startOffset)
+    if #svs ~= 0 and svs[1].StartTime == startOffset then return end
+    addSVToList(svs, startOffset, game.getSVMultiplierAt(startOffset), false)
+end
+function addSVToList(svList, offset, multiplier, endOfList)
+    local newSV = createSV(offset, multiplier)
+    if endOfList then
+        svList[#svList + 1] = newSV
+        return
+    end
+    table.insert(svList, 1, newSV)
+end
+function addSSFToList(ssfList, offset, multiplier, endOfList)
+    local newSSF = createSSF(offset, multiplier)
+    if endOfList then
+        ssfList[#ssfList + 1] = newSSF
+        return
+    end
+    table.insert(ssfList, 1, newSSF)
+end
+function getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset, retroactiveSVRemovalTable)
+    for _, sv in ipairs(map.ScrollVelocities) do
+        local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime <= endOffset + 1
+        if svIsInRange then
+            local svIsRemovable = svTimeIsAdded[sv.StartTime]
+            if svIsRemovable then svsToRemove[#svsToRemove + 1] = sv end
+        end
+    end
+    if (not retroactiveSVRemovalTable) then return end
+    for idx, sv in pairs(retroactiveSVRemovalTable) do
+        local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime <= endOffset + 1
+        if svIsInRange then
+            local svIsRemovable = svTimeIsAdded[sv.StartTime]
+            if svIsRemovable then table.remove(retroactiveSVRemovalTable, idx) end
+        end
+    end
+end
 ---Returns the SV multiplier in a given array of SVs.
 ---@param svs ScrollVelocity[]
 ---@param offset number
@@ -8560,22 +8463,6 @@ function getHypotheticalSVMultiplierAt(svs, offset)
         end
     end
     return 1
-end
----Returns the SV time in a given array of SVs.
----@param svs ScrollVelocity[]
----@param offset number
----@return number
-function getHypotheticalSVTimeAt(svs, offset)
-    if (#svs == 1) then return svs[1].StartTime end
-    local index = #svs
-    while (index >= 1) do
-        if (svs[index].StartTime > offset) then
-            index = index - 1
-        else
-            return svs[index].StartTime
-        end
-    end
-    return -69
 end
 ---Given a predetermined set of SVs, returns a list of [scroll velocities](lua://ScrollVelocity) within a temporal boundary.
 ---@param startOffset number The lower bound of the search area.
@@ -8845,96 +8732,6 @@ function displayStutterSVWindows(settingVars)
         makeSVInfoWindow("SV Info", settingVars.svGraphStats, nil, settingVars.svDistances,
             settingVars.svMultipliers, settingVars.stutterDuration, false)
     end
-end
-function addFinalSV(svsToAdd, endOffset, svMultiplier, force)
-    local sv = map.GetScrollVelocityAt(endOffset)
-    local svExistsAtEndOffset = sv and (sv.StartTime == endOffset)
-    if svExistsAtEndOffset and not force then return end
-    addSVToList(svsToAdd, endOffset, svMultiplier, true)
-end
-function addFinalSSF(ssfsToAdd, endOffset, ssfMultiplier, force)
-    local ssf = map.GetScrollSpeedFactorAt(endOffset)
-    local ssfExistsAtEndOffset = ssf and (ssf.StartTime == endOffset)
-    if ssfExistsAtEndOffset and not force then return end
-    addSSFToList(ssfsToAdd, endOffset, ssfMultiplier, true)
-end
-function addInitialSSF(ssfsToAdd, startOffset)
-    local ssf = map.GetScrollSpeedFactorAt(startOffset)
-    if (ssf == nil) then return end
-    local ssfExistsAtStartOffset = ssf and (ssf.StartTime == startOffset)
-    if ssfExistsAtStartOffset then return end
-    addSSFToList(ssfsToAdd, startOffset, ssf.Multiplier, true)
-end
-function addStartSVIfMissing(svs, startOffset)
-    if #svs ~= 0 and svs[1].StartTime == startOffset then return end
-    addSVToList(svs, startOffset, game.getSVMultiplierAt(startOffset), false)
-end
-function addSVToList(svList, offset, multiplier, endOfList)
-    local newSV = createSV(offset, multiplier)
-    if endOfList then
-        svList[#svList + 1] = newSV
-        return
-    end
-    table.insert(svList, 1, newSV)
-end
-function addSSFToList(ssfList, offset, multiplier, endOfList)
-    local newSSF = createSSF(offset, multiplier)
-    if endOfList then
-        ssfList[#ssfList + 1] = newSSF
-        return
-    end
-    table.insert(ssfList, 1, newSSF)
-end
-function getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset, retroactiveSVRemovalTable)
-    for _, sv in ipairs(map.ScrollVelocities) do
-        local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime <= endOffset + 1
-        if svIsInRange then
-            local svIsRemovable = svTimeIsAdded[sv.StartTime]
-            if svIsRemovable then svsToRemove[#svsToRemove + 1] = sv end
-        end
-    end
-    if (not retroactiveSVRemovalTable) then return end
-    for idx, sv in pairs(retroactiveSVRemovalTable) do
-        local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime <= endOffset + 1
-        if svIsInRange then
-            local svIsRemovable = svTimeIsAdded[sv.StartTime]
-            if svIsRemovable then table.remove(retroactiveSVRemovalTable, idx) end
-        end
-    end
-end
----Removes and adds SVs.
----@param svsToRemove ScrollVelocity[]
----@param svsToAdd ScrollVelocity[]
-function removeAndAddSVs(svsToRemove, svsToAdd)
-    local tolerance = 0.035
-    if #svsToAdd == 0 then return end
-    for idx, sv in pairs(svsToRemove) do
-        local baseSV = game.getSVStartTimeAt(sv.StartTime)
-        if (math.abs(baseSV - sv.StartTime) > tolerance) then
-            table.remove(svsToRemove, idx)
-        end
-    end
-    local editorActions = {
-        utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
-        utils.CreateEditorAction(action_type.AddScrollVelocityBatch, svsToAdd)
-    }
-    actions.PerformBatch(editorActions)
-    toggleablePrint("s!", table.concat({"Created ", #svsToAdd, pluralize(" SV.", #svsToAdd, -2)}))
-end
-function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
-    if #ssfsToAdd == 0 then return end
-    local editorActions = {
-        utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
-        utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)
-    }
-    actions.PerformBatch(editorActions)
-    toggleablePrint("s!", table.concat({"Created ", #ssfsToAdd, pluralize(" SSF.", #ssfsToAdd, -2)}))
-end
-function createSSF(startTime, multiplier)
-     return utils.CreateScrollSpeedFactor(startTime, multiplier)
-end
-function createSV(startTime, multiplier)
-     return utils.CreateScrollVelocity(startTime, multiplier)
 end
 function bezierSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     local settingsChanged = false

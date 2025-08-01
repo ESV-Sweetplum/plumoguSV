@@ -63,9 +63,9 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
             settingVars.avgSV, settingVars.verticalShift)
     elseif svType == "Code" then
         multipliers = {}
-        local func = eval(settingVars.code)
+        local fn = eval(settingVars.code) ---@type fun(t: number): number
         for i = 0, settingVars.svPoints do
-            table.insert(multipliers, func(i / settingVars.svPoints))
+            table.insert(multipliers, fn(i / settingVars.svPoints))
         end
     elseif svType == "Stutter1" then
         multipliers = generateStutterSet(settingVars.startSV, settingVars.stutterDuration,
