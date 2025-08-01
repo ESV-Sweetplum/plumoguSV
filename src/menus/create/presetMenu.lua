@@ -1,9 +1,11 @@
 function renderPresetMenu(menuLabel, menuVars, settingVars)
     local newPresetName = state.GetValue("newPresetName", "")
     imgui.AlignTextToFramePadding()
-    imgui.Text("Name:")
+    imgui.Text("New Preset Name:")
     KeepSameLine()
+    imgui.PushItemWidth(90)
     _, newPresetName = imgui.InputText("##PresetName", newPresetName, 4096)
+    imgui.PopItemWidth()
     imgui.SameLine()
     if (imgui.Button("Save") and newPresetName:len() > 0) then
         preset = {}
@@ -25,25 +27,22 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     end
 
     state.SetValue("newPresetName", newPresetName)
-    imgui.Columns(4)
+    imgui.Columns(3)
 
     imgui.Text("Name")
     imgui.NextColumn()
     imgui.Text("Menu")
     imgui.NextColumn()
-    imgui.Text("Details")
-    imgui.NextColumn()
-    imgui.Text("Select")
+    imgui.Text("Actions")
     imgui.NextColumn()
 
     imgui.Separator()
     for idx, preset in pairs(globalVars.presets) do
+        imgui.AlignTextToFramePadding()
         imgui.Text(preset.name)
         imgui.NextColumn()
-        imgui.Text(table.concat({ preset.type, " > ", removeTrailingTag(preset.menu) }))
-        imgui.NextColumn()
-        imgui.TextDisabled("(?)")
-        ToolTip(preset.data)
+        imgui.AlignTextToFramePadding()
+        imgui.Text(table.concat({ preset.type:shorten(), " > ", removeTrailingTag(preset.menu):sub(1, 3) }))
         imgui.NextColumn()
         if (imgui.Button("Select##Preset" .. idx)) then
             local data = table.parse(preset.data)
@@ -52,16 +51,16 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             saveVariables("place" .. preset.type .. "Menu", data.menuVars)
             globalVars.showPresetMenu = false
         end
-        if (imgui.IsItemClicked("Right")) then
+        KeepSameLine()
+        if (imgui.Button("X##Preset" .. idx)) then
             table.remove(globalVars.presets, idx)
             write(globalVars)
         end
     end
 
-    imgui.SetColumnWidth(0, 50)
-    imgui.SetColumnWidth(1, 100)
-    imgui.SetColumnWidth(2, 60)
-    imgui.SetColumnWidth(3, 60)
+    imgui.SetColumnWidth(0, 90)
+    imgui.SetColumnWidth(1, 73)
+    imgui.SetColumnWidth(2, 95)
 
     imgui.Columns(1)
 end

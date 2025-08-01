@@ -563,8 +563,8 @@ function chooseVibratoQuality(menuVars)
     ToolTip("Note that higher FPS will look worse on lower refresh rate monitors.")
 end
 
-function chooseCurvatureCoefficient(settingVars)
-    plotExponentialCurvature(settingVars)
+function chooseCurvatureCoefficient(settingVars, plotFn)
+    plotFn(settingVars)
     imgui.SameLine(0, 0)
     _, settingVars.curvatureIndex = imgui.SliderInt("Curvature", settingVars.curvatureIndex, 1, #VIBRATO_CURVATURES,
         tostring(VIBRATO_CURVATURES[settingVars.curvatureIndex]))

@@ -63,6 +63,11 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     if (not foundCorrectSnap) then return 5 end
     return guessedSnap
 end
+function game.getSSFStartTimeAt(offset, tgId)
+    local sv = map.GetScrollSpeedFactorAt(offset, tgId)
+    if sv then return sv.StartTime end
+    return -1
+end
 function game.getSSFMultiplierAt(offset)
     local ssf = map.GetScrollSpeedFactorAt(offset)
     if ssf then return ssf.Multiplier end
@@ -283,6 +288,13 @@ end
 function math.quadraticBezier(p2, t)
     return 2 * t * (1 - t) * p2 + t * t
 end
+---Returns n choose r, or nCr.
+---@param n integer
+---@param r integer
+---@return integer
+function math.binom(n, r)
+    return math.factorial(n) / (math.factorial(r) * math.factorial(n - r))
+end
 ---Restricts a number to be within a chosen bound.
 ---@param number number
 ---@param lowerBound number
@@ -326,6 +338,52 @@ function math.hermite(m1, m2, y2, t)
     local b = 3 * y2 - 2 * m1 - m2
     local c = m1
     return a * t * t * t + b * t * t + c * t
+end
+---Interpolates circular parameters of the form (x-h)^2+(y-k)^2=r^2 with three, non-colinear points.
+---@param p1 Vector2
+---@param p2 Vector2
+---@param p3 Vector2
+---@return number, number, number
+function math.interpolateCircle(p1, p2, p3)
+    local mtrx = {
+        vector.Table(2 * (p2 - p1)),
+        vector.Table(2 * (p3 - p1))
+    }
+    local vctr = {
+        vector.Length(p2) ^ 2 - vector.Length(p1) ^ 2,
+        vector.Length(p3) ^ 2 - vector.Length(p1) ^ 2
+    }
+    h, k = matrix.solve(mtrx, vctr)
+    r = math.sqrt((p1.x) ^ 2 + (p1.y) ^ 2 + h * h + k * k - 2 * h * p1.x - 2 * k * p1.y)
+    ---@type number, number, number
+    return h, k, r
+end
+---Interpolates quadratic parameters of the form y=ax^2+bx+c with three, non-colinear points.
+---@param p1 Vector2
+---@param p2 Vector2
+---@param p3 Vector2
+---@return number, number, number
+function math.interpolateQuadratic(p1, p2, p3)
+    local mtrx = {
+        (p2.x) ^ 2 - (p1.x) ^ 2, (p2 - p1).x,
+        (p3.x) ^ 2 - (p1.x) ^ 2, (p3 - p1).x,
+    }
+    local vctr = {
+        (p2 - p1).y,
+        (p3 - p1).y
+    }
+    a, b = matrix.solve(mtrx, vctr)
+    c = p1.y - p1.x * b - (p1.x) ^ 2 * a
+    ---@type number, number, number
+    return a, b, c
+end
+---Returns a number that is `(weight * 100)%` of the way from travelling between `lowerBound` and `upperBound`.
+---@param weight number
+---@param lowerBound number
+---@param upperBound number
+---@return number
+function math.lerp(weight, lowerBound, upperBound)
+    return upperBound * weight + lowerBound * (1 - weight)
 end
 ---Returns the weight of a number between `lowerBound` and `upperBound`.
 ---@param num number
@@ -384,6 +442,11 @@ function matrix.solve(mtrx, vctr)
         end
     end
     return table.unpack(table.property(augMtrx, #mtrx + 1))
+end
+function matrix.swapRows(mtrx, rowIdx1, rowIdx2)
+    local temp = mtrx[rowIdx1]
+    mtrx[rowIdx1] = mtrx[rowIdx2]
+    mtrx[rowIdx2] = temp
 end
 ---Rounds a number to a given amount of decimal places.
 ---@param number number
@@ -475,6 +538,21 @@ function removeTrailingTag(str)
         newStr[#newStr + 1] = str:charAt(i)
     end
     return table.concat(newStr)
+end
+function string.removeVowels(str)
+    local VOWELS = { "a", "e", "i", "o", "u", "y" }
+    local newStr = ""
+    for i = 1, str:len() do
+        local char = str:charAt(i)
+        if (not table.contains(VOWELS, char)) then
+            newStr = newStr .. char
+        end
+    end
+    return newStr
+end
+function string.shorten(str)
+    local consonants = str:removeVowels()
+    return table.concat({ consonants:charAt(1), consonants:charAt(2), consonants:charAt(-1) })
 end
 ---Returns the average value of an array.
 ---@param values number[] The list of numbers.
@@ -734,6 +812,25 @@ end
 ---@param a number
 ---@param b number
 function sortAscending(a, b) return a < b end
+---Sorting function for sorting objects by their `startTime` property. Should be passed into [`table.sort`](lua://table.sort).
+---@param a { StartTime: number }
+---@param b { StartTime: number }
+function sortAscendingStartTime(a, b) return a.StartTime < b.StartTime end
+---Sorting function for sorting objects by their `time` property. Should be passed into [`table.sort`](lua://table.sort).
+---@param a { time: number }
+---@param b { time: number }
+---@return boolean
+function sortAscendingTime(a, b) return a.time < b.time end
+---Sorts a table given a sorting function. Should be passed into [`table.sort`](lua://table.sort).
+---@generic T
+---@param tbl T[] The table to sort.
+---@param compFn fun(a: T, b: T): boolean A comparison function. Given two elements `a` and `b`, how should they be sorted?
+---@return T[] sortedTbl A sorted table.
+function sort(tbl, compFn)
+    newTbl = table.duplicate(tbl)
+    table.sort(newTbl, compFn)
+    return newTbl
+end
 ---Converts a table (or any other primitive values) to a string.
 ---@param var any
 ---@return string
@@ -3502,6 +3599,30 @@ function updateStars()
         end
     end
 end
+function renderReactiveStars()
+    local stars = stars
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    if (not truthy(#stars)) then
+        for _ = 1, 100 do
+            table.insert(stars,
+                {
+                    pos = vector.New(math.random() * 500, math.random() * 500),
+                    v = vector.New(math.random() * 3 + 1, 0),
+                    size = math.random(3) * 0.5,
+                })
+        end
+    else
+        updateStars()
+    end
+    for k = 1, #stars do
+        local star = stars[k]
+        local progress = star.pos.x / dim.x
+        local brightness = math.clamp(-8 * progress * (progress - 1), 0, 1)
+        ctx.AddCircleFilled(star.pos + topLeft, star.size, rgbaToUint(255, 255, 255, brightness * 255))
+    end
+end
 local RGB_SNAP_MAP = {
     [1] = { 255, 0, 0 },
     [2] = { 0, 0, 255 },
@@ -3513,6 +3634,44 @@ local RGB_SNAP_MAP = {
     [12] = { 0, 120, 255 },
     [16] = { 0, 255, 0 },
 }
+function renderSynthesis()
+    local bgVars = {
+        snapTable = {},
+        pulseCount = 0,
+        snapOffset = 0,
+        lastDifference = 0
+    }
+    getVariables("synthesis", bgVars)
+    local circleSize = 10
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    local maxDim = math.sqrt(dim.x ^ 2 + dim.y ^ 2)
+    local curTime = state.SongTime
+    local tl = game.getTimingPointAt(curTime)
+    local msptl = 60000 / tl.Bpm * math.toNumber(tl.Signature)
+    local snapTable = bgVars.snapTable
+    local pulseCount = bgVars.pulseCount
+    local mostRecentStart = game.getNoteOffsetAt(curTime)
+    local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
+    if (#snapTable >= (maxDim / 1.6) / circleSize) then
+        bgVars.snapOffset = circleSize
+        table.remove(snapTable, 1)
+    end
+    if (bgVars.snapOffset > 0.001) then
+        bgVars.snapOffset = bgVars.snapOffset * 0.99 ^ state.DeltaTime
+    end
+    if (curTime - mostRecentStart < bgVars.lastDifference) then
+        table.insert(snapTable, game.getSnapAt(mostRecentStart, true))
+    end
+    bgVars.lastDifference = curTime - mostRecentStart
+    for idx, snap in pairs(snapTable) do
+        local colTbl = RGB_SNAP_MAP[snap]
+        ctx.AddCircle(dim / 2 + topLeft, circleSize * (idx - 1) + bgVars.snapOffset,
+            rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
+    end
+    saveVariables("synthesis", bgVars)
+end
 function drawCapybaraParent()
     drawCapybara()
     drawCapybara2()
@@ -4047,7 +4206,7 @@ end
 ---@field col Vector4
 ---@field size integer
 function renderBackground()
-    renderReactiveSingularities()
+    renderSynthesis()
 end
 function setPluginAppearance()
     local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
@@ -4847,6 +5006,8 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
     imgui.EndCombo()
     return newListIndex
 end
+function BasicInputFloat(label, var, decimalPlaces, suffix, step)
+end
 function ComputableInputFloat(label, var, decimalPlaces, suffix)
     local computableStateIndex = state.GetValue("ComputableInputFloatIndex") or 1
     local previousValue = var
@@ -4991,6 +5152,12 @@ function executeFunctionIfTrue(condition, func, menuVars)
     end
     func()
 end
+function StatedInputText(label, input)
+    local statedInputTextIndex = state.GetValue("StatedInputTextIndex", 1)
+    local _, out = imgui.InputText(table.concat({ label, "##", statedInputTextIndex }), input, 4096)
+    state.SetValue("StatedInputTextIndex", statedInputTextIndex + 1)
+    return out, input ~= out
+end
 function KeepSameLine()
     return imgui.SameLine(0, SAMELINE_SPACING)
 end
@@ -5073,9 +5240,11 @@ end
 function renderPresetMenu(menuLabel, menuVars, settingVars)
     local newPresetName = state.GetValue("newPresetName", "")
     imgui.AlignTextToFramePadding()
-    imgui.Text("Name:")
+    imgui.Text("New Preset Name:")
     KeepSameLine()
+    imgui.PushItemWidth(90)
     _, newPresetName = imgui.InputText("##PresetName", newPresetName, 4096)
+    imgui.PopItemWidth()
     imgui.SameLine()
     if (imgui.Button("Save") and newPresetName:len() > 0) then
         preset = {}
@@ -5096,23 +5265,20 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         write(globalVars)
     end
     state.SetValue("newPresetName", newPresetName)
-    imgui.Columns(4)
+    imgui.Columns(3)
     imgui.Text("Name")
     imgui.NextColumn()
     imgui.Text("Menu")
     imgui.NextColumn()
-    imgui.Text("Details")
-    imgui.NextColumn()
-    imgui.Text("Select")
+    imgui.Text("Actions")
     imgui.NextColumn()
     imgui.Separator()
     for idx, preset in pairs(globalVars.presets) do
+        imgui.AlignTextToFramePadding()
         imgui.Text(preset.name)
         imgui.NextColumn()
-        imgui.Text(table.concat({ preset.type, " > ", removeTrailingTag(preset.menu) }))
-        imgui.NextColumn()
-        imgui.TextDisabled("(?)")
-        ToolTip(preset.data)
+        imgui.AlignTextToFramePadding()
+        imgui.Text(table.concat({ preset.type:shorten(), " > ", removeTrailingTag(preset.menu):sub(1, 3) }))
         imgui.NextColumn()
         if (imgui.Button("Select##Preset" .. idx)) then
             local data = table.parse(preset.data)
@@ -5121,15 +5287,15 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             saveVariables(table.concat({"place", preset.type, "Menu"}), data.menuVars)
             globalVars.showPresetMenu = false
         end
-        if (imgui.IsItemClicked("Right")) then
+        KeepSameLine()
+        if (imgui.Button("X##Preset" .. idx)) then
             table.remove(globalVars.presets, idx)
             write(globalVars)
         end
     end
-    imgui.SetColumnWidth(0, 50)
-    imgui.SetColumnWidth(1, 100)
-    imgui.SetColumnWidth(2, 60)
-    imgui.SetColumnWidth(3, 60)
+    imgui.SetColumnWidth(0, 90)
+    imgui.SetColumnWidth(1, 73)
+    imgui.SetColumnWidth(2, 95)
     imgui.Columns(1)
 end
 function animationFramesSetupMenu(settingVars)
@@ -5297,6 +5463,9 @@ function addSelectedNoteTimesToList(menuVars)
     end
     menuVars.noteTimes = table.dedupe(menuVars.noteTimes)
     menuVars.noteTimes = sort(menuVars.noteTimes, sortAscending)
+end
+function animationPaletteMenu(settingVars)
+    CodeInput(settingVars, "instructions", "", "Write instructions here.")
 end
 function automateSVMenu(settingVars)
     local copiedSVCount = #settingVars.copiedSVs
@@ -5490,7 +5659,7 @@ end
 function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End##Vibrato", " msx", 0, 0.875)
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func = function(t)
             t = math.clamp(t, 0, 1)
@@ -5509,7 +5678,7 @@ function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
     else
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func1 = function(t)
             t = math.clamp(t, 0, 1)
@@ -5595,7 +5764,7 @@ end
 function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End##Vibrato", " msx", 0, 7 / 8)
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func = function(t)
             t = math.clamp(t, 0, 1) * 2
@@ -5613,6 +5782,7 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
                 end
             end
             t = t * 0.5
+            return settingVars.startMsx + t * (settingVars.endMsx - settingVars.startMsx)
         end
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
@@ -5621,24 +5791,42 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
     else
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func1 = function(t)
-            t = math.clamp(t, 0, 1)
-            if (curvature < 10) then
-                t = 1 - (1 - t) ^ (1 / curvature)
+            t = math.clamp(t, 0, 1) * 2
+            if (curvature >= 1) then
+                if (t <= 1) then
+                    t = t ^ curvature
+                else
+                    t = 2 - (2 - t) ^ curvature
+                end
             else
-                t = t ^ curvature
+                if (t <= 1) then
+                    t = (1 - (1 - t) ^ (1 / curvature))
+                else
+                    t = (t - 1) ^ (1 / curvature) + 1
+                end
             end
+            t = t * 0.5
             return settingVars.lowerStart + t * (settingVars.lowerEnd - settingVars.lowerStart)
         end
         local func2 = function(t)
-            t = math.clamp(t, 0, 1)
-            if (curvature < 10) then
-                t = 1 - (1 - t) ^ (1 / curvature)
+            t = math.clamp(t, 0, 1) * 2
+            if (curvature >= 1) then
+                if (t <= 1) then
+                    t = t ^ curvature
+                else
+                    t = 2 - (2 - t) ^ curvature
+                end
             else
-                t = t ^ curvature
+                if (t <= 1) then
+                    t = (1 - (1 - t) ^ (1 / curvature))
+                else
+                    t = (t - 1) ^ (1 / curvature) + 1
+                end
             end
+            t = t * 0.5
             return settingVars.higherStart + t * (settingVars.higherEnd - settingVars.higherStart)
         end
         AddSeparator()
@@ -6903,7 +7091,7 @@ function showDefaultPropertiesSettings()
     if (imgui.CollapsingHeader("Exponential Vibrato SV Settings")) then
         local settingVars = getSettingVars("ExponentialVibratoSV", "Property")
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End", " msx", 0, 0.875)
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
         saveSettingPropertiesButton(settingVars, "ExponentialVibratoSV")
         saveVariables("ExponentialVibratoSVPropertySettings", settingVars)
     end
@@ -6919,7 +7107,7 @@ function showDefaultPropertiesSettings()
     if (imgui.CollapsingHeader("Sigmoidal Vibrato SV Settings")) then
         local settingVars = getSettingVars("SigmoidalVibratoSV", "Property")
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End", " msx", 0, 0.875)
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         saveSettingPropertiesButton(settingVars, "SigmoidalVibratoSV")
         saveVariables("SigmoidalVibratoSVPropertySettings", settingVars)
     end
@@ -6935,7 +7123,7 @@ function showDefaultPropertiesSettings()
         local settingVars = getSettingVars("ExponentialVibratoSSF", "Property")
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs", "x")
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
         saveSettingPropertiesButton(settingVars, "ExponentialVibratoSSF")
         saveVariables("ExponentialVibratoSSFPropertySettings", settingVars)
     end
@@ -6948,6 +7136,14 @@ function showDefaultPropertiesSettings()
         choosePeriodShift(settingVars)
         saveSettingPropertiesButton(settingVars, "SinusoidalVibratoSSF")
         saveVariables("SinusoidalVibratoSSFPropertySettings", settingVars)
+    end
+    if (imgui.CollapsingHeader("Sigmoidal Vibrato SSF Settings")) then
+        local settingVars = getSettingVars("SigmoidalVibratoSSF", "Property")
+        SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs", "x")
+        SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs", "x")
+        chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
+        saveSettingPropertiesButton(settingVars, "SigmoidalVibratoSSF")
+        saveVariables("SigmoidalVibratoSSFPropertySettings", settingVars)
     end
 end
 function showGeneralSettings()
@@ -7605,8 +7801,8 @@ function chooseVibratoQuality(menuVars)
     menuVars.vibratoQuality = Combo("Vibrato Quality", VIBRATO_DETAILED_QUALITIES, menuVars.vibratoQuality)
     ToolTip("Note that higher FPS will look worse on lower refresh rate monitors.")
 end
-function chooseCurvatureCoefficient(settingVars)
-    plotExponentialCurvature(settingVars)
+function chooseCurvatureCoefficient(settingVars, plotFn)
+    plotFn(settingVars)
     imgui.SameLine(0, 0)
     _, settingVars.curvatureIndex = imgui.SliderInt("Curvature", settingVars.curvatureIndex, 1, #VIBRATO_CURVATURES,
         tostring(VIBRATO_CURVATURES[settingVars.curvatureIndex]))
@@ -7772,6 +7968,14 @@ function uintToRgba(n)
         tbl[#tbl + 1] = math.floor(n / 256 ^ i) % 256
     end
     return table.vectorize4(tbl)
+end
+function rgbaToHexa(r, g, b, a)
+    local flr = math.floor
+    local hexaStr = ""
+    for _, col in ipairs({ r, g, b, a }) do
+        hexaStr = hexaStr .. HEXADECIMAL[math.floor(col / 16) + 1] .. HEXADECIMAL[flr(col) % 16 + 1]
+    end
+    return hexaStr
 end
 function hexaToRgba(hexa)
     local rgbaTable = {}
@@ -8427,6 +8631,22 @@ function getHypotheticalSVMultiplierAt(svs, offset)
     end
     return 1
 end
+---Returns the SV time in a given array of SVs.
+---@param svs ScrollVelocity[]
+---@param offset number
+---@return number
+function getHypotheticalSVTimeAt(svs, offset)
+    if (#svs == 1) then return svs[1].StartTime end
+    local index = #svs
+    while (index >= 1) do
+        if (svs[index].StartTime > offset) then
+            index = index - 1
+        else
+            return svs[index].StartTime
+        end
+    end
+    return -69
+end
 ---Given a predetermined set of SVs, returns a list of [scroll velocities](lua://ScrollVelocity) within a temporal boundary.
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
@@ -8566,6 +8786,40 @@ function plotExponentialCurvature(settingVars)
         else
             value = (1 - (1 - t) ^ (1 / curvature))
         end
+        if ((settingVars.startMsx or settingVars.lowerStart) > (settingVars.endMsx or settingVars.lowerEnd)) then
+            value = 1 - value
+        elseif ((settingVars.startMsx or settingVars.lowerStart) == (settingVars.endMsx or settingVars.lowerEnd)) then
+            value = 0.5
+        end
+        values:insert(value)
+    end
+    imgui.PlotLines("##CurvaturePlot", values, #values, 0, "", 0, 1)
+    imgui.PopStyleColor()
+    imgui.PopItemWidth()
+end
+function plotSigmoidalCurvature(settingVars)
+    imgui.PushItemWidth(28)
+    imgui.PushStyleColor(imgui_col.FrameBg, 0)
+    local RESOLUTION = 32
+    local values = table.construct()
+    for i = 1, RESOLUTION do
+        local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
+        local t = i / RESOLUTION * 2
+        local value = t
+        if (curvature >= 1) then
+            if (t <= 1) then
+                value = t ^ curvature
+            else
+                value = 2 - (2 - t) ^ curvature
+            end
+        else
+            if (t <= 1) then
+                value = (1 - (1 - t) ^ (1 / curvature))
+            else
+                value = (t - 1) ^ (1 / curvature) + 1
+            end
+        end
+        value = value / 2
         if ((settingVars.startMsx or settingVars.lowerStart) > (settingVars.endMsx or settingVars.lowerEnd)) then
             value = 1 - value
         elseif ((settingVars.startMsx or settingVars.lowerStart) == (settingVars.endMsx or settingVars.lowerEnd)) then

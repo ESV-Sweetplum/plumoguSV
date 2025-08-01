@@ -106,10 +106,17 @@ export default async function transpiler(
         const splitOutput = output.split('\n');
 
         let [functions, fnIndices] = getFunctionList(splitOutput);
-        functions = functions.filter((fn, idx) => {
+        const spliceIndices = [];
+        for (let i = 0; i < functions.length; i++) {
+            const fn = functions[i];
             const cond = fn.startsWith('string') || fn.startsWith('table');
-            if (cond) fnIndices.splice(idx, 1);
-            return !cond;
+            if (cond) {
+                spliceIndices.unshift(i);
+            }
+        }
+        spliceIndices.forEach((idx) => {
+            functions.splice(idx, 1);
+            fnIndices.splice(idx, 1);
         });
         const [_, unusedIndexes] = getUnusedFunctions(
             splitOutput,
@@ -117,16 +124,16 @@ export default async function transpiler(
             fnIndices
         );
 
-        unusedIndexes.reverse().forEach((idx) => {
-            let startIdx = idx;
-            let endIdx = idx;
-            while (/^---/.test(splitOutput[startIdx - 1]) && startIdx > 0)
-                startIdx--;
-            while (!/^end/.test(splitOutput[endIdx])) endIdx++;
-            splitOutput.splice(startIdx, endIdx - startIdx + 1);
-        });
+        // unusedIndexes.reverse().forEach((idx) => {
+        //     let startIdx = idx;
+        //     let endIdx = idx;
+        //     while (/^---/.test(splitOutput[startIdx - 1]) && startIdx > 0)
+        //         startIdx--;
+        //     while (!/^end/.test(splitOutput[endIdx])) endIdx++;
+        //     splitOutput.splice(startIdx, endIdx - startIdx + 1);
+        // });
 
-        output = splitOutput.join('\n');
+        // output = splitOutput.join('\n');
     }
 
     if (existsSync('plugin.lua')) rmSync('plugin.lua');

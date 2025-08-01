@@ -1,7 +1,7 @@
 function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End##Vibrato", " msx", 0, 0.875)
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func = function(t)
             t = math.clamp(t, 0, 1)
@@ -21,7 +21,7 @@ function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
     else
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
-        chooseCurvatureCoefficient(settingVars)
+        chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
 
         local func1 = function(t)
