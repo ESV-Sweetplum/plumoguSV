@@ -401,10 +401,12 @@ function math.sign(number)
     if number >= 0 then return 1 end
     return -1
 end
----Alias of [tonumber](lua://tonumber) for type coercion.
----@param x string | number
+---Alias of [tonumber](lua://tonumber) for type coercion. Converts boolean values into their respective binary digits.
+---@param x? string | number | boolean
 ---@return number
 function math.toNumber(x)
+    if (not x) then return 0 end
+    if (x == true) then return 1 end
     local result = tonumber(x)
     if (not result or type(result) ~= "number") then return 0 end
     return result
@@ -4958,18 +4960,10 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     end
     FunctionButton(buttonText, ACTION_BUTTON_SIZE, actionfunc, menuVars)
     if (disableKeyInput) then return end
-    if (hideNoteReq) then
-        ToolTip(table.concat({"Press \'", globalVars.hotkeyList[2], "\' on your keyboard to do the same thing as this button"}))
-        executeFunctionIfTrue(kb.pressedKeyCombo(globalVars.hotkeyList[2]), actionfunc, menuVars)
-    else
-        if (optionalKeyOverride) then
-            ToolTip(table.concat({"Press \'", optionalKeyOverride, "\' on your keyboard to do the same thing as this button"}))
-            executeFunctionIfTrue(kb.pressedKeyCombo(optionalKeyOverride), actionfunc, menuVars)
-            return
-        end
-        ToolTip(table.concat({"Press \'", globalVars.hotkeyList[1], "\' on your keyboard to do the same thing as this button"}))
-        executeFunctionIfTrue(kb.pressedKeyCombo(globalVars.hotkeyList[1]), actionfunc, menuVars)
-    end
+    local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + math.toNumber(hideNoteReq)]
+    local tooltip = ToolTip("Press \'" .. keyCombo ..
+        "\' on your keyboard to do the same thing as this button")
+    executeFunctionIfTrue(kb.pressedKeyCombo(keyCombo), actionfunc, menuVars)
 end
 ---Runs a function with the given parameters if the given `condition` is true.
 ---@param condition boolean The condition that is used.
