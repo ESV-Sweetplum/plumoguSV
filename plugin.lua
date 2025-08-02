@@ -813,16 +813,26 @@ end
 ---Sorting function for sorting objects by their numerical value. Should be passed into [`table.sort`](lua://table.sort).
 ---@param a number
 ---@param b number
+---@return boolean
 function sortAscending(a, b) return a < b end
 ---Sorting function for sorting objects by their `startTime` property. Should be passed into [`table.sort`](lua://table.sort).
 ---@param a { StartTime: number }
 ---@param b { StartTime: number }
+---@return boolean
 function sortAscendingStartTime(a, b) return a.StartTime < b.StartTime end
 ---Sorting function for sorting objects by their `time` property. Should be passed into [`table.sort`](lua://table.sort).
 ---@param a { time: number }
 ---@param b { time: number }
 ---@return boolean
 function sortAscendingTime(a, b) return a.time < b.time end
+---Sorting function for sorting notes by their `startTime` property. Should be passed into [`table.sort`](lua://table.sort). If two items are identical, sorts by their lanes instead.
+---@param a { StartTime: number, Lane: integer }
+---@param b { StartTime: number, Lane: integer }
+---@return boolean
+function sortAscendingNoteLaneTime(a, b)
+    if (math.abs(a.StartTime - b.StartTime) > 0.1) then return a.StartTime < b.StartTime end
+    return a.Lane < b.Lane
+end
 ---Sorts a table given a sorting function. Should be passed into [`table.sort`](lua://table.sort).
 ---@generic T
 ---@param tbl T[] The table to sort.
@@ -1515,7 +1525,8 @@ DEFAULT_STARTING_MENU_VARS = {
         single = true,
         jump = false,
         hand = false,
-        quad = false
+        quad = false,
+        laneSelector = 1
     },
     selectNoteType = {
         rice = true,
@@ -3379,7 +3390,7 @@ function selectByChordSizes(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    local notes = sort(game.getNotesBetweenOffsets(startOffset, endOffset), sortAscendingNoteLaneTime)
     local noteTimeTable = {}
     for k = 1, #notes do
         local note = notes[k]
@@ -3392,15 +3403,23 @@ function selectByChordSizes(menuVars)
         {},
         {}
     }
+    local allowedOrdering = {}
+    for n in tostring(menuVars.laneSelector):gmatch("%d") do
+        allowedOrdering[#allowedOrdering + 1] = math.toNumber(n)
+    end
     for k = 1, #noteTimeTable do
         local time = noteTimeTable[k]
         local size = 0
+        local curLane = 0
         local totalNotes = {}
         for k = 1, #notes do
             local note = notes[k]
             if (math.abs(note.StartTime - time) < 3) then
                 size = size + 1
-                totalNotes[#totalNotes + 1] = note
+                curLane = curLane + 1
+                if (table.contains(allowedOrdering, curLane)) then
+                    totalNotes[#totalNotes + 1] = note
+                end
             end
         end
         sizeDict[size] = table.combine(sizeDict[size], totalNotes)
@@ -6474,6 +6493,7 @@ function selectChordSizeMenu()
     _, menuVars.hand = imgui.Checkbox("Select Hands", menuVars.hand)
     KeepSameLine()
     _, menuVars.quad = imgui.Checkbox("Select Quads", menuVars.quad)
+    BasicInputInt(menuVars, "laneSelector", "Lane Selector")
     simpleActionMenu("Select chords within region", 2, selectByChordSizes, menuVars)
     saveVariables("selectChordSizeMenu", menuVars)
 end
@@ -6918,6 +6938,7 @@ function showDefaultPropertiesSettings()
         _, menuVars.hand = imgui.Checkbox("Select Hands", menuVars.hand)
         KeepSameLine()
         _, menuVars.quad = imgui.Checkbox("Select Quads", menuVars.quad)
+        menuVars.laneSelector = BasicInputInt(menuVars, "laneSelector", "Lane Selector")
         saveMenuPropertiesButton(menuVars, "selectChordSize")
         saveVariables("selectChordSizePropertyMenu", menuVars)
     end

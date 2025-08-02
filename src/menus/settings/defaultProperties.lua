@@ -234,6 +234,9 @@ function showDefaultPropertiesSettings()
         KeepSameLine()
         _, menuVars.quad = imgui.Checkbox("Select Quads", menuVars.quad)
 
+        menuVars.laneSelector = BasicInputInt(menuVars, "laneSelector", "Lane Selector")
+
+
         saveMenuPropertiesButton(menuVars, "selectChordSize")
         saveVariables("selectChordSizePropertyMenu", menuVars)
     end

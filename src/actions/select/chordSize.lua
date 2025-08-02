@@ -4,7 +4,7 @@ function selectByChordSizes(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
 
-    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    local notes = sort(game.getNotesBetweenOffsets(startOffset, endOffset), sortAscendingNoteLaneTime)
 
     local noteTimeTable = {}
 
@@ -21,13 +21,23 @@ function selectByChordSizes(menuVars)
         {}
     }
 
+    local allowedOrdering = {}
+
+    for n in tostring(menuVars.laneSelector):gmatch("%d") do
+        table.insert(allowedOrdering, math.toNumber(n))
+    end
+
     for _, time in ipairs(noteTimeTable) do
         local size = 0
+        local curLane = 0
         local totalNotes = {}
         for _, note in ipairs(notes) do
             if (math.abs(note.StartTime - time) < 3) then
                 size = size + 1
-                table.insert(totalNotes, note)
+                curLane = curLane + 1
+                if (table.contains(allowedOrdering, curLane)) then
+                    table.insert(totalNotes, note)
+                end
             end
         end
         sizeDict[size] = table.combine(sizeDict[size], totalNotes)

@@ -8,6 +8,8 @@ function selectChordSizeMenu()
     KeepSameLine()
     _, menuVars.quad = imgui.Checkbox("Select Quads", menuVars.quad)
 
+    BasicInputInt(menuVars, "laneSelector", "Lane Selector")
+
     simpleActionMenu("Select chords within region", 2, selectByChordSizes, menuVars)
 
     saveVariables("selectChordSizeMenu", menuVars)

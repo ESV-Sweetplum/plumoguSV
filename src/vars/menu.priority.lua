@@ -132,7 +132,8 @@ DEFAULT_STARTING_MENU_VARS = {
         single = true,
         jump = false,
         hand = false,
-        quad = false
+        quad = false,
+        laneSelector = 1
     },
     selectNoteType = {
         rice = true,
@@ -152,5 +153,6 @@ function getMenuVars(menuType, optionalLabel)
 
     local labelText = menuType .. optionalLabel .. "Menu"
     getVariables(labelText, menuVars)
+
     return menuVars
 end
