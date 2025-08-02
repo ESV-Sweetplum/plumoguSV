@@ -98,13 +98,12 @@ export default async function transpiler(
     ];
 
     ipairMatches.forEach((match) => {
+        const idx = getCounterAndIncrement();
         output = output.replace(
             match[0],
-            `for k${getCounterAndIncrement()} = 1, #${match[2]} do\n${
-                match[3]
-            }local ${match[1]} = ${match[2]}[k${counter}]\n${match[3]}`
+            `for k${idx} = 1, #${match[2]} do\n${match[3]}local ${match[1]} = ${match[2]}[k${idx}]\n${match[3]}`
         );
-    });
+    }); // Reduce function overhead by removing ipairs (only for static tables)
 
     for (let i = 2; i <= 9; i++) {
         const regex = new RegExp(` ([^\\)]) \\^ ${i}`, 'g');
