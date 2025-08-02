@@ -49,8 +49,6 @@ function renderReactiveSingularities()
         local y = yList[i]
         local vx = vxList[i]
         local vy = vyList[i]
-        -- local ax = axList[i]
-        -- local ay = ayList[i]
 
         local s = sqrt(vx ^ 2 + vy ^ 2)
         local clampedSpeed = clamp(s / 5, 0, 1)
@@ -87,6 +85,8 @@ end
 function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt)
     local sqrt = math.sqrt
     local clamp = math.clamp
+    local spinDir = math.sign(game.getSVMultiplierAt(state.SongTime))
+
     local movementSpeed = 0.1
 
     for i = 1, #xl do
@@ -108,8 +108,8 @@ function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt)
         if (dist < 10) then dist = 10 end
         local gx = xDist / (dist ^ 3) * 500
         local gy = yDist / (dist ^ 3) * 500
-        axl[i] = gx + gy / sqrtDist * 10
-        ayl[i] = gy - gx / sqrtDist * 10
+        axl[i] = gx + gy * 10 * spinDir / sqrtDist
+        ayl[i] = gy - gx * 10 * spinDir / sqrtDist
 
         vxl[i] = vx + ax * dt * movementSpeed
         vyl[i] = vy + ay * dt * movementSpeed
