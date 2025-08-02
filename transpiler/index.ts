@@ -87,7 +87,7 @@ export default async function transpiler(
     ); // Remove double string concats with table
 
     output = output.replaceAll(
-        /\(("[a-z]!"), "([^"]+?)" \.\. (.+) \.\. (.+)\)/g,
+        /\(("[a-z]+!"), "([^"]+?)" \.\. (.+) \.\. (.+)\)/g,
         '($1, table.concat({"$2", $3, $4}))'
     ); // Same as above, but with notification type parameter
 
@@ -96,7 +96,6 @@ export default async function transpiler(
             /for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_, ]+)\) do\n( *)/g
         ),
     ];
-
     ipairMatches.forEach((match) => {
         const idx = getCounterAndIncrement();
         output = output.replace(
