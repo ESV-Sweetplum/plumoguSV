@@ -12,6 +12,13 @@ import getFunctionList from './getFunctionList.js';
 import getUnusedFunctions from './getUnusedFunctions.js';
 import { join } from 'path';
 
+let counter = 0;
+
+export function getCounterAndIncrement() {
+    counter++;
+    return counter;
+}
+
 export default async function transpiler(
     devMode = false,
     fuckify = false,
@@ -84,10 +91,20 @@ export default async function transpiler(
         '($1, table.concat({"$2", $3, $4}))'
     ); // Same as above, but with notification type parameter
 
-    output = output.replaceAll(
-        /for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_, ]+)\) do\n( *)/g,
-        'for k = 1, #$2 do\n$3local $1 = $2[k]\n$3'
-    ); // Reduce function overhead by removing ipairs (only for static tables)
+    const ipairMatches = [
+        ...output.matchAll(
+            /for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_, ]+)\) do\n( *)/g
+        ),
+    ];
+
+    ipairMatches.forEach((match) => {
+        output = output.replace(
+            match[0],
+            `for k${getCounterAndIncrement()} = 1, #${match[2]} do\n${
+                match[3]
+            }local ${match[1]} = ${match[2]}[k${counter}]\n${match[3]}`
+        );
+    });
 
     for (let i = 2; i <= 9; i++) {
         const regex = new RegExp(` ([^\\)]) \\^ ${i}`, 'g');
