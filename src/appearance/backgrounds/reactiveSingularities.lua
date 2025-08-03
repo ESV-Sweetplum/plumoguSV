@@ -139,32 +139,3 @@ function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt, multiplier)
         vyl[i] = clamp(vyl[i] * dragFactor, -5, 5)
     end
 end
-
----Takes the approximate square root of a number using the [Babylonian Method](https://en.wikipedia.org/wiki/Square_root_algorithms). The accuracy converges quadratically with respect to the logarithm of `n`.
----@param n number
----@param iterations? number
----@return number
-function fastSqrt(n, iterations)
-    local c = iterations or 4
-    local a = n
-    local exp = 0
-    if (a < 1) then
-        while (a < 1) do
-            a = a * 100
-            exp = exp - 1
-        end
-    else
-        while (a >= 100) do
-            a = a / 100
-            exp = exp + 1
-        end
-    end
-    a = math.floor(a)
-    local guess = (a / 10 + 1.2) * 10 ^ exp
-
-    for i = 1, c do
-        guess = (guess + n / guess) / 2
-    end
-
-    return guess
-end
