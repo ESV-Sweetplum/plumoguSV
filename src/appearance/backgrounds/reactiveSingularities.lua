@@ -7,6 +7,8 @@ function renderReactiveSingularities()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
 
+    local multiplier = game.getSVMultiplierAt(state.SongTime)
+
     local dimX = dim.x
     local dimY = dim.y
 
@@ -36,9 +38,9 @@ function renderReactiveSingularities()
 
     createParticle(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
 
-    local speed = clamp(math.abs(game.getSVMultiplierAt(state.SongTime)), 0, 4)
+    local speed = clamp(math.abs(multiplier), 0, 4)
     updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
-        state.DeltaTime * speed)
+        state.DeltaTime * speed, multiplier)
 
     local lerp = function(w, l, h)
         return w * h + (1 - w) * l
@@ -82,12 +84,13 @@ function createParticle(x, y, vx, vy, ax, ay, dimX, dimY, n)
     ay[#ay + 1] = 0
 end
 
-function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt)
-    local sqrt = math.sqrt
+function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt, multiplier)
+    local sqrt = fastSqrt
     local clamp = math.clamp
-    local spinDir = math.sign(game.getSVMultiplierAt(state.SongTime))
+    local spinDir = math.sign(multiplier)
 
     local movementSpeed = 0.1
+    local bounceCoefficient = 0.8
 
     for i = 1, #xl do
         local x = xl[i]
@@ -97,24 +100,30 @@ function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt)
         local ax = axl[i]
         local ay = ayl[i]
 
-        local bounceCoefficient = 0.8
-
-        local sgPosx = dimX / 2
-        local sgPosy = dimY / 2
+        local sgPosx = bit32.rshift(dimX, 1)
+        local sgPosy = bit32.rshift(dimY, 1)
         local xDist = sgPosx - x
         local yDist = sgPosy - y
         local dist = sqrt(xDist ^ 2 + yDist ^ 2)
         local sqrtDist = sqrt(dist)
         if (dist < 10) then dist = 10 end
-        local gx = xDist / (dist ^ 3) * 500
-        local gy = yDist / (dist ^ 3) * 500
-        axl[i] = gx + gy * 10 * spinDir / sqrtDist
-        ayl[i] = gy - gx * 10 * spinDir / sqrtDist
 
-        vxl[i] = vx + ax * dt * movementSpeed
-        vyl[i] = vy + ay * dt * movementSpeed
-        xl[i] = x + vx * dt * movementSpeed
-        yl[i] = y + vy * dt * movementSpeed
+        local gravityFactor = bit32.rshift(dist ^ 3, 8)
+
+        local gx = xDist / gravityFactor
+        local gy = yDist / gravityFactor
+
+        local spinFactor = 10 * spinDir / sqrtDist
+
+        axl[i] = gx + gy * spinFactor
+        ayl[i] = gy - gx * spinFactor
+
+        local movementDist = dt * movementSpeed
+
+        vxl[i] = vx + ax * movementDist
+        vyl[i] = vy + ay * movementDist
+        xl[i] = x + vx * movementDist
+        yl[i] = y + vy * movementDist
 
         if (x < 0 or x > dimX) then
             vxl[i] = -vxl[i] * bounceCoefficient
@@ -125,7 +134,38 @@ function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt)
             yl[i] = clamp(yl[i], 1, dimY - 1)
         end
 
-        vxl[i] = clamp(vxl[i] * (1 - dt / 1000 * 2), -5, 5)
-        vyl[i] = clamp(vyl[i] * (1 - dt / 1000 * 2), -5, 5)
+        local dragFactor = 1 - dt / 500
+
+        vxl[i] = clamp(vxl[i] * dragFactor, -5, 5)
+        vyl[i] = clamp(vyl[i] * dragFactor, -5, 5)
     end
+end
+
+---Takes the approximate square root of a number using the [Babylonian Method](https://en.wikipedia.org/wiki/Square_root_algorithms). The accuracy converges quadratically with respect to the logarithm of `n`.
+---@param n number
+---@param iterations? number
+---@return number
+function fastSqrt(n, iterations)
+    local c = iterations or 4
+    local a = n
+    local exp = 0
+    if (a < 1) then
+        while (a < 1) do
+            a = a * 100
+            exp = exp - 1
+        end
+    else
+        while (a >= 100) do
+            a = a / 100
+            exp = exp + 1
+        end
+    end
+    a = math.floor(a)
+    local guess = (a / 10 + 1.2) * 10 ^ exp
+
+    for i = 1, c do
+        guess = (guess + n / guess) / 2
+    end
+
+    return guess
 end
