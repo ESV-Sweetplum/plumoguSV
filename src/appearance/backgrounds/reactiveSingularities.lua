@@ -85,7 +85,7 @@ function createParticle(x, y, vx, vy, ax, ay, dimX, dimY, n)
 end
 
 function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt, multiplier)
-    local sqrt = fastSqrt
+    local sqrt = math.sqrt
     local clamp = math.clamp
     local spinDir = math.sign(multiplier)
 
@@ -105,7 +105,6 @@ function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt, multiplier)
         local xDist = sgPosx - x
         local yDist = sgPosy - y
         local dist = sqrt(xDist ^ 2 + yDist ^ 2)
-        local sqrtDist = sqrt(dist)
         if (dist < 10) then dist = 10 end
 
         local gravityFactor = bit32.rshift(dist ^ 3, 8)
@@ -113,7 +112,7 @@ function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt, multiplier)
         local gx = xDist / gravityFactor
         local gy = yDist / gravityFactor
 
-        local spinFactor = 10 * spinDir / sqrtDist
+        local spinFactor = 10 * spinDir / sqrt(dist)
 
         axl[i] = gx + gy * spinFactor
         ayl[i] = gy - gx * spinFactor

@@ -1070,6 +1070,90 @@ function map.GetTimingPointLength(tp) end
 ---@nodiscard
 function map.GetNearestSnapTimeFromTime(forwards, snap, time) end
 
+bit32 = {}
+
+---##### (READ-ONLY)
+---### Arithmetically bit shifts a number to the right by `disp` places.
+---@param x number The number to shift.
+---@param disp integer Shifts the number to the right by this many places. If `disp` is negative, shifts to the left instead.
+---@return integer n
+function bit32.arshift(x, disp) end
+
+---##### (READ-ONLY)
+---### Returns the bitwise `AND` of the parameters.
+---@param ... number[]
+---@return integer n
+function bit32.band(...) end
+
+---##### (READ-ONLY)
+---### Returns the bitwise `NOT` of the parameters.
+---@param x number
+---@return integer n
+function bit32.bnot(x) end
+
+---##### (READ-ONLY)
+---### Returns the bitwise `OR` of the parameters.
+---@param ... number[]
+---@return integer n
+function bit32.bor(...) end
+
+---##### (READ-ONLY)
+---### Returns true if the bitwise `AND` of the two parameters is nonzero.
+---@param ... number[]
+---@return boolean
+function bit32.test(...) end
+
+---##### (READ-ONLY)
+---### Returns the bitwise `XOR` of the parameters.
+---@param ... number[]
+---@return integer n
+function bit32.bxor(...) end
+
+---##### (READ-ONLY)
+---### (From [Lua 5.2 Manual](https://www.lua.org/manual/5.2/manual.html#6.7)): Returns the unsigned number formed by the bits `field` to `field + width - 1` from `n`. Bits are numbered from `0` (least significant) to `31` (most significant). All accessed bits must be in the range `[0, 31]`. The default for width is `1`.
+---@param n integer
+---@param field integer
+---@param width? integer
+---@return integer n
+function bit32.extract(n, field, width) end
+
+---##### (READ-ONLY)
+---### (From [Lua 5.2 Manual](https://www.lua.org/manual/5.2/manual.html#6.7)): Returns a copy of `n` with the bits `field` to `field + width - 1` replaced by the value `v`. See [bit32.extract](lua://bit32.extract) for details about `field` and `width`.
+---@param n integer
+---@param v integer
+---@param field integer
+---@param width? integer
+---@return integer n
+function bit32.replace(n, v, field, width) end
+
+---##### (READ-ONLY)
+---### Rotationally bit shifts a number to the left by `disp` places.
+---@param x number The number to shift.
+---@param disp integer Shifts the number to the left by this many places. If `disp` is negative, shifts to the right instead.
+---@return integer n
+function bit32.lrotate(x, disp) end
+
+---##### (READ-ONLY)
+---### Logically bit shifts a number to the left by `disp` places.
+---@param x number The number to shift.
+---@param disp integer Shifts the number to the left by this many places. If `disp` is negative, shifts to the right instead.
+---@return integer n
+function bit32.lshift(x, disp) end
+
+---##### (READ-ONLY)
+---### Rotationally bit shifts a number to the right by `disp` places.
+---@param x number The number to shift.
+---@param disp integer Shifts the number to the right by this many places. If `disp` is negative, shifts to the left instead.
+---@return integer n
+function bit32.rrotate(x, disp) end
+
+---##### (READ-ONLY)
+---### Logically bit shifts a number to the right by `disp` places.
+---@param x number The number to shift.
+---@param disp integer Shifts the number to the right by this many places. If `disp` is negative, shifts to the left instead.
+---@return integer n
+function bit32.rshift(x, disp) end
+
 ---##### (READ-ONLY)
 ---#### Invokes the function whenever any [editor action](lua://EditorAction) has occurred. This includes actions invoked by this and other plugins.
 ---@param fn fun(action: EditorAction, type: HistoryType, fromLua: boolean): nil The function that will be invoked during any [editor action](lua://EditorAction).
