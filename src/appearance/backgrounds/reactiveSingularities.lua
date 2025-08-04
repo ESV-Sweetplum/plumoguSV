@@ -17,12 +17,12 @@ function renderReactiveSingularities()
 
     -- DOES NOT USE GETVARIABLES PARADIGM DUE TO FRAME RATE INEFFICIENCY
 
-    local xList = state.GetValue("xList", {})
-    local yList = state.GetValue("yList", {})
-    local vxList = state.GetValue("vxList", {})
-    local vyList = state.GetValue("vyList", {})
-    local axList = state.GetValue("axList", {})
-    local ayList = state.GetValue("ayList", {})
+    local xList = state.GetValue("singularity_xList", {})
+    local yList = state.GetValue("singularity_yList", {})
+    local vxList = state.GetValue("singularity_vxList", {})
+    local vyList = state.GetValue("singularity_vyList", {})
+    local axList = state.GetValue("singularity_axList", {})
+    local ayList = state.GetValue("singularity_ayList", {})
 
     local pulseStatus = state.GetValue("cache_pulseStatus", 0)
 
@@ -34,11 +34,10 @@ function renderReactiveSingularities()
     local fastSpeedG = 165
     local fastSpeedB = 117
 
+    local speed = clamp(math.abs(multiplier), 0, 4)
     if (dimX < 100 or imgui.GetTime() < 0.3) then return end
 
     createParticle(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
-
-    local speed = clamp(math.abs(multiplier), 0, 4)
     updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
         state.DeltaTime * speed, multiplier)
 
@@ -66,16 +65,16 @@ function renderReactiveSingularities()
     ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
     ctx.AddCircle(dim / 2 + topLeft, 24 - pulseStatus * 8, 16777215 + math.floor(pulseStatus * 255) * 16777216)
 
-    state.SetValue("xList", xList)
-    state.SetValue("yList", yList)
-    state.SetValue("vxList", vxList)
-    state.SetValue("vyList", vyList)
-    state.SetValue("axList", axList)
-    state.SetValue("ayList", ayList)
+    state.SetValue("singularity_xList", xList)
+    state.SetValue("singularity_yList", yList)
+    state.SetValue("singularity_vxList", vxList)
+    state.SetValue("singularity_vyList", vyList)
+    state.SetValue("singularity_axList", axList)
+    state.SetValue("singularity_ayList", ayList)
 end
 
 function createParticle(x, y, vx, vy, ax, ay, dimX, dimY, n)
-    if (#x >= 150) then return end
+    if (#x >= n) then return end
     x[#x + 1] = math.random() * dimX
     y[#y + 1] = math.random() * dimY
     vx[#vx + 1] = 0
@@ -107,7 +106,7 @@ function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt, multiplier)
         local dist = sqrt(xDist ^ 2 + yDist ^ 2)
         if (dist < 10) then dist = 10 end
 
-        local gravityFactor = bit32.rshift(dist ^ 3, 8)
+        local gravityFactor = bit32.rshift(dist ^ 3, 9)
 
         local gx = xDist / gravityFactor
         local gy = yDist / gravityFactor

@@ -396,8 +396,8 @@ end
 function matrix.findZeroRow(mtrx)
     for idx, row in pairs(mtrx) do
         local zeroRow = true
-        for k451 = 1, #row do
-            local num = row[k451]
+        for k1480 = 1, #row do
+            local num = row[k1480]
             if (num ~= 0) then
                 zeroRow = false
                 goto continue
@@ -563,8 +563,8 @@ end
 function table.average(values, includeLastValue)
     if #values == 0 then return 0 end
     local sum = 0
-    for k452 = 1, #values do
-        local value = values[k452]
+    for k1481 = 1, #values do
+        local value = values[k1481]
         sum = sum + value
     end
     if not includeLastValue then
@@ -612,8 +612,8 @@ end
 ---@param item any The item to search for.
 ---@return boolean contains Whether or not the item given is within the table.
 function table.contains(tbl, item)
-    for k453 = 1, #tbl do
-        local v = tbl[k453]
+    for k1482 = 1, #tbl do
+        local v = tbl[k1482]
         if (v == item) then return true end
     end
     return false
@@ -625,8 +625,8 @@ table.includes = table.contains
 function table.dedupe(tbl)
     local hash = {}
     local newTbl = {}
-    for k454 = 1, #tbl do
-        local value = tbl[k454]
+    for k1483 = 1, #tbl do
+        local value = tbl[k1483]
         if (not hash[value]) then
             newTbl[#newTbl + 1] = value
             hash[value] = true
@@ -642,8 +642,8 @@ function table.duplicate(tbl)
     if not tbl then return {} end
     local dupeTbl = {}
     if (tbl[1]) then
-        for k455 = 1, #tbl do
-            local value = tbl[k455]
+        for k1484 = 1, #tbl do
+            local value = tbl[k1484]
             dupeTbl[#dupeTbl + 1] = type(value) == "table" and table.duplicate(value) or value
         end
     else
@@ -681,8 +681,8 @@ end
 ---@return T[]
 function table.map(tbl, fn)
     local newTbl = {}
-    for k456 = 1, #tbl do
-        local v = tbl[k456]
+    for k1485 = 1, #tbl do
+        local v = tbl[k1485]
         newTbl[#newTbl + 1] = fn(v)
     end
     return newTbl
@@ -735,13 +735,13 @@ function table.parse(str)
         if (str:len() <= 1) then break end
     end
     if (tableType == "arr") then
-        for k457 = 1, #terms do
-            local v = terms[k457]
+        for k1486 = 1, #terms do
+            local v = terms[k1486]
             tbl[#tbl + 1] = table.parse(v)
         end
     else
-        for k458 = 1, #terms do
-            local v = terms[k458]
+        for k1487 = 1, #terms do
+            local v = terms[k1487]
             local idx = v:find("=")
             tbl[v:sub(1, idx - 1)] = table.parse(v:sub(idx + 1))
         end
@@ -755,8 +755,8 @@ end
 ---@return T[] properties The resultant table.
 function table.property(tbl, property)
     local resultsTbl = {}
-    for k459 = 1, #tbl do
-        local v = tbl[k459]
+    for k1488 = 1, #tbl do
+        local v = tbl[k1488]
         resultsTbl[#resultsTbl + 1] = v[property]
     end
     return resultsTbl
@@ -770,8 +770,8 @@ end
 ---@return V
 function table.reduce(tbl, fn, initialValue)
     local accumulator = initialValue
-    for k460 = 1, #tbl do
-        local v = tbl[k460]
+    for k1489 = 1, #tbl do
+        local v = tbl[k1489]
         accumulator = fn(accumulator, v)
     end
     return accumulator
@@ -854,8 +854,8 @@ function table.stringify(var)
     if (var[1] ~= nil) then
         if (not truthy(#var)) then return "[]" end
         local str = "["
-        for k461 = 1, #var do
-            local v = var[k461]
+        for k1490 = 1, #var do
+            local v = var[k1490]
             str = str .. table.stringify(v) .. ","
         end
         return str:sub(1, -2) .. "]"
@@ -878,8 +878,8 @@ function table.validate(checkList, tbl, extrapolateData, inferTypes)
     local validKeys = table.keys(checkList)
     local tableKeys = table.keys(tbl)
     local outputTable = {}
-    for k462 = 1, #validKeys do
-        local key = validKeys[k462]
+    for k1491 = 1, #validKeys do
+        local key = validKeys[k1491]
         if (table.contains(tableKeys, key)) then
             outputTable[key] = tbl[key]
         end
@@ -897,8 +897,8 @@ end
 ---@return string[] values A list of values.
 function table.values(tbl)
     local resultsTbl = {}
-    for k463 = 1, #tbl do
-        local v = tbl[k463]
+    for k1492 = 1, #tbl do
+        local v = tbl[k1492]
         resultsTbl[#resultsTbl + 1] = v
     end
     return resultsTbl
@@ -1872,8 +1872,8 @@ function automateCopySVs(settingVars)
     end
     local firstSVTime = svs[1].StartTime
     local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
-    for k464 = 1, #svs do
-        local sv = svs[k464]
+    for k1493 = 1, #svs do
+        local sv = svs[k1493]
         local copiedSV = {
             relativeOffset = sv.StartTime - firstSVTime,
             multiplier = sv.Multiplier
@@ -2484,8 +2484,8 @@ function alignTimingLines()
             times[#times + 1] = originalTime
         end
     end
-    for k465 = 1, #times do
-        local time = times[k465]
+    for k1494 = 1, #times do
+        local time = times[k1494]
         if (game.getTimingPointAt(time).StartTime == time) then
             tpsToRemove[#tpsToRemove + 1] = game.getTimingPointAt(time)
         end
@@ -2511,12 +2511,12 @@ function changeGroups(menuVars)
     local svsToAdd = {}
     local ssfsToAdd = {}
     local oldGroup = state.SelectedScrollGroupId
-    for k466 = 1, #svsToRemove do
-        local sv = svsToRemove[k466]
+    for k1495 = 1, #svsToRemove do
+        local sv = svsToRemove[k1495]
         table.insert(svsToAdd, createSV(sv.StartTime, sv.Multiplier))
     end
-    for k467 = 1, #ssfsToRemove do
-        local ssf = ssfsToRemove[k467]
+    for k1496 = 1, #ssfsToRemove do
+        local ssf = ssfsToRemove[k1496]
         table.insert(ssfsToAdd, createSSF(ssf.StartTime, ssf.Multiplier))
     end
     local actionList = {}
@@ -2557,22 +2557,22 @@ function convertSVSSF(menuVars)
     local editorActions = {}
     if (menuVars.conversionDirection) then
         local svs = game.getSVsBetweenOffsets(startOffset, endOffset, false)
-        for k468 = 1, #svs do
-            local sv = svs[k468]
+        for k1497 = 1, #svs do
+            local sv = svs[k1497]
             table.insert(objects, { StartTime = sv.StartTime, Multiplier = sv.Multiplier })
         end
         table.insert(editorActions, utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svs))
     else
         local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset, false)
-        for k469 = 1, #ssfs do
-            local ssf = ssfs[k469]
+        for k1498 = 1, #ssfs do
+            local ssf = ssfs[k1498]
             table.insert(objects, { StartTime = ssf.StartTime, Multiplier = ssf.Multiplier })
         end
         table.insert(editorActions, utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfs))
     end
     local createTable = {}
-    for k470 = 1, #objects do
-        local obj = objects[k470]
+    for k1499 = 1, #objects do
+        local obj = objects[k1499]
         if (menuVars.conversionDirection) then
             table.insert(createTable, createSSF(obj.StartTime,
                 obj.Multiplier))
@@ -2599,8 +2599,8 @@ function copyItems(menuVars)
     local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset)
     local bms = game.getBookmarksBetweenOffsets(startOffset, endOffset)
     if (not menuVars.copyTable[1]) then goto continue1 end
-    for k471 = 1, #lines do
-        local line = lines[k471]
+    for k1500 = 1, #lines do
+        local line = lines[k1500]
         local copiedLine = {
             relativeOffset = line.StartTime - startOffset,
             bpm = line.Bpm,
@@ -2611,8 +2611,8 @@ function copyItems(menuVars)
     end
     ::continue1::
     if (not menuVars.copyTable[2]) then goto continue2 end
-    for k472 = 1, #svs do
-        local sv = svs[k472]
+    for k1501 = 1, #svs do
+        local sv = svs[k1501]
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
             multiplier = sv.Multiplier
@@ -2621,8 +2621,8 @@ function copyItems(menuVars)
     end
     ::continue2::
     if (not menuVars.copyTable[3]) then goto continue3 end
-    for k473 = 1, #ssfs do
-        local ssf = ssfs[k473]
+    for k1502 = 1, #ssfs do
+        local ssf = ssfs[k1502]
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
             multiplier = ssf.Multiplier
@@ -2631,8 +2631,8 @@ function copyItems(menuVars)
     end
     ::continue3::
     if (not menuVars.copyTable[4]) then goto continue4 end
-    for k474 = 1, #bms do
-        local bm = bms[k474]
+    for k1503 = 1, #bms do
+        local bm = bms[k1503]
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
             note = bm.Note
@@ -2796,8 +2796,8 @@ function displaceNoteSVsParent(menuVars)
     if (not truthy(offsets)) then return end
     local svsToRemove = {}
     local svsToAdd = {}
-    for k475 = 1, #offsets do
-        local offset = offsets[k475]
+    for k1504 = 1, #offsets do
+        local offset = offsets[k1504]
         local tbl = displaceNoteSVs(
             {
                 distance = (offset - offsets[1]) / (offsets[#offsets] - offsets[1]) *
@@ -2873,8 +2873,8 @@ function dynamicScaleSVs(menuVars)
             endOffset)
         local targetDistance = targetAvgSV * (endOffset - startOffset)
         local scalingFactor = targetDistance / currentDistance
-        for k476 = 1, #svsBetweenOffsets do
-            local sv = svsBetweenOffsets[k476]
+        for k1505 = 1, #svsBetweenOffsets do
+            local sv = svsBetweenOffsets[k1505]
             local newSVMultiplier = scalingFactor * sv.Multiplier
             addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
         end
@@ -2995,8 +2995,8 @@ function layerSnaps()
     local layerDict = {}
     local layerNames = table.property(map.EditorLayers, "Name")
     local notes = game.uniqueNotesBetweenSelected()
-    for k477 = 1, #notes do
-        local ho = notes[k477]
+    for k1506 = 1, #notes do
+        local ho = notes[k1506]
         local color = COLOR_MAP[game.getSnapAt(ho.StartTime)]
         if (ho.EditorLayer == 0) then
             layer = { Name = "Default", ColorRgb = "255,255,255", Hidden = false }
@@ -3172,14 +3172,14 @@ function reverseScrollSVs(menuVars)
         prepareDisplacingSVs(noteOffset, almostSVsToAdd, svTimeIsAdded, beforeDisplacement,
             atDisplacement, afterDisplacement)
     end
-    for k478 = 1, #svsBetweenOffsets do
-        local sv = svsBetweenOffsets[k478]
+    for k1507 = 1, #svsBetweenOffsets do
+        local sv = svsBetweenOffsets[k1507]
         if (not svTimeIsAdded[sv.StartTime]) then
             almostSVsToAdd[#almostSVsToAdd + 1] = sv
         end
     end
-    for k479 = 1, #almostSVsToAdd do
-        local sv = almostSVsToAdd[k479]
+    for k1508 = 1, #almostSVsToAdd do
+        local sv = almostSVsToAdd[k1508]
         local newSVMultiplier = -sv.Multiplier
         if sv.StartTime > endOffset then newSVMultiplier = sv.Multiplier end
         addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
@@ -3248,8 +3248,8 @@ function scaleMultiplySVs(menuVars)
         elseif scaleType == "Absolute Distance" then
             scalingFactor = menuVars.distance / currentDistance
         end
-        for k480 = 1, #svsBetweenOffsets do
-            local sv = svsBetweenOffsets[k480]
+        for k1509 = 1, #svsBetweenOffsets do
+            local sv = svsBetweenOffsets[k1509]
             local newSVMultiplier = scalingFactor * sv.Multiplier
             addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
         end
@@ -3290,8 +3290,8 @@ function verticalShiftSVs(menuVars)
     local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
     local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
-    for k481 = 1, #svsBetweenOffsets do
-        local sv = svsBetweenOffsets[k481]
+    for k1510 = 1, #svsBetweenOffsets do
+        local sv = svsBetweenOffsets[k1510]
         local newSVMultiplier = sv.Multiplier + menuVars.verticalShift
         addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
     end
@@ -3358,8 +3358,8 @@ function selectAlternating(menuVars)
     local endOffset = offsets[#offsets]
     local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
     local times = {}
-    for k482 = 1, #notes do
-        local ho = notes[k482]
+    for k1511 = 1, #notes do
+        local ho = notes[k1511]
         times[#times + 1] = ho.StartTime
     end
     times = table.dedupe(times)
@@ -3372,8 +3372,8 @@ function selectAlternating(menuVars)
     local notesToSelect = {}
     local currentTime = allowedTimes[1]
     local index = 2
-    for k483 = 1, #notes do
-        local note = notes[k483]
+    for k1512 = 1, #notes do
+        local note = notes[k1512]
         if (note.StartTime > currentTime and index <= #allowedTimes) then
             currentTime = allowedTimes[index]
             index = index + 1
@@ -3392,8 +3392,8 @@ function selectByChordSizes(menuVars)
     local endOffset = offsets[#offsets]
     local notes = sort(game.getNotesBetweenOffsets(startOffset, endOffset), sortAscendingNoteLaneTime)
     local noteTimeTable = {}
-    for k484 = 1, #notes do
-        local note = notes[k484]
+    for k1513 = 1, #notes do
+        local note = notes[k1513]
         noteTimeTable[#noteTimeTable + 1] = note.StartTime
     end
     noteTimeTable = table.dedupe(noteTimeTable)
@@ -3407,13 +3407,13 @@ function selectByChordSizes(menuVars)
     for n in tostring(menuVars.laneSelector):gmatch("%d") do
         allowedOrdering[#allowedOrdering + 1] = math.toNumber(n)
     end
-    for k485 = 1, #noteTimeTable do
-        local time = noteTimeTable[k485]
+    for k1514 = 1, #noteTimeTable do
+        local time = noteTimeTable[k1514]
         local size = 0
         local curLane = 0
         local totalNotes = {}
-        for k486 = 1, #notes do
-            local note = notes[k486]
+        for k1515 = 1, #notes do
+            local note = notes[k1515]
             if (math.abs(note.StartTime - time) < 3) then
                 size = size + 1
                 curLane = curLane + 1
@@ -3439,8 +3439,8 @@ function selectByNoteType(menuVars)
     local endOffset = offsets[#offsets]
     local totalNotes = game.getNotesBetweenOffsets(startOffset, endOffset)
     local notesToSelect = {}
-    for k487 = 1, #totalNotes do
-        local note = totalNotes[k487]
+    for k1516 = 1, #totalNotes do
+        local note = totalNotes[k1516]
         if (note.EndTime == 0 and menuVars.rice) then notesToSelect[#notesToSelect + 1] = note end
         if (note.EndTime ~= 0 and menuVars.ln) then notesToSelect[#notesToSelect + 1] = note end
     end
@@ -3463,8 +3463,8 @@ function selectBySnap(menuVars)
     for i = 2, (menuVars.snap - 1) do
         if (menuVars.snap % i == 0) then factors[#factors + 1] = i end
     end
-    for k488 = 1, #factors do
-        local factor = factors[k488]
+    for k1517 = 1, #factors do
+        local factor = factors[k1517]
         while (pointer <= endOffset + 10) do
             if ((counter ~= 0 or factor == 1) and pointer >= startOffset) then disallowedTimes[#disallowedTimes + 1] = pointer end
             counter = (counter + 1) % factor
@@ -3478,8 +3478,8 @@ function selectBySnap(menuVars)
         counter = (counter + 1) % menuVars.snap
         pointer = pointer + (60000 / bpm) / (menuVars.snap)
     end
-    for k489 = 1, #disallowedTimes do
-        local bannedTime = disallowedTimes[k489]
+    for k1518 = 1, #disallowedTimes do
+        local bannedTime = disallowedTimes[k1518]
         for idx, time in pairs(times) do
             if (math.abs(time - bannedTime) < 10) then table.remove(times, idx) end
         end
@@ -3487,8 +3487,8 @@ function selectBySnap(menuVars)
     local notesToSelect = {}
     local currentTime = times[1]
     local index = 2
-    for k490 = 1, #notes do
-        local note = notes[k490]
+    for k1519 = 1, #notes do
+        local note = notes[k1519]
         if (note.StartTime > currentTime + 10 and index <= #times) then
             currentTime = times[index]
             index = index + 1
@@ -3512,12 +3512,12 @@ function renderReactiveSingularities()
     local dimY = dim.y
     local sqrt = math.sqrt
     local clamp = math.clamp
-    local xList = state.GetValue("xList", {})
-    local yList = state.GetValue("yList", {})
-    local vxList = state.GetValue("vxList", {})
-    local vyList = state.GetValue("vyList", {})
-    local axList = state.GetValue("axList", {})
-    local ayList = state.GetValue("ayList", {})
+    local xList = state.GetValue("singularity_xList", {})
+    local yList = state.GetValue("singularity_yList", {})
+    local vxList = state.GetValue("singularity_vxList", {})
+    local vyList = state.GetValue("singularity_vyList", {})
+    local axList = state.GetValue("singularity_axList", {})
+    local ayList = state.GetValue("singularity_ayList", {})
     local pulseStatus = state.GetValue("cache_pulseStatus", 0)
     local slowSpeedR = 89
     local slowSpeedG = 0
@@ -3525,9 +3525,9 @@ function renderReactiveSingularities()
     local fastSpeedR = 255
     local fastSpeedG = 165
     local fastSpeedB = 117
+    local speed = clamp(math.abs(multiplier), 0, 4)
     if (dimX < 100 or imgui.GetTime() < 0.3) then return end
     createParticle(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
-    local speed = clamp(math.abs(multiplier), 0, 4)
     updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
         state.DeltaTime * speed, multiplier)
     local lerp = function(w, l, h)
@@ -3550,15 +3550,15 @@ function renderReactiveSingularities()
     ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
     ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
     ctx.AddCircle(dim / 2 + topLeft, 24 - pulseStatus * 8, 16777215 + math.floor(pulseStatus * 255) * 16777216)
-    state.SetValue("xList", xList)
-    state.SetValue("yList", yList)
-    state.SetValue("vxList", vxList)
-    state.SetValue("vyList", vyList)
-    state.SetValue("axList", axList)
-    state.SetValue("ayList", ayList)
+    state.SetValue("singularity_xList", xList)
+    state.SetValue("singularity_yList", yList)
+    state.SetValue("singularity_vxList", vxList)
+    state.SetValue("singularity_vyList", vyList)
+    state.SetValue("singularity_axList", axList)
+    state.SetValue("singularity_ayList", ayList)
 end
 function createParticle(x, y, vx, vy, ax, ay, dimX, dimY, n)
-    if (#x >= 150) then return end
+    if (#x >= n) then return end
     x[#x + 1] = math.random() * dimX
     y[#y + 1] = math.random() * dimY
     vx[#vx + 1] = 0
@@ -3585,7 +3585,7 @@ function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt, multiplier)
         local yDist = sgPosy - y
         local dist = sqrt(xDist ^ 2 + yDist ^ 2)
         if (dist < 10) then dist = 10 end
-        local gravityFactor = bit32.rshift(dist ^ 3, 8)
+        local gravityFactor = bit32.rshift(dist ^ 3, 9)
         local gx = xDist / gravityFactor
         local gy = yDist / gravityFactor
         local spinFactor = 10 * spinDir / sqrt(dist)
@@ -3609,52 +3609,64 @@ function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt, multiplier)
         vyl[i] = clamp(vyl[i] * dragFactor, -5, 5)
     end
 end
-stars = {}
-function updateStars()
-    local dim = imgui.GetWindowSize()
-    for k491 = 1, #stars do
-        local star = stars[k491]
-        local starWrapped = false
-        while (star.pos.x > dim.x + 10) do
-            starWrapped = true
-            star.pos.x = star.pos.x - dim.x - 20
-        end
-        while (star.pos.x < -10) do
-            starWrapped = true
-            star.pos.x = star.pos.x + dim.x + 20
-        end
-        if (starWrapped) then
-            star.pos.y = math.random() * dim.y
-            star.v.x = math.random() * 3 + 1
-            star.size = math.random(3) * 0.5
-        else
-            star.pos = star.pos + star.v * state.DeltaTime * 0.05 *
-                math.clamp(2 * game.getSVMultiplierAt(state.SongTime), -50, 50)
-        end
-    end
-end
 function renderReactiveStars()
-    local stars = stars
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
-    if (not truthy(#stars)) then
-        for _ = 1, 100 do
-            table.insert(stars,
-                {
-                    pos = vector.New(math.random() * 500, math.random() * 500),
-                    v = vector.New(math.random() * 3 + 1, 0),
-                    size = math.random(3) * 0.5,
-                })
-        end
-    else
-        updateStars()
+    local dimX = dim.x
+    local dimY = dim.y
+    local clamp = math.clamp
+    local xList = state.GetValue("stars_xList", {})
+    local yList = state.GetValue("stars_yList", {})
+    local vxList = state.GetValue("stars_vxList", {})
+    local szList = state.GetValue("stars_szList", {})
+    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
+    createStar(xList, yList, vxList, szList, dimX, dimY, 100)
+    updateStars(xList, yList, vxList, szList, dimX, dimY, state.DeltaTime)
+    for i = 1, #xList do
+        local x = xList[i]
+        local y = yList[i]
+        local sz = szList[i]
+        local progress = x / dimX
+        local brightness = clamp(-8 * progress * (progress - 1), 0, 1)
+        local pos = { x + topLeft.x, y + topLeft.y }
+        ctx.AddCircleFilled(pos, sz, rgbaToUint(255, 255, 255, brightness * 255))
     end
-    for k492 = 1, #stars do
-        local star = stars[k492]
-        local progress = star.pos.x / dim.x
-        local brightness = math.clamp(-8 * progress * (progress - 1), 0, 1)
-        ctx.AddCircleFilled(star.pos + topLeft, star.size, rgbaToUint(255, 255, 255, brightness * 255))
+    state.SetValue("stars_xList", xList)
+    state.SetValue("stars_yList", yList)
+    state.SetValue("stars_vxList", vxList)
+    state.SetValue("stars_szList", szList)
+end
+function createStar(x, y, vx, sz, dimX, dimY, n)
+    if (#x >= n) then return end
+    x[#x + 1] = math.random() * dimX
+    y[#y + 1] = math.random() * dimY
+    vx[#vx + 1] = math.random() * 3 + 1
+    sz[#sz + 1] = math.random(3) * 0.5
+end
+function updateStars(xl, yl, vxl, szl, dimX, dimY, dt)
+    for i = 1, #xl do
+        local starWrapped = false
+        local x = xl[i]
+        local y = yl[i]
+        local vx = vxl[i]
+        while (x > dimX + 10) do
+            starWrapped = true
+            x = x - dimX - 20
+        end
+        while (x < -10) do
+            starWrapped = true
+            x = x + dimX + 20
+        end
+        xl[i] = x
+        if (starWrapped) then
+            yl[i] = math.random() * dimY
+            vxl[i] = math.random() * 3 + 1
+            szl[i] = math.random(3) * 0.5
+        else
+            xl[i] = x + vx * state.DeltaTime * 0.05 *
+                math.clamp(2 * game.getSVMultiplierAt(state.SongTime), -50, 50)
+        end
     end
 end
 local RGB_SNAP_MAP = {
@@ -6397,8 +6409,8 @@ function infoTab()
         local tgList = map.GetTimingGroupIds()
         local svSum = 0
         local ssfSum = 0
-        for k493 = 1, #tgList do
-            local tg = tgList[k493]
+        for k1520 = 1, #tgList do
+            local tg = tgList[k1520]
             state.SelectedScrollGroupId = tg
             svSum = svSum + #map.ScrollVelocities
             ssfSum = ssfSum + #map.ScrollSpeedFactors
@@ -6705,8 +6717,8 @@ end
 function stringifyCustomStyle(customStyle)
     local keys = table.keys(customStyle)
     local resultStr = "v2 "
-    for k494 = 1, #keys do
-        local key = keys[k494]
+    for k1521 = 1, #keys do
+        local key = keys[k1521]
         local value = customStyle[key]
         keyId = convertStrToShort(key)
         local r = math.floor(value.x * 255)
@@ -8701,8 +8713,8 @@ end
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for k495 = 1, #svs do
-        local sv = svs[k495]
+    for k1522 = 1, #svs do
+        local sv = svs[k1522]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
         if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
     end
