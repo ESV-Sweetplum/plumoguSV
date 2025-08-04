@@ -25,7 +25,8 @@ REVERSE_COLOR_MAP = {
 
 function layerSnaps()
     local layerDict = {}
-    local layerNames = table.property(map.EditorLayers, "Name")
+    local originalLayerNames = table.property(map.EditorLayers, "Name")
+    local layerNames = table.duplicate(originalLayerNames)
     local notes = game.uniqueNotesBetweenSelected()
     for _, ho in ipairs(notes) do
         local color = COLOR_MAP[game.getSnapAt(ho.StartTime)]
@@ -36,6 +37,11 @@ function layerSnaps()
         end
         local newLayerName = layer.Name .. "-plumoguSV-snap-" .. color
         if (table.contains(layerNames, newLayerName)) then
+            if (table.contains(originalLayerNames, newLayerName)) then
+                print("e!",
+                    "Existing plumoguSV snap layers have been detected. Please remove them before trying to layer snaps again.")
+                return
+            end
             table.insert(layerDict[newLayerName].hos, ho)
         else
             layerDict[newLayerName] = { hos = { ho }, ColorRgb = layer.ColorRgb, Hidden = layer.Hidden }
