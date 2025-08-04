@@ -40,28 +40,32 @@ local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---@param dontPrintInaccuracy? boolean If set to true, will not print warning messages on unconfident guesses.
 ---@return SnapNumber
 function game.getSnapAt(time, dontPrintInaccuracy)
-    local previousBar = map.GetNearestSnapTimeFromTime(false, 1, time)
-    local barTime = 60000 / game.getTimingPointAt(time).Bpm
-    local distance = time - previousBar
-    if (math.abs(distance) / barTime < 0.02) then return 1 end
-    local absoluteSnap = barTime / distance
-    local foundCorrectSnap = false
-    for i = 1, math.ceil(16 / absoluteSnap) do
-        local currentSnap = absoluteSnap * i
-        guessedSnap = table.searchClosest(SPECIAL_SNAPS, currentSnap)
-        local approximateError = math.abs(guessedSnap - currentSnap) / currentSnap
-        if (approximateError < 0.05) then
-            if (approximateError > 0.03 and not dontPrintInaccuracy) then
-                print("w!",
-                    "The snap for the note at time " ..
-                    time .. " could be incorrect (confidence < 97%). Please double check to see if it's correct.")
-            end
-            foundCorrectSnap = true
-            break
-        end
+    local previousBar = math.floor(map.GetNearestSnapTimeFromTime(false, 1, time + 6) or 0)
+    local barLength = math.floor(map.GetNearestSnapTimeFromTime(true, 1, time) or 0) - previousBar
+    local distanceAbovePrev = time - previousBar
+    if (distanceAbovePrev <= 5 or distanceAbovePrev >= barLength - 5) then return 1 end
+    local snap48 = barLength / 48
+    local checkingTime = 0
+    local index = -1
+    for _ = 1, 48 do
+        if (checkingTime > distanceAbovePrev) then break end
+        checkingTime = checkingTime + snap48
+        index = index + 1
     end
-    if (not foundCorrectSnap) then return 5 end
-    return guessedSnap
+    if (math.abs(snap48 * (index + 1) - distanceAbovePrev) < math.abs(snap48 * index - distanceAbovePrev)) then
+        index = index + 1
+    end
+    local v = 48
+    local div = index
+    local r = -1
+    while (r ~= 0) do
+        r = v % div
+        v = div
+        div = r
+    end
+    if (math.floor(48 / v) ~= 48 / v) then return 5 end
+    if (48 / v > 16) then return 5 end
+    return 48 / v
 end
 function game.getSSFStartTimeAt(offset, tgId)
     local sv = map.GetScrollSpeedFactorAt(offset, tgId)

@@ -25,9 +25,7 @@ export default async function transpiler(
     lint = true
 ) {
     counter = 0;
-
     let fileCount = 0;
-
     let output = '';
 
     const entryPoints = ['draw.lua', 'awake.lua'];
