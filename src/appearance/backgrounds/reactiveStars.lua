@@ -44,6 +44,11 @@ function createStar(x, y, vx, sz, dimX, dimY, n)
 end
 
 function updateStars(xl, yl, vxl, szl, dimX, dimY, dt)
+    local random = math.random
+    local clamp = math.clamp
+
+    local m = game.getSVMultiplierAt(state.SongTime)
+
     for i = 1, #xl do
         local starWrapped = false
 
@@ -61,12 +66,12 @@ function updateStars(xl, yl, vxl, szl, dimX, dimY, dt)
         end
         xl[i] = x
         if (starWrapped) then
-            yl[i] = math.random() * dimY
-            vxl[i] = math.random() * 3 + 1
-            szl[i] = math.random(3) * 0.5
+            yl[i] = random() * dimY
+            vxl[i] = random() * 3 + 1
+            szl[i] = random(3) * 0.5
         else
-            xl[i] = x + vx * state.DeltaTime * 0.05 *
-                math.clamp(2 * game.getSVMultiplierAt(state.SongTime), -50, 50)
+            xl[i] = x + vx * dt * 0.05 *
+                clamp(2 * m, -50, 50)
         end
     end
 end
