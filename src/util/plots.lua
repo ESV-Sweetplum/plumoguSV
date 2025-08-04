@@ -75,7 +75,7 @@ end
 function plotExponentialCurvature(settingVars)
     imgui.PushItemWidth(28)
     imgui.PushStyleColor(imgui_col.FrameBg, 0)
-    local RESOLUTION = 16
+    local RESOLUTION = 32
     local values = table.construct()
     for i = 1, RESOLUTION do
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]

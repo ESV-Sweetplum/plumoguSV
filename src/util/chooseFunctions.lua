@@ -394,9 +394,9 @@ function chooseMainSV(settingVars)
     local label = "Main SV"
     if settingVars.linearlyChange then label = label .. " (start)" end
     _, settingVars.mainSV = imgui.InputFloat(label, settingVars.mainSV, 0, 0, "%.2fx")
-    local HelpMarkerText = "This SV will last ~99.99%% of the stutter"
+    local helpMarkerText = "This SV will last ~99.99%% of the stutter"
     if not settingVars.linearlyChange then
-        HelpMarker(HelpMarkerText)
+        HelpMarker(helpMarkerText)
         return
     end
 
@@ -600,9 +600,9 @@ function chooseStartSVPercent(settingVars)
     local label1 = "Start SV %"
     if settingVars.linearlyChange then label1 = label1 .. " (start)" end
     _, settingVars.svPercent = imgui.InputFloat(label1, settingVars.svPercent, 1, 1, "%.2f%%")
-    local HelpMarkerText = "%% distance between notes"
+    local helpMarkerText = "%% distance between notes"
     if not settingVars.linearlyChange then
-        HelpMarker(HelpMarkerText)
+        HelpMarker(helpMarkerText)
         return
     end
 

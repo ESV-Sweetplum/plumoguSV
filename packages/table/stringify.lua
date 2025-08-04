@@ -15,7 +15,7 @@ function table.stringify(var)
         end
         return str:sub(1, -2) .. "]"
     end -- from below, must be a key-value table
-    if (not truthy(#table.keys(var))) then return "{}" end
+    if (not truthy(#table.keys(var))) then return "[]" end
     local str = "{"
     for k, v in pairs(var) do
         str = str .. k .. "=" .. table.stringify(v) .. ","

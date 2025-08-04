@@ -864,7 +864,7 @@ function table.stringify(var)
         end
         return str:sub(1, -2) .. "]"
     end
-    if (not truthy(#table.keys(var))) then return "{}" end
+    if (not truthy(#table.keys(var))) then return "[]" end
     local str = "{"
     for k, v in pairs(var) do
         str = str .. k .. table.concat({"=", table.stringify(v), ","})
@@ -1127,58 +1127,58 @@ STANDARD_SVS_NO_COMBO = {
     "Custom",
     "Chinchilla"
 }
-local STILL_TYPES = {
+STILL_TYPES = {
     "No",
     "Start",
     "End",
     "Auto",
     "Otua"
 }
-local STUTTER_CONTROLS = {
+STUTTER_CONTROLS = {
     "First SV",
     "Second SV"
 }
-local STYLE_THEMES = {
+STYLE_THEMES = {
     "Rounded",
     "Boxed",
     "Rounded + Border",
     "Boxed + Border"
 }
-local SV_BEHAVIORS = {
+SV_BEHAVIORS = {
     "Slow down",
     "Speed up"
 }
-local TRAIL_SHAPES = {
+TRAIL_SHAPES = {
     "Circles",
     "Triangles"
 }
-local STILL_BEHAVIOR_TYPES = {
+STILL_BEHAVIOR_TYPES = {
     "Entire Region",
     "Per Note Group",
 }
-local DISTANCE_TYPES = {
+DISTANCE_TYPES = {
     "Average SV + Shift",
     "Distance + Shift",
     "Start / End"
 }
-local VIBRATO_TYPES = {
+VIBRATO_TYPES = {
     "SV (msx)",
     "SSF (x)",
 }
-local VIBRATO_QUALITIES = {
+VIBRATO_QUALITIES = {
     "Low",
     "Medium",
     "High",
     "Ultra",
     "Omega"
 }
-local VIBRATO_FRAME_RATES = { 45, 90, 150, 210, 450 }
-local VIBRATO_DETAILED_QUALITIES = {}
+VIBRATO_FRAME_RATES = { 45, 90, 150, 210, 450 }
+VIBRATO_DETAILED_QUALITIES = {}
 for i, v in pairs(VIBRATO_QUALITIES) do
     VIBRATO_DETAILED_QUALITIES[#VIBRATO_DETAILED_QUALITIES + 1] = v .. table.concat({"  (~", VIBRATO_FRAME_RATES[i], "fps)"})
 end
-local VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
-local DEFAULT_STYLE = {
+VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
+DEFAULT_STYLE = {
     windowBg = vector.New(0.00, 0.00, 0.00, 1.00),
     popupBg = vector.New(0.08, 0.08, 0.08, 0.94),
     border = vector.New(0, 0, 0, 1),
@@ -1231,8 +1231,8 @@ local DEFAULT_STYLE = {
     plotHistogramHovered =
         vector.New(1.00, 0.60, 0.00, 1.00)
 }
-local DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Shift+Alt+L" }
-local HOTKEY_LABELS = { "Execute Primary Action", "Execute Secondary Action", "Swap Primary Inputs",
+DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Shift+Alt+L" }
+HOTKEY_LABELS = { "Execute Primary Action", "Execute Secondary Action", "Swap Primary Inputs",
     "Negate Primary Inputs", "Reset Secondary Input", "Go To Previous Scroll Group", "Go To Next Scroll Group",
     "Execute Vibrato Separately", "Use TG of Selected Note", "Toggle Note Lock Mode" }
 function createSVGraphStats()
@@ -5324,6 +5324,22 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         write(globalVars)
     end
     state.SetValue("newPresetName", newPresetName)
+    AddSeparator()
+    local importCustomPreset = state.GetValue("importCustomPreset", "")
+    imgui.AlignTextToFramePadding()
+    imgui.Text("Import Preset:")
+    KeepSameLine()
+    imgui.PushItemWidth(103)
+    _, importCustomPreset = imgui.InputText("##CustomPreset", importCustomPreset, MAX_IMPORT_CHARACTER_LIMIT)
+    state.SetValue("importCustomPreset", importCustomPreset)
+    imgui.PopItemWidth()
+    imgui.SameLine()
+    if (imgui.Button("Import##CustomPreset")) then
+        table.insert(globalVars.presets, table.parse(importCustomPreset))
+        importCustomPreset = ""
+        write(globalVars)
+    end
+    AddSeparator()
     imgui.Columns(3)
     imgui.Text("Name")
     imgui.NextColumn()
@@ -5341,13 +5357,13 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         imgui.NextColumn()
         if (imgui.Button("Select##Preset" .. idx)) then
             local data = table.parse(preset.data)
-            globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.menu)
+            globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
             saveVariables(preset.menu .. preset.type .. "Settings", data.settingVars)
             saveVariables(table.concat({"place", preset.type, "Menu"}), data.menuVars)
             globalVars.showPresetMenu = false
         end
         if (imgui.IsItemClicked("Right")) then
-            imgui.SetClipboardText(preset.data)
+            imgui.SetClipboardText(table.stringify(preset))
             print("i!", "Exported preset to your clipboard.")
         end
         ToolTip("Left-click to select this preset. Right-click to copy this preset to your clipboard.")
@@ -7722,9 +7738,9 @@ function chooseMainSV(settingVars)
     local label = "Main SV"
     if settingVars.linearlyChange then label = label .. " (start)" end
     _, settingVars.mainSV = imgui.InputFloat(label, settingVars.mainSV, 0, 0, "%.2fx")
-    local HelpMarkerText = "This SV will last ~99.99%% of the stutter"
+    local helpMarkerText = "This SV will last ~99.99%% of the stutter"
     if not settingVars.linearlyChange then
-        HelpMarker(HelpMarkerText)
+        HelpMarker(helpMarkerText)
         return
     end
     _, settingVars.mainSV2 = imgui.InputFloat("Main SV (end)", settingVars.mainSV2, 0, 0, "%.2fx")
@@ -7904,9 +7920,9 @@ function chooseStartSVPercent(settingVars)
     local label1 = "Start SV %"
     if settingVars.linearlyChange then label1 = label1 .. " (start)" end
     _, settingVars.svPercent = imgui.InputFloat(label1, settingVars.svPercent, 1, 1, "%.2f%%")
-    local HelpMarkerText = "%% distance between notes"
+    local helpMarkerText = "%% distance between notes"
     if not settingVars.linearlyChange then
-        HelpMarker(HelpMarkerText)
+        HelpMarker(helpMarkerText)
         return
     end
     local label2 = "Start SV % (end)"
@@ -8848,7 +8864,7 @@ end
 function plotExponentialCurvature(settingVars)
     imgui.PushItemWidth(28)
     imgui.PushStyleColor(imgui_col.FrameBg, 0)
-    local RESOLUTION = 16
+    local RESOLUTION = 32
     local values = table.construct()
     for i = 1, RESOLUTION do
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
@@ -9311,5 +9327,7 @@ function renderMeasureDataWidget()
     imgui.Text(table.concat({"SV Distance = ", widgetVars.roundedSVDistance, " msx"}))
     imgui.Text(table.concat({"Avg SV = ", widgetVars.roundedAvgSV, "x"}))
     imgui.EndTooltip()
+    widgetVars.oldStartOffset = startOffset
+    widgetVars.oldEndOffset = endOffset
     saveVariables("measureWidget", widgetVars)
 end

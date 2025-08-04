@@ -158,7 +158,7 @@ STANDARD_SVS_NO_COMBO = {
     "Chinchilla"
 }
 
-local STILL_TYPES = {
+STILL_TYPES = {
     "No",
     "Start",
     "End",
@@ -166,45 +166,45 @@ local STILL_TYPES = {
     "Otua"
 }
 
-local STUTTER_CONTROLS = {
+STUTTER_CONTROLS = {
     "First SV",
     "Second SV"
 }
 
-local STYLE_THEMES = {
+STYLE_THEMES = {
     "Rounded",
     "Boxed",
     "Rounded + Border",
     "Boxed + Border"
 }
 
-local SV_BEHAVIORS = {
+SV_BEHAVIORS = {
     "Slow down",
     "Speed up"
 }
 
-local TRAIL_SHAPES = {
+TRAIL_SHAPES = {
     "Circles",
     "Triangles"
 }
 
-local STILL_BEHAVIOR_TYPES = {
+STILL_BEHAVIOR_TYPES = {
     "Entire Region",
     "Per Note Group",
 }
 
-local DISTANCE_TYPES = {
+DISTANCE_TYPES = {
     "Average SV + Shift",
     "Distance + Shift",
     "Start / End"
 }
 
-local VIBRATO_TYPES = {
+VIBRATO_TYPES = {
     "SV (msx)",
     "SSF (x)",
 }
 
-local VIBRATO_QUALITIES = {
+VIBRATO_QUALITIES = {
     "Low",
     "Medium",
     "High",
@@ -212,17 +212,17 @@ local VIBRATO_QUALITIES = {
     "Omega"
 }
 
-local VIBRATO_FRAME_RATES = { 45, 90, 150, 210, 450 }
+VIBRATO_FRAME_RATES = { 45, 90, 150, 210, 450 }
 
-local VIBRATO_DETAILED_QUALITIES = {} -- what actually shows up in-game
+VIBRATO_DETAILED_QUALITIES = {} -- what actually shows up in-game
 
 for i, v in pairs(VIBRATO_QUALITIES) do
     table.insert(VIBRATO_DETAILED_QUALITIES, v .. "  (~" .. VIBRATO_FRAME_RATES[i] .. "fps)")
 end
 
-local VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
+VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
 
-local DEFAULT_STYLE = {
+DEFAULT_STYLE = {
     windowBg = vector.New(0.00, 0.00, 0.00, 1.00),
     popupBg = vector.New(0.08, 0.08, 0.08, 0.94),
     border = vector.New(0, 0, 0, 1),
@@ -276,8 +276,8 @@ local DEFAULT_STYLE = {
         vector.New(1.00, 0.60, 0.00, 1.00)
 }
 
-local DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Shift+Alt+L" }
+DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Shift+Alt+L" }
 
-local HOTKEY_LABELS = { "Execute Primary Action", "Execute Secondary Action", "Swap Primary Inputs",
+HOTKEY_LABELS = { "Execute Primary Action", "Execute Secondary Action", "Swap Primary Inputs",
     "Negate Primary Inputs", "Reset Secondary Input", "Go To Previous Scroll Group", "Go To Next Scroll Group",
     "Execute Vibrato Separately", "Use TG of Selected Note", "Toggle Note Lock Mode" }

@@ -17,7 +17,7 @@ drawCapybara312: false
 selectTypeIndex: 1
 placeTypeIndex: 1
 editToolIndex: 1
-showPresetMenu: false
+showPresetMenu: true
 scrollGroupIndex: 1
 hideSVInfo: true
 showVibratoWidget: true
@@ -597,5 +597,5 @@ defaultProperties:
       snap: 1
 presets:
 - 
-dynamicBackgroundIndex: 2
+dynamicBackgroundIndex: 1
 ignoreNotes: false

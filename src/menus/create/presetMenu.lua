@@ -25,8 +25,27 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         table.insert(globalVars.presets, preset)
         write(globalVars)
     end
-
     state.SetValue("newPresetName", newPresetName)
+
+    AddSeparator()
+
+    local importCustomPreset = state.GetValue("importCustomPreset", "")
+    imgui.AlignTextToFramePadding()
+    imgui.Text("Import Preset:")
+    KeepSameLine()
+    imgui.PushItemWidth(103)
+    _, importCustomPreset = imgui.InputText("##CustomPreset", importCustomPreset, MAX_IMPORT_CHARACTER_LIMIT)
+    state.SetValue("importCustomPreset", importCustomPreset)
+    imgui.PopItemWidth()
+    imgui.SameLine()
+    if (imgui.Button("Import##CustomPreset")) then
+        table.insert(globalVars.presets, table.parse(importCustomPreset))
+        importCustomPreset = ""
+        write(globalVars)
+    end
+
+    AddSeparator()
+
     imgui.Columns(3)
 
     imgui.Text("Name")
@@ -46,13 +65,13 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         imgui.NextColumn()
         if (imgui.Button("Select##Preset" .. idx)) then
             local data = table.parse(preset.data)
-            globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.menu)
+            globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
             saveVariables(preset.menu .. preset.type .. "Settings", data.settingVars)
             saveVariables("place" .. preset.type .. "Menu", data.menuVars)
             globalVars.showPresetMenu = false
         end
         if (imgui.IsItemClicked("Right")) then
-            imgui.SetClipboardText(preset.data)
+            imgui.SetClipboardText(table.stringify(preset))
             print("i!", "Exported preset to your clipboard.")
         end
         ToolTip("Left-click to select this preset. Right-click to copy this preset to your clipboard.")

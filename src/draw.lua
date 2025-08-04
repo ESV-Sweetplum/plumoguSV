@@ -88,13 +88,15 @@ function renderMeasureDataWidget()
         avgSV = totalDistance / (endOffset - startOffset)
         widgetVars.roundedAvgSV = math.round(avgSV, 3)
     end
-
     imgui.BeginTooltip()
     imgui.Text("Measure Info:")
     imgui.Text("NSV Distance = " .. widgetVars.nsvDistance .. " ms")
     imgui.Text("SV Distance = " .. widgetVars.roundedSVDistance .. " msx")
     imgui.Text("Avg SV = " .. widgetVars.roundedAvgSV .. "x")
     imgui.EndTooltip()
+
+    widgetVars.oldStartOffset = startOffset
+    widgetVars.oldEndOffset = endOffset
 
     saveVariables("measureWidget", widgetVars)
 end
