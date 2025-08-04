@@ -29,6 +29,7 @@ CHINCHILLA_TYPES = {
     "Inverse Power",
     "Peter Stock"
 }
+
 COLOR_THEMES = {
     "Classic",
     "Strawberry",
@@ -47,7 +48,8 @@ COLOR_THEMES = {
     "otingocnI",
     "CUSTOM"
 }
-COLOR_THEME_COLORS = { -- colors of theme dropdown
+
+COLOR_THEME_COLORS = {
     "255,255,255",
     "251,41,67",
     "153,102,204",
@@ -65,13 +67,15 @@ COLOR_THEME_COLORS = { -- colors of theme dropdown
     "255,255,255",
     "0,0,0",
 }
+
 DYNAMIC_BACKGROUND_TYPES = {
     "None",
     "Reactive Stars",
     "Reactive Singularity",
     "Synthesis",
 }
-COMBO_SV_TYPE = { -- options for overlapping combo SVs
+
+COMBO_SV_TYPE = {
     "Add",
     "Cross Multiply",
     "Remove",
@@ -80,17 +84,20 @@ COMBO_SV_TYPE = { -- options for overlapping combo SVs
     "SV Type 1 Only",
     "SV Type 2 Only"
 }
-CURSOR_TRAILS = { -- available cursor trail types
+
+CURSOR_TRAILS = {
     "None",
     "Snake",
     "Dust",
     "Sparkle"
 }
-DISPLACE_SCALE_SPOTS = { -- places to scale SV sections by displacing
+
+DISPLACE_SCALE_SPOTS = {
     "Start",
     "End"
 }
-EMOTICONS = { -- emoticons to visually clutter the plugin and confuse users
+
+EMOTICONS = {
     "( - _ - )",
     "( e . e )",
     "( * o * )",
@@ -111,31 +118,35 @@ EMOTICONS = { -- emoticons to visually clutter the plugin and confuse users
     "[ . _ . ]",
     "[ ' = ' ]",
 }
-FINAL_SV_TYPES = { -- options for the last SV placed at the tail end of all SVs
+
+FINAL_SV_TYPES = {
     "Normal",
     "Custom",
     "Override"
 }
-FLICKER_TYPES = { -- types of flickers
+
+FLICKER_TYPES = {
     "Normal",
     "Delayed"
 }
-NOTE_SKIN_TYPES = { -- types of note skins
+
+NOTE_SKIN_TYPES = {
     "Bar",
     "Circle"
 }
 
-RANDOM_TYPES = { -- distribution types of random values
+RANDOM_TYPES = {
     "Normal",
     "Uniform"
 }
-SCALE_TYPES = { -- ways to scale SVs
+
+SCALE_TYPES = {
     "Average SV",
     "Absolute Distance",
     "Relative Ratio"
 }
 
-STANDARD_SVS_NO_COMBO = { -- types of standard SVs (excluding combo)
+STANDARD_SVS_NO_COMBO = {
     "Linear",
     "Exponential",
     "Bezier",
@@ -146,49 +157,54 @@ STANDARD_SVS_NO_COMBO = { -- types of standard SVs (excluding combo)
     "Custom",
     "Chinchilla"
 }
-STILL_TYPES = { -- types of still displacements
+
+local STILL_TYPES = {
     "No",
     "Start",
     "End",
     "Auto",
     "Otua"
 }
-STUTTER_CONTROLS = { -- parts of a stutter SV to control
+
+local STUTTER_CONTROLS = {
     "First SV",
     "Second SV"
 }
-STYLE_THEMES = { -- available style/appearance themes for the plugin
+
+local STYLE_THEMES = {
     "Rounded",
     "Boxed",
     "Rounded + Border",
     "Boxed + Border"
 }
-SV_BEHAVIORS = { -- behaviors of SVs
+
+local SV_BEHAVIORS = {
     "Slow down",
     "Speed up"
 }
-TRAIL_SHAPES = { -- shapes for cursor trails
+
+local TRAIL_SHAPES = {
     "Circles",
     "Triangles"
 }
 
-STILL_BEHAVIOR_TYPES = {
+local STILL_BEHAVIOR_TYPES = {
     "Entire Region",
     "Per Note Group",
 }
 
-DISTANCE_TYPES = {
+local DISTANCE_TYPES = {
     "Average SV + Shift",
     "Distance + Shift",
     "Start / End"
 }
 
-VIBRATO_TYPES = {
+local VIBRATO_TYPES = {
     "SV (msx)",
     "SSF (x)",
 }
 
-VIBRATO_QUALITIES = {
+local VIBRATO_QUALITIES = {
     "Low",
     "Medium",
     "High",
@@ -196,17 +212,17 @@ VIBRATO_QUALITIES = {
     "Omega"
 }
 
-VIBRATO_FRAME_RATES = { 45, 90, 150, 210, 450 }
+local VIBRATO_FRAME_RATES = { 45, 90, 150, 210, 450 }
 
-VIBRATO_DETAILED_QUALITIES = {} -- what actually shows up in-game
+local VIBRATO_DETAILED_QUALITIES = {} -- what actually shows up in-game
 
 for i, v in pairs(VIBRATO_QUALITIES) do
     table.insert(VIBRATO_DETAILED_QUALITIES, v .. "  (~" .. VIBRATO_FRAME_RATES[i] .. "fps)")
 end
 
-VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
+local VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
 
-DEFAULT_STYLE = {
+local DEFAULT_STYLE = {
     windowBg = vector.New(0.00, 0.00, 0.00, 1.00),
     popupBg = vector.New(0.08, 0.08, 0.08, 0.94),
     border = vector.New(0, 0, 0, 1),
@@ -260,7 +276,8 @@ DEFAULT_STYLE = {
         vector.New(1.00, 0.60, 0.00, 1.00)
 }
 
-DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Shift+Alt+L" }
-HOTKEY_LABELS = { "Execute Primary Action", "Execute Secondary Action", "Swap Primary Inputs",
+local DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Shift+Alt+L" }
+
+local HOTKEY_LABELS = { "Execute Primary Action", "Execute Secondary Action", "Swap Primary Inputs",
     "Negate Primary Inputs", "Reset Secondary Input", "Go To Previous Scroll Group", "Go To Next Scroll Group",
     "Execute Vibrato Separately", "Use TG of Selected Note", "Toggle Note Lock Mode" }
