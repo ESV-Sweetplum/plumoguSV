@@ -24,6 +24,8 @@ export default async function transpiler(
     fuckify = false,
     lint = true
 ) {
+    counter = 0;
+
     let fileCount = 0;
 
     let output = '';
