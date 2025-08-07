@@ -3351,10 +3351,6 @@ function initializeNoteLockMode()
         end
     end)
 end
-function checkForGlobalHotkeys()
-    if (kb.pressedKeyCombo(globalVars.hotkeyList[9])) then jumpToTg() end
-    if (kb.pressedKeyCombo(globalVars.hotkeyList[10])) then changeNoteLockMode() end
-end
 function jumpToTg()
     if (not truthy(#state.SelectedHitObjects)) then return end
     local tgId = state.SelectedHitObjects[1].TimingGroup
@@ -3362,6 +3358,10 @@ function jumpToTg()
         if (ho.TimingGroup ~= tgId) then return end
     end
     state.SelectedScrollGroupId = tgId
+end
+function checkForGlobalHotkeys()
+    if (kb.pressedKeyCombo(globalVars.hotkeyList[9])) then jumpToTg() end
+    if (kb.pressedKeyCombo(globalVars.hotkeyList[10])) then changeNoteLockMode() end
 end
 function selectAlternating(menuVars)
     local offsets = game.uniqueSelectedNoteOffsets()
@@ -5790,6 +5790,30 @@ function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
             separateWindow and globalVars.hotkeyList[8] or nil)
     end
 end
+function linearVibratoMenu(menuVars, settingVars, separateWindow)
+    if (menuVars.vibratoMode == 1) then
+        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End##Vibrato", " msx", 0, 0.875)
+        local func = function(t)
+            return settingVars.endMsx * t + settingVars.startMsx * (1 - t)
+        end
+        AddSeparator()
+        simpleActionMenu("Vibrate", 2, function(v)
+            svVibrato(v, func)
+        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[8] or nil)
+    else
+        SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
+        SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
+        local func1 = function(t)
+            return settingVars.lowerStart + t * (settingVars.lowerEnd - settingVars.lowerStart)
+        end
+        local func2 = function(t)
+            return settingVars.higherStart + t * (settingVars.higherEnd - settingVars.higherStart)
+        end
+        AddSeparator()
+        simpleActionMenu("Vibrate", 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
+            separateWindow and globalVars.hotkeyList[8] or nil)
+    end
+end
 VIBRATO_SVS = {
     "Linear##Vibrato",
     "Exponential##Vibrato",
@@ -5823,30 +5847,6 @@ function placeVibratoSVMenu(separateWindow)
     local labelText = currentSVType .. (menuVars.vibratoMode == 1 and "SV" or "SSF") .. "Vibrato"
     saveVariables(labelText .. "Settings", settingVars)
     saveVariables("placeVibratoMenu", menuVars)
-end
-function linearVibratoMenu(menuVars, settingVars, separateWindow)
-    if (menuVars.vibratoMode == 1) then
-        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End##Vibrato", " msx", 0, 0.875)
-        local func = function(t)
-            return settingVars.endMsx * t + settingVars.startMsx * (1 - t)
-        end
-        AddSeparator()
-        simpleActionMenu("Vibrate", 2, function(v)
-            svVibrato(v, func)
-        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[8] or nil)
-    else
-        SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
-        SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
-        local func1 = function(t)
-            return settingVars.lowerStart + t * (settingVars.lowerEnd - settingVars.lowerStart)
-        end
-        local func2 = function(t)
-            return settingVars.higherStart + t * (settingVars.higherEnd - settingVars.higherStart)
-        end
-        AddSeparator()
-        simpleActionMenu("Vibrate", 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
-            separateWindow and globalVars.hotkeyList[8] or nil)
-    end
 end
 function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
@@ -6242,6 +6242,12 @@ function flickerMenu()
     AddSeparator()
     simpleActionMenu("Add flicker SVs between selected notes", 2, flickerSVs, menuVars)
 end
+function layerSnapMenu()
+    simpleActionMenu("Layer snaps between selection", 2, layerSnaps, nil)
+    AddSeparator()
+    simpleActionMenu("Collapse snap layers", 0, collapseSnaps, nil)
+    simpleActionMenu("Clear unused snap layers", 0, clearSnappedLayers, nil)
+end
 EDIT_SV_TOOLS = {
     "Add Teleport",
     "Align Timing Lines",
@@ -6287,12 +6293,6 @@ function editSVTab()
     if toolName == "Scale (Multiply)" then scaleMultiplyMenu() end
     if toolName == "Swap Notes" then swapNotesMenu() end
     if toolName == "Vertical Shift" then verticalShiftMenu() end
-end
-function layerSnapMenu()
-    simpleActionMenu("Layer snaps between selection", 2, layerSnaps, nil)
-    AddSeparator()
-    simpleActionMenu("Collapse snap layers", 0, collapseSnaps, nil)
-    simpleActionMenu("Clear unused snap layers", 0, clearSnappedLayers, nil)
 end
 function measureMenu()
     local menuVars = getMenuVars("measure")
@@ -6387,29 +6387,6 @@ function verticalShiftMenu()
     local buttonText = "Vertically shift SVs between selected notes"
     simpleActionMenu(buttonText, 2, verticalShiftSVs, menuVars)
 end
-TAB_MENUS = {
-    "Info",
-    "Select",
-    "Create",
-    "Edit",
-    "Delete"
-}
----Creates a menu tab.
----@param tabName string
-function createMenuTab(tabName)
-    if not imgui.BeginTabItem(tabName) then return end
-    AddPadding()
-    if tabName == "Info" then
-        infoTab()
-    else
-        state.SetValue("showSettingsWindow", false)
-    end
-    if tabName == "Select" then selectTab() end
-    if tabName == "Create" then createSVTab() end
-    if tabName == "Edit" then editSVTab() end
-    if tabName == "Delete" then deleteTab() end
-    imgui.EndTabItem()
-end
 function infoTab()
     imgui.SeparatorText("Welcome to plumoguSV!")
     imgui.TextWrapped("This plugin is your one-stop shop for all of \nyour SV needs. Using it is quick and easy:")
@@ -6462,6 +6439,29 @@ function infoTab()
             "Remember that the quality of map has no correlation with the object count! Try to be optimal in your object usage.")
         state.SelectedScrollGroupId = currentTg
     end
+end
+TAB_MENUS = {
+    "Info",
+    "Select",
+    "Create",
+    "Edit",
+    "Delete"
+}
+---Creates a menu tab.
+---@param tabName string
+function createMenuTab(tabName)
+    if not imgui.BeginTabItem(tabName) then return end
+    AddPadding()
+    if tabName == "Info" then
+        infoTab()
+    else
+        state.SetValue("showSettingsWindow", false)
+    end
+    if tabName == "Select" then selectTab() end
+    if tabName == "Create" then createSVTab() end
+    if tabName == "Edit" then editSVTab() end
+    if tabName == "Delete" then deleteTab() end
+    imgui.EndTabItem()
 end
 function selectAlternatingMenu()
     local menuVars = getMenuVars("selectAlternating")
@@ -7269,6 +7269,36 @@ function chooseUpscroll()
         write(globalVars)
     end
 end
+function showKeybindSettings()
+    local awaitingIndex = state.GetValue("hotkey_awaitingIndex", 0)
+    for hotkeyIndex, hotkeyCombo in pairs(globalVars.hotkeyList) do
+        if imgui.Button(awaitingIndex == hotkeyIndex and "Listening...##listening" or hotkeyCombo .. "##" .. hotkeyIndex) then
+            if (awaitingIndex == hotkeyIndex) then
+                awaitingIndex = 0
+            else
+                awaitingIndex = hotkeyIndex
+            end
+        end
+        KeepSameLine()
+        imgui.SetCursorPosX(95)
+        imgui.Text("" .. HOTKEY_LABELS[hotkeyIndex])
+    end
+    AddSeparator()
+    simpleActionMenu("Reset Hotkey Settings", 0, function()
+        globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
+        write(globalVars)
+        awaitingIndex = 0
+    end, nil, true, true)
+    state.SetValue("hotkey_awaitingIndex", awaitingIndex)
+    if (awaitingIndex == 0) then return end
+    local prefixes, key = kb.listenForAnyKeyPressed()
+    if (key == -1) then return end
+    globalVars.hotkeyList[awaitingIndex] = table.concat(prefixes, "+") ..
+        (truthy(prefixes) and "+" or "") .. kb.numToKey(key)
+    awaitingIndex = 0
+    write(globalVars)
+    state.SetValue("hotkey_awaitingIndex", awaitingIndex)
+end
 SETTING_TYPES = {
     "General",
     "Default Properties",
@@ -7368,36 +7398,6 @@ function showPluginSettingsWindow()
     setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
     setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
     imgui.End()
-end
-function showKeybindSettings()
-    local awaitingIndex = state.GetValue("hotkey_awaitingIndex", 0)
-    for hotkeyIndex, hotkeyCombo in pairs(globalVars.hotkeyList) do
-        if imgui.Button(awaitingIndex == hotkeyIndex and "Listening...##listening" or hotkeyCombo .. "##" .. hotkeyIndex) then
-            if (awaitingIndex == hotkeyIndex) then
-                awaitingIndex = 0
-            else
-                awaitingIndex = hotkeyIndex
-            end
-        end
-        KeepSameLine()
-        imgui.SetCursorPosX(95)
-        imgui.Text("" .. HOTKEY_LABELS[hotkeyIndex])
-    end
-    AddSeparator()
-    simpleActionMenu("Reset Hotkey Settings", 0, function()
-        globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
-        write(globalVars)
-        awaitingIndex = 0
-    end, nil, true, true)
-    state.SetValue("hotkey_awaitingIndex", awaitingIndex)
-    if (awaitingIndex == 0) then return end
-    local prefixes, key = kb.listenForAnyKeyPressed()
-    if (key == -1) then return end
-    globalVars.hotkeyList[awaitingIndex] = table.concat(prefixes, "+") ..
-        (truthy(prefixes) and "+" or "") .. kb.numToKey(key)
-    awaitingIndex = 0
-    write(globalVars)
-    state.SetValue("hotkey_awaitingIndex", awaitingIndex)
 end
 function showWindowSettings()
     GlobalCheckbox("hideSVInfo", "Hide SV Info Window",
