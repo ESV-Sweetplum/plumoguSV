@@ -4,6 +4,7 @@ function selectBySnap(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
 
     local timingPoint = game.getTimingPointAt(startOffset)
     local bpm = timingPoint.Bpm

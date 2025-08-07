@@ -46,7 +46,8 @@ function showPluginSettingsWindow()
         globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
         toggleablePrint("e!", "Settings have been reset.")
     end
-    if (imgui.Button("become a bad girl >:3")) then
+    -- Crash the fucking game
+    if (imgui.Button("show me the quzz (quaver huzz)")) then
         ---@diagnostic disable-next-line: param-type-mismatch
         imgui.Text(nil)
     end

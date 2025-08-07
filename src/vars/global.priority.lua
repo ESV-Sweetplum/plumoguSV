@@ -34,6 +34,7 @@ globalVars = {
     customStyle = {},
     dontPrintCreation = false,
     equalizeLinear = false,
+    comboizeSelect = false,
     defaultProperties = { settings = {}, menu = {} },
     presets = {},
     dynamicBackgroundIndex = 1,
@@ -77,5 +78,6 @@ function setGlobalVars(tempGlobalVars)
             .border)
     end
     globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear)
+    globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
     globalVars.dynamicBackgroundIndex = math.toNumber(tempGlobalVars.dynamicBackgroundIndex)
 end

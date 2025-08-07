@@ -17,6 +17,8 @@ function showGeneralSettings()
         'Disables printing "Created __ SVs" messages.')
     GlobalCheckbox("equalizeLinear", "Equalize Linear SV",
         "Forces the standard > linear option to have an average sv of 0 if the start and end SVs are equal. For beginners, this should be enabled.")
+    GlobalCheckbox("comboizeSelect", "Select Using Already Selected Notes",
+        "Changes the behavior of the SELECT tab to select notes that are already selected, instead of all notes between the start/end selection.")
 end
 
 function chooseUpscroll()

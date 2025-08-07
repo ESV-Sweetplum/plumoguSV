@@ -4,6 +4,7 @@ function selectAlternating(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     local times = {}
     for _, ho in ipairs(notes) do
         table.insert(times, ho.StartTime)

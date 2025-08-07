@@ -1352,6 +1352,7 @@ globalVars = {
     customStyle = {},
     dontPrintCreation = false,
     equalizeLinear = false,
+    comboizeSelect = false,
     defaultProperties = { settings = {}, menu = {} },
     presets = {},
     dynamicBackgroundIndex = 1,
@@ -1393,6 +1394,7 @@ function setGlobalVars(tempGlobalVars)
             .border)
     end
     globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear)
+    globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
     globalVars.dynamicBackgroundIndex = math.toNumber(tempGlobalVars.dynamicBackgroundIndex)
 end
 DEFAULT_STARTING_MENU_VARS = {
@@ -3367,6 +3369,7 @@ function selectAlternating(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     local times = {}
     for k32 = 1, #notes do
         local ho = notes[k32]
@@ -3400,7 +3403,9 @@ function selectByChordSizes(menuVars)
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local notes = sort(game.getNotesBetweenOffsets(startOffset, endOffset), sortAscendingNoteLaneTime)
+    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
+    notes = sort(notes, sortAscendingNoteLaneTime)
     local noteTimeTable = {}
     for k34 = 1, #notes do
         local note = notes[k34]
@@ -3448,6 +3453,7 @@ function selectByNoteType(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local totalNotes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    if (globalVars.comboizeSelect) then totalNotes = state.SelectedHitObjects end
     local notesToSelect = {}
     for k37 = 1, #totalNotes do
         local note = totalNotes[k37]
@@ -3463,6 +3469,7 @@ function selectBySnap(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     local timingPoint = game.getTimingPointAt(startOffset)
     local bpm = timingPoint.Bpm
     local times = {}
@@ -7251,6 +7258,8 @@ function showGeneralSettings()
         'Disables printing "Created __ SVs" messages.')
     GlobalCheckbox("equalizeLinear", "Equalize Linear SV",
         "Forces the standard > linear option to have an average sv of 0 if the start and end SVs are equal. For beginners, this should be enabled.")
+    GlobalCheckbox("comboizeSelect", "Select Using Already Selected Notes",
+        "Changes the behavior of the SELECT tab to select notes that are already selected, instead of all notes between the start/end selection.")
 end
 function chooseUpscroll()
     local oldUpscroll = globalVars.upscroll
@@ -7301,7 +7310,7 @@ function showPluginSettingsWindow()
         globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
         toggleablePrint("e!", "Settings have been reset.")
     end
-    if (imgui.Button("become a bad girl >:3")) then
+    if (imgui.Button("show me the quzz (quaver huzz)")) then
         ---@diagnostic disable-next-line: param-type-mismatch
         imgui.Text(nil)
     end

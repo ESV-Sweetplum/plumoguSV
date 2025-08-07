@@ -4,7 +4,10 @@ function selectByChordSizes(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
 
-    local notes = sort(game.getNotesBetweenOffsets(startOffset, endOffset), sortAscendingNoteLaneTime)
+    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
+
+    notes = sort(notes, sortAscendingNoteLaneTime)
 
     local noteTimeTable = {}
 

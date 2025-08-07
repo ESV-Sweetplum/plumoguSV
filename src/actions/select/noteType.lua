@@ -5,6 +5,7 @@ function selectByNoteType(menuVars)
     local endOffset = offsets[#offsets]
 
     local totalNotes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    if (globalVars.comboizeSelect) then totalNotes = state.SelectedHitObjects end
 
     local notesToSelect = {}
 
