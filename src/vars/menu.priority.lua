@@ -129,10 +129,16 @@ DEFAULT_STARTING_MENU_VARS = {
         offset = 0
     },
     selectChordSize = {
-        single = true,
-        jump = false,
-        hand = false,
-        quad = false,
+        select1 = true,
+        select2 = false,
+        select3 = false,
+        select4 = false,
+        select5 = false,
+        select6 = false,
+        select7 = false,
+        select8 = false,
+        select9 = false,
+        select10 = false,
         laneSelector = 1
     },
     selectNoteType = {

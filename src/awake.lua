@@ -7,6 +7,7 @@ function awake()
     setPresets(tempGlobalVars.presets or {})
     initializeNoteLockMode()
     listenForHitObjectChanges()
+    keyCount = map.GetKeyCount(false)
 
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
 end

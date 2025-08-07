@@ -17,18 +17,17 @@ function selectByChordSizes(menuVars)
 
     noteTimeTable = table.dedupe(noteTimeTable)
 
-    local sizeDict = {
-        {},
-        {},
-        {},
-        {}
-    }
+    local sizeDict = {}
 
-    local allowedOrdering = {}
-
-    for n in tostring(menuVars.laneSelector):gmatch("%d") do
-        table.insert(allowedOrdering, math.toNumber(n))
+    for idx = 1, keyCount do
+        table.insert(sizeDict, {})
     end
+
+    -- local allowedOrdering = {}
+
+    -- for n in tostring(menuVars.laneSelector):gmatch("%d") do
+    --     table.insert(allowedOrdering, math.toNumber(n))
+    -- end
 
     for _, time in ipairs(noteTimeTable) do
         local size = 0
@@ -38,9 +37,9 @@ function selectByChordSizes(menuVars)
             if (math.abs(note.StartTime - time) < 3) then
                 size = size + 1
                 curLane = curLane + 1
-                if (table.contains(allowedOrdering, curLane)) then
-                    table.insert(totalNotes, note)
-                end
+                -- if (table.contains(allowedOrdering, curLane)) then
+                table.insert(totalNotes, note)
+                -- end
             end
         end
         sizeDict[size] = table.combine(sizeDict[size], totalNotes)
@@ -48,10 +47,11 @@ function selectByChordSizes(menuVars)
 
     local notesToSelect = {}
 
-    if (menuVars.single) then notesToSelect = table.combine(notesToSelect, sizeDict[1]) end
-    if (menuVars.jump) then notesToSelect = table.combine(notesToSelect, sizeDict[2]) end
-    if (menuVars.hand) then notesToSelect = table.combine(notesToSelect, sizeDict[3]) end
-    if (menuVars.quad) then notesToSelect = table.combine(notesToSelect, sizeDict[4]) end
+    for idx = 1, keyCount do
+        if (menuVars["select" .. idx]) then
+            notesToSelect = table.combine(notesToSelect, sizeDict[idx])
+        end
+    end
 
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")

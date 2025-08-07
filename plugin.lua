@@ -1528,10 +1528,16 @@ DEFAULT_STARTING_MENU_VARS = {
         offset = 0
     },
     selectChordSize = {
-        single = true,
-        jump = false,
-        hand = false,
-        quad = false,
+        select1 = true,
+        select2 = false,
+        select3 = false,
+        select4 = false,
+        select5 = false,
+        select6 = false,
+        select7 = false,
+        select8 = false,
+        select9 = false,
+        select10 = false,
         laneSelector = 1
     },
     selectNoteType = {
@@ -3412,15 +3418,9 @@ function selectByChordSizes(menuVars)
         noteTimeTable[#noteTimeTable + 1] = note.StartTime
     end
     noteTimeTable = table.dedupe(noteTimeTable)
-    local sizeDict = {
-        {},
-        {},
-        {},
-        {}
-    }
-    local allowedOrdering = {}
-    for n in tostring(menuVars.laneSelector):gmatch("%d") do
-        allowedOrdering[#allowedOrdering + 1] = math.toNumber(n)
+    local sizeDict = {}
+    for idx = 1, keyCount do
+        sizeDict[#sizeDict + 1] = {}
     end
     for k35 = 1, #noteTimeTable do
         local time = noteTimeTable[k35]
@@ -3432,18 +3432,17 @@ function selectByChordSizes(menuVars)
             if (math.abs(note.StartTime - time) < 3) then
                 size = size + 1
                 curLane = curLane + 1
-                if (table.contains(allowedOrdering, curLane)) then
-                    totalNotes[#totalNotes + 1] = note
-                end
+                totalNotes[#totalNotes + 1] = note
             end
         end
         sizeDict[size] = table.combine(sizeDict[size], totalNotes)
     end
     local notesToSelect = {}
-    if (menuVars.single) then notesToSelect = table.combine(notesToSelect, sizeDict[1]) end
-    if (menuVars.jump) then notesToSelect = table.combine(notesToSelect, sizeDict[2]) end
-    if (menuVars.hand) then notesToSelect = table.combine(notesToSelect, sizeDict[3]) end
-    if (menuVars.quad) then notesToSelect = table.combine(notesToSelect, sizeDict[4]) end
+    for idx = 1, keyCount do
+        if (menuVars["select" .. idx]) then
+            notesToSelect = table.combine(notesToSelect, sizeDict[idx])
+        end
+    end
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
@@ -6540,13 +6539,12 @@ function selectBookmarkMenu()
 end
 function selectChordSizeMenu()
     local menuVars = getMenuVars("selectChordSize")
-    _, menuVars.single = imgui.Checkbox("Select Singles", menuVars.single)
-    KeepSameLine()
-    _, menuVars.jump = imgui.Checkbox("Select Jumps", menuVars.jump)
-    _, menuVars.hand = imgui.Checkbox("Select Hands", menuVars.hand)
-    KeepSameLine()
-    _, menuVars.quad = imgui.Checkbox("Select Quads", menuVars.quad)
-    BasicInputInt(menuVars, "laneSelector", "Lane Selector")
+    for idx = 1, keyCount do
+        local varLabel = "select" .. idx
+        local label = table.concat({ table.concat({"Size ", idx, " Chord"}) })
+        _, menuVars[varLabel] = imgui.Checkbox(label, menuVars[varLabel])
+        if (idx % 2 == 1) then KeepSameLine() end
+    end
     simpleActionMenu("Select chords within region", 2, selectByChordSizes, menuVars)
     saveVariables("selectChordSizeMenu", menuVars)
 end
@@ -9243,6 +9241,7 @@ function awake()
     setPresets(tempGlobalVars.presets or {})
     initializeNoteLockMode()
     listenForHitObjectChanges()
+    keyCount = map.GetKeyCount(false)
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
 end
 function listenForHitObjectChanges()
