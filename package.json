@@ -6,6 +6,7 @@
         "test": "npm run transpile && node dist/tests",
         "transpile": "tsc && node dist/transpiler",
         "watch": "tsc && node dist/transpiler/watch",
+        "dev": "npm run watch",
         "build": "tsc && node dist/transpiler/build"
     },
     "repository": {
