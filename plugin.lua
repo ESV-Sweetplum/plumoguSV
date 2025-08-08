@@ -946,8 +946,9 @@ function toggleablePrint(type, msg)
 end
 ---Returns `true` if given a string called "true", given a number greater than 0, given a table with an element, or is given `true`. Otherwise, returns `false`.
 ---@param param any The parameter to truthify.
+---@param assumeTrue? boolean If the item is nil, will return true if this is true.
 ---@return boolean truthy The truthy value of the parameter.
-function truthy(param)
+function truthy(param, assumeTrue)
     local t = type(param)
     if t == "string" then
         return param:lower() == "true"
@@ -961,7 +962,7 @@ function truthy(param)
     if t == "boolean" then
         return param
     end
-    return false
+    return assumeTrue or false
 end
 ---Creates a new [`Vector4`](lua://Vector4) with all elements being the given number.
 ---@param n number The number to use as the entries.
@@ -1382,7 +1383,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.drawCapybara312 = truthy(tempGlobalVars.drawCapybara312)
     globalVars.ignoreNotes = truthy(tempGlobalVars.ignoreNotesOutsideTg)
     globalVars.hideSVInfo = truthy(tempGlobalVars.hideSVInfo)
-    globalVars.showSVInfoVisualizer = truthy(tempGlobalVars.showSVInfoVisualizer)
+    globalVars.showSVInfoVisualizer = truthy(tempGlobalVars.showSVInfoVisualizer, true)
     globalVars.showVibratoWidget = truthy(tempGlobalVars.showVibratoWidget)
     globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
     globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
