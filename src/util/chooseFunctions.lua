@@ -161,7 +161,7 @@ function chooseCurrentFrame(settingVars)
     if imgui.ArrowButton("##rightFrame", imgui_dir.Right) then
         settingVars.currentFrame = settingVars.currentFrame + 1
     end
-    settingVars.currentFrame = math.wrap(settingVars.currentFrame, 1, settingVars.numFrames)
+    settingVars.currentFrame = math.wrappedClamp(settingVars.currentFrame, 1, settingVars.numFrames)
     imgui.PopItemWidth()
 end
 
@@ -418,7 +418,7 @@ function chooseMenuStep(settingVars)
         settingVars.menuStep = settingVars.menuStep + 1
     end
     imgui.PopItemWidth()
-    settingVars.menuStep = math.wrap(settingVars.menuStep, 1, 3)
+    settingVars.menuStep = math.wrappedClamp(settingVars.menuStep, 1, 3)
 end
 
 function chooseNoNormalize(settingVars)
@@ -451,7 +451,7 @@ function choosePeriodShift(settingVars)
     local oldShift = settingVars.periodsShift
     local _, newShift = imgui.InputFloat("Phase Shift", oldShift, 0.25, 0.25, "%.2f")
     newShift = math.quarter(newShift)
-    newShift = math.wrap(newShift, -0.75, 1)
+    newShift = math.wrappedClamp(newShift, -0.75, 1)
     settingVars.periodsShift = newShift
     return oldShift ~= newShift
 end

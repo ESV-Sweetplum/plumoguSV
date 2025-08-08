@@ -3,7 +3,7 @@
 ---@param lowerBound number
 ---@param upperBound number
 ---@return number
-function math.wrap(number, lowerBound, upperBound)
+function math.wrappedClamp(number, lowerBound, upperBound)
     if number < lowerBound then return upperBound end
     if number > upperBound then return lowerBound end
     return number

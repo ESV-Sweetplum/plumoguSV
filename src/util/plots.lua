@@ -170,6 +170,33 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
                           stutterDuration, skipDistGraph)
     if (globalVars.hideSVInfo) then return end
     imgui.Begin(windowText, imgui_window_flags.AlwaysAutoResize)
+    if (globalVars.showSVInfoVisualizer) then
+        local ctx = imgui.GetWindowDrawList()
+        local topLeft = imgui.GetWindowPos()
+        local dim = imgui.GetWindowSize()
+
+        local simTime = 120000 / game.getTimingPointAt(state.SongTime).Bpm
+        local curTime = (state.SongTime - 50) % simTime
+        local progress = curTime / simTime
+
+        local maxDist = math.max(table.unpack(svDistances))
+        local minDist = math.min(table.unpack(svDistances))
+        local beforeIdx = math.floor((#svDistances - 1) * progress) + 1
+        local afterIdx = beforeIdx + 1
+        local beforeDist = svDistances[beforeIdx]
+        local afterDist = svDistances[math.clamp(afterIdx, 1, #svDistances)]
+
+        local subProgress = progress * (#svDistances - 1) + 1 - beforeIdx
+
+        local curDist = afterDist * subProgress + (1 - subProgress) * beforeDist - minDist
+        local heightValue = topLeft.y + dim.y - curDist * dim.y / (maxDist - minDist)
+
+        for i = 1, 4 do
+            ctx.AddRectFilled(vector.New(topLeft.x + (i - 1) * dim.x / 4 + 5, heightValue),
+                vector.New(topLeft.x + i * dim.x / 4 - 5, heightValue + 20),
+                imgui.GetColorU32(imgui_col.Header, (1 - (1 - progress) ^ 10)))
+        end
+    end
     if not skipDistGraph then
         imgui.Text("Projected Note Motion:")
         HelpMarker("Distance vs Time graph of notes")
@@ -193,6 +220,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
     else
         displaySVStats(svStats)
     end
+
     imgui.End()
 end
 

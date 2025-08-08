@@ -483,7 +483,7 @@ end
 ---@param lowerBound number
 ---@param upperBound number
 ---@return number
-function math.wrap(number, lowerBound, upperBound)
+function math.wrappedClamp(number, lowerBound, upperBound)
     if number < lowerBound then return upperBound end
     if number > upperBound then return lowerBound end
     return number
@@ -1339,6 +1339,7 @@ globalVars = {
     showPresetMenu = false,
     scrollGroupIndex = 1,
     hideSVInfo = false,
+    showSVInfoVisualizer = true,
     showVibratoWidget = false,
     showNoteDataWidget = false,
     showMeasureDataWidget = false,
@@ -1381,6 +1382,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.drawCapybara312 = truthy(tempGlobalVars.drawCapybara312)
     globalVars.ignoreNotes = truthy(tempGlobalVars.ignoreNotesOutsideTg)
     globalVars.hideSVInfo = truthy(tempGlobalVars.hideSVInfo)
+    globalVars.showSVInfoVisualizer = truthy(tempGlobalVars.showSVInfoVisualizer)
     globalVars.showVibratoWidget = truthy(tempGlobalVars.showVibratoWidget)
     globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
     globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
@@ -3534,7 +3536,7 @@ function renderReactiveSingularities()
     local vyList = state.GetValue("singularity_vyList", {})
     local axList = state.GetValue("singularity_axList", {})
     local ayList = state.GetValue("singularity_ayList", {})
-    local pulseStatus = state.GetValue("cache_pulseStatus", 0)
+    local pulseStatus = state.GetValue("cache_pulseValue", 0)
     local slowSpeedR = 89
     local slowSpeedG = 0
     local slowSpeedB = 255
@@ -4261,7 +4263,8 @@ function pulseController()
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
     imgui.PushStyleColor(imgui_col.Border, pulseColor * pulseVars.pulseStatus + borderColor * (1 - pulseVars.pulseStatus))
     saveVariables("pulseController", pulseVars)
-    state.SetValue("cache_pulseStatus", pulseVars.pulseStatus)
+    state.SetValue("cache_pulseValue", pulseVars.pulseStatus)
+    state.SetValue("cache_pulseStatus", pulseVars.pulsedThisFrame)
 end
 ---@class PhysicsObject
 ---@field pos Vector2
@@ -7400,6 +7403,10 @@ end
 function showWindowSettings()
     GlobalCheckbox("hideSVInfo", "Hide SV Info Window",
         "Disables the window that shows note distances when placing Standard, Special, or Still SVs.")
+    if (globalVars.hideSVInfo) then imgui.BeginDisabled() end
+    GlobalCheckbox("showSVInfoVisualizer", "Show SV Info Visualizer",
+        "Enables a visualizer behind the SV info window that shows the general movement of the notes.")
+    if (globalVars.hideSVInfo) then imgui.EndDisabled() end
     GlobalCheckbox("showVibratoWidget", "Separate Vibrato Into New Window",
         "For those who are used to having Vibrato as a separate plugin, this option makes a new, independent window with vibrato only.")
     AddSeparator()
@@ -7543,7 +7550,7 @@ function chooseCurrentFrame(settingVars)
     if imgui.ArrowButton("##rightFrame", imgui_dir.Right) then
         settingVars.currentFrame = settingVars.currentFrame + 1
     end
-    settingVars.currentFrame = math.wrap(settingVars.currentFrame, 1, settingVars.numFrames)
+    settingVars.currentFrame = math.wrappedClamp(settingVars.currentFrame, 1, settingVars.numFrames)
     imgui.PopItemWidth()
 end
 function chooseCursorTrail()
@@ -7767,7 +7774,7 @@ function chooseMenuStep(settingVars)
         settingVars.menuStep = settingVars.menuStep + 1
     end
     imgui.PopItemWidth()
-    settingVars.menuStep = math.wrap(settingVars.menuStep, 1, 3)
+    settingVars.menuStep = math.wrappedClamp(settingVars.menuStep, 1, 3)
 end
 function chooseNoNormalize(settingVars)
     AddPadding()
@@ -7795,7 +7802,7 @@ function choosePeriodShift(settingVars)
     local oldShift = settingVars.periodsShift
     local _, newShift = imgui.InputFloat("Phase Shift", oldShift, 0.25, 0.25, "%.2f")
     newShift = math.quarter(newShift)
-    newShift = math.wrap(newShift, -0.75, 1)
+    newShift = math.wrappedClamp(newShift, -0.75, 1)
     settingVars.periodsShift = newShift
     return oldShift ~= newShift
 end
@@ -8941,6 +8948,28 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
                           stutterDuration, skipDistGraph)
     if (globalVars.hideSVInfo) then return end
     imgui.Begin(windowText, imgui_window_flags.AlwaysAutoResize)
+    if (globalVars.showSVInfoVisualizer) then
+        local ctx = imgui.GetWindowDrawList()
+        local topLeft = imgui.GetWindowPos()
+        local dim = imgui.GetWindowSize()
+        local simTime = 120000 / game.getTimingPointAt(state.SongTime).Bpm
+        local curTime = (state.SongTime - 50) % simTime
+        local progress = curTime / simTime
+        local maxDist = math.max(table.unpack(svDistances))
+        local minDist = math.min(table.unpack(svDistances))
+        local beforeIdx = math.floor((#svDistances - 1) * progress) + 1
+        local afterIdx = beforeIdx + 1
+        local beforeDist = svDistances[beforeIdx]
+        local afterDist = svDistances[math.clamp(afterIdx, 1, #svDistances)]
+        local subProgress = progress * (#svDistances - 1) + 1 - beforeIdx
+        local curDist = afterDist * subProgress + (1 - subProgress) * beforeDist - minDist
+        local heightValue = topLeft.y + dim.y - curDist * dim.y / (maxDist - minDist)
+        for i = 1, 4 do
+            ctx.AddRectFilled(vector.New(topLeft.x + (i - 1) * dim.x / 4 + 5, heightValue),
+                vector.New(topLeft.x + i * dim.x / 4 - 5, heightValue + 20),
+                imgui.GetColorU32(imgui_col.Header, (1 - (1 - progress) ^ 10)))
+        end
+    end
     if not skipDistGraph then
         imgui.Text("Projected Note Motion:")
         HelpMarker("Distance vs Time graph of notes")

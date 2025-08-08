@@ -24,7 +24,7 @@ function renderReactiveSingularities()
     local axList = state.GetValue("singularity_axList", {})
     local ayList = state.GetValue("singularity_ayList", {})
 
-    local pulseStatus = state.GetValue("cache_pulseStatus", 0)
+    local pulseStatus = state.GetValue("cache_pulseValue", 0)
 
     local slowSpeedR = 89
     local slowSpeedG = 0

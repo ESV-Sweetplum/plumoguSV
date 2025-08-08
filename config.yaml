@@ -19,7 +19,8 @@ placeTypeIndex: 1
 editToolIndex: 1
 showPresetMenu: false
 scrollGroupIndex: 1
-hideSVInfo: true
+hideSVInfo: false
+showSVInfoVisualizer: true
 showVibratoWidget: true
 showNoteDataWidget: true
 showMeasureDataWidget: true
@@ -166,24 +167,24 @@ customStyle:
   - 0.60000002384185791
   - 1
   plotLines:
-  - 0.60784316062927246
-  - 0.60784316062927246
-  - 0.60784316062927246
+  - 1
+  - 0.43703705072402954
+  - 0.43703705072402954
   - 1
   plotLinesHovered:
   - 1
-  - 0.42745098471641541
-  - 0.3490196168422699
+  - 0.12048190832138062
+  - 0
   - 1
   plotHistogram:
-  - 0.89803922176361084
-  - 0.69803923368453979
+  - 0.27938985824584961
   - 0
+  - 0.89803922176361084
   - 1
   plotHistogramHovered:
-  - 1
-  - 0.60000002384185791
+  - 0.57777738571166992
   - 0
+  - 1
   - 1
   border:
   - 0
@@ -604,5 +605,5 @@ defaultProperties:
       snap: 1
 presets:
 - 
-dynamicBackgroundIndex: 1
+dynamicBackgroundIndex: 2
 ignoreNotes: false

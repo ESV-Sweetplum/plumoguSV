@@ -1,6 +1,10 @@
 function showWindowSettings()
     GlobalCheckbox("hideSVInfo", "Hide SV Info Window",
         "Disables the window that shows note distances when placing Standard, Special, or Still SVs.")
+    if (globalVars.hideSVInfo) then imgui.BeginDisabled() end
+    GlobalCheckbox("showSVInfoVisualizer", "Show SV Info Visualizer",
+        "Enables a visualizer behind the SV info window that shows the general movement of the notes.")
+    if (globalVars.hideSVInfo) then imgui.EndDisabled() end
     GlobalCheckbox("showVibratoWidget", "Separate Vibrato Into New Window",
         "For those who are used to having Vibrato as a separate plugin, this option makes a new, independent window with vibrato only.")
     AddSeparator()

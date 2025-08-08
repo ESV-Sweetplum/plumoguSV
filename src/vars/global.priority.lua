@@ -21,6 +21,7 @@ globalVars = {
     showPresetMenu = false,
     scrollGroupIndex = 1,
     hideSVInfo = false,
+    showSVInfoVisualizer = true,
     showVibratoWidget = false,
     showNoteDataWidget = false,
     showMeasureDataWidget = false,
@@ -65,6 +66,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.drawCapybara312 = truthy(tempGlobalVars.drawCapybara312)
     globalVars.ignoreNotes = truthy(tempGlobalVars.ignoreNotesOutsideTg)
     globalVars.hideSVInfo = truthy(tempGlobalVars.hideSVInfo)
+    globalVars.showSVInfoVisualizer = truthy(tempGlobalVars.showSVInfoVisualizer)
     globalVars.showVibratoWidget = truthy(tempGlobalVars.showVibratoWidget)
     globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
     globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
