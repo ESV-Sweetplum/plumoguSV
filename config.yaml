@@ -17,7 +17,7 @@ drawCapybara312: false
 selectTypeIndex: 1
 placeTypeIndex: 1
 editToolIndex: 1
-showPresetMenu: true
+showPresetMenu: false
 scrollGroupIndex: 1
 hideSVInfo: true
 showVibratoWidget: true
@@ -28,8 +28,8 @@ advancedMode: true
 hideAutomatic: true
 pulseCoefficient: 1
 pulseColor:
-- 1
-- 1
+- 0.39215686917304993
+- 0
 - 1
 - 1
 useCustomPulseColor: true
@@ -202,6 +202,7 @@ customStyle:
   - 1
 dontPrintCreation: false
 equalizeLinear: true
+comboizeSelect: true
 defaultProperties:
   settings:
     linearVibratoSV:
@@ -585,10 +586,16 @@ defaultProperties:
       every: 1
       offset: 0
     selectChordSize:
-      single: true
-      jump: false
-      hand: false
-      quad: false
+      select1: true
+      select2: false
+      select3: false
+      select4: false
+      select5: false
+      select6: false
+      select7: false
+      select8: false
+      select9: false
+      select10: false
       laneSelector: 1
     selectNoteType:
       rice: true
