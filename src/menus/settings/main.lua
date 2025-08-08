@@ -43,7 +43,6 @@ function showPluginSettingsWindow()
     if (imgui.Button("Reset Settings")) then
         write({})
         globalVars = DEFAULT_GLOBAL_VARS
-        globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
         toggleablePrint("e!", "Settings have been reset.")
     end
     -- Crash the fucking game

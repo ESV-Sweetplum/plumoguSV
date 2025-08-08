@@ -1321,7 +1321,7 @@ globalVars = {
     stepSize = 5,
     dontReplaceSV = false,
     upscroll = false,
-    colorThemeIndex = 9,
+    colorThemeIndex = 1,
     styleThemeIndex = 1,
     effectFPS = 90,
     cursorTrailIndex = 1,
@@ -1348,9 +1348,9 @@ globalVars = {
     advancedMode = false,
     hideAutomatic = false,
     pulseCoefficient = 0,
-    pulseColor = {},
+    pulseColor = { 0, 0, 0, 0 },
     useCustomPulseColor = false,
-    hotkeyList = {},
+    hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST),
     customStyle = {},
     dontPrintCreation = false,
     equalizeLinear = false,
@@ -1360,7 +1360,6 @@ globalVars = {
     dynamicBackgroundIndex = 1,
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
-globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
 function setGlobalVars(tempGlobalVars)
     globalVars.useCustomPulseColor = truthy(tempGlobalVars.useCustomPulseColor)
     globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
@@ -4310,7 +4309,7 @@ function setPluginAppearanceStyles(styleTheme)
 end
 function setPluginAppearanceColors(colorTheme)
     local borderColor = vector4(1)
-    if colorTheme == "Classic" then borderColor = setClassicColors() end
+    if colorTheme == "Classic" or not colorTheme then borderColor = setClassicColors() end
     if colorTheme == "Strawberry" then borderColor = setStrawberryColors() end
     if colorTheme == "Amethyst" then borderColor = setAmethystColors() end
     if colorTheme == "Tree" then borderColor = setTreeColors() end
@@ -7339,7 +7338,6 @@ function showPluginSettingsWindow()
     if (imgui.Button("Reset Settings")) then
         write({})
         globalVars = DEFAULT_GLOBAL_VARS
-        globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
         toggleablePrint("e!", "Settings have been reset.")
     end
     if (imgui.Button("show me the quzz (quaver huzz)")) then
@@ -9265,10 +9263,14 @@ function sinusoidalSettingsMenu(settingVars, skipFinalSV)
 end
 function awake()
     local tempGlobalVars = read()
-    if (not tempGlobalVars) then tempGlobalVars = {} end
-    setGlobalVars(tempGlobalVars)
-    loadDefaultProperties(tempGlobalVars.defaultProperties)
-    setPresets(tempGlobalVars.presets or {})
+    if (not tempGlobalVars) then
+        write(globalVars)
+        setPresets({})
+    else
+        setGlobalVars(tempGlobalVars)
+        loadDefaultProperties(tempGlobalVars.defaultProperties)
+        setPresets(tempGlobalVars.presets or {})
+    end
     initializeNoteLockMode()
     listenForHitObjectChanges()
     keyCount = map.GetKeyCount(false)

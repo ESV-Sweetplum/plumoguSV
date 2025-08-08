@@ -2,7 +2,7 @@ globalVars = {
     stepSize = 5,
     dontReplaceSV = false,
     upscroll = false,
-    colorThemeIndex = 9,
+    colorThemeIndex = 1,
     styleThemeIndex = 1,
     effectFPS = 90,
     cursorTrailIndex = 1,
@@ -29,9 +29,9 @@ globalVars = {
     advancedMode = false,
     hideAutomatic = false,
     pulseCoefficient = 0,
-    pulseColor = {},
+    pulseColor = { 0, 0, 0, 0 },
     useCustomPulseColor = false,
-    hotkeyList = {},
+    hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST),
     customStyle = {},
     dontPrintCreation = false,
     equalizeLinear = false,
@@ -42,7 +42,6 @@ globalVars = {
 }
 
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
-globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
 
 function setGlobalVars(tempGlobalVars)
     globalVars.useCustomPulseColor = truthy(tempGlobalVars.useCustomPulseColor)

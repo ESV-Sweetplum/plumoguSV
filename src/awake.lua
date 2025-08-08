@@ -1,10 +1,15 @@
 function awake()
     local tempGlobalVars = read()
-    if (not tempGlobalVars) then tempGlobalVars = {} end
 
-    setGlobalVars(tempGlobalVars)
-    loadDefaultProperties(tempGlobalVars.defaultProperties)
-    setPresets(tempGlobalVars.presets or {})
+    if (not tempGlobalVars) then
+        write(globalVars) -- First time launching plugin
+        setPresets({})
+    else
+        setGlobalVars(tempGlobalVars)
+        loadDefaultProperties(tempGlobalVars.defaultProperties)
+        setPresets(tempGlobalVars.presets or {})
+    end
+
     initializeNoteLockMode()
     listenForHitObjectChanges()
     keyCount = map.GetKeyCount(false)

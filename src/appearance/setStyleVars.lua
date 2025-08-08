@@ -43,7 +43,7 @@ end
 function setPluginAppearanceColors(colorTheme)
     local borderColor = vector4(1)
 
-    if colorTheme == "Classic" then borderColor = setClassicColors() end
+    if colorTheme == "Classic" or not colorTheme then borderColor = setClassicColors() end
     if colorTheme == "Strawberry" then borderColor = setStrawberryColors() end
     if colorTheme == "Amethyst" then borderColor = setAmethystColors() end
     if colorTheme == "Tree" then borderColor = setTreeColors() end
