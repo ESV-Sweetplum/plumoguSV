@@ -8954,7 +8954,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
         local topLeft = imgui.GetWindowPos()
         local dim = imgui.GetWindowSize()
         local simTime = 120000 / game.getTimingPointAt(state.SongTime).Bpm
-        local curTime = (state.SongTime - 50) % simTime
+        local curTime = (state.UnixTime) % simTime
         local progress = curTime / simTime
         local maxDist = math.max(table.unpack(svDistances))
         local minDist = math.min(table.unpack(svDistances))
