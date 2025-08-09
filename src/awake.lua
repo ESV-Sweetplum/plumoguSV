@@ -17,6 +17,10 @@ function awake()
     keyCount = map.GetKeyCount(false)
 
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
+
+    if (not state.CurrentTimingPoint) then
+        print("e!", "Please place a timing point before attempting to use plumoguSV.")
+    end
 end
 
 function listenForHitObjectChanges()

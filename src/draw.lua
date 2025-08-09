@@ -1,4 +1,6 @@
 function draw()
+    if (not state.CurrentTimingPoint) then return end
+
     state.SetValue("ComputableInputFloatIndex", 1)
     state.SetValue("StatedInputTextIndex", 1)
     state.IsWindowHovered = imgui.IsWindowHovered()
@@ -36,8 +38,6 @@ function draw()
     end
 
     imgui.End()
-
-    imgui.ShowDemoWindow()
 
     pulseController()
     checkForGlobalHotkeys()

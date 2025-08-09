@@ -1,11 +1,11 @@
-import transpiler from ".";
-import * as chokidar from "chokidar";
-import * as chalk from "chalk";
-import { performance } from "perf_hooks";
+import transpiler from '.';
+import * as chokidar from 'chokidar';
+import * as chalk from 'chalk';
+import { performance } from 'perf_hooks';
 
 console.log(
     chalk.blueBright(
-        chalk.bold("Watcher initialized. Make a change to a file to transpile.")
+        chalk.bold('Watcher initialized. Make a change to a file to transpile.')
     )
 );
 
@@ -19,8 +19,8 @@ const debounce = (fn: Function, ms = 300) => {
     };
 };
 
-chokidar.watch(["src", "packages"], { ignoreInitial: true }).on(
-    "all",
+chokidar.watch(['src', 'packages'], { ignoreInitial: true }).on(
+    'all',
     debounce(
         (event: keyof chokidar.FSWatcherEventMap, path: string) =>
             main(event, path),
@@ -36,9 +36,8 @@ async function main(event, path) {
         )}. Now retranspiling...`
     );
 
-    const devMode = path.includes("src\\dev\\unlock");
-    const fuckify = path.includes("fuckify");
-    const fileCount = await transpiler(devMode, fuckify, true);
+    const devMode = path.includes('src\\dev\\unlock');
+    const fileCount = await transpiler(devMode, true);
     const endTime = performance.now();
     console.log(
         `Successfully transpiled ${chalk.green(

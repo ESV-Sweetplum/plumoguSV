@@ -7,7 +7,6 @@ import {
     copyFileSync,
 } from 'fs';
 import { getFilesRecursively } from './getFilesRecursively.js';
-import fuckifyOutput from './fuckify.js';
 import getFunctionList from './getFunctionList.js';
 import getUnusedFunctions from './getUnusedFunctions.js';
 import { join } from 'path';
@@ -19,11 +18,7 @@ export function getCounterAndIncrement() {
     return counter;
 }
 
-export default async function transpiler(
-    devMode = false,
-    fuckify = false,
-    lint = true
-) {
+export default async function transpiler(devMode = false, lint = true) {
     counter = 0;
     let fileCount = 0;
     let output = '';
@@ -113,8 +108,6 @@ export default async function transpiler(
                 .join('')}`
         );
     } // Remove integer exponentiation and replace with repeated multiplication
-
-    if (fuckify) output = fuckifyOutput(output);
 
     output = output.replaceAll('\n\n', '\n').trimStart();
     if (lint) {
