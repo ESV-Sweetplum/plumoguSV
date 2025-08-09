@@ -6989,13 +6989,12 @@ function showDefaultPropertiesSettings()
     end
     if (imgui.CollapsingHeader("Select Chord Size Settings")) then
         local menuVars = getMenuVars("selectChordSize", "Property")
-        _, menuVars.single = imgui.Checkbox("Select Singles", menuVars.single)
-        KeepSameLine()
-        _, menuVars.jump = imgui.Checkbox("Select Jumps", menuVars.jump)
-        _, menuVars.hand = imgui.Checkbox("Select Hands", menuVars.hand)
-        KeepSameLine()
-        _, menuVars.quad = imgui.Checkbox("Select Quads", menuVars.quad)
-        menuVars.laneSelector = BasicInputInt(menuVars, "laneSelector", "Lane Selector")
+        for idx = 1, keyCount do
+            local varLabel = "select" .. idx
+            local label = table.concat({ table.concat({"Size ", idx, " Chord"}) })
+            _, menuVars[varLabel] = imgui.Checkbox(label, menuVars[varLabel])
+            if (idx % 2 == 1) then KeepSameLine() end
+        end
         saveMenuPropertiesButton(menuVars, "selectChordSize")
         saveVariables("selectChordSizePropertyMenu", menuVars)
     end
@@ -7343,29 +7342,7 @@ function showPluginSettingsWindow()
         globalVars = DEFAULT_GLOBAL_VARS
         toggleablePrint("e!", "Settings have been reset.")
     end
-    if (imgui.Button("show me the quzz (quaver huzz)")) then
-        ---@diagnostic disable-next-line: param-type-mismatch
-        imgui.Text(nil)
-    end
-    local text = state.GetValue("crazy", "Crazy?")
-    local full =
-    " I was crazy once. They put me in a map. A ranked map. A ranked map with no SV. And no SV makes me crazy. Crazy?"
-    if (imgui.Button(text)) then
-        state.SetValue("activateCrazy", true)
-    end
-    if (state.GetValue("activateCrazy")) then
-        imgui.TextWrapped(text)
-        if (clock.listen("crazy", 10 * math.exp(- #text / 100))) then
-            local curIdx = state.GetValue("crazyIdx", 1)
-            if (curIdx > #full) then curIdx = curIdx - #full end
-            text = text .. full:charAt(curIdx)
-            state.SetValue("crazyIdx", curIdx + 1)
-            state.SetValue("crazy", text)
-        end
-        if (imgui.GetScrollMaxY() > imgui.GetScrollY()) then
-            imgui.SetScrollHereY(1)
-        end
-    end
+    if (globalVars.advancedMode) then renderMemeButtons() end
     imgui.EndChild()
     imgui.NextColumn()
     imgui.BeginChild(69)
@@ -7401,6 +7378,31 @@ function showPluginSettingsWindow()
     setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
     setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
     imgui.End()
+end
+function renderMemeButtons()
+    if (imgui.Button("show me the quzz (quaver huzz)")) then
+        ---@diagnostic disable-next-line: param-type-mismatch
+        imgui.Text(nil)
+    end
+    local text = state.GetValue("crazy", "Crazy?")
+    local full =
+    " I was crazy once. They put me in a map. A ranked map. A ranked map with no SV. And no SV makes me crazy. Crazy?"
+    if (imgui.Button(text)) then
+        state.SetValue("activateCrazy", true)
+    end
+    if (state.GetValue("activateCrazy")) then
+        imgui.TextWrapped(text)
+        if (clock.listen("crazy", 10 * math.exp(- #text / 100))) then
+            local curIdx = state.GetValue("crazyIdx", 1)
+            if (curIdx > #full) then curIdx = curIdx - #full end
+            text = text .. full:charAt(curIdx)
+            state.SetValue("crazyIdx", curIdx + 1)
+            state.SetValue("crazy", text)
+        end
+        if (imgui.GetScrollMaxY() > imgui.GetScrollY()) then
+            imgui.SetScrollHereY(1)
+        end
+    end
 end
 function showWindowSettings()
     GlobalCheckbox("hideSVInfo", "Hide SV Info Window",
