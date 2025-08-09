@@ -1234,7 +1234,7 @@ DEFAULT_STYLE = {
 }
 DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Shift+Alt+L" }
 HOTKEY_LABELS = { "Execute Primary Action", "Execute Secondary Action", "Swap Primary Inputs",
-    "Negate Primary Inputs", "Reset Secondary Input", "Go To Previous Scroll Group", "Go To Next Scroll Group",
+    "Negate Primary Inputs", "Reset Secondary Input", "Go To Prev. Scroll Group", "Go To Next Scroll Group",
     "Execute Vibrato Separately", "Use TG of Selected Note", "Toggle Note Lock Mode" }
 function createSVGraphStats()
     local svGraphStats = {
@@ -6407,7 +6407,7 @@ function infoTab()
     imgui.BulletText("ESV members for constant support.")
     AddPadding()
     AddPadding()
-    if (imgui.Button("Click Here To Edit Settings", ACTION_BUTTON_SIZE)) then
+    if (imgui.Button("Click Here to Edit Settings", ACTION_BUTTON_SIZE)) then
         state.SetValue("showSettingsWindow", true)
         local windowDim = state.WindowSize
         local pluginDim = imgui.GetWindowSize()
@@ -6419,7 +6419,7 @@ function infoTab()
     if (state.GetValue("showSettingsWindow")) then
         showPluginSettingsWindow()
     end
-    if (imgui.Button("Click Here To Get Map Stats", ACTION_BUTTON_SIZE)) then
+    if (imgui.Button("Click Here to Get Map Stats", ACTION_BUTTON_SIZE)) then
         local currentTg = state.SelectedScrollGroupId
         local tgList = map.GetTimingGroupIds()
         local svSum = 0
@@ -6440,6 +6440,9 @@ function infoTab()
         print("w!",
             "Remember that the quality of map has no correlation with the object count! Try to be optimal in your object usage.")
         state.SelectedScrollGroupId = currentTg
+    end
+    if (imgui.Button("Click Here to View Various Tutorials", ACTION_BUTTON_SIZE)) then
+        state.SetValue("showTutorialWindow", true)
     end
 end
 TAB_MENUS = {
@@ -7281,7 +7284,7 @@ function showKeybindSettings()
             end
         end
         KeepSameLine()
-        imgui.SetCursorPosX(95)
+        imgui.SetCursorPosX(111)
         imgui.Text("" .. HOTKEY_LABELS[hotkeyIndex])
     end
     AddSeparator()
@@ -9265,6 +9268,8 @@ function awake()
     local tempGlobalVars = read()
     if (not tempGlobalVars) then
         write(globalVars)
+        print("w!",
+            'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "Click Here to View Various Tutorials".')
         setPresets({})
     else
         setGlobalVars(tempGlobalVars)

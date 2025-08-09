@@ -3,6 +3,8 @@ function awake()
 
     if (not tempGlobalVars) then
         write(globalVars) -- First time launching plugin
+        print("w!",
+            'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "Click Here to View Various Tutorials".')
         setPresets({})
     else
         setGlobalVars(tempGlobalVars)

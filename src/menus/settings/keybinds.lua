@@ -9,7 +9,7 @@ function showKeybindSettings()
             end
         end
         KeepSameLine()
-        imgui.SetCursorPosX(95)
+        imgui.SetCursorPosX(111)
         imgui.Text("" .. HOTKEY_LABELS[hotkeyIndex])
     end
     AddSeparator()
