@@ -34,7 +34,7 @@ globalVars = {
     hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST),
     customStyle = {},
     dontPrintCreation = false,
-    equalizeLinear = false,
+    equalizeLinear = true,
     comboizeSelect = false,
     defaultProperties = { settings = {}, menu = {} },
     presets = {},
@@ -78,7 +78,7 @@ function setGlobalVars(tempGlobalVars)
         globalVars.customStyle.border = table.vectorize4(globalVars.customStyle
             .border)
     end
-    globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear)
+    globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
     globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
     globalVars.dynamicBackgroundIndex = math.toNumber(tempGlobalVars.dynamicBackgroundIndex)
 end

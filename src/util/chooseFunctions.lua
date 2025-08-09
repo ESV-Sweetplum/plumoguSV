@@ -669,7 +669,7 @@ function chooseSVBehavior(settingVars)
     settingVars.behaviorIndex = Combo("Behavior", SV_BEHAVIORS, oldBehaviorIndex)
     imgui.PopItemWidth()
     if (swapButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[3])) then
-        settingVars.behaviorIndex = oldBehaviorIndex == 1 and 2 or 1
+        settingVars.behaviorIndex = tn(oldBehaviorIndex == 1) + 1
     end
     return oldBehaviorIndex ~= settingVars.behaviorIndex
 end

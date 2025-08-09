@@ -11,7 +11,7 @@ function table.parse(str)
     local tbl = {}
     local terms = {}
     while true do
-        local nestedTableFactor = table.contains({ "[", "{" }, str:charAt(2)) and 1 or 0
+        local nestedTableFactor = tn(table.contains({ "[", "{" }, str:charAt(2)))
         local depth = nestedTableFactor
         local searchIdx = 2 + nestedTableFactor
         local inQuotes = false

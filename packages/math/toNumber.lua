@@ -8,3 +8,5 @@ function math.toNumber(x)
     if (not result or type(result) ~= "number") then return 0 end
     return result
 end
+
+tn = math.toNumber

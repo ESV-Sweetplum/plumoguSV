@@ -16,7 +16,7 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     end
     FunctionButton(buttonText, ACTION_BUTTON_SIZE, actionfunc, menuVars)
     if (disableKeyInput) then return end
-    local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + math.toNumber(hideNoteReq)]
+    local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + tn(hideNoteReq)]
     local tooltip = ToolTip("Press \'" .. keyCombo ..
         "\' on your keyboard to do the same thing as this button")
     executeFunctionIfTrue(kb.pressedKeyCombo(keyCombo), actionfunc, menuVars)

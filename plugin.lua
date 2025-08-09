@@ -31,7 +31,7 @@ function game.getNoteOffsetAt(offset, forward)
     if (not truthy(#startTimes)) then return -1 end
     if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
     if (state.SongTime < startTimes[1]) then return startTimes[1] end
-    local startTime = table.searchClosest(startTimes, offset, forward and 2 or 1)
+    local startTime = table.searchClosest(startTimes, offset, tn(forward) + 1)
     return startTime
 end
 local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
@@ -478,6 +478,7 @@ function math.toNumber(x)
     if (not result or type(result) ~= "number") then return 0 end
     return result
 end
+tn = math.toNumber
 ---Restricts a number to be within a closed ring.
 ---@param number number
 ---@param lowerBound number
@@ -717,7 +718,7 @@ function table.parse(str)
     local tbl = {}
     local terms = {}
     while true do
-        local nestedTableFactor = table.contains({ "[", "{" }, str:charAt(2)) and 1 or 0
+        local nestedTableFactor = tn(table.contains({ "[", "{" }, str:charAt(2)))
         local depth = nestedTableFactor
         local searchIdx = 2 + nestedTableFactor
         local inQuotes = false
@@ -1353,7 +1354,7 @@ globalVars = {
     hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST),
     customStyle = {},
     dontPrintCreation = false,
-    equalizeLinear = false,
+    equalizeLinear = true,
     comboizeSelect = false,
     defaultProperties = { settings = {}, menu = {} },
     presets = {},
@@ -1395,7 +1396,7 @@ function setGlobalVars(tempGlobalVars)
         globalVars.customStyle.border = table.vectorize4(globalVars.customStyle
             .border)
     end
-    globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear)
+    globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
     globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
     globalVars.dynamicBackgroundIndex = math.toNumber(tempGlobalVars.dynamicBackgroundIndex)
 end
@@ -4315,8 +4316,8 @@ end
 function setPluginAppearanceStyles(styleTheme)
     local cornerRoundnessValue = (styleTheme == "Boxed" or
         styleTheme == "Boxed + Border") and 0 or 5
-    local borderSize = (styleTheme == "Rounded + Border" or
-        styleTheme == "Boxed + Border") and 1 or 0
+    local borderSize = tn(styleTheme == "Rounded + Border" or
+        styleTheme == "Boxed + Border")
     imgui.PushStyleVar(imgui_style_var.FrameBorderSize, borderSize)
     imgui.PushStyleVar(imgui_style_var.WindowPadding, vector.New(PADDING_WIDTH, 8))
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
@@ -5225,7 +5226,7 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     end
     FunctionButton(buttonText, ACTION_BUTTON_SIZE, actionfunc, menuVars)
     if (disableKeyInput) then return end
-    local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + math.toNumber(hideNoteReq)]
+    local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + tn(hideNoteReq)]
     local tooltip = ToolTip("Press \'" .. keyCombo ..
         "\' on your keyboard to do the same thing as this button")
     executeFunctionIfTrue(kb.pressedKeyCombo(keyCombo), actionfunc, menuVars)
@@ -8004,7 +8005,7 @@ function chooseSVBehavior(settingVars)
     settingVars.behaviorIndex = Combo("Behavior", SV_BEHAVIORS, oldBehaviorIndex)
     imgui.PopItemWidth()
     if (swapButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[3])) then
-        settingVars.behaviorIndex = oldBehaviorIndex == 1 and 2 or 1
+        settingVars.behaviorIndex = tn(oldBehaviorIndex == 1) + 1
     end
     return oldBehaviorIndex ~= settingVars.behaviorIndex
 end
