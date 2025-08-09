@@ -26,6 +26,6 @@ function chooseUpscroll()
     globalVars.upscroll = RadioButtons("Scroll Direction:", globalVars.upscroll, { "Down", "Up" }, { false, true },
         "Orientation for distance graphs and visuals")
     if (oldUpscroll ~= globalVars.upscroll) then
-        -- write(globalVars)
+        write(globalVars)
     end
 end

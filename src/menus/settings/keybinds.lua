@@ -15,7 +15,7 @@ function showKeybindSettings()
     AddSeparator()
     simpleActionMenu("Reset Hotkey Settings", 0, function()
         globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
-        -- write(globalVars)
+        write(globalVars)
         awaitingIndex = 0
     end, nil, true, true)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
@@ -25,6 +25,6 @@ function showKeybindSettings()
     globalVars.hotkeyList[awaitingIndex] = table.concat(prefixes, "+") ..
         (truthy(prefixes) and "+" or "") .. kb.numToKey(key)
     awaitingIndex = 0
-    -- write(globalVars)
+    write(globalVars)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
 end

@@ -119,7 +119,7 @@ function showCustomThemeSettings()
         ::skip::
     end
     if (settingsChanged) then
-        -- write(globalVars)
+        write(globalVars)
     end
 end
 

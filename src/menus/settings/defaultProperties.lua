@@ -7,7 +7,7 @@ function saveSettingPropertiesButton(settingVars, label)
     if (not globalVars.defaultProperties.settings) then globalVars.defaultProperties.settings = {} end
     globalVars.defaultProperties.settings[label] = settingVars
     loadDefaultProperties(globalVars.defaultProperties)
-    -- write(globalVars)
+    write(globalVars)
 
     print("i!",
         "Default setting properties for " .. label .. " have been set. Changes will be shown on the next plugin refresh.")
@@ -22,7 +22,7 @@ function saveMenuPropertiesButton(menuVars, label)
     if (not globalVars.defaultProperties.menu) then globalVars.defaultProperties.menu = {} end
     globalVars.defaultProperties.menu[label] = menuVars
     loadDefaultProperties(globalVars.defaultProperties)
-    -- write(globalVars)
+    write(globalVars)
 
     print("i!",
         "Default menu properties for " .. label .. " have been set. Changes will be shown on the next plugin refresh.")

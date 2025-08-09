@@ -5006,6 +5006,35 @@ function getCurrentRGBColors(rgbPeriod)
     end
     return { red = red, green = green, blue = blue }
 end
+function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOverride, windowScale)
+    if (not forcedOverride) then
+        imgui.Dummy(vector.New(0, 10))
+        imgui.SetCursorPosX((380 - 270 * szFactor.x) / 2)
+    end
+    imgui.BeginChild(label, vector.New(270, 150) * szFactor, imgui_child_flags.Border)
+    local heightFactor = szFactor.y
+    local simulationTime = state.UnixTime % simulationDuration
+    local progress = simulationTime / simulationDuration
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    for i = 1, #colTbl do
+        for _, col in ipairs(colTbl[i]) do
+            local height = 50 * (#colTbl * distanceFn(math.wrap(progress + 0.25, 0, 1)) + #colTbl - i)
+            if (height > 150) then
+                height = height - 50 * #colTbl
+            end
+            local notePos = vector.New((col - 1) * 60 + 20, height) * szFactor
+            local noteSize = vector.New(50, 20) * szFactor
+            ctx.AddRectFilledMultiColor(topLeft + notePos, topLeft + notePos + noteSize, rgbaToUint(255, 0, 0, 100),
+                rgbaToUint(255, 0, 0, 100), rgbaToUint(255, 0, 200, 255), rgbaToUint(255, 0, 200, 255))
+        end
+    end
+    imgui.EndChild()
+    if (not forcedOverride) then
+        imgui.Dummy(vector.New(0, 10))
+    end
+end
 ---Creates an imgui button.
 ---@param text string The text that the button should have.
 ---@param size Vector2 The size of the button.
@@ -5049,6 +5078,7 @@ function GlobalCheckbox(parameterName, label, tooltipText)
     _, globalVars[parameterName] = imgui.Checkbox(label, oldValue)
     if (tooltipText) then ToolTip(tooltipText) end
     if (oldValue ~= globalVars[parameterName]) then
+        write(globalVars)
     end
 end
 ---Creates an input designed specifically for code.
@@ -5370,6 +5400,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             preset.menu = VIBRATO_SVS[menuVars.svTypeIndex]
         end
         table.insert(globalVars.presets, preset)
+        write(globalVars)
     end
     state.SetValue("newPresetName", newPresetName)
     AddSeparator()
@@ -5385,6 +5416,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     if (imgui.Button("Import##CustomPreset")) then
         table.insert(globalVars.presets, table.parse(importCustomPreset))
         importCustomPreset = ""
+        write(globalVars)
     end
     AddSeparator()
     imgui.Columns(3)
@@ -5417,6 +5449,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         KeepSameLine()
         if (imgui.Button("X##Preset" .. idx)) then
             table.remove(globalVars.presets, idx)
+            write(globalVars)
         end
     end
     imgui.SetColumnWidth(0, 90)
@@ -6645,6 +6678,7 @@ function showAppearanceSettings()
     local oldDynamicBgIndex = globalVars.dynamicBackgroundIndex
     globalVars.dynamicBackgroundIndex = Combo("Dynamic BG", DYNAMIC_BACKGROUND_TYPES, oldDynamicBgIndex)
     if (oldDynamicBgIndex ~= globalVars.dynamicBackgroundIndex) then
+        write(globalVars)
     end
 end
 local customStyleIds = {
@@ -6760,6 +6794,7 @@ function showCustomThemeSettings()
         ::skip::
     end
     if (settingsChanged) then
+        write(globalVars)
     end
 end
 function convertStrToShort(str)
@@ -6837,6 +6872,7 @@ function saveSettingPropertiesButton(settingVars, label)
     if (not globalVars.defaultProperties.settings) then globalVars.defaultProperties.settings = {} end
     globalVars.defaultProperties.settings[label] = settingVars
     loadDefaultProperties(globalVars.defaultProperties)
+    write(globalVars)
     print("i!",
         table.concat({"Default setting properties for ", label, " have been set. Changes will be shown on the next plugin refresh."}))
 end
@@ -6849,6 +6885,7 @@ function saveMenuPropertiesButton(menuVars, label)
     if (not globalVars.defaultProperties.menu) then globalVars.defaultProperties.menu = {} end
     globalVars.defaultProperties.menu[label] = menuVars
     loadDefaultProperties(globalVars.defaultProperties)
+    write(globalVars)
     print("i!",
         table.concat({"Default menu properties for ", label, " have been set. Changes will be shown on the next plugin refresh."}))
 end
@@ -7286,6 +7323,7 @@ function chooseUpscroll()
     globalVars.upscroll = RadioButtons("Scroll Direction:", globalVars.upscroll, { "Down", "Up" }, { false, true },
         "Orientation for distance graphs and visuals")
     if (oldUpscroll ~= globalVars.upscroll) then
+        write(globalVars)
     end
 end
 function showKeybindSettings()
@@ -7305,6 +7343,7 @@ function showKeybindSettings()
     AddSeparator()
     simpleActionMenu("Reset Hotkey Settings", 0, function()
         globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
+        write(globalVars)
         awaitingIndex = 0
     end, nil, true, true)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
@@ -7314,6 +7353,7 @@ function showKeybindSettings()
     globalVars.hotkeyList[awaitingIndex] = table.concat(prefixes, "+") ..
         (truthy(prefixes) and "+" or "") .. kb.numToKey(key)
     awaitingIndex = 0
+    write(globalVars)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
 end
 SETTING_TYPES = {
@@ -7442,14 +7482,18 @@ function renderTutorialMenu()
     end
     local navigatorWidth = 200
     imgui.Columns(2)
-    imgui.SetColumnWidth(0, navigatorWidth)
-    imgui.SetColumnWidth(1, 600 - navigatorWidth)
+    imgui.SetColumnWidth(0, 200)
+    imgui.SetColumnWidth(1, 400)
     imgui.BeginChild("Tutorial Navigator")
     imgui.SeparatorText("For Beginners")
     if (imgui.TreeNode("Placing SVs")) then
-        imgui.Selectable("Your First Effect")
-        if (imgui.IsItemClicked()) then
-            tutorialWindowName = "Your First Effect"
+        local tabs = { "Your First Effect", "Your Second Effect", "Working With Shapes", "Composite Effects",
+            "Stills and Displacement" }
+        for _, t in pairs(tabs) do
+            imgui.Selectable(t)
+            if (imgui.IsItemClicked()) then
+                tutorialWindowName = t
+            end
         end
         imgui.TreePop()
     end
@@ -7467,89 +7511,204 @@ function renderTutorialMenu()
     end
     imgui.EndChild()
     imgui.NextColumn()
-    imgui.BeginChild("Tutorial Data", vector.New(600 - navigatorWidth - 20, 500), imgui_child_flags
+    imgui.BeginChild("Tutorial Data", vector.New(380, 500), imgui_child_flags
         .AlwaysUseWindowPadding)
-    local importantColor = vector.New(1, 0.5, 0.5, 1)
     function ForceHeight(h)
         imgui.SetCursorPosY(h)
         imgui.TextColored(vector4(0), "penis")
     end
-    if (tutorialWindowName == "Your First Effect") then
-        imgui.SeparatorText("Making your first SV effect")
-        imgui.TextWrapped(
-            "At the absolute basics of SV are the pulse effects, effects that highlight significant parts of the song, such as a repeating drum. We will apply a very basic stutter SV effect on the drum beat (assuming your song has that), like so:")
-        imgui.Dummy(vector.New(0, 10))
-        imgui.SetCursorPosX(55)
-        imgui.BeginChild("Your First Effect Stutter Example", vector.New(270, 150), imgui_child_flags.Border)
-        function distanceFn(t)
-            if (t < 0.05) then
-                return 800 * t
-            elseif (t < 0.25) then
-                return 50 * t + 38
-            else
-                return 200 * t
-            end
-        end
-        local simulationDuration = 500
-        local simulationTime = state.UnixTime % simulationDuration
-        local progress = simulationTime / simulationDuration
-        local ctx = imgui.GetWindowDrawList()
-        local topLeft = imgui.GetWindowPos()
-        local dim = imgui.GetWindowSize()
-        local colTbl = { { 1, 2 }, { 3 }, { 4 }, { 3 } }
-        for i = 1, 4 do
-            for _, col in ipairs(colTbl[i]) do
-                local height = distanceFn(math.wrap(progress + 0.25, 0, 1)) + 200 - i * 50
-                if (height > 150) then
-                    height = height - 200
-                end
-                local notePos = vector.New((col - 1) * 60 + 20, height)
-                local noteSize = vector.New(50, 20)
-                ctx.AddRectFilledMultiColor(topLeft + notePos, topLeft + notePos + noteSize, rgbaToUint(255, 0, 0, 100),
-                    rgbaToUint(255, 0, 0, 100), rgbaToUint(255, 0, 200, 255), rgbaToUint(255, 0, 200, 255))
-            end
-        end
-        imgui.EndChild()
-        imgui.Dummy(vector.New(0, 10))
-        imgui.TextWrapped(
-            'To implement this effect, we will need to create some SV. Head to the CREATE tab in your plugin, and locate the dropdown with the word "TYPE" next to it.')
-        imgui.TextColored(importantColor,
-            'Select "SPECIAL" under the "TYPE" dropdown. The tutorial will\ncontinue when you\'ve done so. In the future, all tutorials will go to\nthe next step when the instructions in RED TEXT are completed.')
-        if (globalVars.placeTypeIndex == 2) then
-            imgui.TextColored(importantColor,
-                'Now, under the "SPECIAL" tab, make sure "STUTTER" is selected.')
-            local menuVars = getMenuVars("placeSpecial")
-            if (menuVars.svTypeIndex ~= 1) then goto endTutorial end
-            local settingVars = getSettingVars("Stutter", "Special")
-            imgui.Dummy(vector.New(0, 10))
-            imgui.TextWrapped(
-                "We want to edit the value of the first SV, and the second SV will be updated accordingly. Note that the default SV for a map is 1x, so we will leave average SV on 1x.")
-            imgui.TextColored(importantColor,
-                'Set the SV value to 4.00x by clicking on the input and inputting "4".')
-            ForceHeight(490)
-            if (settingVars.startSV ~= 4) then goto endTutorial end
-            ForceHeight(450)
-            imgui.Dummy(vector.New(0, 10))
-            imgui.TextWrapped(
-                'At any time, you can see what your SVs will look like in the "SV INFO" window. Looking inside, we notice one of our SVs is negative. This is because of the relatively large SV we just put in, 4. To counter this, we have two options; either let the second SV be negative, or change how long the first SV lasts. Try playing around with the "Duration" slider.')
-            imgui.TextColored(importantColor,
-                "Set the duration to be 20%%. Either drag the slider along,\nor hold Ctrl and click to edit the slider directly.")
-            ForceHeight(620)
-            if (settingVars.stutterDuration ~= 20) then goto endTutorial end
-            ForceHeight(580)
-            imgui.TextColored(vector4(0), "penis")
-            imgui.TextWrapped(
-                'If you want, you can change some of the other settings; try seeing what happens when you increase the stutter count. However, for the sake of this tutorial, you are done.')
-            imgui.TextColored(importantColor,
-                'Now, select a note representing a strong sound, and\nthe note after it. Either hit the "T" button, or click\nthe "Place SVs between selected notes" button.')
-            ForceHeight(730)
-        end
-        ::endTutorial::
+    if (map.GetKeyCount(false) ~= 4) then
+        imgui.SeparatorText("This tutorial does not support this key mode.")
+        imgui.Text("Please go to a 4K map to continue.")
+        goto dontRenderTutorial
     end
+    if (not truthy(tutorialWindowName:len())) then
+        imgui.SeparatorText("Select a tutorial menu on the left to view it.")
+    end
+    if (tutorialWindowName == "Your First Effect") then
+        showYourFirstEffectTutorial()
+    end
+    if (tutorialWindowName == "Your Second Effect") then
+        showYourSecondEffectTutorial()
+    end
+    if (tutorialWindowName == "Working With Shapes") then
+        showWorkingWithShapesTutorial()
+    end
+    ::dontRenderTutorial::
     imgui.EndChild()
     imgui.Columns(1)
     imgui.End()
     state.SetValue("tutorialWindowName", tutorialWindowName)
+end
+function showWorkingWithShapesTutorial()
+    local importantColor = vector.New(1, 0.5, 0.5, 1)
+    imgui.SeparatorText("Working with different shapes")
+    imgui.TextWrapped(
+        'So far, we\'ve only been working with stutters, but the core of SV is being able to make cohesive and/or fluid movement. We do this by working with particular shapes in the "STANDARD" tab.')
+    imgui.TextColored(importantColor,
+        'Select "STANDARD" under the "TYPE" dropdown.')
+    if (globalVars.placeTypeIndex ~= 1) then return end
+    imgui.Dummy(vector.New(0, 10))
+    if (globalVars.hideSVInfo) then
+        imgui.TextColored(importantColor, 'Please disable the "HIDE SV INFO" option in settings to continue.')
+        return
+    end
+    imgui.TextWrapped(
+        'In the tab below the type dropdown, you\'ll notice a plethora of different options to choose from. Don\'t get overwhelmed; most experienced SV mappers usually limit themselves to using 3-5 of these shapes. Most commonly seen, we have the exponential shape, which makes the notes go towards the receptor at an exponential rate.')
+    imgui.TextColored(importantColor,
+        'Under the "STANDARD" tab, select "EXPONENTIAL".')
+    local menuVars = getMenuVars("placeStandard")
+    if (menuVars.svTypeIndex ~= 2 and not state.GetValue("workingWithShapes_pg")) then return end
+    imgui.Dummy(vector.New(0, 10))
+    state.SetValue("workingWithShapes_pg", true)
+    imgui.TextWrapped(
+        "If you are unfamiliar with any of the SV shapes, the SV Info window will be your best friend. Behind the SV Info window is a slightly visible set of 4 notes, which show you (in advance) how the notes will move if you use this particular effect. Notice how if you change the intensity, the speed at which the notes decelerate increases, and vice versa. The SV Info visualizer is particularly noticable when you change a drastic part of the shape's behavior.")
+    local settingVars = getSettingVars("Exponential", "Standard")
+    imgui.TextColored(importantColor,
+        'Change the exponential type to "SPEED UP", either via\nthe dropdown or by pressing "S" on your keyboard. Note that\nany parameter with a button next to it labelled "SWAP" or "S"\ncan be changed with this keybind. Hotkeys will be reviewed later.')
+    if (settingVars.behaviorIndex ~= 2) then return end
+    imgui.Dummy(vector.New(0, 10))
+    imgui.TextWrapped(
+        'Now, the SV Info visualizer is showing a more "rain drop" like appearance than a sudden approach. Feel free to experiment with all the shapes and see what you can come up with. Let\'s try making a fun bouncy effect using linear.')
+    imgui.TextColored(importantColor,
+        'Select the "LINEAR" shape. Set the start SV to -1.5x,\nand the end SV to 1.5x. Don\'t worry about SV points or final SV.')
+    settingVars = getSettingVars("Linear", "Standard")
+    ForceHeight(520)
+    if (menuVars.svTypeIndex ~= 1 or math.abs(settingVars.startSV + 1.5) > 0.001 or math.abs(settingVars.endSV - 1.5) > 0.001) then return end
+    ForceHeight(490)
+    imgui.TextWrapped(
+        "Take a look at the SV info window, and notice how the notes are jumping. This is exactly what the effect will look like when placed in game.")
+    imgui.TextColored(importantColor,
+        'Select more than 2 chords (at least 3 notes with different times),\nand place the SV using an aforementioned method.')
+    imgui.Dummy(vector.New(0, 10))
+    imgui.TextWrapped(
+        "If your notes are in different columns, you may have noticed that all the notes have combined into one large chord. Looking at the SV Info window, the reasoning becomes clear; the average SV is 0.00x, meaning the notes are always going to be next to each other. We can remedy this by adding a teleport to each set of notes, so they no longer line up with each other.")
+    imgui.TextColored(importantColor,
+        'Head to the "EDIT" tab, select "ADD TELEPORT",\nthen select your notes and place the SV.')
+    imgui.Dummy(vector.New(0, 10))
+    imgui.TextWrapped(
+        "Hopefully you should now have an effect that resembles individual jumping notes! You might recognize this effect from the old SV map PARTY. Now that you're more familiar with the SV info window and shapes, play around and see what you can make. Trial and error is the best way to learn SV.")
+    ForceHeight(840)
+end
+function showYourFirstEffectTutorial()
+    local importantColor = vector.New(1, 0.5, 0.5, 1)
+    imgui.SeparatorText("Making your first SV effect")
+    imgui.TextWrapped(
+        "At the absolute basics of SV are the pulse effects, effects that highlight significant parts of the song, such as a repeating drum. We will apply a very basic stutter SV effect on the drum beat (assuming your song has that), like so:")
+    gpsim("Your First Effect Stutter Example", vector2(1), function(t)
+        if (t < 0.05) then
+            return 4 * t
+        elseif (t < 0.25) then
+            return 0.25 * t + 0.19
+        else
+            return t
+        end
+    end, { { 1, 2 }, { 3 }, { 4 }, { 3 } }, 500)
+    imgui.TextWrapped(
+        'To implement this effect, we will need to create some SV. Head to the CREATE tab in your plugin, and locate the dropdown with the word "TYPE" next to it.')
+    imgui.TextColored(importantColor,
+        'Select "SPECIAL" under the "TYPE" dropdown. The tutorial will\ncontinue when you\'ve done so. In the future, all tutorials will go to\nthe next step when the instructions in RED TEXT are completed.')
+    if (globalVars.placeTypeIndex ~= 2) then return end
+    imgui.TextColored(importantColor,
+        'Now, under the "SPECIAL" tab, make sure "STUTTER" is selected.')
+    local menuVars = getMenuVars("placeSpecial")
+    if (menuVars.svTypeIndex ~= 1) then return end
+    local settingVars = getSettingVars("Stutter", "Special")
+    imgui.Dummy(vector.New(0, 10))
+    imgui.TextWrapped(
+        "We want to edit the value of the first SV, and the second SV will be updated accordingly. Note that the default SV for a map is 1x, so we will leave average SV on 1x.")
+    imgui.TextColored(importantColor,
+        'Set the SV value to 4.00x by clicking on the input and inputting "4".')
+    ForceHeight(490)
+    if (settingVars.startSV ~= 4) then return end
+    ForceHeight(450)
+    imgui.Dummy(vector.New(0, 10))
+    imgui.TextWrapped(
+        'At any time, you can see what your SVs will look like in the "SV INFO" window. Looking inside, we notice one of our SVs is negative. This is because of the relatively large SV we just put in, 4. To counter this, we have two options; either let the second SV be negative, or change how long the first SV lasts. Try playing around with the "Duration" slider.')
+    imgui.TextColored(importantColor,
+        "Set the duration to be 20%%. Either drag the slider along,\nor hold Ctrl and click to edit the slider directly.")
+    ForceHeight(620)
+    if (settingVars.stutterDuration ~= 20) then return end
+    ForceHeight(580)
+    imgui.TextColored(vector4(0), "penis")
+    imgui.TextWrapped(
+        'If you want, you can change some of the other settings; try seeing what happens when you increase the stutter count. However, for the sake of this tutorial, you are done.')
+    imgui.TextColored(importantColor,
+        'Now, select a note representing a strong sound, and\nthe note after it. Either hit the "T" button, or click\nthe "Place SVs between selected notes" button.')
+    ForceHeight(730)
+end
+function showYourSecondEffectTutorial()
+    local importantColor = vector.New(1, 0.5, 0.5, 1)
+    imgui.SeparatorText("Making your second SV effect")
+    imgui.TextWrapped(
+        "Stutters are cool and all, but there's another type of stutter that's more versatile: teleport stutters. Usually, these would not be possible in engines like osu, but since Quaver has no limitations on SV size, we can do it here. Take a look at the difference between normal stutter and teleport stutter:")
+    imgui.Dummy(vector.New(0, 10))
+    imgui.SetCursorPosX(40)
+    gpsim("Your Second Effect Stutter Example", vector2(0.5), function(t)
+        local highT = math.frac(t * 4)
+        local reductionIdx = math.floor(t * 4)
+        if (highT < 0.05) then
+            return highT + reductionIdx / 4
+        elseif (highT < 0.25) then
+            return 0.05 + reductionIdx / 4
+        else
+            return (highT + reductionIdx) / 4
+        end
+    end, { { 1, 2 }, { 3 }, { 4 }, { 3 } }, 4000, true)
+    KeepSameLine()
+    imgui.SetCursorPosX(200)
+    gpsim("Your Second Effect Teleport Stutter Example", vector2(0.5), function(t)
+        local highT = math.frac(t * 4)
+        local reductionIdx = math.floor(t * 4)
+        return (0.5 * highT + 0.5 + reductionIdx) / 4
+    end, { { 1, 2 }, { 3 }, { 4 }, { 3 } }, 4000, true)
+    imgui.Dummy(vector.New(0, 10))
+    imgui.TextWrapped(
+        "Notice how on the left, the stutter makes the notes visibly move down, but on the right, the teleport stutter (for self-explanatory reasons) makes the notes teleport. Let's try using teleport stutter now.")
+    imgui.TextColored(importantColor,
+        'Select "SPECIAL" under the "TYPE" dropdown.')
+    if (globalVars.placeTypeIndex ~= 2) then return end
+    imgui.TextColored(importantColor,
+        'Now, under the "SPECIAL" tab, make sure that the effect\n"TELEPORT STUTTER" is selected.')
+    local menuVars = getMenuVars("placeSpecial")
+    if (menuVars.svTypeIndex ~= 2) then return end
+    imgui.TextWrapped(
+        "Teleport Stutter differs from normal stutter, in that you don't control the speed at which the note moves, but rather how far down the note teleports. For example, if your start SV is 75%%, then your note will start 75%% of the way down. If you want the note to land on the receptor, you must make the start SV %% (in decimal form, not percent) and the main SV add up to the average SV.")
+    imgui.TextColored(importantColor,
+        'Set the main SV to 0.2x. Then, set the start SV %% to be the\npercentage required to have the notes land on the receptor.\nHINT: 1.00x - 0.20x = ??%%')
+    local settingVars = getSettingVars("Teleport Stutter", "Special")
+    ForceHeight(490)
+    if (not settingVars.linearlyChange and (math.abs(settingVars.mainSV - 0.2) > 0.001 or settingVars.svPercent ~= 80)) then return end
+    ForceHeight(450)
+    imgui.TextColored(importantColor,
+        'Similarly, select a note representing a strong sound, and\nthe note after it. Either hit the "T" button on your keyboard or click\nthe "Place SVs between selected notes" button. Alternatively,\nyou can try selecting all the notes which you want to have SV.')
+    imgui.SeparatorText("Experimenting with Teleport Stutter")
+    imgui.TextWrapped(
+        'It would be kind of boring if the teleport stutter remained the same throughout. You can adjust how the teleport stutter acts over time by enabling the "Change Stutter Over Time" option.')
+    imgui.TextColored(importantColor,
+        'Enable "Change Stutter Over Time".')
+    ForceHeight(640)
+    if (not settingVars.linearlyChange) then return end
+    ForceHeight(610)
+    imgui.TextWrapped(
+        'You\'ll now notice that we have two options for both start SV %% and main SV value; one for start, and one for end. The way this works is that when you select more than two notes (obviously with different times), the teleport stutter for that note will change linearly according to the start/end values. For example, if your start SV %% (start) is 100%%, and your start SV %% (end) is 0%%, then a note in the very middle of your selection would have a teleport stutter with start SV %% of 50%%. We will use this to create some dynamic effects.')
+    imgui.TextColored(importantColor,
+        "Set the Start SV %% (start) to 100%%, the main SV (start) to 0.00x,\nand main SV (end) to whichever value it must be such that the\nnote lines up with the receptor. HINT: 0%% + ?.??x = 1.00x")
+    ForceHeight(820)
+    if (math.abs(settingVars.mainSV) > 0.001 or math.abs(settingVars.mainSV2 - 1) > 0.001 or settingVars.svPercent ~= 100 or settingVars.svPercent2 ~= 0) then return end
+    ForceHeight(800)
+    imgui.TextWrapped(
+        "What we have set up here is a teleport stutter that initially has a very strong teleporting strength (start SV 100%%, main SV 0.00x, so the notes don't appear to move at all) to an extremely weak strength (start SV 0%%, main SV 1.00x, so it's as if they haven't even teleported). All of the notes between will lie somewhere within its boundary.")
+    imgui.TextColored(importantColor,
+        'Select a large group of notes and either hit the "T" button on\nyour keyboard or click the Place SV button.')
+    ForceHeight(920)
+    imgui.TextWrapped(
+        "Now that you're hopefully feeling familiar with teleport stutter, try playing around with some of the parameters. Here are some ideas to try. All the effects below will be presented as a list of four numbers, where the first two are the start SV %% (start and end), while the last two are the main SV (start and end).")
+    imgui.BulletText("0%%, 100%%, 1.00x, 0.00x")
+    imgui.BulletText("100%%, 100%%, -1.00x, 0.00x")
+    imgui.BulletText("100%%, 0%%, -1.00x, 1.00x")
+    imgui.TextWrapped('Fun fact: the above effect is used in the popular SV map Hypnotizer.')
+    ForceHeight(1120)
 end
 function chooseAddComboMultipliers(settingVars)
     local oldValues = vector.New(settingVars.comboMultiplier1, settingVars.comboMultiplier2)
@@ -7596,6 +7755,7 @@ function chooseColorTheme()
     local oldColorThemeIndex = globalVars.colorThemeIndex
     globalVars.colorThemeIndex = Combo("Color Theme", COLOR_THEMES, globalVars.colorThemeIndex, COLOR_THEME_COLORS)
     if (oldColorThemeIndex ~= globalVars.colorThemeIndex) then
+        write(globalVars)
     end
     local currentTheme = COLOR_THEMES[globalVars.colorThemeIndex]
     local isRGBColorTheme = currentTheme:find("RGB") or currentTheme:find("BGR")
@@ -7692,6 +7852,7 @@ function chooseCursorTrail()
     local oldCursorTrailIndex = globalVars.cursorTrailIndex
     globalVars.cursorTrailIndex = Combo("Cursor Trail", CURSOR_TRAILS, oldCursorTrailIndex)
     if (oldCursorTrailIndex ~= globalVars.cursorTrailIndex) then
+        write(globalVars)
     end
 end
 function chooseCursorTrailGhost()
@@ -7704,6 +7865,7 @@ function chooseCursorTrailPoints()
     if currentTrail ~= "Snake" then return end
     local settingChanged = BasicInputInt(globalVars, "cursorTrailPoints", "Trail Points")
     if (settingChanged) then
+        write(globalVars)
     end
 end
 function chooseCursorTrailShape()
@@ -7713,6 +7875,7 @@ function chooseCursorTrailShape()
     local oldTrailShapeIndex = globalVars.cursorTrailShapeIndex
     globalVars.cursorTrailShapeIndex = Combo(label, TRAIL_SHAPES, oldTrailShapeIndex)
     if (oldTrailShapeIndex ~= globalVars.cursorTrailShapeIndex) then
+        write(globalVars)
     end
 end
 function chooseCursorShapeSize()
@@ -7720,6 +7883,7 @@ function chooseCursorShapeSize()
     if currentTrail ~= "Snake" then return end
     local settingChanged = BasicInputInt(globalVars, "cursorTrailSize", "Shape Size")
     if (settingChanged) then
+        write(globalVars)
     end
 end
 function chooseCurveSharpness(settingVars)
@@ -7805,6 +7969,7 @@ function chooseEffectFPS()
     local settingChanged = BasicInputInt(globalVars, "effectFPS", "Effect FPS", { 2, 1000 },
         "Set this to a multiple of UPS or FPS to make cursor effects smooth")
     if (settingChanged) then
+        write(globalVars)
     end
 end
 function chooseFinalSV(settingVars, skipFinalSV)
@@ -7875,6 +8040,7 @@ function chooseStepSize()
     globalVars.stepSize = math.clamp(tempStepSize, 1, 100)
     imgui.PopItemWidth()
     if (oldStepSize ~= globalVars.stepSize) then
+        write(globalVars)
     end
 end
 function chooseMainSV(settingVars)
@@ -7994,6 +8160,7 @@ function chooseRGBPeriod()
     globalVars.rgbPeriod = math.clamp(globalVars.rgbPeriod, MIN_RGB_CYCLE_TIME,
         MAX_RGB_CYCLE_TIME)
     if (oldRGBPeriod ~= globalVars.rgbPeriod) then
+        write(globalVars)
     end
 end
 function chooseScaleType(menuVars)
@@ -8012,6 +8179,7 @@ function chooseSnakeSpringConstant()
     HelpMarker("Pick any number from 0.01 to 1")
     globalVars.snakeSpringConstant = math.clamp(globalVars.snakeSpringConstant, 0.01, 1)
     if (globalVars.snakeSpringConstant ~= oldValue) then
+        write(globalVars)
     end
 end
 function chooseSpecialSVType(menuVars)
@@ -8109,6 +8277,7 @@ function chooseStyleTheme()
     local oldStyleTheme = globalVars.styleThemeIndex
     globalVars.styleThemeIndex = Combo("Style Theme", STYLE_THEMES, oldStyleTheme)
     if (oldStyleTheme ~= globalVars.styleThemeIndex) then
+        write(globalVars)
     end
 end
 function chooseSVBehavior(settingVars)
@@ -8152,6 +8321,7 @@ function choosePulseCoefficient()
         math.round(globalVars.pulseCoefficient * 100) .. "%%")
     globalVars.pulseCoefficient = math.clamp(globalVars.pulseCoefficient, 0, 1)
     if (oldCoefficient ~= globalVars.pulseCoefficient) then
+        write(globalVars)
     end
 end
 function choosePulseColor()
@@ -8160,6 +8330,7 @@ function choosePulseColor()
     local oldColor = globalVars.pulseColor
     _, globalVars.pulseColor = imgui.ColorPicker4("Pulse Color", globalVars.pulseColor)
     if (oldColor ~= globalVars.pulseColor) then
+        write(globalVars)
     end
     if (not colorPickerOpened) then
         state.SetValue("showColorPicker", false)
@@ -9388,6 +9559,7 @@ end
 function awake()
     local tempGlobalVars = read()
     if (not tempGlobalVars) then
+        write(globalVars)
         print("w!",
             'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.')
         setPresets({})
