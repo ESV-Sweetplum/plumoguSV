@@ -17,7 +17,7 @@ function infoTab()
     AddPadding()
     AddPadding()
     if (imgui.Button("Click Here to Edit Settings", ACTION_BUTTON_SIZE)) then
-        state.SetValue("showSettingsWindow", true)
+        state.SetValue("showSettingsWindow", not state.GetValue("showSettingsWindow", false))
         local windowDim = state.WindowSize
         local pluginDim = imgui.GetWindowSize()
         local centeringX = (windowDim[1] - pluginDim.x) * 0.5
@@ -33,6 +33,6 @@ function infoTab()
     end
     KeepSameLine()
     if (imgui.Button("View Tutorials", HALF_ACTION_BUTTON_SIZE)) then
-        state.SetValue("showTutorialWindow", true)
+        state.SetValue("showTutorialWindow", not state.GetValue("showTutorialWindow", false))
     end
 end
