@@ -1088,7 +1088,7 @@ EMOTICONS = {
     "( > . < )",
     "( + x + )",
     "( o _ 0 )",
-    "[ m w m ]",
+    "[ ^ . ^ ]",
     "( v . ^ )",
     "( ^ o v )",
     "( ^ o v )",
@@ -7324,7 +7324,7 @@ function showPluginSettingsWindow()
     imgui.Columns(2, "settings_columnList", true)
     imgui.SetColumnWidth(0, 150)
     imgui.SetColumnWidth(1, 283)
-    imgui.BeginChild(420)
+    imgui.BeginChild("Setting Categories")
     imgui.Text("Setting Type")
     imgui.Separator()
     for idx, v in pairs(SETTING_TYPES) do
@@ -7343,7 +7343,7 @@ function showPluginSettingsWindow()
     if (globalVars.advancedMode) then renderMemeButtons() end
     imgui.EndChild()
     imgui.NextColumn()
-    imgui.BeginChild(69)
+    imgui.BeginChild("Settings Data")
     if (SETTING_TYPES[typeIndex] == "General") then
         showGeneralSettings()
     end
@@ -7416,6 +7416,37 @@ function showWindowSettings()
         "If one note is selected, shows simple data about that note.")
     GlobalCheckbox("showMeasureDataWidget", "Show Measure Data Of Selection",
         "If two notes are selected, shows measure data within the selected region.")
+end
+function renderTutorialMenu()
+    imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
+    _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, imgui_window_flags.NoResize)
+    if (not opened) then
+        state.SetValue("showTutorialWindow", false)
+    end
+    local navigatorWidth = 200
+    imgui.Columns(2)
+    imgui.SetColumnWidth(0, navigatorWidth)
+    imgui.SetColumnWidth(1, 600 - navigatorWidth)
+    imgui.BeginChild("Tutorial Navigator")
+    imgui.SeparatorText("For Beginners")
+    if (imgui.TreeNode("Placing SVs")) then
+        imgui.TreePop()
+    end
+    if (imgui.TreeNode("Removing SVs")) then
+        imgui.TreePop()
+    end
+    if (imgui.TreeNode("Adding Effects")) then
+        imgui.TreePop()
+    end
+    if (imgui.TreeNode("Vibrato")) then
+        imgui.TreePop()
+    end
+    imgui.EndChild()
+    imgui.NextColumn()
+    imgui.BeginChild("Tutorial Data")
+    imgui.EndChild()
+    imgui.Columns(1)
+    imgui.End()
 end
 function chooseAddComboMultipliers(settingVars)
     local oldValues = vector.New(settingVars.comboMultiplier1, settingVars.comboMultiplier2)
@@ -7945,8 +7976,7 @@ function chooseStillType(menuVars)
         imgui.Indent(indentWidth)
     else
         imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.6 - 5)
-        _, menuVars.stillDistance = imgui.InputFloat("##still", menuVars.stillDistance, 0, 0,
-            "%.2f msx")
+        menuVars.stillDistance = ComputableInputFloat("##still", menuVars.stillDistance, 2, " msx")
         KeepSameLine()
         imgui.PopItemWidth()
     end
@@ -9303,7 +9333,11 @@ function draw()
     if (globalVars.showMeasureDataWidget) then
         renderMeasureDataWidget()
     end
+    if (state.GetValue("showTutorialWindow")) then
+        renderTutorialMenu()
+    end
     imgui.End()
+    imgui.ShowDemoWindow()
     pulseController()
     checkForGlobalHotkeys()
 end

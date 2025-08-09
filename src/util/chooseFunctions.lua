@@ -619,8 +619,7 @@ function chooseStillType(menuVars)
         imgui.Indent(indentWidth)
     else
         imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.6 - 5)
-        _, menuVars.stillDistance = imgui.InputFloat("##still", menuVars.stillDistance, 0, 0,
-            "%.2f msx")
+        menuVars.stillDistance = ComputableInputFloat("##still", menuVars.stillDistance, 2, " msx")
         KeepSameLine()
         imgui.PopItemWidth()
     end

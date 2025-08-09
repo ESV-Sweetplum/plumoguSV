@@ -31,8 +31,13 @@ function draw()
     if (globalVars.showMeasureDataWidget) then
         renderMeasureDataWidget()
     end
+    if (state.GetValue("showTutorialWindow")) then
+        renderTutorialMenu()
+    end
 
     imgui.End()
+
+    imgui.ShowDemoWindow()
 
     pulseController()
     checkForGlobalHotkeys()

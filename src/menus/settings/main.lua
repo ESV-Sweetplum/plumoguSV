@@ -27,9 +27,8 @@ function showPluginSettingsWindow()
     imgui.SetColumnWidth(0, 150)
     imgui.SetColumnWidth(1, 283)
 
-    -- CATEGORY COLUMN
+    imgui.BeginChild("Setting Categories")
 
-    imgui.BeginChild(420)
     imgui.Text("Setting Type")
     imgui.Separator()
     for idx, v in pairs(SETTING_TYPES) do
@@ -46,12 +45,11 @@ function showPluginSettingsWindow()
         toggleablePrint("e!", "Settings have been reset.")
     end
     if (globalVars.advancedMode) then renderMemeButtons() end
+
     imgui.EndChild()
     imgui.NextColumn()
+    imgui.BeginChild("Settings Data")
 
-    -- SETTINGS COLUMN
-
-    imgui.BeginChild(69)
     if (SETTING_TYPES[typeIndex] == "General") then
         showGeneralSettings()
     end
