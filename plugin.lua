@@ -7447,9 +7447,9 @@ function renderTutorialMenu()
     imgui.BeginChild("Tutorial Navigator")
     imgui.SeparatorText("For Beginners")
     if (imgui.TreeNode("Placing SVs")) then
-        imgui.Selectable("The Basics")
+        imgui.Selectable("Your First Effect")
         if (imgui.IsItemClicked()) then
-            tutorialWindowName = "The Basics"
+            tutorialWindowName = "Your First Effect"
         end
         imgui.TreePop()
     end
@@ -7473,13 +7473,13 @@ function renderTutorialMenu()
         imgui.SetCursorPosY(h)
         imgui.TextColored(vector4(0), "penis")
     end
-    if (tutorialWindowName == "The Basics") then
+    if (tutorialWindowName == "Your First Effect") then
         imgui.SeparatorText("Making your first SV effect")
         imgui.TextWrapped(
             "At the absolute basics of SV are the pulse effects, effects that highlight significant parts of the song, such as a repeating drum. We will apply a very basic stutter SV effect on the drum beat (assuming your song has that), like so:")
         imgui.Dummy(vector.New(0, 10))
         imgui.SetCursorPosX(55)
-        imgui.BeginChild("The Basics Stutter Example", vector.New(270, 150), imgui_child_flags.Border)
+        imgui.BeginChild("Your First Effect Stutter Example", vector.New(270, 150), imgui_child_flags.Border)
         function distanceFn(t)
             if (t < 0.05) then
                 return 800 * t
