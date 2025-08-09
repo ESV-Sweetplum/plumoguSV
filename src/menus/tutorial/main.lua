@@ -34,6 +34,9 @@ function renderTutorialMenu()
     if (imgui.TreeNode("Vibrato")) then
         imgui.TreePop()
     end
+    if (imgui.TreeNode("Recreating Popular Effects")) then
+        imgui.TreePop()
+    end
 
     imgui.EndChild()
     imgui.NextColumn()
