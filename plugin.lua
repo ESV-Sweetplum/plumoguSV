@@ -7487,7 +7487,8 @@ function renderTutorialMenu()
     imgui.BeginChild("Tutorial Navigator")
     imgui.SeparatorText("For Beginners")
     if (imgui.TreeNode("Placing SVs")) then
-        local tabs = { "Your First Effect", "Your Second Effect", "Working With Shapes", "Composite Effects",
+        local tabs = { "Your First Effect", "Your Second Effect", "Working With Shapes", "Removing SVs",
+            "Composite Effects",
             "Stills and Displacement" }
         for _, t in pairs(tabs) do
             imgui.Selectable(t)
@@ -7495,9 +7496,6 @@ function renderTutorialMenu()
                 tutorialWindowName = t
             end
         end
-        imgui.TreePop()
-    end
-    if (imgui.TreeNode("Removing SVs")) then
         imgui.TreePop()
     end
     if (imgui.TreeNode("Adding Effects")) then
