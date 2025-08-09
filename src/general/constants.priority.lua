@@ -1,24 +1,24 @@
-imgui_disable_vector_packing = true           -- Use vectors instead of tables for imgui output
+imgui_disable_vector_packing = true                                    -- Use vectors instead of tables for imgui output
 
-DEFAULT_WIDGET_HEIGHT = 26                    -- value determining the height of GUI widgets
-DEFAULT_WIDGET_WIDTH = 160                    -- value determining the width of GUI widgets
-PADDING_WIDTH = 8                             -- value determining window and frame padding
-RADIO_BUTTON_SPACING = 7.5                    -- value determining spacing between radio buttons
-SAMELINE_SPACING = 5                          -- value determining spacing between GUI items on the same row
-ACTION_BUTTON_SIZE = vector.New(253, 42)      -- dimensions of the button that does important things
-PLOT_GRAPH_SIZE = vector.New(253, 100)        -- dimensions of the plot graph for SVs and note motion
-HALF_ACTION_BUTTON_SIZE = vector.New(125, 42) -- dimensions of a button that does kinda important things
-SECONDARY_BUTTON_SIZE = vector.New(48, 24)    -- dimensions of a button that does less important things
-TERTIARY_BUTTON_SIZE = vector.New(21.5, 24)   -- dimensions of a button that does much less important things
-EXPORT_BUTTON_SIZE = vector.New(40, 24)       -- dimensions of the export menu settings button
-BEEG_BUTTON_SIZE = vector.New(253, 24)        -- beeg button
+DEFAULT_WIDGET_HEIGHT = 26                                             -- value determining the height of GUI widgets
+DEFAULT_WIDGET_WIDTH = 160                                             -- value determining the width of GUI widgets
+PADDING_WIDTH = 8                                                      -- value determining window and frame padding
+RADIO_BUTTON_SPACING = 7.5                                             -- value determining spacing between radio buttons
+SAMELINE_SPACING = 5                                                   -- value determining spacing between GUI items on the same row
+ACTION_BUTTON_SIZE = vector.New(253, 42)                               -- dimensions of the button that does important things
+PLOT_GRAPH_SIZE = vector.New(253, 100)                                 -- dimensions of the plot graph for SVs and note motion
+HALF_ACTION_BUTTON_SIZE = vector.New((253 - SAMELINE_SPACING) / 2, 42) -- dimensions of a button that does kinda important things
+SECONDARY_BUTTON_SIZE = vector.New(48, 24)                             -- dimensions of a button that does less important things
+TERTIARY_BUTTON_SIZE = vector.New(21.5, 24)                            -- dimensions of a button that does much less important things
+EXPORT_BUTTON_SIZE = vector.New(40, 24)                                -- dimensions of the export menu settings button
+BEEG_BUTTON_SIZE = vector.New(253, 24)                                 -- beeg button
 
-MIN_RGB_CYCLE_TIME = 0.1                      -- minimum seconds for one complete RGB color cycle
-MAX_RGB_CYCLE_TIME = 300                      -- maximum seconds for one complete RGB color cycle
-MAX_CURSOR_TRAIL_POINTS = 100                 -- maximum number of points for cursor trail effects
-MAX_SV_POINTS = 1000                          -- maximum number of SV points allowed
-MAX_ANIMATION_FRAMES = 999                    -- maximum number of animation frames allowed
-MAX_IMPORT_CHARACTER_LIMIT = 999999           -- maximum number of characters allowed for import text
+MIN_RGB_CYCLE_TIME = 0.1                                               -- minimum seconds for one complete RGB color cycle
+MAX_RGB_CYCLE_TIME = 300                                               -- maximum seconds for one complete RGB color cycle
+MAX_CURSOR_TRAIL_POINTS = 100                                          -- maximum number of points for cursor trail effects
+MAX_SV_POINTS = 1000                                                   -- maximum number of SV points allowed
+MAX_ANIMATION_FRAMES = 999                                             -- maximum number of animation frames allowed
+MAX_IMPORT_CHARACTER_LIMIT = 999999                                    -- maximum number of characters allowed for import text
 
 CHINCHILLA_TYPES = {
     "Exponential",
