@@ -3371,6 +3371,28 @@ function checkForGlobalHotkeys()
     if (kb.pressedKeyCombo(globalVars.hotkeyList[9])) then jumpToTg() end
     if (kb.pressedKeyCombo(globalVars.hotkeyList[10])) then changeNoteLockMode() end
 end
+function getMapStats()
+    local currentTg = state.SelectedScrollGroupId
+    local tgList = map.GetTimingGroupIds()
+    local svSum = 0
+    local ssfSum = 0
+    for k32 = 1, #tgList do
+        local tg = tgList[k32]
+        state.SelectedScrollGroupId = tg
+        svSum = svSum + #map.ScrollVelocities
+        ssfSum = ssfSum + #map.ScrollSpeedFactors
+    end
+    print("s!",
+        "That's an average of " ..
+        math.round(svSum * 1000 / map.TrackLength, 2) ..
+        table.concat({" SVs per second, or ", math.round(ssfSum * 1000 / map.TrackLength, 2), " SSFs per second."}))
+    print("s!", table.concat({"This map also contains ", #map.TimingPoints, " timing points."}))
+    print("s!",
+        table.concat({"This map has ", svSum .. " SVs and " .. ssfSum .. " SSFs across " .. #tgList, " timing groups."}))
+    print("w!",
+        "Remember that the quality of map has no correlation with the object count! Try to be optimal in your object usage.")
+    state.SelectedScrollGroupId = currentTg
+end
 function selectAlternating(menuVars)
     local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
@@ -3379,8 +3401,8 @@ function selectAlternating(menuVars)
     local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     local times = {}
-    for k32 = 1, #notes do
-        local ho = notes[k32]
+    for k33 = 1, #notes do
+        local ho = notes[k33]
         times[#times + 1] = ho.StartTime
     end
     times = table.dedupe(times)
@@ -3393,8 +3415,8 @@ function selectAlternating(menuVars)
     local notesToSelect = {}
     local currentTime = allowedTimes[1]
     local index = 2
-    for k33 = 1, #notes do
-        local note = notes[k33]
+    for k34 = 1, #notes do
+        local note = notes[k34]
         if (note.StartTime > currentTime and index <= #allowedTimes) then
             currentTime = allowedTimes[index]
             index = index + 1
@@ -3415,8 +3437,8 @@ function selectByChordSizes(menuVars)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     notes = sort(notes, sortAscendingNoteLaneTime)
     local noteTimeTable = {}
-    for k34 = 1, #notes do
-        local note = notes[k34]
+    for k35 = 1, #notes do
+        local note = notes[k35]
         noteTimeTable[#noteTimeTable + 1] = note.StartTime
     end
     noteTimeTable = table.dedupe(noteTimeTable)
@@ -3424,13 +3446,13 @@ function selectByChordSizes(menuVars)
     for idx = 1, keyCount do
         sizeDict[#sizeDict + 1] = {}
     end
-    for k35 = 1, #noteTimeTable do
-        local time = noteTimeTable[k35]
+    for k36 = 1, #noteTimeTable do
+        local time = noteTimeTable[k36]
         local size = 0
         local curLane = 0
         local totalNotes = {}
-        for k36 = 1, #notes do
-            local note = notes[k36]
+        for k37 = 1, #notes do
+            local note = notes[k37]
             if (math.abs(note.StartTime - time) < 3) then
                 size = size + 1
                 curLane = curLane + 1
@@ -3456,8 +3478,8 @@ function selectByNoteType(menuVars)
     local totalNotes = game.getNotesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then totalNotes = state.SelectedHitObjects end
     local notesToSelect = {}
-    for k37 = 1, #totalNotes do
-        local note = totalNotes[k37]
+    for k38 = 1, #totalNotes do
+        local note = totalNotes[k38]
         if (note.EndTime == 0 and menuVars.rice) then notesToSelect[#notesToSelect + 1] = note end
         if (note.EndTime ~= 0 and menuVars.ln) then notesToSelect[#notesToSelect + 1] = note end
     end
@@ -3481,8 +3503,8 @@ function selectBySnap(menuVars)
     for i = 2, (menuVars.snap - 1) do
         if (menuVars.snap % i == 0) then factors[#factors + 1] = i end
     end
-    for k38 = 1, #factors do
-        local factor = factors[k38]
+    for k39 = 1, #factors do
+        local factor = factors[k39]
         while (pointer <= endOffset + 10) do
             if ((counter ~= 0 or factor == 1) and pointer >= startOffset) then disallowedTimes[#disallowedTimes + 1] = pointer end
             counter = (counter + 1) % factor
@@ -3496,8 +3518,8 @@ function selectBySnap(menuVars)
         counter = (counter + 1) % menuVars.snap
         pointer = pointer + (60000 / bpm) / (menuVars.snap)
     end
-    for k39 = 1, #disallowedTimes do
-        local bannedTime = disallowedTimes[k39]
+    for k40 = 1, #disallowedTimes do
+        local bannedTime = disallowedTimes[k40]
         for idx, time in pairs(times) do
             if (math.abs(time - bannedTime) < 10) then table.remove(times, idx) end
         end
@@ -3505,8 +3527,8 @@ function selectBySnap(menuVars)
     local notesToSelect = {}
     local currentTime = times[1]
     local index = 2
-    for k40 = 1, #notes do
-        local note = notes[k40]
+    for k41 = 1, #notes do
+        local note = notes[k41]
         if (note.StartTime > currentTime + 10 and index <= #times) then
             currentTime = times[index]
             index = index + 1
@@ -6420,26 +6442,7 @@ function infoTab()
         showPluginSettingsWindow()
     end
     if (imgui.Button("Get Map Stats", HALF_ACTION_BUTTON_SIZE)) then
-        local currentTg = state.SelectedScrollGroupId
-        local tgList = map.GetTimingGroupIds()
-        local svSum = 0
-        local ssfSum = 0
-        for k41 = 1, #tgList do
-            local tg = tgList[k41]
-            state.SelectedScrollGroupId = tg
-            svSum = svSum + #map.ScrollVelocities
-            ssfSum = ssfSum + #map.ScrollSpeedFactors
-        end
-        print("s!",
-            "That's an average of " ..
-            math.round(svSum * 1000 / map.TrackLength, 2) ..
-            table.concat({" SVs per second, or ", math.round(ssfSum * 1000 / map.TrackLength, 2), " SSFs per second."}))
-        print("s!", table.concat({"This map also contains ", #map.TimingPoints, " timing points."}))
-        print("s!",
-            table.concat({"This map has ", svSum .. " SVs and " .. ssfSum .. " SSFs across " .. #tgList, " timing groups."}))
-        print("w!",
-            "Remember that the quality of map has no correlation with the object count! Try to be optimal in your object usage.")
-        state.SelectedScrollGroupId = currentTg
+        getMapStats()
     end
     KeepSameLine()
     if (imgui.Button("View Tutorials", HALF_ACTION_BUTTON_SIZE)) then
