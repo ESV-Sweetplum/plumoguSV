@@ -5032,7 +5032,8 @@ function GlobalCheckbox(parameterName, label, tooltipText)
     local oldValue = globalVars[parameterName] ---@cast oldValue boolean
     _, globalVars[parameterName] = imgui.Checkbox(label, oldValue)
     if (tooltipText) then ToolTip(tooltipText) end
-    if (oldValue ~= globalVars[parameterName]) then write(globalVars) end
+    if (oldValue ~= globalVars[parameterName]) then
+    end
 end
 ---Creates an input designed specifically for code.
 ---@param varsTable { [string]: any } The table that is meant to be modified.
@@ -5353,7 +5354,6 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             preset.menu = VIBRATO_SVS[menuVars.svTypeIndex]
         end
         table.insert(globalVars.presets, preset)
-        write(globalVars)
     end
     state.SetValue("newPresetName", newPresetName)
     AddSeparator()
@@ -5369,7 +5369,6 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     if (imgui.Button("Import##CustomPreset")) then
         table.insert(globalVars.presets, table.parse(importCustomPreset))
         importCustomPreset = ""
-        write(globalVars)
     end
     AddSeparator()
     imgui.Columns(3)
@@ -5402,7 +5401,6 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         KeepSameLine()
         if (imgui.Button("X##Preset" .. idx)) then
             table.remove(globalVars.presets, idx)
-            write(globalVars)
         end
     end
     imgui.SetColumnWidth(0, 90)
@@ -6630,7 +6628,8 @@ function showAppearanceSettings()
     AddSeparator()
     local oldDynamicBgIndex = globalVars.dynamicBackgroundIndex
     globalVars.dynamicBackgroundIndex = Combo("Dynamic BG", DYNAMIC_BACKGROUND_TYPES, oldDynamicBgIndex)
-    if (oldDynamicBgIndex ~= globalVars.dynamicBackgroundIndex) then write(globalVars) end
+    if (oldDynamicBgIndex ~= globalVars.dynamicBackgroundIndex) then
+    end
 end
 local customStyleIds = {
     "windowBg",
@@ -6745,7 +6744,6 @@ function showCustomThemeSettings()
         ::skip::
     end
     if (settingsChanged) then
-        write(globalVars)
     end
 end
 function convertStrToShort(str)
@@ -6823,7 +6821,6 @@ function saveSettingPropertiesButton(settingVars, label)
     if (not globalVars.defaultProperties.settings) then globalVars.defaultProperties.settings = {} end
     globalVars.defaultProperties.settings[label] = settingVars
     loadDefaultProperties(globalVars.defaultProperties)
-    write(globalVars)
     print("i!",
         table.concat({"Default setting properties for ", label, " have been set. Changes will be shown on the next plugin refresh."}))
 end
@@ -6836,7 +6833,6 @@ function saveMenuPropertiesButton(menuVars, label)
     if (not globalVars.defaultProperties.menu) then globalVars.defaultProperties.menu = {} end
     globalVars.defaultProperties.menu[label] = menuVars
     loadDefaultProperties(globalVars.defaultProperties)
-    write(globalVars)
     print("i!",
         table.concat({"Default menu properties for ", label, " have been set. Changes will be shown on the next plugin refresh."}))
 end
@@ -7274,7 +7270,6 @@ function chooseUpscroll()
     globalVars.upscroll = RadioButtons("Scroll Direction:", globalVars.upscroll, { "Down", "Up" }, { false, true },
         "Orientation for distance graphs and visuals")
     if (oldUpscroll ~= globalVars.upscroll) then
-        write(globalVars)
     end
 end
 function showKeybindSettings()
@@ -7294,7 +7289,6 @@ function showKeybindSettings()
     AddSeparator()
     simpleActionMenu("Reset Hotkey Settings", 0, function()
         globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
-        write(globalVars)
         awaitingIndex = 0
     end, nil, true, true)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
@@ -7304,7 +7298,6 @@ function showKeybindSettings()
     globalVars.hotkeyList[awaitingIndex] = table.concat(prefixes, "+") ..
         (truthy(prefixes) and "+" or "") .. kb.numToKey(key)
     awaitingIndex = 0
-    write(globalVars)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
 end
 SETTING_TYPES = {
@@ -7469,7 +7462,6 @@ function chooseColorTheme()
     local oldColorThemeIndex = globalVars.colorThemeIndex
     globalVars.colorThemeIndex = Combo("Color Theme", COLOR_THEMES, globalVars.colorThemeIndex, COLOR_THEME_COLORS)
     if (oldColorThemeIndex ~= globalVars.colorThemeIndex) then
-        write(globalVars)
     end
     local currentTheme = COLOR_THEMES[globalVars.colorThemeIndex]
     local isRGBColorTheme = currentTheme:find("RGB") or currentTheme:find("BGR")
@@ -7566,7 +7558,6 @@ function chooseCursorTrail()
     local oldCursorTrailIndex = globalVars.cursorTrailIndex
     globalVars.cursorTrailIndex = Combo("Cursor Trail", CURSOR_TRAILS, oldCursorTrailIndex)
     if (oldCursorTrailIndex ~= globalVars.cursorTrailIndex) then
-        write(globalVars)
     end
 end
 function chooseCursorTrailGhost()
@@ -7579,7 +7570,6 @@ function chooseCursorTrailPoints()
     if currentTrail ~= "Snake" then return end
     local settingChanged = BasicInputInt(globalVars, "cursorTrailPoints", "Trail Points")
     if (settingChanged) then
-        write(globalVars)
     end
 end
 function chooseCursorTrailShape()
@@ -7589,7 +7579,6 @@ function chooseCursorTrailShape()
     local oldTrailShapeIndex = globalVars.cursorTrailShapeIndex
     globalVars.cursorTrailShapeIndex = Combo(label, TRAIL_SHAPES, oldTrailShapeIndex)
     if (oldTrailShapeIndex ~= globalVars.cursorTrailShapeIndex) then
-        write(globalVars)
     end
 end
 function chooseCursorShapeSize()
@@ -7597,7 +7586,6 @@ function chooseCursorShapeSize()
     if currentTrail ~= "Snake" then return end
     local settingChanged = BasicInputInt(globalVars, "cursorTrailSize", "Shape Size")
     if (settingChanged) then
-        write(globalVars)
     end
 end
 function chooseCurveSharpness(settingVars)
@@ -7683,7 +7671,6 @@ function chooseEffectFPS()
     local settingChanged = BasicInputInt(globalVars, "effectFPS", "Effect FPS", { 2, 1000 },
         "Set this to a multiple of UPS or FPS to make cursor effects smooth")
     if (settingChanged) then
-        write(globalVars)
     end
 end
 function chooseFinalSV(settingVars, skipFinalSV)
@@ -7754,7 +7741,6 @@ function chooseStepSize()
     globalVars.stepSize = math.clamp(tempStepSize, 1, 100)
     imgui.PopItemWidth()
     if (oldStepSize ~= globalVars.stepSize) then
-        write(globalVars)
     end
 end
 function chooseMainSV(settingVars)
@@ -7874,7 +7860,6 @@ function chooseRGBPeriod()
     globalVars.rgbPeriod = math.clamp(globalVars.rgbPeriod, MIN_RGB_CYCLE_TIME,
         MAX_RGB_CYCLE_TIME)
     if (oldRGBPeriod ~= globalVars.rgbPeriod) then
-        write(globalVars)
     end
 end
 function chooseScaleType(menuVars)
@@ -7893,7 +7878,6 @@ function chooseSnakeSpringConstant()
     HelpMarker("Pick any number from 0.01 to 1")
     globalVars.snakeSpringConstant = math.clamp(globalVars.snakeSpringConstant, 0.01, 1)
     if (globalVars.snakeSpringConstant ~= oldValue) then
-        write(globalVars)
     end
 end
 function chooseSpecialSVType(menuVars)
@@ -7992,7 +7976,6 @@ function chooseStyleTheme()
     local oldStyleTheme = globalVars.styleThemeIndex
     globalVars.styleThemeIndex = Combo("Style Theme", STYLE_THEMES, oldStyleTheme)
     if (oldStyleTheme ~= globalVars.styleThemeIndex) then
-        write(globalVars)
     end
 end
 function chooseSVBehavior(settingVars)
@@ -8036,7 +8019,6 @@ function choosePulseCoefficient()
         math.round(globalVars.pulseCoefficient * 100) .. "%%")
     globalVars.pulseCoefficient = math.clamp(globalVars.pulseCoefficient, 0, 1)
     if (oldCoefficient ~= globalVars.pulseCoefficient) then
-        write(globalVars)
     end
 end
 function choosePulseColor()
@@ -8045,7 +8027,6 @@ function choosePulseColor()
     local oldColor = globalVars.pulseColor
     _, globalVars.pulseColor = imgui.ColorPicker4("Pulse Color", globalVars.pulseColor)
     if (oldColor ~= globalVars.pulseColor) then
-        write(globalVars)
     end
     if (not colorPickerOpened) then
         state.SetValue("showColorPicker", false)
@@ -9274,7 +9255,6 @@ end
 function awake()
     local tempGlobalVars = read()
     if (not tempGlobalVars) then
-        write(globalVars)
         print("w!",
             'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.')
         setPresets({})
