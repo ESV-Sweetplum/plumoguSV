@@ -23,7 +23,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             preset.menu = VIBRATO_SVS[menuVars.svTypeIndex]
         end
         table.insert(globalVars.presets, preset)
-        write(globalVars)
+        -- write(globalVars)
     end
     state.SetValue("newPresetName", newPresetName)
 
@@ -41,7 +41,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     if (imgui.Button("Import##CustomPreset")) then
         table.insert(globalVars.presets, table.parse(importCustomPreset))
         importCustomPreset = ""
-        write(globalVars)
+        -- write(globalVars)
     end
 
     AddSeparator()
@@ -78,7 +78,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         KeepSameLine()
         if (imgui.Button("X##Preset" .. idx)) then
             table.remove(globalVars.presets, idx)
-            write(globalVars)
+            -- write(globalVars)
         end
     end
 

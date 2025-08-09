@@ -51,7 +51,7 @@ function chooseColorTheme()
     globalVars.colorThemeIndex = Combo("Color Theme", COLOR_THEMES, globalVars.colorThemeIndex, COLOR_THEME_COLORS)
 
     if (oldColorThemeIndex ~= globalVars.colorThemeIndex) then
-        write(globalVars)
+        -- write(globalVars)
     end
 
     local currentTheme = COLOR_THEMES[globalVars.colorThemeIndex]
@@ -169,7 +169,7 @@ function chooseCursorTrail()
     local oldCursorTrailIndex = globalVars.cursorTrailIndex
     globalVars.cursorTrailIndex = Combo("Cursor Trail", CURSOR_TRAILS, oldCursorTrailIndex)
     if (oldCursorTrailIndex ~= globalVars.cursorTrailIndex) then
-        write(globalVars)
+        -- write(globalVars)
     end
 end
 
@@ -185,7 +185,7 @@ function chooseCursorTrailPoints()
 
     local settingChanged = BasicInputInt(globalVars, "cursorTrailPoints", "Trail Points")
     if (settingChanged) then
-        write(globalVars)
+        -- write(globalVars)
     end
 end
 
@@ -197,7 +197,7 @@ function chooseCursorTrailShape()
     local oldTrailShapeIndex = globalVars.cursorTrailShapeIndex
     globalVars.cursorTrailShapeIndex = Combo(label, TRAIL_SHAPES, oldTrailShapeIndex)
     if (oldTrailShapeIndex ~= globalVars.cursorTrailShapeIndex) then
-        write(globalVars)
+        -- write(globalVars)
     end
 end
 
@@ -207,7 +207,7 @@ function chooseCursorShapeSize()
 
     local settingChanged = BasicInputInt(globalVars, "cursorTrailSize", "Shape Size")
     if (settingChanged) then
-        write(globalVars)
+        -- write(globalVars)
     end
 end
 
@@ -302,7 +302,7 @@ function chooseEffectFPS()
     local settingChanged = BasicInputInt(globalVars, "effectFPS", "Effect FPS", { 2, 1000 },
         "Set this to a multiple of UPS or FPS to make cursor effects smooth")
     if (settingChanged) then
-        write(globalVars)
+        -- write(globalVars)
     end
 end
 
@@ -385,7 +385,7 @@ function chooseStepSize()
     globalVars.stepSize = math.clamp(tempStepSize, 1, 100)
     imgui.PopItemWidth()
     if (oldStepSize ~= globalVars.stepSize) then
-        write(globalVars)
+        -- write(globalVars)
     end
 end
 
@@ -518,7 +518,7 @@ function chooseRGBPeriod()
     globalVars.rgbPeriod = math.clamp(globalVars.rgbPeriod, MIN_RGB_CYCLE_TIME,
         MAX_RGB_CYCLE_TIME)
     if (oldRGBPeriod ~= globalVars.rgbPeriod) then
-        write(globalVars)
+        -- write(globalVars)
     end
 end
 
@@ -541,7 +541,7 @@ function chooseSnakeSpringConstant()
     HelpMarker("Pick any number from 0.01 to 1")
     globalVars.snakeSpringConstant = math.clamp(globalVars.snakeSpringConstant, 0.01, 1)
     if (globalVars.snakeSpringConstant ~= oldValue) then
-        write(globalVars)
+        -- write(globalVars)
     end
 end
 
@@ -654,7 +654,7 @@ function chooseStyleTheme()
     local oldStyleTheme = globalVars.styleThemeIndex
     globalVars.styleThemeIndex = Combo("Style Theme", STYLE_THEMES, oldStyleTheme)
     if (oldStyleTheme ~= globalVars.styleThemeIndex) then
-        write(globalVars)
+        -- write(globalVars)
     end
 end
 
@@ -704,7 +704,7 @@ function choosePulseCoefficient()
         math.round(globalVars.pulseCoefficient * 100) .. "%%")
     globalVars.pulseCoefficient = math.clamp(globalVars.pulseCoefficient, 0, 1)
     if (oldCoefficient ~= globalVars.pulseCoefficient) then
-        write(globalVars)
+        -- write(globalVars)
     end
 end
 
@@ -714,7 +714,7 @@ function choosePulseColor()
     local oldColor = globalVars.pulseColor
     _, globalVars.pulseColor = imgui.ColorPicker4("Pulse Color", globalVars.pulseColor)
     if (oldColor ~= globalVars.pulseColor) then
-        write(globalVars)
+        -- write(globalVars)
     end
     if (not colorPickerOpened) then
         state.SetValue("showColorPicker", false)
