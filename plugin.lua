@@ -7464,8 +7464,6 @@ function renderTutorialMenu()
     end
     imgui.EndChild()
     imgui.NextColumn()
-    imgui.SetNextWindowSizeConstraints(vector.New(600 - navigatorWidth - 20, 500),
-        vector.New(600 - navigatorWidth - 20, 10000))
     imgui.BeginChild("Tutorial Data", vector.New(600 - navigatorWidth - 20, 500), imgui_child_flags
         .AlwaysUseWindowPadding)
     local importantColor = vector.New(1, 0.5, 0.5, 1)
@@ -7513,7 +7511,7 @@ function renderTutorialMenu()
         imgui.TextWrapped(
             'To implement this effect, we will need to create some SV. Head to the CREATE tab in your plugin, and locate the dropdown with the word "TYPE" next to it.')
         imgui.TextColored(importantColor,
-            'Select "SPECIAL" under the "TYPE" dropdown. The tutorial will\ncontinue when you\'ve done so. In the future,all tutorials will go to\nthe next step when the instructions in RED TEXT are completed.')
+            'Select "SPECIAL" under the "TYPE" dropdown. The tutorial will\ncontinue when you\'ve done so. In the future, all tutorials will go to\nthe next step when the instructions in RED TEXT are completed.')
         if (globalVars.placeTypeIndex == 2) then
             imgui.TextColored(importantColor,
                 'Now, under the "SPECIAL" tab, make sure "STUTTER" is selected.')
@@ -7525,23 +7523,23 @@ function renderTutorialMenu()
                 "We want to edit the value of the first SV, and the second SV will be updated accordingly. Note that the default SV for a map is 1x, so we will leave average SV on 1x.")
             imgui.TextColored(importantColor,
                 'Set the SV value to 4.00x by clicking on the input and inputting "4".')
-            ForceHeight(500)
+            ForceHeight(490)
             if (settingVars.startSV ~= 4) then goto endTutorial end
-            ForceHeight(460)
+            ForceHeight(450)
             imgui.Dummy(vector.New(0, 10))
             imgui.TextWrapped(
                 'At any time, you can see what your SVs will look like in the "SV INFO" window. Looking inside, we notice one of our SVs is negative. This is because of the relatively large SV we just put in, 4. To counter this, we have two options; either let the second SV be negative, or change how long the first SV lasts. Try playing around with the "Duration" slider.')
             imgui.TextColored(importantColor,
                 "Set the duration to be 20%%. Either drag the slider along,\nor hold Ctrl and click to edit the slider directly.")
-            ForceHeight(630)
+            ForceHeight(620)
             if (settingVars.stutterDuration ~= 20) then goto endTutorial end
-            ForceHeight(590)
+            ForceHeight(580)
             imgui.TextColored(vector4(0), "penis")
             imgui.TextWrapped(
                 'If you want, you can change some of the other settings; try seeing what happens when you increase the stutter count. However, for the sake of this tutorial, you are done.')
             imgui.TextColored(importantColor,
                 'Now, select a note representing a strong sound, and\nthe note after it. Either hit the "T" button, or click\nthe "Place SVs between selected notes" button.')
-            ForceHeight(740)
+            ForceHeight(730)
         end
         ::endTutorial::
     end
