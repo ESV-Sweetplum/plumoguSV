@@ -1,4 +1,3 @@
--- Swap selected notes' position with SVs
 function swapNoteSVs()
     local svsToAdd = {}
     local svsToRemove = {}

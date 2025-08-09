@@ -6,9 +6,6 @@ function setPluginAppearance()
     setPluginAppearanceColors(colorTheme)
 end
 
--- Configures the plugin GUI styles
--- Parameters
---    styleTheme : name of the desired style theme [String]
 function setPluginAppearanceStyles(styleTheme)
     local cornerRoundnessValue = (styleTheme == "Boxed" or
         styleTheme == "Boxed + Border") and 0 or 5 -- up to 12, 14 for WindowRounding and 16 for ChildRounding
@@ -36,10 +33,6 @@ function setPluginAppearanceStyles(styleTheme)
     -- imgui.GetStyle() which hasn't worked from my testing in Quaver plugins
 end
 
--- Configures the plugin GUI colors
--- Parameters
---    colorTheme : currently selected color theme [String]
---    rgbPeriod  : length in seconds of one RGB color cycle [Int/Float]
 function setPluginAppearanceColors(colorTheme)
     local borderColor = vector4(1)
 
@@ -63,7 +56,6 @@ function setPluginAppearanceColors(colorTheme)
     state.SetValue("baseBorderColor", borderColor)
 end
 
--- Sets plugin colors to the "Classic" theme
 function setClassicColors()
     local borderColor = vector.New(0.81, 0.88, 1.00, 0.30)
     imgui.PushStyleColor(imgui_col.WindowBg, vector.New(0.00, 0.00, 0.00, 1.00))
@@ -100,7 +92,6 @@ function setClassicColors()
     return borderColor
 end
 
--- Sets plugin colors to the "Strawberry" theme
 function setStrawberryColors()
     local borderColor = vector.New(1.00, 0.81, 0.88, 0.30)
     imgui.PushStyleColor(imgui_col.WindowBg, vector.New(0.00, 0.00, 0.00, 1.00))
@@ -137,7 +128,6 @@ function setStrawberryColors()
     return borderColor
 end
 
--- Sets plugin colors to the "Amethyst" theme
 function setAmethystColors()
     local borderColor = vector.New(0.90, 0.00, 0.81, 0.30)
 
@@ -175,7 +165,6 @@ function setAmethystColors()
     return borderColor
 end
 
--- Sets plugin colors to the "Tree" theme
 function setTreeColors()
     local borderColor = vector.New(0.81, 0.90, 0.00, 0.30)
 
@@ -213,7 +202,6 @@ function setTreeColors()
     return borderColor
 end
 
--- Sets plugin colors to the "Barbie" theme
 function setBarbieColors()
     local pink = vector.New(0.79, 0.31, 0.55, 1.00)
     local white = vector.New(0.95, 0.85, 0.87, 1.00)
@@ -254,7 +242,6 @@ function setBarbieColors()
     return pinkTint
 end
 
--- Sets plugin colors to the "Incognito" theme
 function setIncognitoColors()
     local black = vector.New(0.00, 0.00, 0.00, 1.00)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
@@ -341,7 +328,6 @@ function setIncognitoRGBColors(rgbPeriod)
     return rgbColor
 end
 
--- Sets plugin colors to the "Tobi's Glass" theme
 function setTobiGlassColors()
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.70)
     local transparentWhite = vector.New(0.30, 0.30, 0.30, 0.50)
@@ -428,7 +414,6 @@ function setTobiRGBGlassColors(rgbPeriod)
     return activeColor
 end
 
--- Sets plugin colors to the "Glass" theme
 function setGlassColors()
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.25)
     local transparentWhite = vector.New(1.00, 1.00, 1.00, 0.70)
@@ -648,7 +633,6 @@ function setInvertedIncognitoRGBColors(rgbPeriod)
     return rgbColor
 end
 
--- Sets plugin colors to the "otingocnI" theme
 function setInvertedIncognitoColors()
     local black = vector.New(0.00, 0.00, 0.00, 1.00)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
@@ -690,7 +674,6 @@ function setInvertedIncognitoColors()
     return blackTint
 end
 
--- Sets plugin colors to the "Classic" theme
 function setCustomColors()
     if (globalVars.customStyle == nil) then
         return setClassicColors()

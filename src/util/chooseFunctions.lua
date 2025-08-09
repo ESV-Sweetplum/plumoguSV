@@ -378,7 +378,6 @@ function chooseInterlace(menuVars)
     return interlaceChanged or oldRatio ~= menuVars.interlaceRatio
 end
 
--- Lets you choose the increments the Intensity slider goes by (e.g. Exponential Intensity Slider)
 function chooseStepSize()
     imgui.PushItemWidth(40)
     local oldStepSize = globalVars.stepSize

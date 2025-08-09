@@ -26,7 +26,6 @@ end
 
 -- Scales a percent value based on the selected scale type
 
---    percent     : percent value to scale [Int/Float]
 function scalePercent(settingVars, percent)
     local behaviorType = SV_BEHAVIORS[settingVars.behaviorIndex]
     local slowDownType = behaviorType == "Slow down"
