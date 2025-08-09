@@ -95,7 +95,7 @@ function renderTutorialMenu()
         imgui.TextWrapped(
             'To implement this effect, we will need to create some SV. Head to the CREATE tab in your plugin, and locate the dropdown with the word "TYPE" next to it.')
         imgui.TextColored(importantColor,
-            'Select "SPECIAL" under the "TYPE" dropdown.\nThe tutorial will continue when you\'ve done so. In the future,\nall tutorials will go to the next step when the \nRED TEXT is completed.')
+            'Select "SPECIAL" under the "TYPE" dropdown. The tutorial will\ncontinue when you\'ve done so. In the future,all tutorials will go to\nthe next step when the instructions in RED TEXT are completed.')
         if (globalVars.placeTypeIndex == 2) then
             imgui.TextColored(importantColor,
                 'Now, under the "SPECIAL" tab, make sure "STUTTER" is selected.')
