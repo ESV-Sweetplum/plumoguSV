@@ -14,5 +14,7 @@
         ".vscode",
         "plugin.lua"
     ],
-    "codeLens.enable": true
+    "codeLens.enable": true,
+    "workspace.ignoreSubmodules": true,
+    "workspace.useGitIgnore": true
 }
