@@ -11,6 +11,7 @@ function renderTutorialMenu()
     local navigatorWidth = 200
 
     local nullFn = function() end
+    local tutorialFn = state.GetValue("tutorialFn", nullFn)
 
     local tree = {
         ["For Beginners"] = {
@@ -45,8 +46,26 @@ function renderTutorialMenu()
 
     imgui.BeginChild("Tutorial Navigator")
 
-    for text, data in ipairs(tree) do
+    function renderBranch(branch)
+        for text, data in pairs(branch) do
+            if (type(data) == "table") then
+                if (imgui.TreeNode(text)) then
+                    renderBranch(data)
+                    imgui.TreePop()
+                end
+            else
+                imgui.Selectable(text)
+                if (imgui.IsItemClicked()) then
+                    tutorialWindowName = text
+                    tutorialFn = data
+                end
+            end
+        end
+    end
 
+    for text, data in pairs(tree) do
+        imgui.SeparatorText(text)
+        renderBranch(data)
     end
 
     imgui.EndChild()
@@ -75,13 +94,7 @@ function renderTutorialMenu()
         imgui.SeparatorText("Select a tutorial menu on the left to view it.")
     end
 
-    windowMap = {
-        ["Your First Effect"] = showYourFirstEffectTutorial,
-        ["Your Second Effect"] = showYourSecondEffectTutorial,
-        ["Working With Shapes"] = showWorkingWithShapesTutorial
-    }
-
-    (windowMap[tutorialWindowName] or function() end)() -- Render Window
+    tutorialFn()
 
     ::dontRenderTutorial::
     imgui.EndChild()
@@ -90,4 +103,5 @@ function renderTutorialMenu()
     imgui.End()
 
     state.SetValue("tutorialWindowName", tutorialWindowName)
+    state.SetValue("tutorialFn", tutorialFn)
 end
