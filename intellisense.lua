@@ -3,7 +3,8 @@
 
 --[[
 
-Note: This file is exclusively for intellisense purposes. None of this file should ever go within plugin.lua.
+NOTE: This file is exclusively for intellisense purposes. None of this file should ever go within plugin.lua.
+
 Created by Emik and plummyyummy, for the public domain. Use this file as you wish.
 DM kvrosakura on Discord if there are any errors within this file.
 
@@ -39,7 +40,6 @@ For more information, please refer to <https://unlicense.org>
 ---@alias NoteLane 1|2|3|4|5|6|7|8|9|10
 ---@alias SnapNumber 1|2|3|4|5|6|8|12|16 The denominator of the corresponding snap.
 
--- STARTING LINE
 ---@class (exact) ScrollGroup
 ---##### (READ-ONLY)
 ---#### The initial [sv](lua://ScrollVelocity) multiplier of this [scroll group](lua://ScrollGroup).
@@ -1197,10 +1197,10 @@ function print(notificationType, ...) end
 
 ---@enum HitSounds
 hitsounds    = {
-    Normal = 1 << 0,  -- This is 1, but Normal should be played regardless if it's 0 or 1.
-    Whistle = 1 << 1, -- 2
-    Finish = 1 << 2,  -- 4
-    Clap = 1 << 3     -- 8
+    Normal = 1, -- Normal should be played regardless if it's 0 or 1.
+    Whistle = 2,
+    Finish = 4,
+    Clap = 8
 }
 
 ---@enum EditorActionType
