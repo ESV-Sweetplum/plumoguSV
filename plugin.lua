@@ -7509,7 +7509,7 @@ function renderTutorialMenu()
     end
     imgui.SeparatorText("Helpful Info")
     if (imgui.TreeNode("The Math Behind SV")) then
-        local tabs = { "Preface", "What IS msx?", "The calculus of SV", "Why do we call them shapes?" }
+        local tabs = { "Preface", "What IS msx?", "The calculus of SV", "Why do we call them shapes?", "My Balls" }
     end
     imgui.EndChild()
     imgui.NextColumn()
