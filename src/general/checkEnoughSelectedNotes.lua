@@ -8,6 +8,6 @@ function checkEnoughSelectedNotes(minimumNotes)
     local numSelectedNotes = #selectedNotes
     if numSelectedNotes == 0 then return false end
     if minimumNotes == 1 then return true end
-    if numSelectedNotes > map.GetKeyCount() then return true end
+    if numSelectedNotes > game.keyCount then return true end
     return selectedNotes[1].StartTime ~= selectedNotes[numSelectedNotes].StartTime
 end

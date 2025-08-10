@@ -67,11 +67,6 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     if (48 / v > 16) then return 5 end
     return 48 / v
 end
-function game.getSSFStartTimeAt(offset, tgId)
-    local sv = map.GetScrollSpeedFactorAt(offset, tgId)
-    if sv then return sv.StartTime end
-    return -1
-end
 function game.getSSFMultiplierAt(offset)
     local ssf = map.GetScrollSpeedFactorAt(offset)
     if ssf then return ssf.Multiplier end
@@ -292,13 +287,6 @@ end
 function math.quadraticBezier(p2, t)
     return 2 * t * (1 - t) * p2 + t * t
 end
----Returns n choose r, or nCr.
----@param n integer
----@param r integer
----@return integer
-function math.binom(n, r)
-    return math.factorial(n) / (math.factorial(r) * math.factorial(n - r))
-end
 ---Restricts a number to be within a chosen bound.
 ---@param number number
 ---@param lowerBound number
@@ -342,52 +330,6 @@ function math.hermite(m1, m2, y2, t)
     local b = 3 * y2 - 2 * m1 - m2
     local c = m1
     return a * t * t * t + b * t * t + c * t
-end
----Interpolates circular parameters of the form (x-h)^2+(y-k)^2=r^2 with three, non-colinear points.
----@param p1 Vector2
----@param p2 Vector2
----@param p3 Vector2
----@return number, number, number
-function math.interpolateCircle(p1, p2, p3)
-    local mtrx = {
-        vector.Table(2 * (p2 - p1)),
-        vector.Table(2 * (p3 - p1))
-    }
-    local vctr = {
-        vector.Length(p2) ^ 2 - vector.Length(p1) ^ 2,
-        vector.Length(p3) ^ 2 - vector.Length(p1) ^ 2
-    }
-    h, k = matrix.solve(mtrx, vctr)
-    r = math.sqrt((p1.x) ^ 2 + (p1.y) ^ 2 + h * h + k * k - 2 * h * p1.x - 2 * k * p1.y)
-    ---@type number, number, number
-    return h, k, r
-end
----Interpolates quadratic parameters of the form y=ax^2+bx+c with three, non-colinear points.
----@param p1 Vector2
----@param p2 Vector2
----@param p3 Vector2
----@return number, number, number
-function math.interpolateQuadratic(p1, p2, p3)
-    local mtrx = {
-        (p2.x) ^ 2 - (p1.x) ^ 2, (p2 - p1).x,
-        (p3.x) ^ 2 - (p1.x) ^ 2, (p3 - p1).x,
-    }
-    local vctr = {
-        (p2 - p1).y,
-        (p3 - p1).y
-    }
-    a, b = matrix.solve(mtrx, vctr)
-    c = p1.y - p1.x * b - (p1.x) ^ 2 * a
-    ---@type number, number, number
-    return a, b, c
-end
----Returns a number that is `(weight * 100)%` of the way from travelling between `lowerBound` and `upperBound`.
----@param weight number
----@param lowerBound number
----@param upperBound number
----@return number
-function math.lerp(weight, lowerBound, upperBound)
-    return upperBound * weight + lowerBound * (1 - weight)
 end
 ---Returns the weight of a number between `lowerBound` and `upperBound`.
 ---@param num number
@@ -446,11 +388,6 @@ function matrix.solve(mtrx, vctr)
         end
     end
     return table.unpack(table.property(augMtrx, #mtrx + 1))
-end
-function matrix.swapRows(mtrx, rowIdx1, rowIdx2)
-    local temp = mtrx[rowIdx1]
-    mtrx[rowIdx1] = mtrx[rowIdx2]
-    mtrx[rowIdx2] = temp
 end
 ---Rounds a number to a given amount of decimal places.
 ---@param number number
@@ -998,9 +935,6 @@ end
 ---@return Vector2 vctr The resultant vector of style `<n, n>`.
 function vector2(n)
     return vector.New(n, n)
-end
-function unit2(theta)
-    return vector.New(math.cos(theta), math.sin(theta))
 end
 imgui_disable_vector_packing = true
 DEFAULT_WIDGET_HEIGHT = 26
@@ -3460,7 +3394,7 @@ function selectByChordSizes(menuVars)
     end
     noteTimeTable = table.dedupe(noteTimeTable)
     local sizeDict = {}
-    for idx = 1, keyCount do
+    for idx = 1, game.keyCount do
         sizeDict[#sizeDict + 1] = {}
     end
     for k36 = 1, #noteTimeTable do
@@ -3479,7 +3413,7 @@ function selectByChordSizes(menuVars)
         sizeDict[size] = table.combine(sizeDict[size], totalNotes)
     end
     local notesToSelect = {}
-    for idx = 1, keyCount do
+    for idx = 1, game.keyCount do
         if (menuVars["select" .. idx]) then
             notesToSelect = table.combine(notesToSelect, sizeDict[idx])
         end
@@ -5006,35 +4940,6 @@ function getCurrentRGBColors(rgbPeriod)
     end
     return { red = red, green = green, blue = blue }
 end
-function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOverride, windowScale)
-    if (not forcedOverride) then
-        imgui.Dummy(vector.New(0, 10))
-        imgui.SetCursorPosX((380 - 270 * szFactor.x) / 2)
-    end
-    imgui.BeginChild(label, vector.New(270, 150) * szFactor, imgui_child_flags.Border)
-    local heightFactor = szFactor.y
-    local simulationTime = state.UnixTime % simulationDuration
-    local progress = simulationTime / simulationDuration
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    for i = 1, #colTbl do
-        for _, col in ipairs(colTbl[i]) do
-            local height = 50 * (#colTbl * distanceFn(math.wrap(progress + 0.25, 0, 1)) + #colTbl - i)
-            if (height > 150) then
-                height = height - 50 * #colTbl
-            end
-            local notePos = vector.New((col - 1) * 60 + 20, height) * szFactor
-            local noteSize = vector.New(50, 20) * szFactor
-            ctx.AddRectFilledMultiColor(topLeft + notePos, topLeft + notePos + noteSize, rgbaToUint(255, 0, 0, 100),
-                rgbaToUint(255, 0, 0, 100), rgbaToUint(255, 0, 200, 255), rgbaToUint(255, 0, 200, 255))
-        end
-    end
-    imgui.EndChild()
-    if (not forcedOverride) then
-        imgui.Dummy(vector.New(0, 10))
-    end
-end
 ---Creates an imgui button.
 ---@param text string The text that the button should have.
 ---@param size Vector2 The size of the button.
@@ -5151,8 +5056,6 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
     end
     imgui.EndCombo()
     return newListIndex
-end
-function BasicInputFloat(label, var, decimalPlaces, suffix, step)
 end
 function ComputableInputFloat(label, var, decimalPlaces, suffix)
     local computableStateIndex = state.GetValue("ComputableInputFloatIndex") or 1
@@ -5290,12 +5193,6 @@ function executeFunctionIfTrue(condition, fn, menuVars)
     end
     fn()
 end
-function StatedInputText(label, input)
-    local statedInputTextIndex = state.GetValue("StatedInputTextIndex", 1)
-    local _, out = imgui.InputText(table.concat({ label, "##", statedInputTextIndex }), input, 4096)
-    state.SetValue("StatedInputTextIndex", statedInputTextIndex + 1)
-    return out, input ~= out
-end
 function KeepSameLine()
     return imgui.SameLine(0, SAMELINE_SPACING)
 end
@@ -5320,13 +5217,42 @@ function HelpMarker(text)
     imgui.TextDisabled("(?)")
     ToolTip(text)
 end
+function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOverride, windowScale)
+    if (not forcedOverride) then
+        imgui.Dummy(vector.New(0, 10))
+        imgui.SetCursorPosX((380 - 270 * szFactor.x) / 2)
+    end
+    imgui.BeginChild(label, vector.New(270, 150) * szFactor, imgui_child_flags.Border)
+    local heightFactor = szFactor.y
+    local simulationTime = state.UnixTime % simulationDuration
+    local progress = simulationTime / simulationDuration
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    for i = 1, #colTbl do
+        for _, col in ipairs(colTbl[i]) do
+            local height = 50 * (#colTbl * distanceFn(math.wrap(progress + 0.25, 0, 1)) + #colTbl - i)
+            if (height > 150) then
+                height = height - 50 * #colTbl
+            end
+            local notePos = vector.New((col - 1) * 60 + 20, height) * szFactor
+            local noteSize = vector.New(50, 20) * szFactor
+            ctx.AddRectFilledMultiColor(topLeft + notePos, topLeft + notePos + noteSize, rgbaToUint(255, 0, 0, 100),
+                rgbaToUint(255, 0, 0, 100), rgbaToUint(255, 0, 200, 255), rgbaToUint(255, 0, 200, 255))
+        end
+    end
+    imgui.EndChild()
+    if (not forcedOverride) then
+        imgui.Dummy(vector.New(0, 10))
+    end
+end
 function checkEnoughSelectedNotes(minimumNotes)
     if minimumNotes == 0 then return true end
     local selectedNotes = state.SelectedHitObjects
     local numSelectedNotes = #selectedNotes
     if numSelectedNotes == 0 then return false end
     if minimumNotes == 1 then return true end
-    if numSelectedNotes > map.GetKeyCount() then return true end
+    if numSelectedNotes > game.keyCount then return true end
     return selectedNotes[1].StartTime ~= selectedNotes[numSelectedNotes].StartTime
 end
 function showSettingsMenu(currentSVType, settingVars, skipFinalSV, svPointsForce)
@@ -5514,7 +5440,7 @@ end
 function addFrameTimes(settingVars)
     if not imgui.Button("Add selected notes to use for frames", ACTION_BUTTON_SIZE) then return end
     local hasAlreadyAddedLaneTime = {}
-    for _ = 1, map.GetKeyCount() do
+    for _ = 1, game.keyCount do
         hasAlreadyAddedLaneTime[#hasAlreadyAddedLaneTime + 1] = {}
     end
     local frameTimeToIndex = {}
@@ -5575,7 +5501,7 @@ function displayFrameTimes(settingVars)
     imgui.EndChild()
 end
 function drawCurrentFrame(settingVars)
-    local mapKeyCount = map.GetKeyCount()
+    local mapKeyCount = game.keyCount
     local noteWidth = 200 / mapKeyCount
     local noteSpacing = 5
     local barNoteHeight = math.round(2 * noteWidth / 5, 0)
@@ -5622,9 +5548,6 @@ function addSelectedNoteTimesToList(menuVars)
     end
     menuVars.noteTimes = table.dedupe(menuVars.noteTimes)
     menuVars.noteTimes = sort(menuVars.noteTimes, sortAscending)
-end
-function animationPaletteMenu(settingVars)
-    CodeInput(settingVars, "instructions", "", "Write instructions here.")
 end
 function automateSVMenu(settingVars)
     local copiedSVCount = #settingVars.copiedSVs
@@ -6596,7 +6519,7 @@ function selectBookmarkMenu()
 end
 function selectChordSizeMenu()
     local menuVars = getMenuVars("selectChordSize")
-    for idx = 1, keyCount do
+    for idx = 1, game.keyCount do
         local varLabel = "select" .. idx
         local label = table.concat({ table.concat({"Size ", idx, " Chord"}) })
         _, menuVars[varLabel] = imgui.Checkbox(label, menuVars[varLabel])
@@ -7042,7 +6965,7 @@ function showDefaultPropertiesSettings()
     end
     if (imgui.CollapsingHeader("Select Chord Size Settings")) then
         local menuVars = getMenuVars("selectChordSize", "Property")
-        for idx = 1, keyCount do
+        for idx = 1, game.keyCount do
             local varLabel = "select" .. idx
             local label = table.concat({ table.concat({"Size ", idx, " Chord"}) })
             _, menuVars[varLabel] = imgui.Checkbox(label, menuVars[varLabel])
@@ -7481,7 +7404,7 @@ function renderTutorialMenu()
     end
     local navigatorWidth = 200
     local nullFn = function() end
-    local tutorialFn = state.GetValue("tutorialFn", nullFn)
+    local tutorialFn = state.GetValue("tutorialFn") or nullFn
     local tree = {
         ["For Beginners"] = {
             ["Placing SVs"] = {
@@ -7500,11 +7423,14 @@ function renderTutorialMenu()
             }
         },
         ["Helpful Info"] = {
+            ["Plugin Efficiency Tips"] = {
+            },
             ["The Math Behind SV"] = {
                 ["Preface"] = nullFn,
                 ["What IS msx?"] = nullFn,
                 ["The calculus of SV"] = nullFn,
                 ["Why do we call them shapes?"] = nullFn,
+                ["Analogies to Physics"] = nullFn,
             }
         }
     }
@@ -7540,7 +7466,7 @@ function renderTutorialMenu()
         imgui.SetCursorPosY(h)
         imgui.TextColored(vector4(0), "penis")
     end
-    if (map.GetKeyCount(false) ~= 4) then
+    if (game.keyCount ~= 4) then
         imgui.SeparatorText("This tutorial does not support this key mode.")
         imgui.Text("Please go to a 4K map to continue.")
         goto dontRenderTutorial
@@ -8386,14 +8312,6 @@ function uintToRgba(n)
     end
     return table.vectorize4(tbl)
 end
-function rgbaToHexa(r, g, b, a)
-    local flr = math.floor
-    local hexaStr = ""
-    for _, col in ipairs({ r, g, b, a }) do
-        hexaStr = hexaStr .. HEXADECIMAL[math.floor(col / 16) + 1] .. HEXADECIMAL[flr(col) % 16 + 1]
-    end
-    return hexaStr
-end
 function hexaToRgba(hexa)
     local rgbaTable = {}
     for i = 1, 8, 2 do
@@ -8948,9 +8866,6 @@ end
 function createSSF(startTime, multiplier)
     return utils.CreateScrollSpeedFactor(startTime, multiplier)
 end
-function createEA(actionType, ...)
-    return utils.CreateEditorAction(actionType, ...)
-end
 ---Removes and adds SVs.
 ---@param svsToRemove ScrollVelocity[]
 ---@param svsToAdd ScrollVelocity[]
@@ -9050,22 +8965,6 @@ function getHypotheticalSVMultiplierAt(svs, offset)
         end
     end
     return 1
-end
----Returns the SV time in a given array of SVs.
----@param svs ScrollVelocity[]
----@param offset number
----@return number
-function getHypotheticalSVTimeAt(svs, offset)
-    if (#svs == 1) then return svs[1].StartTime end
-    local index = #svs
-    while (index >= 1) do
-        if (svs[index].StartTime > offset) then
-            index = index - 1
-        else
-            return svs[index].StartTime
-        end
-    end
-    return -69
 end
 ---Given a predetermined set of SVs, returns a list of [scroll velocities](lua://ScrollVelocity) within a temporal boundary.
 ---@param startOffset number The lower bound of the search area.
@@ -9593,7 +9492,7 @@ function awake()
     end
     initializeNoteLockMode()
     listenForHitObjectChanges()
-    keyCount = map.GetKeyCount(false)
+    game.keyCount = map.GetKeyCount()
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
     if (not state.CurrentTimingPoint) then
         print("e!", "Please place a timing point before attempting to use plumoguSV.")

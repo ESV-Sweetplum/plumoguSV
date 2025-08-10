@@ -227,7 +227,7 @@ function showDefaultPropertiesSettings()
     if (imgui.CollapsingHeader("Select Chord Size Settings")) then
         local menuVars = getMenuVars("selectChordSize", "Property")
 
-        for idx = 1, keyCount do
+        for idx = 1, game.keyCount do
             local varLabel = "select" .. idx
             local label = table.concat({ "Size " .. idx .. " Chord" })
             _, menuVars[varLabel] = imgui.Checkbox(label, menuVars[varLabel])

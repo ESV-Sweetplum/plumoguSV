@@ -11,7 +11,7 @@ function renderTutorialMenu()
     local navigatorWidth = 200
 
     local nullFn = function() end
-    local tutorialFn = state.GetValue("tutorialFn", nullFn)
+    local tutorialFn = state.GetValue("tutorialFn") or nullFn
 
     local tree = {
         ["For Beginners"] = {
@@ -31,11 +31,15 @@ function renderTutorialMenu()
             }
         },
         ["Helpful Info"] = {
+            ["Plugin Efficiency Tips"] = {
+
+            },
             ["The Math Behind SV"] = {
                 ["Preface"] = nullFn,
                 ["What IS msx?"] = nullFn,
                 ["The calculus of SV"] = nullFn,
                 ["Why do we call them shapes?"] = nullFn,
+                ["Analogies to Physics"] = nullFn,
             }
         }
     }
@@ -79,7 +83,7 @@ function renderTutorialMenu()
         imgui.TextColored(vector4(0), "penis")
     end
 
-    if (map.GetKeyCount(false) ~= 4) then
+    if (game.keyCount ~= 4) then
         imgui.SeparatorText("This tutorial does not support this key mode.")
         imgui.Text("Please go to a 4K map to continue.")
         goto dontRenderTutorial

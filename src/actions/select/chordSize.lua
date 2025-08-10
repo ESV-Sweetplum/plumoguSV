@@ -19,7 +19,7 @@ function selectByChordSizes(menuVars)
 
     local sizeDict = {}
 
-    for idx = 1, keyCount do
+    for idx = 1, game.keyCount do
         table.insert(sizeDict, {})
     end
 
@@ -47,7 +47,7 @@ function selectByChordSizes(menuVars)
 
     local notesToSelect = {}
 
-    for idx = 1, keyCount do
+    for idx = 1, game.keyCount do
         if (menuVars["select" .. idx]) then
             notesToSelect = table.combine(notesToSelect, sizeDict[idx])
         end

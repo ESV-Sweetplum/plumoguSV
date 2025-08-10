@@ -58,7 +58,7 @@ function addFrameTimes(settingVars)
     if not imgui.Button("Add selected notes to use for frames", ACTION_BUTTON_SIZE) then return end
 
     local hasAlreadyAddedLaneTime = {}
-    for _ = 1, map.GetKeyCount() do
+    for _ = 1, game.keyCount do
         table.insert(hasAlreadyAddedLaneTime, {})
     end
     local frameTimeToIndex = {}
@@ -121,7 +121,7 @@ function displayFrameTimes(settingVars)
 end
 
 function drawCurrentFrame(settingVars)
-    local mapKeyCount = map.GetKeyCount()
+    local mapKeyCount = game.keyCount
     local noteWidth = 200 / mapKeyCount
     local noteSpacing = 5
     local barNoteHeight = math.round(2 * noteWidth / 5, 0)

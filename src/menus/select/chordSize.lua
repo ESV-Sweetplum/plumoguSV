@@ -1,7 +1,7 @@
 function selectChordSizeMenu()
     local menuVars = getMenuVars("selectChordSize")
 
-    for idx = 1, keyCount do
+    for idx = 1, game.keyCount do
         local varLabel = "select" .. idx
         local label = table.concat({ "Size " .. idx .. " Chord" })
         _, menuVars[varLabel] = imgui.Checkbox(label, menuVars[varLabel])
