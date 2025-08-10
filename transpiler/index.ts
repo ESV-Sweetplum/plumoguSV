@@ -132,16 +132,16 @@ export default async function transpiler(devMode = false, lint = true) {
             fnIndices
         );
 
-        // unusedIndexes.reverse().forEach((idx) => {
-        //     let startIdx = idx;
-        //     let endIdx = idx;
-        //     while (/^---/.test(splitOutput[startIdx - 1]) && startIdx > 0)
-        //         startIdx--;
-        //     while (!/^end/.test(splitOutput[endIdx])) endIdx++;
-        //     splitOutput.splice(startIdx, endIdx - startIdx + 1);
-        // });
+        unusedIndexes.reverse().forEach((idx) => {
+            let startIdx = idx;
+            let endIdx = idx;
+            while (/^---/.test(splitOutput[startIdx - 1]) && startIdx > 0)
+                startIdx--;
+            while (!/^end/.test(splitOutput[endIdx])) endIdx++;
+            splitOutput.splice(startIdx, endIdx - startIdx + 1);
+        });
 
-        // output = splitOutput.join('\n');
+        output = splitOutput.join('\n');
     }
 
     if (existsSync('plugin.lua')) rmSync('plugin.lua');

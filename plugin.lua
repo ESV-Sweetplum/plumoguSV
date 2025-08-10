@@ -7480,36 +7480,38 @@ function renderTutorialMenu()
         state.SetValue("showTutorialWindow", false)
     end
     local navigatorWidth = 200
+    local nullFn = function() end
+    local tree = {
+        ["For Beginners"] = {
+            ["Placing SVs"] = {
+                ["Your First Effect"] = showYourFirstEffectTutorial,
+                ["Your Second Effect"] = showYourSecondEffectTutorial,
+                ["Working With Shapes"] = showWorkingWithShapesTutorial,
+                ["Editing/Removing SVs"] = nullFn,
+                ["Composite Effects"] = nullFn,
+                ["Stills and Displacement"] = nullFn,
+            },
+            ["Adding Effects"] = {},
+            ["Vibrato"] = {},
+            ["Deconstructing Effects"] = {
+                ["Preface"] = nullFn,
+                ["PK Rave"] = nullFn
+            }
+        },
+        ["Helpful Info"] = {
+            ["The Math Behind SV"] = {
+                ["Preface"] = nullFn,
+                ["What IS msx?"] = nullFn,
+                ["The calculus of SV"] = nullFn,
+                ["Why do we call them shapes?"] = nullFn,
+            }
+        }
+    }
     imgui.Columns(2)
     imgui.SetColumnWidth(0, 200)
     imgui.SetColumnWidth(1, 400)
     imgui.BeginChild("Tutorial Navigator")
-    imgui.SeparatorText("For Beginners")
-    if (imgui.TreeNode("Placing SVs")) then
-        local tabs = { "Your First Effect", "Your Second Effect", "Working With Shapes", "Editing/Removing SVs",
-            "Composite Effects",
-            "Stills and Displacement" }
-        for _, t in pairs(tabs) do
-            imgui.Selectable(t)
-            if (imgui.IsItemClicked()) then
-                tutorialWindowName = t
-            end
-        end
-        imgui.TreePop()
-    end
-    if (imgui.TreeNode("Adding Effects")) then
-        imgui.TreePop()
-    end
-    if (imgui.TreeNode("Vibrato")) then
-        imgui.TreePop()
-    end
-    if (imgui.TreeNode("Deconstructing Effects")) then
-        local tabs = { "Preface", "PK Rave" }
-        imgui.TreePop()
-    end
-    imgui.SeparatorText("Helpful Info")
-    if (imgui.TreeNode("The Math Behind SV")) then
-        local tabs = { "Preface", "What IS msx?", "The calculus of SV", "Why do we call them shapes?", "My Balls" }
+    for text, data in ipairs(tree) do
     end
     imgui.EndChild()
     imgui.NextColumn()
