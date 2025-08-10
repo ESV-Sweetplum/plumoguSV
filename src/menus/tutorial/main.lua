@@ -19,7 +19,7 @@ function renderTutorialMenu()
     imgui.SeparatorText("For Beginners")
 
     if (imgui.TreeNode("Placing SVs")) then
-        local tabs = { "Your First Effect", "Your Second Effect", "Working With Shapes", "Removing SVs",
+        local tabs = { "Your First Effect", "Your Second Effect", "Working With Shapes", "Editing/Removing SVs",
             "Composite Effects",
             "Stills and Displacement" }
         for _, t in pairs(tabs) do
@@ -36,8 +36,14 @@ function renderTutorialMenu()
     if (imgui.TreeNode("Vibrato")) then
         imgui.TreePop()
     end
-    if (imgui.TreeNode("Recreating Popular Effects")) then
+    if (imgui.TreeNode("Deconstructing Effects")) then
+        local tabs = { "Preface", "PK Rave" }
         imgui.TreePop()
+    end
+
+    imgui.SeparatorText("Helpful Info")
+    if (imgui.TreeNode("The Math Behind SV")) then
+        local tabs = { "Preface", "What IS msx?", "The calculus of SV", "Why do we call them shapes?" }
     end
 
     imgui.EndChild()
@@ -56,18 +62,24 @@ function renderTutorialMenu()
         imgui.Text("Please go to a 4K map to continue.")
         goto dontRenderTutorial
     end
+
+    if (state.GetValue("tutorialWindowQueue", nil)) then
+        tutorialWindowName = state.GetValue("tutorialWindowQueue")
+        state.SetValue("tutorialWindowQueue", nil)
+    end
+
     if (not truthy(tutorialWindowName:len())) then
         imgui.SeparatorText("Select a tutorial menu on the left to view it.")
     end
-    if (tutorialWindowName == "Your First Effect") then
-        showYourFirstEffectTutorial()
-    end
-    if (tutorialWindowName == "Your Second Effect") then
-        showYourSecondEffectTutorial()
-    end
-    if (tutorialWindowName == "Working With Shapes") then
-        showWorkingWithShapesTutorial()
-    end
+
+    windowMap = {
+        ["Your First Effect"] = showYourFirstEffectTutorial,
+        ["Your Second Effect"] = showYourSecondEffectTutorial,
+        ["Working With Shapes"] = showWorkingWithShapesTutorial
+    }
+
+    (windowMap[tutorialWindowName] or function() end)() -- Render Window
+
     ::dontRenderTutorial::
     imgui.EndChild()
 

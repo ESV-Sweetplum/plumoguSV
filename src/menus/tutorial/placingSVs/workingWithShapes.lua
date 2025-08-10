@@ -37,7 +37,10 @@ function showWorkingWithShapesTutorial()
     if (menuVars.svTypeIndex ~= 1 or math.abs(settingVars.startSV + 1.5) > 0.001 or math.abs(settingVars.endSV - 1.5) > 0.001) then return end
     ForceHeight(490)
     imgui.TextWrapped(
-        "Take a look at the SV info window, and notice how the notes are jumping. This is exactly what the effect will look like when placed in game.")
+        "Take a look at the SV info window, and notice how the notes are jumping. This is exactly what the effect will look like when placed in game:")
+    gpsim("Working With Shapes Jumping", vector2(1), function(t)
+        return 0.9 - 2 * (t - t ^ 2)
+    end, { { 1, 2, 3, 4 }, {}, {}, {} }, 500)
     imgui.TextColored(importantColor,
         'Select more than 2 chords (at least 3 notes with different times),\nand place the SV using an aforementioned method.')
     imgui.Dummy(vector.New(0, 10))
@@ -48,5 +51,5 @@ function showWorkingWithShapesTutorial()
     imgui.Dummy(vector.New(0, 10))
     imgui.TextWrapped(
         "Hopefully you should now have an effect that resembles individual jumping notes! You might recognize this effect from the old SV map PARTY. Now that you're more familiar with the SV info window and shapes, play around and see what you can make. Trial and error is the best way to learn SV.")
-    ForceHeight(840)
+    ForceHeight(1010)
 end

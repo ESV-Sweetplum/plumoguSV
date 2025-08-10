@@ -6150,8 +6150,7 @@ end
 function directSVMenu()
     local menuVars = getMenuVars("directSV")
     local clockTime = 0.2
-    if ((state.UnixTime or 0) - (state.GetValue("lastRecordedTime") or 0) >= clockTime) then
-        state.SetValue("lastRecordedTime", state.UnixTime or 0)
+    if (clock.listen("directSV", 500)) then
         updateDirectEdit()
     end
     local svs = state.GetValue("directSVList") or {}
@@ -7487,7 +7486,7 @@ function renderTutorialMenu()
     imgui.BeginChild("Tutorial Navigator")
     imgui.SeparatorText("For Beginners")
     if (imgui.TreeNode("Placing SVs")) then
-        local tabs = { "Your First Effect", "Your Second Effect", "Working With Shapes", "Removing SVs",
+        local tabs = { "Your First Effect", "Your Second Effect", "Working With Shapes", "Editing/Removing SVs",
             "Composite Effects",
             "Stills and Displacement" }
         for _, t in pairs(tabs) do
@@ -7504,8 +7503,13 @@ function renderTutorialMenu()
     if (imgui.TreeNode("Vibrato")) then
         imgui.TreePop()
     end
-    if (imgui.TreeNode("Recreating Popular Effects")) then
+    if (imgui.TreeNode("Deconstructing Effects")) then
+        local tabs = { "Preface", "PK Rave" }
         imgui.TreePop()
+    end
+    imgui.SeparatorText("Helpful Info")
+    if (imgui.TreeNode("The Math Behind SV")) then
+        local tabs = { "Preface", "What IS msx?", "The calculus of SV", "Why do we call them shapes?" }
     end
     imgui.EndChild()
     imgui.NextColumn()
@@ -7520,18 +7524,19 @@ function renderTutorialMenu()
         imgui.Text("Please go to a 4K map to continue.")
         goto dontRenderTutorial
     end
+    if (state.GetValue("tutorialWindowQueue", nil)) then
+        tutorialWindowName = state.GetValue("tutorialWindowQueue")
+        state.SetValue("tutorialWindowQueue", nil)
+    end
     if (not truthy(tutorialWindowName:len())) then
         imgui.SeparatorText("Select a tutorial menu on the left to view it.")
     end
-    if (tutorialWindowName == "Your First Effect") then
-        showYourFirstEffectTutorial()
-    end
-    if (tutorialWindowName == "Your Second Effect") then
-        showYourSecondEffectTutorial()
-    end
-    if (tutorialWindowName == "Working With Shapes") then
-        showWorkingWithShapesTutorial()
-    end
+    windowMap = {
+        ["Your First Effect"] = showYourFirstEffectTutorial,
+        ["Your Second Effect"] = showYourSecondEffectTutorial,
+        ["Working With Shapes"] = showWorkingWithShapesTutorial
+    }
+    (windowMap[tutorialWindowName] or function() end)()
     ::dontRenderTutorial::
     imgui.EndChild()
     imgui.Columns(1)
@@ -7575,7 +7580,10 @@ function showWorkingWithShapesTutorial()
     if (menuVars.svTypeIndex ~= 1 or math.abs(settingVars.startSV + 1.5) > 0.001 or math.abs(settingVars.endSV - 1.5) > 0.001) then return end
     ForceHeight(490)
     imgui.TextWrapped(
-        "Take a look at the SV info window, and notice how the notes are jumping. This is exactly what the effect will look like when placed in game.")
+        "Take a look at the SV info window, and notice how the notes are jumping. This is exactly what the effect will look like when placed in game:")
+    gpsim("Working With Shapes Jumping", vector2(1), function(t)
+        return 0.9 - 2 * (t - t * t)
+    end, { { 1, 2, 3, 4 }, {}, {}, {} }, 500)
     imgui.TextColored(importantColor,
         'Select more than 2 chords (at least 3 notes with different times),\nand place the SV using an aforementioned method.')
     imgui.Dummy(vector.New(0, 10))
@@ -7586,7 +7594,7 @@ function showWorkingWithShapesTutorial()
     imgui.Dummy(vector.New(0, 10))
     imgui.TextWrapped(
         "Hopefully you should now have an effect that resembles individual jumping notes! You might recognize this effect from the old SV map PARTY. Now that you're more familiar with the SV info window and shapes, play around and see what you can make. Trial and error is the best way to learn SV.")
-    ForceHeight(840)
+    ForceHeight(1010)
 end
 function showYourFirstEffectTutorial()
     local importantColor = vector.New(1, 0.5, 0.5, 1)
