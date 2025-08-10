@@ -1,0 +1,18 @@
+{
+    "type.castNumberToInteger": false,
+    "type.inferParamType": true,
+    "type.checkTableShape": true,
+    "diagnostics.disable": [
+        "lowercase-global",
+        "duplicate-set-field",
+        "duplicate-doc-alias",
+        "unused-local",
+        "duplicate-doc-field"
+    ],
+    "runtime.version": "Lua 5.2",
+    "workspace.ignoreDir": [
+        ".vscode",
+        "plugin.lua"
+    ],
+    "codeLens.enable": true
+}
