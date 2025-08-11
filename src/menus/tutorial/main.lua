@@ -1,7 +1,12 @@
 function renderTutorialMenu()
-    imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
-    _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
+    INSTRUCTION_COLOR = vector.New(1, 0.5, 0.5, 1)
+    GUIDELINE_COLOR = vector.New(0.5, 0.5, 1, 1)
 
+    imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
+    imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
+    imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
+
+    _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
     local tutorialWindowName = state.GetValue("tutorialWindowName", "")
 
     if (not opened) then
@@ -10,16 +15,19 @@ function renderTutorialMenu()
 
     local navigatorWidth = 200
 
-    local nullFn = function() end
+    local nullFn = function()
+        imgui.Text("Select a tutorial menu on the left to view it.")
+    end
     local tutorialFn = state.GetValue("tutorialFn") or nullFn
 
     local tree = {
         ["For Beginners"] = {
-            ["Placing SVs"] = {
+            ["Start Here"] = showStartingTutorial,
+            ["Placing Basic SVs"] = {
                 ["Your First Effect"] = showYourFirstEffectTutorial,
                 ["Your Second Effect"] = showYourSecondEffectTutorial,
                 ["Working With Shapes"] = showWorkingWithShapesTutorial,
-                ["Editing/Removing SVs"] = nullFn,
+                ["Editing/Removing SVs"] = showEditingRemovingSVTutorial,
                 ["Composite Effects"] = nullFn,
                 ["Stills and Displacement"] = nullFn,
             },
@@ -58,6 +66,7 @@ function renderTutorialMenu()
                     imgui.TreePop()
                 end
             else
+                if (imgui.GetCursorPosX() < 10) then imgui.SetCursorPosX(10) end
                 imgui.Selectable(text)
                 if (imgui.IsItemClicked()) then
                     tutorialWindowName = text
@@ -78,6 +87,8 @@ function renderTutorialMenu()
     imgui.BeginChild("Tutorial Data", vector.New(380, 500), imgui_child_flags
         .AlwaysUseWindowPadding)
 
+    imgui.SetCursorPosY(0)
+
     function ForceHeight(h)
         imgui.SetCursorPosY(h)
         imgui.TextColored(vector4(0), "penis")
@@ -94,10 +105,6 @@ function renderTutorialMenu()
         state.SetValue("tutorialWindowQueue", nil)
     end
 
-    if (not truthy(tutorialWindowName:len())) then
-        imgui.SeparatorText("Select a tutorial menu on the left to view it.")
-    end
-
     tutorialFn()
 
     ::dontRenderTutorial::
@@ -105,6 +112,8 @@ function renderTutorialMenu()
 
     imgui.Columns(1)
     imgui.End()
+
+    imgui.PopStyleColor(2)
 
     state.SetValue("tutorialWindowName", tutorialWindowName)
     state.SetValue("tutorialFn", tutorialFn)

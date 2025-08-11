@@ -6419,29 +6419,6 @@ function infoTab()
         state.SetValue("showTutorialWindow", not state.GetValue("showTutorialWindow", false))
     end
 end
-TAB_MENUS = {
-    "Info",
-    "Select",
-    "Create",
-    "Edit",
-    "Delete"
-}
----Creates a menu tab.
----@param tabName string
-function createMenuTab(tabName)
-    if not imgui.BeginTabItem(tabName) then return end
-    AddPadding()
-    if tabName == "Info" then
-        infoTab()
-    else
-        state.SetValue("showSettingsWindow", false)
-    end
-    if tabName == "Select" then selectTab() end
-    if tabName == "Create" then createSVTab() end
-    if tabName == "Edit" then editSVTab() end
-    if tabName == "Delete" then deleteTab() end
-    imgui.EndTabItem()
-end
 function selectAlternatingMenu()
     local menuVars = getMenuVars("selectAlternating")
     BasicInputInt(menuVars, "every", "Every __ notes", { 1, MAX_SV_POINTS })
@@ -7395,23 +7372,53 @@ function showWindowSettings()
     GlobalCheckbox("showMeasureDataWidget", "Show Measure Data Of Selection",
         "If two notes are selected, shows measure data within the selected region.")
 end
+TAB_MENUS = {
+    "Info",
+    "Select",
+    "Create",
+    "Edit",
+    "Delete"
+}
+---Creates a menu tab.
+---@param tabName string
+function createMenuTab(tabName)
+    if not imgui.BeginTabItem(tabName) then return end
+    AddPadding()
+    if tabName == "Info" then
+        infoTab()
+    else
+        state.SetValue("showSettingsWindow", false)
+    end
+    if tabName == "Select" then selectTab() end
+    if tabName == "Create" then createSVTab() end
+    if tabName == "Edit" then editSVTab() end
+    if tabName == "Delete" then deleteTab() end
+    imgui.EndTabItem()
+end
 function renderTutorialMenu()
+    INSTRUCTION_COLOR = vector.New(1, 0.5, 0.5, 1)
+    GUIDELINE_COLOR = vector.New(0.5, 0.5, 1, 1)
     imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
+    imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
+    imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
     _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
     local tutorialWindowName = state.GetValue("tutorialWindowName", "")
     if (not opened) then
         state.SetValue("showTutorialWindow", false)
     end
     local navigatorWidth = 200
-    local nullFn = function() end
+    local nullFn = function()
+        imgui.Text("Select a tutorial menu on the left to view it.")
+    end
     local tutorialFn = state.GetValue("tutorialFn") or nullFn
     local tree = {
         ["For Beginners"] = {
-            ["Placing SVs"] = {
+            ["Start Here"] = showStartingTutorial,
+            ["Placing Basic SVs"] = {
                 ["Your First Effect"] = showYourFirstEffectTutorial,
                 ["Your Second Effect"] = showYourSecondEffectTutorial,
                 ["Working With Shapes"] = showWorkingWithShapesTutorial,
-                ["Editing/Removing SVs"] = nullFn,
+                ["Editing/Removing SVs"] = showEditingRemovingSVTutorial,
                 ["Composite Effects"] = nullFn,
                 ["Stills and Displacement"] = nullFn,
             },
@@ -7446,6 +7453,7 @@ function renderTutorialMenu()
                     imgui.TreePop()
                 end
             else
+                if (imgui.GetCursorPosX() < 10) then imgui.SetCursorPosX(10) end
                 imgui.Selectable(text)
                 if (imgui.IsItemClicked()) then
                     tutorialWindowName = text
@@ -7462,6 +7470,7 @@ function renderTutorialMenu()
     imgui.NextColumn()
     imgui.BeginChild("Tutorial Data", vector.New(380, 500), imgui_child_flags
         .AlwaysUseWindowPadding)
+    imgui.SetCursorPosY(0)
     function ForceHeight(h)
         imgui.SetCursorPosY(h)
         imgui.TextColored(vector4(0), "penis")
@@ -7475,33 +7484,52 @@ function renderTutorialMenu()
         tutorialWindowName = state.GetValue("tutorialWindowQueue")
         state.SetValue("tutorialWindowQueue", nil)
     end
-    if (not truthy(tutorialWindowName:len())) then
-        imgui.SeparatorText("Select a tutorial menu on the left to view it.")
-    end
     tutorialFn()
     ::dontRenderTutorial::
     imgui.EndChild()
     imgui.Columns(1)
     imgui.End()
+    imgui.PopStyleColor(2)
     state.SetValue("tutorialWindowName", tutorialWindowName)
     state.SetValue("tutorialFn", tutorialFn)
 end
+function showEditingRemovingSVTutorial()
+    imgui.SeparatorText("Directly Editing SVs")
+    imgui.TextWrapped(
+        "You may want to occasionally directly edit an SV value, without having to navigate through the slow scroll velocity editor. That's what the direct SV feature is for.")
+    imgui.TextColored(GUIDELINE_COLOR,
+        'Make sure you\'re in the "EDIT" tab, then go to "DIRECT SV".\nSelect two notes, and if there are SVs between them,\nyou should be able to edit their start time and multiplier.')
+    imgui.SeparatorText("Scaling SVs")
+    imgui.TextWrapped(
+        'Sometimes you want to change how fast an SV is, or increase the intensity of a 0.00x average SV effect. You can scale SVs in several different ways, but the easiest one is to use the "SCALE (MULTIPLY)" feature. For more advanced mappers, you can also use ymulch.')
+    imgui.TextColored(GUIDELINE_COLOR,
+        'Make sure you\'re in the "EDIT" tab, then go to "SCALE (MULTIPLY)".\nYou can either scale the notes to have a different average SV using\nthe "Average SV" mode, or you can multiply all SVs within your\nselection by a constant factor with the "Relative Ratio" mode.')
+    imgui.SeparatorText("Deleting SVs")
+    imgui.TextWrapped(
+        "As with most things, deleting stuff is easier than creating it. Simply select two notes, and the delete tab will help you delete all desired objects within your selection range. You can also make a standard/special/still effect and the effect will remove any lingering SVs within its selection.")
+    imgui.TextColored(GUIDELINE_COLOR,
+        'Go to the "DELETE" tab, and ensure that "Delete SVs" is enabled.\nThen, select two notes and click the "Delete" button.')
+    imgui.SeparatorText("Reversing Effects")
+    imgui.TextWrapped(
+        'If you like upscroll, you can take any effect and turn it into upscroll using the "REVERSE SCROLL" feature under "EDIT". Generally, you should use 300-400 msx for your upscroll height, which is how much distance the "receptors" would be from the bottom.')
+    imgui.TextColored(GUIDELINE_COLOR, 'Select an existing effect, and hit the "Reverse" button.')
+    ForceHeight(540)
+end
 function showWorkingWithShapesTutorial()
-    local importantColor = vector.New(1, 0.5, 0.5, 1)
     imgui.SeparatorText("Working with different shapes")
     imgui.TextWrapped(
         'So far, we\'ve only been working with stutters, but the core of SV is being able to make cohesive and/or fluid movement. We do this by working with particular shapes in the "STANDARD" tab.')
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         'Select "STANDARD" under the "TYPE" dropdown.')
     if (globalVars.placeTypeIndex ~= 1) then return end
     imgui.Dummy(vector.New(0, 10))
     if (globalVars.hideSVInfo) then
-        imgui.TextColored(importantColor, 'Please disable the "HIDE SV INFO" option in settings to continue.')
+        imgui.TextColored(INSTRUCTION_COLOR, 'Please disable the "HIDE SV INFO" option in settings to continue.')
         return
     end
     imgui.TextWrapped(
         'In the tab below the type dropdown, you\'ll notice a plethora of different options to choose from. Don\'t get overwhelmed; most experienced SV mappers usually limit themselves to using 3-5 of these shapes. Most commonly seen, we have the exponential shape, which makes the notes go towards the receptor at an exponential rate.')
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         'Under the "STANDARD" tab, select "EXPONENTIAL".')
     local menuVars = getMenuVars("placeStandard")
     if (menuVars.svTypeIndex ~= 2 and not state.GetValue("workingWithShapes_pg")) then return end
@@ -7510,13 +7538,13 @@ function showWorkingWithShapesTutorial()
     imgui.TextWrapped(
         "If you are unfamiliar with any of the SV shapes, the SV Info window will be your best friend. Behind the SV Info window is a slightly visible set of 4 notes, which show you (in advance) how the notes will move if you use this particular effect. Notice how if you change the intensity, the speed at which the notes decelerate increases, and vice versa. The SV Info visualizer is particularly noticable when you change a drastic part of the shape's behavior.")
     local settingVars = getSettingVars("Exponential", "Standard")
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         'Change the exponential type to "SPEED UP", either via\nthe dropdown or by pressing "S" on your keyboard. Note that\nany parameter with a button next to it labelled "SWAP" or "S"\ncan be changed with this keybind. Hotkeys will be reviewed later.')
     if (settingVars.behaviorIndex ~= 2) then return end
     imgui.Dummy(vector.New(0, 10))
     imgui.TextWrapped(
         'Now, the SV Info visualizer is showing a more "rain drop" like appearance than a sudden approach. Feel free to experiment with all the shapes and see what you can come up with. Let\'s try making a fun bouncy effect using linear.')
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         'Select the "LINEAR" shape. Set the start SV to -1.5x,\nand the end SV to 1.5x. Don\'t worry about SV points or final SV.')
     settingVars = getSettingVars("Linear", "Standard")
     ForceHeight(520)
@@ -7527,12 +7555,12 @@ function showWorkingWithShapesTutorial()
     gpsim("Working With Shapes Jumping", vector2(1), function(t)
         return 0.9 - 2 * (t - t * t)
     end, { { 1, 2, 3, 4 }, {}, {}, {} }, 500)
-    imgui.TextColored(importantColor,
+    imgui.TextColored(GUIDELINE_COLOR,
         'Select more than 2 chords (at least 3 notes with different times),\nand place the SV using an aforementioned method.')
     imgui.Dummy(vector.New(0, 10))
     imgui.TextWrapped(
         "If your notes are in different columns, you may have noticed that all the notes have combined into one large chord. Looking at the SV Info window, the reasoning becomes clear; the average SV is 0.00x, meaning the notes are always going to be next to each other. We can remedy this by adding a teleport to each set of notes, so they no longer line up with each other.")
-    imgui.TextColored(importantColor,
+    imgui.TextColored(GUIDELINE_COLOR,
         'Head to the "EDIT" tab, select "ADD TELEPORT",\nthen select your notes and place the SV.')
     imgui.Dummy(vector.New(0, 10))
     imgui.TextWrapped(
@@ -7540,7 +7568,6 @@ function showWorkingWithShapesTutorial()
     ForceHeight(1010)
 end
 function showYourFirstEffectTutorial()
-    local importantColor = vector.New(1, 0.5, 0.5, 1)
     imgui.SeparatorText("Making your first SV effect")
     imgui.TextWrapped(
         "At the absolute basics of SV are the pulse effects, effects that highlight significant parts of the song, such as a repeating drum. We will apply a very basic stutter SV effect on the drum beat (assuming your song has that), like so:")
@@ -7555,10 +7582,10 @@ function showYourFirstEffectTutorial()
     end, { { 1, 2 }, { 3 }, { 4 }, { 3 } }, 500)
     imgui.TextWrapped(
         'To implement this effect, we will need to create some SV. Head to the CREATE tab in your plugin, and locate the dropdown with the word "TYPE" next to it.')
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         'Select "SPECIAL" under the "TYPE" dropdown. The tutorial will\ncontinue when you\'ve done so. In the future, all tutorials will go to\nthe next step when the instructions in RED TEXT are completed.')
     if (globalVars.placeTypeIndex ~= 2) then return end
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         'Now, under the "SPECIAL" tab, make sure "STUTTER" is selected.')
     local menuVars = getMenuVars("placeSpecial")
     if (menuVars.svTypeIndex ~= 1) then return end
@@ -7566,28 +7593,27 @@ function showYourFirstEffectTutorial()
     imgui.Dummy(vector.New(0, 10))
     imgui.TextWrapped(
         "We want to edit the value of the first SV, and the second SV will be updated accordingly. Note that the default SV for a map is 1x, so we will leave average SV on 1x.")
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         'Set the SV value to 4.00x by clicking on the input and inputting "4".')
-    ForceHeight(490)
+    ForceHeight(480)
     if (settingVars.startSV ~= 4) then return end
-    ForceHeight(450)
+    ForceHeight(440)
     imgui.Dummy(vector.New(0, 10))
     imgui.TextWrapped(
         'At any time, you can see what your SVs will look like in the "SV INFO" window. Looking inside, we notice one of our SVs is negative. This is because of the relatively large SV we just put in, 4. To counter this, we have two options; either let the second SV be negative, or change how long the first SV lasts. Try playing around with the "Duration" slider.')
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         "Set the duration to be 20%%. Either drag the slider along,\nor hold Ctrl and click to edit the slider directly.")
-    ForceHeight(620)
+    ForceHeight(610)
     if (settingVars.stutterDuration ~= 20) then return end
-    ForceHeight(580)
+    ForceHeight(570)
     imgui.TextColored(vector4(0), "penis")
     imgui.TextWrapped(
         'If you want, you can change some of the other settings; try seeing what happens when you increase the stutter count. However, for the sake of this tutorial, you are done.')
-    imgui.TextColored(importantColor,
+    imgui.TextColored(GUIDELINE_COLOR,
         'Now, select a note representing a strong sound, and\nthe note after it. Either hit the "T" button, or click\nthe "Place SVs between selected notes" button.')
-    ForceHeight(730)
+    ForceHeight(720)
 end
 function showYourSecondEffectTutorial()
-    local importantColor = vector.New(1, 0.5, 0.5, 1)
     imgui.SeparatorText("Making your second SV effect")
     imgui.TextWrapped(
         "Stutters are cool and all, but there's another type of stutter that's more versatile: teleport stutters. Usually, these would not be possible in engines like osu, but since Quaver has no limitations on SV size, we can do it here. Take a look at the difference between normal stutter and teleport stutter:")
@@ -7614,41 +7640,41 @@ function showYourSecondEffectTutorial()
     imgui.Dummy(vector.New(0, 10))
     imgui.TextWrapped(
         "Notice how on the left, the stutter makes the notes visibly move down, but on the right, the teleport stutter (for self-explanatory reasons) makes the notes teleport. Let's try using teleport stutter now.")
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         'Select "SPECIAL" under the "TYPE" dropdown.')
     if (globalVars.placeTypeIndex ~= 2) then return end
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         'Now, under the "SPECIAL" tab, make sure that the effect\n"TELEPORT STUTTER" is selected.')
     local menuVars = getMenuVars("placeSpecial")
     if (menuVars.svTypeIndex ~= 2) then return end
     imgui.TextWrapped(
         "Teleport Stutter differs from normal stutter, in that you don't control the speed at which the note moves, but rather how far down the note teleports. For example, if your start SV is 75%%, then your note will start 75%% of the way down. If you want the note to land on the receptor, you must make the start SV %% (in decimal form, not percent) and the main SV add up to the average SV.")
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         'Set the main SV to 0.2x. Then, set the start SV %% to be the\npercentage required to have the notes land on the receptor.\nHINT: 1.00x - 0.20x = ??%%')
     local settingVars = getSettingVars("Teleport Stutter", "Special")
     ForceHeight(490)
     if (not settingVars.linearlyChange and (math.abs(settingVars.mainSV - 0.2) > 0.001 or settingVars.svPercent ~= 80)) then return end
     ForceHeight(450)
-    imgui.TextColored(importantColor,
+    imgui.TextColored(GUIDELINE_COLOR,
         'Similarly, select a note representing a strong sound, and\nthe note after it. Either hit the "T" button on your keyboard or click\nthe "Place SVs between selected notes" button. Alternatively,\nyou can try selecting all the notes which you want to have SV.')
     imgui.SeparatorText("Experimenting with Teleport Stutter")
     imgui.TextWrapped(
         'It would be kind of boring if the teleport stutter remained the same throughout. You can adjust how the teleport stutter acts over time by enabling the "Change Stutter Over Time" option.')
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         'Enable "Change Stutter Over Time".')
     ForceHeight(640)
     if (not settingVars.linearlyChange) then return end
     ForceHeight(610)
     imgui.TextWrapped(
         'You\'ll now notice that we have two options for both start SV %% and main SV value; one for start, and one for end. The way this works is that when you select more than two notes (obviously with different times), the teleport stutter for that note will change linearly according to the start/end values. For example, if your start SV %% (start) is 100%%, and your start SV %% (end) is 0%%, then a note in the very middle of your selection would have a teleport stutter with start SV %% of 50%%. We will use this to create some dynamic effects.')
-    imgui.TextColored(importantColor,
+    imgui.TextColored(INSTRUCTION_COLOR,
         "Set the Start SV %% (start) to 100%%, the main SV (start) to 0.00x,\nand main SV (end) to whichever value it must be such that the\nnote lines up with the receptor. HINT: 0%% + ?.??x = 1.00x")
     ForceHeight(820)
     if (math.abs(settingVars.mainSV) > 0.001 or math.abs(settingVars.mainSV2 - 1) > 0.001 or settingVars.svPercent ~= 100 or settingVars.svPercent2 ~= 0) then return end
     ForceHeight(800)
     imgui.TextWrapped(
         "What we have set up here is a teleport stutter that initially has a very strong teleporting strength (start SV 100%%, main SV 0.00x, so the notes don't appear to move at all) to an extremely weak strength (start SV 0%%, main SV 1.00x, so it's as if they haven't even teleported). All of the notes between will lie somewhere within its boundary.")
-    imgui.TextColored(importantColor,
+    imgui.TextColored(GUIDELINE_COLOR,
         'Select a large group of notes and either hit the "T" button on\nyour keyboard or click the Place SV button.')
     ForceHeight(920)
     imgui.TextWrapped(
@@ -7658,6 +7684,35 @@ function showYourSecondEffectTutorial()
     imgui.BulletText("100%%, 0%%, -1.00x, 1.00x")
     imgui.TextWrapped('Fun fact: the above effect is used in the popular SV map Hypnotizer.')
     ForceHeight(1120)
+end
+function showStartingTutorial()
+    imgui.SeparatorText("The Very Beginning")
+    imgui.TextWrapped(
+        "So, you want to make some SV maps, or scroll velocity maps. For those who don't know, scroll velocities are objects that change the speed at which notes fall towards the receptor. If you're new to plumogu, welcome! This plugin is your one-stop shop for creating SV maps. However, there are a few things we will need to go over before starting. These are important, so please read them!")
+    imgui.SeparatorText("Colors in the Tutorial")
+    imgui.Text("You may come across some instructions in ")
+    imgui.SameLine(0, 0)
+    imgui.TextColored(INSTRUCTION_COLOR, "Red")
+    imgui.SameLine(0, 0)
+    imgui.Text(" or ")
+    imgui.SameLine(0, 0)
+    imgui.TextColored(GUIDELINE_COLOR, "Blue")
+    imgui.SameLine(0, 0)
+    imgui.Text(".")
+    imgui.PushStyleColor(imgui_col.Text, INSTRUCTION_COLOR)
+    imgui.BulletText("Red text indicates an instruction that MUST\nbe completed for the tutorial to continue.")
+    imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
+    imgui.BulletText(
+        "Blue text indicates an instruction that could be skipped \nand won't progress the tutorial, but helps for learning.")
+    imgui.PopStyleColor(2)
+    imgui.SeparatorText("Selections")
+    imgui.TextWrapped(
+        'Often times we will say the phrase "within the selection", which just means within a specific time (e.g. between 5 seconds and 6 seconds into the song). If you select two notes, the SVs within the selection are all SVs with a start time between the first note and the last note. This definition applies to all objects with a StartTime property, that being SVs, SSFs, and timing lines.')
+    imgui.SeparatorText("SVs vs SSFs")
+    imgui.TextWrapped(
+        "If you come from osu!, you may not be familiar with SSFs, or scroll speed factors; objects that change the player's scroll speed to some multiplier. The critical difference between SSFs and SVs is that while SVs do not instantly change the position of notes, SSFs do.")
+    imgui.SeparatorText("Now, let's start making some effects!")
+    imgui.Text('Click "Placing Basic SVs" at the left, and start from "Your First Effect".')
 end
 function chooseAddComboMultipliers(settingVars)
     local oldValues = vector.New(settingVars.comboMultiplier1, settingVars.comboMultiplier2)
