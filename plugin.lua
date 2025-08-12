@@ -1,6 +1,29 @@
+---@diagnostic disable: param-type-mismatch
+cache = {}
+cache.get = state.GetValue
+cache.set = state.SetValue
 game = {}
 kb = {}
 matrix = {}
+---#### (NOTE: This function is impure and has no return value. This should be changed eventually.)
+---Gets a list of variables.
+---@param listName string An identifier to avoid state collisions.
+---@param variables { [string]: any } The key-value table to get data for.
+function cache.loadTable(listName, variables)
+    for key, _ in pairs(variables) do
+        if (state.GetValue(listName .. key) ~= nil) then
+            variables[key] = state.GetValue(listName .. key)
+        end
+    end
+end
+---Saves a table in state, independently.
+---@param listName string An identifier to avoid state collisions.
+---@param variables { [string]: any } A key-value table to save.
+function cache.saveTable(listName, variables)
+    for key, value in pairs(variables) do
+        state.SetValue(listName .. key, value)
+    end
+end
 clock = {}
 ---Returns true every `interval` ms.
 ---@param id string The unique identifier of the clock.
@@ -1204,25 +1227,6 @@ function createSVStats()
     }
     return svStats
 end
----#### (NOTE: This function is impure and has no return value. This should be changed eventually.)
----Gets a list of variables.
----@param listName string An identifier to avoid state collisions.
----@param variables { [string]: any } The key-value table to get data for.
-function getVariables(listName, variables)
-    for key, _ in pairs(variables) do
-        if (state.GetValue(listName .. key) ~= nil) then
-            variables[key] = state.GetValue(listName .. key)
-        end
-    end
-end
----Saves a table in state, independently.
----@param listName string An identifier to avoid state collisions.
----@param variables { [string]: any } A key-value table to save.
-function saveVariables(listName, variables)
-    for key, value in pairs(variables) do
-        state.SetValue(listName .. key, value)
-    end
-end
 function loadDefaultProperties(defaultProperties)
     if (not defaultProperties) then return end
     if (not defaultProperties.menu) then goto skipMenu end
@@ -1508,7 +1512,7 @@ function getMenuVars(menuType, optionalLabel)
     optionalLabel = optionalLabel or ""
     local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuType])
     local labelText = menuType .. optionalLabel .. "Menu"
-    getVariables(labelText, menuVars)
+    cache.loadTable(labelText, menuVars)
     return menuVars
 end
 function setPresets(presetList)
@@ -1782,7 +1786,7 @@ function getSettingVars(svType, label)
     searchTerm = searchTerm:charAt(1):lower() .. searchTerm:sub(2)
     local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[searchTerm])
     local labelText = svType .. label .. "Settings"
-    getVariables(labelText, settingVars)
+    cache.loadTable(labelText, settingVars)
     return settingVars
 end
 function displaceNotesForAnimationFrames(settingVars)
@@ -3620,7 +3624,7 @@ function renderReactiveStars()
         local sz = szList[i]
         local progress = x / dimX
         local brightness = clamp(-8 * progress * (progress - 1), 0, 1)
-        local pos = { x + topLeft.x, y + topLeft.y }
+        local pos = vector.New(x + topLeft.x, y + topLeft.y)
         ctx.AddCircleFilled(pos, sz, rgbaToUint(255, 255, 255, brightness * 255))
     end
     state.SetValue("stars_xList", xList)
@@ -3681,7 +3685,7 @@ function renderSynthesis()
         snapOffset = 0,
         lastDifference = 0
     }
-    getVariables("synthesis", bgVars)
+    cache.loadTable("synthesis", bgVars)
     local circleSize = 10
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
@@ -3710,7 +3714,7 @@ function renderSynthesis()
         ctx.AddCircle(dim / 2 + topLeft, circleSize * (idx - 1) + bgVars.snapOffset,
             rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
     end
-    saveVariables("synthesis", bgVars)
+    cache.saveTable("synthesis", bgVars)
 end
 function drawCapybaraParent()
     drawCapybara()
@@ -3981,11 +3985,11 @@ function drawSnakeTrail(o, m, t)
     local trailPoints = globalVars.cursorTrailPoints
     local snakeTrailPoints = {}
     initializeSnakeTrailPoints(snakeTrailPoints, m, MAX_CURSOR_TRAIL_POINTS)
-    getVariables("snakeTrailPoints", snakeTrailPoints)
+    cache.loadTable("snakeTrailPoints", snakeTrailPoints)
     local needTrailUpdate = clock.listen("snakeTrail", 1000 / globalVars.effectFPS)
     updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoints,
         globalVars.snakeSpringConstant)
-    saveVariables("snakeTrailPoints", snakeTrailPoints)
+    cache.saveTable("snakeTrailPoints", snakeTrailPoints)
     local trailShape = TRAIL_SHAPES[globalVars.cursorTrailShapeIndex]
     renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, globalVars.cursorTrailSize,
         globalVars.cursorTrailGhost, trailShape)
@@ -4001,7 +4005,7 @@ function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
         snakeTrailPoints[i] = m
     end
     state.SetValue("initializeSnakeTrail", true)
-    saveVariables("snakeTrailPoints", snakeTrailPoints)
+    cache.saveTable("snakeTrailPoints", snakeTrailPoints)
 end
 function updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoints,
                                 snakeSpringConstant)
@@ -4049,9 +4053,9 @@ function drawDustTrail(o, m, t, sz)
     local numDustParticles = 20
     local dustParticles = {}
     initializeDustParticles(sz, t, dustParticles, numDustParticles, dustDuration)
-    getVariables("dustParticles", dustParticles)
+    cache.loadTable("dustParticles", dustParticles)
     updateDustParticles(t, m, dustParticles, dustDuration, dustSize)
-    saveVariables("dustParticles", dustParticles)
+    cache.saveTable("dustParticles", dustParticles)
     renderDustParticles(globalVars.rgbPeriod, o, t, dustParticles, dustDuration, dustSize)
 end
 function initializeDustParticles(_, t, dustParticles, numDustParticles, dustDuration)
@@ -4067,7 +4071,7 @@ function initializeDustParticles(_, t, dustParticles, numDustParticles, dustDura
         dustParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
     state.SetValue("initializeDustParticles", true)
-    saveVariables("dustParticles", dustParticles)
+    cache.saveTable("dustParticles", dustParticles)
 end
 function updateDustParticles(t, m, dustParticles, dustDuration, dustSize)
     local yRange = 8 * dustSize * (math.random() - 0.5)
@@ -4104,9 +4108,9 @@ function drawSparkleTrail(o, m, t, sz)
     local numSparkleParticles = 10
     local sparkleParticles = {}
     initializeSparkleParticles(sz, t, sparkleParticles, numSparkleParticles, sparkleDuration)
-    getVariables("sparkleParticles", sparkleParticles)
+    cache.loadTable("sparkleParticles", sparkleParticles)
     updateSparkleParticles(t, m, sparkleParticles, sparkleDuration, sparkleSize)
-    saveVariables("sparkleParticles", sparkleParticles)
+    cache.saveTable("sparkleParticles", sparkleParticles)
     renderSparkleParticles(o, t, sparkleParticles, sparkleDuration, sparkleSize)
 end
 function initializeSparkleParticles(_, t, sparkleParticles, numSparkleParticles, sparkleDuration)
@@ -4122,7 +4126,7 @@ function initializeSparkleParticles(_, t, sparkleParticles, numSparkleParticles,
         sparkleParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
     state.SetValue("initializeSparkleParticles", true)
-    saveVariables("sparkleParticles", sparkleParticles)
+    cache.saveTable("sparkleParticles", sparkleParticles)
 end
 function updateSparkleParticles(t, m, sparkleParticles, sparkleDuration, sparkleSize)
     for i = 1, #sparkleParticles do
@@ -4214,7 +4218,7 @@ function pulseController()
         pulseStatus = 0,
         pulsedThisFrame = false
     }
-    getVariables("pulseController", pulseVars)
+    cache.loadTable("pulseController", pulseVars)
     local timeOffset = 50
     local timeSinceLastBar = ((state.SongTime + timeOffset) - game.getTimingPointAt(state.SongTime).StartTime) %
         ((60000 / game.getTimingPointAt(state.SongTime).Bpm))
@@ -4235,7 +4239,7 @@ function pulseController()
     local negatedBorderColor = vector4(1) - borderColor
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
     imgui.PushStyleColor(imgui_col.Border, pulseColor * pulseVars.pulseStatus + borderColor * (1 - pulseVars.pulseStatus))
-    saveVariables("pulseController", pulseVars)
+    cache.saveTable("pulseController", pulseVars)
     state.SetValue("cache_pulseValue", pulseVars.pulseStatus)
     state.SetValue("cache_pulseStatus", pulseVars.pulsedThisFrame)
 end
@@ -5363,8 +5367,8 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         if (imgui.Button("Select##Preset" .. idx)) then
             local data = table.parse(preset.data)
             globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
-            saveVariables(preset.menu .. preset.type .. "Settings", data.settingVars)
-            saveVariables(table.concat({"place", preset.type, "Menu"}), data.menuVars)
+            cache.saveTable(preset.menu .. preset.type .. "Settings", data.settingVars)
+            cache.saveTable(table.concat({"place", preset.type, "Menu"}), data.menuVars)
             globalVars.showPresetMenu = false
         end
         if (imgui.IsItemClicked("Right")) then
@@ -5597,8 +5601,8 @@ function placeSpecialSVMenu()
     if currentSVType == "Automate" then automateSVMenu(settingVars) end
     if currentSVType == "Penis" then penisMenu(settingVars) end
     local labelText = currentSVType .. "Special"
-    saveVariables(labelText .. "Settings", settingVars)
-    saveVariables("placeSpecialMenu", menuVars)
+    cache.saveTable(labelText .. "Settings", settingVars)
+    cache.saveTable("placeSpecialMenu", menuVars)
 end
 function penisMenu(settingVars)
     _, settingVars.bWidth = imgui.InputInt("Ball Width", math.floor(settingVars.bWidth))
@@ -5681,8 +5685,8 @@ function placeStandardSVMenu()
         simpleActionMenu("Place SVs between selected notes", 2, placeSVs, menuVars)
     end
     simpleActionMenu("Place SSFs between selected notes", 2, placeSSFs, menuVars, true)
-    saveVariables(currentSVType .. "StandardSettings", settingVars)
-    saveVariables("placeStandardMenu", menuVars)
+    cache.saveTable(currentSVType .. "StandardSettings", settingVars)
+    cache.saveTable("placeStandardMenu", menuVars)
 end
 function placeStillSVMenu()
     PresetButton()
@@ -5711,8 +5715,8 @@ function placeStillSVMenu()
     AddSeparator()
     menuVars.settingVars = settingVars
     simpleActionMenu("Place SVs between selected notes", 2, placeStillSVsParent, menuVars)
-    saveVariables(currentSVType .. "StillSettings", settingVars)
-    saveVariables("placeStillMenu", menuVars)
+    cache.saveTable(currentSVType .. "StillSettings", settingVars)
+    cache.saveTable("placeStillMenu", menuVars)
 end
 function customVibratoMenu(menuVars, settingVars, separateWindow)
     local typingCode = false
@@ -5840,8 +5844,8 @@ function placeVibratoSVMenu(separateWindow)
     if currentSVType == "Sigmoidal##Vibrato" then sigmoidalVibratoMenu(menuVars, settingVars, separateWindow) end
     if currentSVType == "Custom##Vibrato" then customVibratoMenu(menuVars, settingVars, separateWindow) end
     local labelText = currentSVType .. (menuVars.vibratoMode == 1 and "SV" or "SSF") .. "Vibrato"
-    saveVariables(labelText .. "Settings", settingVars)
-    saveVariables("placeVibratoMenu", menuVars)
+    cache.saveTable(labelText .. "Settings", settingVars)
+    cache.saveTable("placeVibratoMenu", menuVars)
 end
 function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
@@ -5963,7 +5967,7 @@ function deleteTab()
     _, menuVars.deleteTable[3] = imgui.Checkbox("Delete SSFs", menuVars.deleteTable[3])
     imgui.SameLine(0, SAMELINE_SPACING + 3.5)
     _, menuVars.deleteTable[4] = imgui.Checkbox("Delete Bookmarks", menuVars.deleteTable[4])
-    saveVariables("deleteMenu", menuVars)
+    cache.saveTable("deleteMenu", menuVars)
     for i = 1, 4 do
         if (menuVars.deleteTable[i]) then goto continue end
     end
@@ -5975,7 +5979,7 @@ function addTeleportMenu()
     local menuVars = getMenuVars("addTeleport")
     chooseDistance(menuVars)
     BasicCheckbox(menuVars, "teleportBeforeHand", "Add teleport before note")
-    saveVariables("addTeleportMenu", menuVars)
+    cache.saveTable("addTeleportMenu", menuVars)
     AddSeparator()
     simpleActionMenu("Add teleport SVs at selected notes", 1, addTeleportSVs, menuVars)
 end
@@ -6011,13 +6015,13 @@ function changeGroupsMenu()
     KeepSameLine()
     _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
     AddSeparator()
-    saveVariables("changeGroupsMenu", menuVars)
+    cache.saveTable("changeGroupsMenu", menuVars)
     simpleActionMenu("Move items to " .. menuVars.designatedTimingGroup, 2, changeGroups, menuVars)
 end
 function convertSVSSFMenu()
     local menuVars = getMenuVars("convertSVSSF")
     chooseConvertSVSSFDirection(menuVars)
-    saveVariables("convertSVSSFMenu", menuVars)
+    cache.saveTable("convertSVSSFMenu", menuVars)
     simpleActionMenu(menuVars.conversionDirection and "Convert SVs -> SSFs" or "Convert SSFs -> SVs", 2, convertSVSSF,
         menuVars, false, false)
 end
@@ -6043,19 +6047,19 @@ function copyNPasteMenu()
     end
     AddSeparator()
     local copiedItemCount = #menuVars.copied.lines[menuVars.curSlot] + #menuVars.copied.SVs[menuVars.curSlot] +
-    #menuVars.copied.SSFs[menuVars.curSlot] + #menuVars.copied.BMs[menuVars.curSlot]
+        #menuVars.copied.SSFs[menuVars.curSlot] + #menuVars.copied.BMs[menuVars.curSlot]
     if (copiedItemCount == 0) then
         simpleActionMenu("Copy items between selected notes", 2, copyItems, menuVars)
     else
         FunctionButton("Clear copied items", ACTION_BUTTON_SIZE, clearCopiedItems, menuVars)
     end
     if copiedItemCount == 0 then
-        saveVariables("copyMenu", menuVars)
+        cache.saveTable("copyMenu", menuVars)
         return
     end
     AddSeparator()
     _, menuVars.tryAlign = imgui.Checkbox("Try to fix misalignments", menuVars.tryAlign)
-    saveVariables("copyMenu", menuVars)
+    cache.saveTable("copyMenu", menuVars)
     simpleActionMenu("Paste items at selected notes", 1, pasteItems, menuVars)
 end
 function updateDirectEdit()
@@ -6151,20 +6155,20 @@ function directSVMenu()
         imgui.PopID()
     end
     imgui.EndTable()
-    saveVariables("directSVMenu", menuVars)
+    cache.saveTable("directSVMenu", menuVars)
 end
 function displaceNoteMenu()
     local menuVars = getMenuVars("displaceNote")
     chooseVaryingDistance(menuVars)
     BasicCheckbox(menuVars, "linearlyChange", "Change distance over time")
-    saveVariables("displaceNoteMenu", menuVars)
+    cache.saveTable("displaceNoteMenu", menuVars)
     AddSeparator()
     simpleActionMenu("Displace selected notes", 1, displaceNoteSVsParent, menuVars)
 end
 function displaceViewMenu()
     local menuVars = getMenuVars("displaceView")
     chooseDistance(menuVars)
-    saveVariables("displaceViewMenu", menuVars)
+    cache.saveTable("displaceViewMenu", menuVars)
     AddSeparator()
     simpleActionMenu("Displace view between selected notes", 2, displaceViewSVs, menuVars)
 end
@@ -6174,7 +6178,7 @@ function dynamicScaleMenu()
     imgui.Text(#menuVars.noteTimes .. " note times assigned to scale SVs between")
     addNoteTimesToDynamicScaleButton(menuVars)
     if numNoteTimes == 0 then
-        saveVariables("dynamicScaleMenu", menuVars)
+        cache.saveTable("dynamicScaleMenu", menuVars)
         return
     else
         clearNoteTimesButton(menuVars)
@@ -6183,7 +6187,7 @@ function dynamicScaleMenu()
     if #menuVars.noteTimes < 3 then
         imgui.Text("Not enough note times assigned")
         imgui.Text("Assign 3 or more note times instead")
-        saveVariables("dynamicScaleMenu", menuVars)
+        cache.saveTable("dynamicScaleMenu", menuVars)
         return
     end
     local numSVPoints = numNoteTimes - 1
@@ -6196,7 +6200,7 @@ function dynamicScaleMenu()
     local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
     if currentSVType == "Sinusoidal" then
         imgui.Text("Import sinusoidal values using 'Custom' instead")
-        saveVariables("dynamicScaleMenu", menuVars)
+        cache.saveTable("dynamicScaleMenu", menuVars)
         return
     end
     local settingVars = getSettingVars(currentSVType, "DynamicScale")
@@ -6206,8 +6210,8 @@ function dynamicScaleMenu()
     makeSVInfoWindow("SV Info", menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
         menuVars.svMultipliers, nil, true)
     local labelText = currentSVType .. "DynamicScale"
-    saveVariables(labelText .. "Settings", settingVars)
-    saveVariables("dynamicScaleMenu", menuVars)
+    cache.saveTable(labelText .. "Settings", settingVars)
+    cache.saveTable("dynamicScaleMenu", menuVars)
     AddSeparator()
     simpleActionMenu("Scale spacing between assigned notes", 0, dynamicScaleSVs, menuVars)
 end
@@ -6232,7 +6236,7 @@ function flickerMenu()
     BasicCheckbox(menuVars, "linearlyChange", "Change distance over time")
     BasicInputInt(menuVars, "numFlickers", "Flickers", { 1, 9999 })
     if (globalVars.advancedMode) then chooseFlickerPosition(menuVars) end
-    saveVariables("flickerMenu", menuVars)
+    cache.saveTable("flickerMenu", menuVars)
     AddSeparator()
     simpleActionMenu("Add flicker SVs between selected notes", 2, flickerSVs, menuVars)
 end
@@ -6302,7 +6306,7 @@ function measureMenu()
     ToolTip("Measured values might not be 100%% accurate & may not work on older maps")
     AddSeparator()
     simpleActionMenu("Measure SVs between selected notes", 2, measureSVs, menuVars)
-    saveVariables("measureMenu", menuVars)
+    cache.saveTable("measureMenu", menuVars)
 end
 function displayMeasuredStatsRounded(menuVars)
     imgui.Columns(2, "Measured SV Stats", false)
@@ -6348,7 +6352,7 @@ function reverseScrollMenu()
     local menuVars = getMenuVars("reverseScroll")
     chooseDistance(menuVars)
     HelpMarker("Height at which reverse scroll notes are hit")
-    saveVariables("reverseScrollMenu", menuVars)
+    cache.saveTable("reverseScrollMenu", menuVars)
     AddSeparator()
     local buttonText = "Reverse scroll between selected notes"
     simpleActionMenu(buttonText, 2, reverseScrollSVs, menuVars)
@@ -6357,7 +6361,7 @@ function scaleDisplaceMenu()
     local menuVars = getMenuVars("scaleDisplace")
     menuVars.scaleSpotIndex = Combo("Displace Spot", DISPLACE_SCALE_SPOTS, menuVars.scaleSpotIndex)
     chooseScaleType(menuVars)
-    saveVariables("scaleDisplaceMenu", menuVars)
+    cache.saveTable("scaleDisplaceMenu", menuVars)
     AddSeparator()
     local buttonText = "Scale SVs between selected notes##displace"
     simpleActionMenu(buttonText, 2, scaleDisplaceSVs, menuVars)
@@ -6365,7 +6369,7 @@ end
 function scaleMultiplyMenu()
     local menuVars = getMenuVars("scaleMultiply")
     chooseScaleType(menuVars)
-    saveVariables("scaleMultiplyMenu", menuVars)
+    cache.saveTable("scaleMultiplyMenu", menuVars)
     AddSeparator()
     local buttonText = "Scale SVs between selected notes##multiply"
     simpleActionMenu(buttonText, 2, scaleMultiplySVs, menuVars)
@@ -6376,7 +6380,7 @@ end
 function verticalShiftMenu()
     local menuVars = getMenuVars("verticalShift")
     chooseConstantShift(menuVars, 0)
-    saveVariables("verticalShiftMenu", menuVars)
+    cache.saveTable("verticalShiftMenu", menuVars)
     AddSeparator()
     local buttonText = "Vertically shift SVs between selected notes"
     simpleActionMenu(buttonText, 2, verticalShiftSVs, menuVars)
@@ -6423,7 +6427,7 @@ function selectAlternatingMenu()
     local menuVars = getMenuVars("selectAlternating")
     BasicInputInt(menuVars, "every", "Every __ notes", { 1, MAX_SV_POINTS })
     BasicInputInt(menuVars, "offset", "From note #__", { 1, menuVars.every })
-    saveVariables("selectAlternatingMenu", menuVars)
+    cache.saveTable("selectAlternatingMenu", menuVars)
     AddSeparator()
     simpleActionMenu(
         "Select a note every " ..
@@ -6474,10 +6478,11 @@ function selectBookmarkMenu()
             imgui.Text(bm.StartTime)
             imgui.NextColumn()
             imgui.SetCursorPosY(vPos)
-            bm.Note = bm.Note:fixToSize(110)
+            bmData = {}
+            bmData.Note = bm.Note:fixToSize(110)
             imgui.NextColumn()
             if (imgui.Button("Go to #" .. idx - skippedIndices, vector.New(65, 24))) then
-                actions.GoToObjects(bm.StartTime)
+                actions.GoToObjects(bm .. StartTime)
             end
             imgui.NextColumn()
             if (idx ~= #bookmarks) then imgui.Separator() end
@@ -6503,7 +6508,7 @@ function selectChordSizeMenu()
         if (idx % 2 == 1) then KeepSameLine() end
     end
     simpleActionMenu("Select chords within region", 2, selectByChordSizes, menuVars)
-    saveVariables("selectChordSizeMenu", menuVars)
+    cache.saveTable("selectChordSizeMenu", menuVars)
 end
 SELECT_TOOLS = {
     "Alternating",
@@ -6528,12 +6533,12 @@ function selectNoteTypeMenu()
     KeepSameLine()
     _, menuVars.ln = imgui.Checkbox("Select LNs", menuVars.ln)
     simpleActionMenu("Select notes within region", 2, selectByNoteType, menuVars)
-    saveVariables("selectNoteTypeMenu", menuVars)
+    cache.saveTable("selectNoteTypeMenu", menuVars)
 end
 function selectBySnapMenu()
     local menuVars = getMenuVars("selectBySnap")
     BasicInputInt(menuVars, "snap", "Snap", { 1, 100 })
-    saveVariables("selectBySnapMenu", menuVars)
+    cache.saveTable("selectBySnapMenu", menuVars)
     AddSeparator()
     simpleActionMenu(
         table.concat({"Select notes with 1/", menuVars.snap, " snap"}),
@@ -6796,13 +6801,13 @@ function showDefaultPropertiesSettings()
         AddSeparator()
         chooseInterlace(menuVars)
         saveMenuPropertiesButton(menuVars, "placeStandard")
-        saveVariables("placeStandardPropertyMenu", menuVars)
+        cache.saveTable("placeStandardPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("General Special Settings")) then
         local menuVars = getMenuVars("placeSpecial", "Property")
         chooseSpecialSVType(menuVars)
         saveMenuPropertiesButton(menuVars, "placeSpecial")
-        saveVariables("placeSpecialPropertyMenu", menuVars)
+        cache.saveTable("placeSpecialPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("General Still Settings")) then
         local menuVars = getMenuVars("placeStill", "Property")
@@ -6813,7 +6818,7 @@ function showDefaultPropertiesSettings()
         chooseStillType(menuVars)
         chooseInterlace(menuVars)
         saveMenuPropertiesButton(menuVars, "placeStill")
-        saveVariables("placeStillPropertyMenu", menuVars)
+        cache.saveTable("placeStillPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("General Vibrato Settings")) then
         local menuVars = getMenuVars("placeVibrato", "Property")
@@ -6826,7 +6831,7 @@ function showDefaultPropertiesSettings()
             chooseVibratoSides(menuVars)
         end
         saveMenuPropertiesButton(menuVars, "placeVibrato")
-        saveVariables("placeVibratoPropertyMenu", menuVars)
+        cache.saveTable("placeVibratoPropertyMenu", menuVars)
     end
     imgui.SeparatorText("Edit Tab Settings")
     if (imgui.CollapsingHeader("Add Teleport Settings")) then
@@ -6834,7 +6839,7 @@ function showDefaultPropertiesSettings()
         chooseDistance(menuVars)
         BasicCheckbox(menuVars, "teleportBeforeHand", "Add teleport before note")
         saveMenuPropertiesButton(menuVars, "addTeleport")
-        saveVariables("addTeleportPropertyMenu", menuVars)
+        cache.saveTable("addTeleportPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Change Group Settings")) then
         local menuVars = getMenuVars("changeGroups", "Property")
@@ -6842,13 +6847,13 @@ function showDefaultPropertiesSettings()
         KeepSameLine()
         _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
         saveMenuPropertiesButton(menuVars, "changeGroups")
-        saveVariables("changeGroupsPropertyMenu", menuVars)
+        cache.saveTable("changeGroupsPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Convert SV <-> SSF Settings")) then
         local menuVars = getMenuVars("convertSVSSF", "Property")
         chooseConvertSVSSFDirection(menuVars)
         saveMenuPropertiesButton(menuVars, "convertSVSSF")
-        saveVariables("convertSVSSFPropertyMenu", menuVars)
+        cache.saveTable("convertSVSSFPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Copy Settings")) then
         local menuVars = getMenuVars("copy", "Property")
@@ -6863,20 +6868,20 @@ function showDefaultPropertiesSettings()
         _, menuVars.alignWindow = imgui.SliderInt("Alignment window (ms)", menuVars.alignWindow, 1, 10)
         imgui.PopItemWidth()
         saveMenuPropertiesButton(menuVars, "copy")
-        saveVariables("copyPropertyMenu", menuVars)
+        cache.saveTable("copyPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Displace Note Settings")) then
         local menuVars = getMenuVars("displaceNote", "Property")
         chooseVaryingDistance(menuVars)
         BasicCheckbox(menuVars, "linearlyChange", "Change distance over time")
         saveMenuPropertiesButton(menuVars, "displaceNote")
-        saveVariables("displaceNotePropertyMenu", menuVars)
+        cache.saveTable("displaceNotePropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Displace View Settings")) then
         local menuVars = getMenuVars("displaceView", "Property")
         chooseDistance(menuVars)
         saveMenuPropertiesButton(menuVars, "displaceView")
-        saveVariables("displaceViewPropertyMenu", menuVars)
+        cache.saveTable("displaceViewPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Flicker Settings")) then
         local menuVars = getMenuVars("flicker", "Property")
@@ -6886,33 +6891,33 @@ function showDefaultPropertiesSettings()
         BasicInputInt(menuVars, "numFlickers", "Flickers", { 1, 9999 })
         if (globalVars.advancedMode) then chooseFlickerPosition(menuVars) end
         saveMenuPropertiesButton(menuVars, "flicker")
-        saveVariables("flickerPropertyMenu", menuVars)
+        cache.saveTable("flickerPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Reverse Scroll Settings")) then
         local menuVars = getMenuVars("reverseScroll", "Property")
         chooseDistance(menuVars)
         HelpMarker("Height at which reverse scroll notes are hit")
         saveMenuPropertiesButton(menuVars, "reverseScroll")
-        saveVariables("reverseScrollPropertyMenu", menuVars)
+        cache.saveTable("reverseScrollPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Scale (Displace) Settings")) then
         local menuVars = getMenuVars("scaleDisplace", "Property")
         menuVars.scaleSpotIndex = Combo("Displace Spot", DISPLACE_SCALE_SPOTS, menuVars.scaleSpotIndex)
         chooseScaleType(menuVars)
         saveMenuPropertiesButton(menuVars, "scaleDisplace")
-        saveVariables("scaleDisplacePropertyMenu", menuVars)
+        cache.saveTable("scaleDisplacePropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Scale (Multiply) Settings")) then
         local menuVars = getMenuVars("scaleMultiply", "Property")
         chooseScaleType(menuVars)
         saveMenuPropertiesButton(menuVars, "scaleMultiply")
-        saveVariables("scaleMultiplyPropertyMenu", menuVars)
+        cache.saveTable("scaleMultiplyPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Vertical Shift Settings")) then
         local menuVars = getMenuVars("verticalShift", "Property")
         chooseConstantShift(menuVars, 0)
         saveMenuPropertiesButton(menuVars, "verticalShift")
-        saveVariables("verticalShiftPropertyMenu", menuVars)
+        cache.saveTable("verticalShiftPropertyMenu", menuVars)
     end
     imgui.SeparatorText("Delete Tab Settings")
     if (imgui.CollapsingHeader("Delete Menu Settings")) then
@@ -6924,7 +6929,7 @@ function showDefaultPropertiesSettings()
         imgui.SameLine(0, SAMELINE_SPACING + 3.5)
         _, menuVars.deleteTable[4] = imgui.Checkbox("Delete Bookmarks", menuVars.deleteTable[4])
         saveMenuPropertiesButton(menuVars, "delete")
-        saveVariables("deletePropertyMenu", menuVars)
+        cache.saveTable("deletePropertyMenu", menuVars)
     end
     imgui.SeparatorText("Select Tab Settings")
     if (imgui.CollapsingHeader("Select Alternating Settings")) then
@@ -6932,13 +6937,13 @@ function showDefaultPropertiesSettings()
         BasicInputInt(menuVars, "every", "Every __ notes", { 1, MAX_SV_POINTS })
         BasicInputInt(menuVars, "offset", "From note #__", { 1, menuVars.every })
         saveMenuPropertiesButton(menuVars, "selectAlternating")
-        saveVariables("selectAlternatingPropertyMenu", menuVars)
+        cache.saveTable("selectAlternatingPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Select By Snap Settings")) then
         local menuVars = getMenuVars("selectBySnap", "Property")
         BasicInputInt(menuVars, "snap", "Snap", { 1, 100 })
         saveMenuPropertiesButton(menuVars, "selectBySnap")
-        saveVariables("selectBySnapPropertyMenu", menuVars)
+        cache.saveTable("selectBySnapPropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Select Chord Size Settings")) then
         local menuVars = getMenuVars("selectChordSize", "Property")
@@ -6949,7 +6954,7 @@ function showDefaultPropertiesSettings()
             if (idx % 2 == 1) then KeepSameLine() end
         end
         saveMenuPropertiesButton(menuVars, "selectChordSize")
-        saveVariables("selectChordSizePropertyMenu", menuVars)
+        cache.saveTable("selectChordSizePropertyMenu", menuVars)
     end
     if (imgui.CollapsingHeader("Select Note Type Settings")) then
         local menuVars = getMenuVars("selectNoteType", "Property")
@@ -6957,7 +6962,7 @@ function showDefaultPropertiesSettings()
         KeepSameLine()
         _, menuVars.ln = imgui.Checkbox("Select LNs", menuVars.ln)
         saveMenuPropertiesButton(menuVars, "selectNoteType")
-        saveVariables("selectNoteTypePropertyMenu", menuVars)
+        cache.saveTable("selectNoteTypePropertyMenu", menuVars)
     end
     imgui.SeparatorText("Standard/Still Settings")
     if (imgui.CollapsingHeader("Linear Settings")) then
@@ -6966,7 +6971,7 @@ function showDefaultPropertiesSettings()
         chooseSVPoints(settingVars)
         chooseFinalSV(settingVars)
         saveSettingPropertiesButton(settingVars, "Linear")
-        saveVariables("LinearPropertySettings", settingVars)
+        cache.saveTable("LinearPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Exponential Settings")) then
         local settingVars = getSettingVars("Exponential", "Property")
@@ -6988,7 +6993,7 @@ function showDefaultPropertiesSettings()
         chooseSVPoints(settingVars)
         chooseFinalSV(settingVars)
         saveSettingPropertiesButton(settingVars, "Exponential")
-        saveVariables("ExponentialPropertySettings", settingVars)
+        cache.saveTable("ExponentialPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Bezier Settings")) then
         local settingVars = getSettingVars("Bezier", "Property")
@@ -6999,7 +7004,7 @@ function showDefaultPropertiesSettings()
         chooseSVPoints(settingVars)
         chooseFinalSV(settingVars)
         saveSettingPropertiesButton(settingVars, "Bezier")
-        saveVariables("BezierPropertySettings", settingVars)
+        cache.saveTable("BezierPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Hermite Settings")) then
         local settingVars = getSettingVars("Hermite", "Property")
@@ -7009,7 +7014,7 @@ function showDefaultPropertiesSettings()
         chooseSVPoints(settingVars)
         chooseFinalSV(settingVars)
         saveSettingPropertiesButton(settingVars, "Hermite")
-        saveVariables("HermitePropertySettings", settingVars)
+        cache.saveTable("HermitePropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Sinusoidal Settings")) then
         local settingVars = getSettingVars("Sinusoidal", "Property")
@@ -7022,7 +7027,7 @@ function showDefaultPropertiesSettings()
         chooseSVPerQuarterPeriod(settingVars)
         chooseFinalSV(settingVars)
         saveSettingPropertiesButton(settingVars, "Sinusoidal")
-        saveVariables("SinusoidalPropertySettings", settingVars)
+        cache.saveTable("SinusoidalPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Circular Settings")) then
         local settingVars = getSettingVars("Circular", "Property")
@@ -7034,7 +7039,7 @@ function showDefaultPropertiesSettings()
         chooseFinalSV(settingVars)
         chooseNoNormalize(settingVars)
         saveSettingPropertiesButton(settingVars, "Circular")
-        saveVariables("CircularPropertySettings", settingVars)
+        cache.saveTable("CircularPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Random Settings")) then
         local settingVars = getSettingVars("Random", "Property")
@@ -7049,7 +7054,7 @@ function showDefaultPropertiesSettings()
         chooseFinalSV(settingVars)
         chooseNoNormalize(settingVars)
         saveSettingPropertiesButton(settingVars, "Random")
-        saveVariables("RandomPropertySettings", settingVars)
+        cache.saveTable("RandomPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Chinchilla Settings")) then
         local settingVars = getSettingVars("Chinchilla", "Property")
@@ -7061,7 +7066,7 @@ function showDefaultPropertiesSettings()
         chooseSVPoints(settingVars)
         chooseFinalSV(settingVars)
         saveSettingPropertiesButton(settingVars, "Chinchilla")
-        saveVariables("ChinchillaPropertySettings", settingVars)
+        cache.saveTable("ChinchillaPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Code Settings")) then
         local settingVars = getSettingVars("Code", "Property")
@@ -7071,7 +7076,7 @@ function showDefaultPropertiesSettings()
         chooseSVPoints(settingVars)
         chooseFinalSV(settingVars)
         saveSettingPropertiesButton(settingVars, "Code")
-        saveVariables("CodePropertySettings", settingVars)
+        cache.saveTable("CodePropertySettings", settingVars)
     end
     imgui.SeparatorText("Special Settings")
     if (imgui.CollapsingHeader("Stutter Settings")) then
@@ -7085,7 +7090,7 @@ function showDefaultPropertiesSettings()
         settingsChanged = chooseAverageSV(settingVars) or settingsChanged
         settingsChanged = chooseFinalSV(settingVars, false) or settingsChanged
         saveSettingPropertiesButton(settingVars, "Stutter")
-        saveVariables("StutterPropertySettings", settingVars)
+        cache.saveTable("StutterPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Teleport Stutter Settings")) then
         local settingVars = getSettingVars("TeleportStutter", "Property")
@@ -7101,7 +7106,7 @@ function showDefaultPropertiesSettings()
         BasicCheckbox(settingVars, "useDistance", "Use distance for start SV")
         BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time")
         saveSettingPropertiesButton(settingVars, "TeleportStutter")
-        saveVariables("TeleportStutterPropertySettings", settingVars)
+        cache.saveTable("TeleportStutterPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Automate Settings")) then
         local settingVars = getSettingVars("Automate", "Property")
@@ -7117,7 +7122,7 @@ function showDefaultPropertiesSettings()
             imgui.PopItemWidth()
         end
         saveSettingPropertiesButton(settingVars, "Automate")
-        saveVariables("AutomatePropertySettings", settingVars)
+        cache.saveTable("AutomatePropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Penis Settings")) then
         local settingVars = getSettingVars("Penis", "Property")
@@ -7128,21 +7133,21 @@ function showDefaultPropertiesSettings()
         _, settingVars.bCurvature = imgui.SliderInt("B Curvature", settingVars.bCurvature, 1, 100,
             settingVars.bCurvature .. "%%")
         saveSettingPropertiesButton(settingVars, "Penis")
-        saveVariables("PenisPropertySettings", settingVars)
+        cache.saveTable("PenisPropertySettings", settingVars)
     end
     imgui.SeparatorText("SV Vibrato Settings")
     if (imgui.CollapsingHeader("Linear Vibrato SV Settings")) then
         local settingVars = getSettingVars("LinearVibratoSV", "Property")
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End", " msx", 0, 0.875)
         saveSettingPropertiesButton(settingVars, "LinearVibratoSV")
-        saveVariables("LinearVibratoSVPropertySettings", settingVars)
+        cache.saveTable("LinearVibratoSVPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Exponential Vibrato SV Settings")) then
         local settingVars = getSettingVars("ExponentialVibratoSV", "Property")
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End", " msx", 0, 0.875)
         chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
         saveSettingPropertiesButton(settingVars, "ExponentialVibratoSV")
-        saveVariables("ExponentialVibratoSVPropertySettings", settingVars)
+        cache.saveTable("ExponentialVibratoSVPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Sinusoidal Vibrato SV Settings")) then
         local settingVars = getSettingVars("SinusoidalVibratoSV", "Property")
@@ -7151,14 +7156,14 @@ function showDefaultPropertiesSettings()
         chooseNumPeriods(settingVars)
         choosePeriodShift(settingVars)
         saveSettingPropertiesButton(settingVars, "SinusoidalVibratoSV")
-        saveVariables("SinusoidalVibratoSVPropertySettings", settingVars)
+        cache.saveTable("SinusoidalVibratoSVPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Sigmoidal Vibrato SV Settings")) then
         local settingVars = getSettingVars("SigmoidalVibratoSV", "Property")
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End", " msx", 0, 0.875)
         chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         saveSettingPropertiesButton(settingVars, "SigmoidalVibratoSV")
-        saveVariables("SigmoidalVibratoSVPropertySettings", settingVars)
+        cache.saveTable("SigmoidalVibratoSVPropertySettings", settingVars)
     end
     imgui.SeparatorText("SSF Vibrato Settings")
     if (imgui.CollapsingHeader("Linear Vibrato SSF Settings")) then
@@ -7166,7 +7171,7 @@ function showDefaultPropertiesSettings()
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs", "x")
         saveSettingPropertiesButton(settingVars, "LinearVibratoSSF")
-        saveVariables("LinearVibratoSSFPropertySettings", settingVars)
+        cache.saveTable("LinearVibratoSSFPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Exponential Vibrato SSF Settings")) then
         local settingVars = getSettingVars("ExponentialVibratoSSF", "Property")
@@ -7174,7 +7179,7 @@ function showDefaultPropertiesSettings()
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs", "x")
         chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
         saveSettingPropertiesButton(settingVars, "ExponentialVibratoSSF")
-        saveVariables("ExponentialVibratoSSFPropertySettings", settingVars)
+        cache.saveTable("ExponentialVibratoSSFPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Sinusoidal Vibrato SSF Settings")) then
         local settingVars = getSettingVars("SinusoidalVibratoSSF", "Property")
@@ -7184,7 +7189,7 @@ function showDefaultPropertiesSettings()
         chooseNumPeriods(settingVars)
         choosePeriodShift(settingVars)
         saveSettingPropertiesButton(settingVars, "SinusoidalVibratoSSF")
-        saveVariables("SinusoidalVibratoSSFPropertySettings", settingVars)
+        cache.saveTable("SinusoidalVibratoSSFPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Sigmoidal Vibrato SSF Settings")) then
         local settingVars = getSettingVars("SigmoidalVibratoSSF", "Property")
@@ -7192,7 +7197,7 @@ function showDefaultPropertiesSettings()
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs", "x")
         chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         saveSettingPropertiesButton(settingVars, "SigmoidalVibratoSSF")
-        saveVariables("SigmoidalVibratoSSFPropertySettings", settingVars)
+        cache.saveTable("SigmoidalVibratoSSFPropertySettings", settingVars)
     end
 end
 function showGeneralSettings()
@@ -7272,7 +7277,7 @@ function showPluginSettingsWindow()
     imgui.PushStyleColor(imgui_col.TitleBg, bgColor)
     imgui.PushStyleColor(imgui_col.TitleBgActive, bgColor)
     imgui.PushStyleColor(imgui_col.Border, vector4(1))
-    imgui.SetNextWindowCollapsed(false)
+    startNextWindowNotCollapsed("Settings")
     _, settingsOpened = imgui.Begin("plumoguSV Settings", true, 42)
     imgui.SetWindowSize("plumoguSV Settings", vector.New(433, 400))
     local typeIndex = state.GetValue("settings_typeIndex", 1)
@@ -7401,6 +7406,7 @@ function renderTutorialMenu()
     imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
     imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
     imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
+    startNextWindowNotCollapsed("Tutorial")
     _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
     local tutorialWindowName = state.GetValue("tutorialWindowName", "")
     if (not opened) then
@@ -7431,6 +7437,8 @@ function renderTutorialMenu()
         },
         ["Helpful Info"] = {
             ["Plugin Efficiency Tips"] = {
+                ["Hotkeys"] = nullFn,
+                ["Same Effect, Different Methods"] = nullFn,
             },
             ["The Math Behind SV"] = {
                 ["Preface"] = nullFn,
@@ -8869,12 +8877,12 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
         local settingVars1 = getSettingVars(svType1, "Combo1")
         local multipliers1 = generateSVMultipliers(svType1, settingVars1, nil)
         local labelText1 = svType1 .. "Combo1"
-        saveVariables(labelText1 .. "Settings", settingVars1)
+        cache.saveTable(labelText1 .. "Settings", settingVars1)
         local svType2 = STANDARD_SVS[settingVars.svType2Index]
         local settingVars2 = getSettingVars(svType2, "Combo2")
         local multipliers2 = generateSVMultipliers(svType2, settingVars2, nil)
         local labelText2 = svType2 .. "Combo2"
-        saveVariables(labelText2 .. "Settings", settingVars2)
+        cache.saveTable(labelText2 .. "Settings", settingVars2)
         local comboType = COMBO_SV_TYPE[settingVars.comboTypeIndex]
         multipliers = generateComboSet(multipliers1, multipliers2, settingVars.comboPhase,
             comboType, settingVars.comboMultiplier1,
@@ -9388,7 +9396,7 @@ function comboSettingsMenu(settingVars)
     local settingVars1 = getSettingVars(svType1, "Combo1")
     settingsChanged = showSettingsMenu(svType1, settingVars1, true, nil) or settingsChanged
     local labelText1 = svType1 .. "Combo1"
-    saveVariables(labelText1 .. "Settings", settingVars1)
+    cache.saveTable(labelText1 .. "Settings", settingVars1)
     imgui.End()
     startNextWindowNotCollapsed("svType2AutoOpen")
     imgui.Begin("SV Type 2 Settings", imgui_window_flags.AlwaysAutoResize)
@@ -9397,7 +9405,7 @@ function comboSettingsMenu(settingVars)
     local settingVars2 = getSettingVars(svType2, "Combo2")
     settingsChanged = showSettingsMenu(svType2, settingVars2, true, nil) or settingsChanged
     local labelText2 = svType2 .. "Combo2"
-    saveVariables(labelText2 .. "Settings", settingVars2)
+    cache.saveTable(labelText2 .. "Settings", settingVars2)
     imgui.End()
     local maxComboPhase = settingVars1.svPoints + settingVars2.svPoints
     settingsChanged = chooseStandardSVTypes(settingVars) or settingsChanged
@@ -9620,7 +9628,7 @@ function renderMeasureDataWidget()
         roundedSVDistance = 0,
         roundedAvgSV = 0
     }
-    getVariables("measureWidget", widgetVars)
+    cache.loadTable("measureWidget", widgetVars)
     if #state.SelectedHitObjects < 2 then return end
     local uniqueDict = {}
     for _, ho in ipairs(state.SelectedHitObjects) do
@@ -9650,5 +9658,5 @@ function renderMeasureDataWidget()
     imgui.EndTooltip()
     widgetVars.oldStartOffset = startOffset
     widgetVars.oldEndOffset = endOffset
-    saveVariables("measureWidget", widgetVars)
+    cache.saveTable("measureWidget", widgetVars)
 end

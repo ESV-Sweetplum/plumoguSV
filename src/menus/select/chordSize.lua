@@ -12,5 +12,5 @@ function selectChordSizeMenu()
 
     simpleActionMenu("Select chords within region", 2, selectByChordSizes, menuVars)
 
-    saveVariables("selectChordSizeMenu", menuVars)
+    cache.saveTable("selectChordSizeMenu", menuVars)
 end

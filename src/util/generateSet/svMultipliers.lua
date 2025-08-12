@@ -50,12 +50,12 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
         local settingVars1 = getSettingVars(svType1, "Combo1")
         local multipliers1 = generateSVMultipliers(svType1, settingVars1, nil)
         local labelText1 = svType1 .. "Combo1"
-        saveVariables(labelText1 .. "Settings", settingVars1)
+        cache.saveTable(labelText1 .. "Settings", settingVars1)
         local svType2 = STANDARD_SVS[settingVars.svType2Index]
         local settingVars2 = getSettingVars(svType2, "Combo2")
         local multipliers2 = generateSVMultipliers(svType2, settingVars2, nil)
         local labelText2 = svType2 .. "Combo2"
-        saveVariables(labelText2 .. "Settings", settingVars2)
+        cache.saveTable(labelText2 .. "Settings", settingVars2)
         local comboType = COMBO_SV_TYPE[settingVars.comboTypeIndex]
         multipliers = generateComboSet(multipliers1, multipliers2, settingVars.comboPhase,
             comboType, settingVars.comboMultiplier1,

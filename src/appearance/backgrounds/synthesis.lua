@@ -18,7 +18,7 @@ function renderSynthesis()
         lastDifference = 0
     }
 
-    getVariables("synthesis", bgVars)
+    cache.loadTable("synthesis", bgVars)
 
     local circleSize = 10
 
@@ -61,5 +61,5 @@ function renderSynthesis()
             rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
     end
 
-    saveVariables("synthesis", bgVars)
+    cache.saveTable("synthesis", bgVars)
 end

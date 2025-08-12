@@ -1,5 +1,5 @@
 {
-    "type.castNumberToInteger": false,
+    "type.castNumberToInteger": true,
     "type.inferParamType": true,
     "type.checkTableShape": true,
     "diagnostics.disable": [

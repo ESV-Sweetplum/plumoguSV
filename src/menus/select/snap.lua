@@ -1,7 +1,7 @@
 function selectBySnapMenu()
     local menuVars = getMenuVars("selectBySnap")
     BasicInputInt(menuVars, "snap", "Snap", { 1, 100 })
-    saveVariables("selectBySnapMenu", menuVars)
+    cache.saveTable("selectBySnapMenu", menuVars)
 
     AddSeparator()
     simpleActionMenu(

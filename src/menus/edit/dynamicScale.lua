@@ -4,7 +4,7 @@ function dynamicScaleMenu()
     imgui.Text(#menuVars.noteTimes .. " note times assigned to scale SVs between")
     addNoteTimesToDynamicScaleButton(menuVars)
     if numNoteTimes == 0 then
-        saveVariables("dynamicScaleMenu", menuVars)
+        cache.saveTable("dynamicScaleMenu", menuVars)
         return
     else
         clearNoteTimesButton(menuVars)
@@ -14,7 +14,7 @@ function dynamicScaleMenu()
     if #menuVars.noteTimes < 3 then
         imgui.Text("Not enough note times assigned")
         imgui.Text("Assign 3 or more note times instead")
-        saveVariables("dynamicScaleMenu", menuVars)
+        cache.saveTable("dynamicScaleMenu", menuVars)
         return
     end
     local numSVPoints = numNoteTimes - 1
@@ -28,7 +28,7 @@ function dynamicScaleMenu()
     local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
     if currentSVType == "Sinusoidal" then
         imgui.Text("Import sinusoidal values using 'Custom' instead")
-        saveVariables("dynamicScaleMenu", menuVars)
+        cache.saveTable("dynamicScaleMenu", menuVars)
         return
     end
 
@@ -41,8 +41,8 @@ function dynamicScaleMenu()
         menuVars.svMultipliers, nil, true)
 
     local labelText = currentSVType .. "DynamicScale"
-    saveVariables(labelText .. "Settings", settingVars)
-    saveVariables("dynamicScaleMenu", menuVars)
+    cache.saveTable(labelText .. "Settings", settingVars)
+    cache.saveTable("dynamicScaleMenu", menuVars)
 
     AddSeparator()
     simpleActionMenu("Scale spacing between assigned notes", 0, dynamicScaleSVs, menuVars)

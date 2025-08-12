@@ -20,11 +20,11 @@ function drawSnakeTrail(o, m, t)
     local trailPoints = globalVars.cursorTrailPoints
     local snakeTrailPoints = {}
     initializeSnakeTrailPoints(snakeTrailPoints, m, MAX_CURSOR_TRAIL_POINTS)
-    getVariables("snakeTrailPoints", snakeTrailPoints)
+    cache.loadTable("snakeTrailPoints", snakeTrailPoints)
     local needTrailUpdate = clock.listen("snakeTrail", 1000 / globalVars.effectFPS)
     updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoints,
         globalVars.snakeSpringConstant)
-    saveVariables("snakeTrailPoints", snakeTrailPoints)
+    cache.saveTable("snakeTrailPoints", snakeTrailPoints)
     local trailShape = TRAIL_SHAPES[globalVars.cursorTrailShapeIndex]
     renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, globalVars.cursorTrailSize,
         globalVars.cursorTrailGhost, trailShape)
@@ -46,7 +46,7 @@ function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
         snakeTrailPoints[i] = m
     end
     state.SetValue("initializeSnakeTrail", true)
-    saveVariables("snakeTrailPoints", snakeTrailPoints)
+    cache.saveTable("snakeTrailPoints", snakeTrailPoints)
 end
 
 -- Updates the points of the snake trail
@@ -125,9 +125,9 @@ function drawDustTrail(o, m, t, sz)
     local numDustParticles = 20
     local dustParticles = {}
     initializeDustParticles(sz, t, dustParticles, numDustParticles, dustDuration)
-    getVariables("dustParticles", dustParticles)
+    cache.loadTable("dustParticles", dustParticles)
     updateDustParticles(t, m, dustParticles, dustDuration, dustSize)
-    saveVariables("dustParticles", dustParticles)
+    cache.saveTable("dustParticles", dustParticles)
     renderDustParticles(globalVars.rgbPeriod, o, t, dustParticles, dustDuration, dustSize)
 end
 
@@ -151,7 +151,7 @@ function initializeDustParticles(_, t, dustParticles, numDustParticles, dustDura
         dustParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
     state.SetValue("initializeDustParticles", true)
-    saveVariables("dustParticles", dustParticles)
+    cache.saveTable("dustParticles", dustParticles)
 end
 
 -- Updates the particles of the dust trail
@@ -210,9 +210,9 @@ function drawSparkleTrail(o, m, t, sz)
     local numSparkleParticles = 10
     local sparkleParticles = {}
     initializeSparkleParticles(sz, t, sparkleParticles, numSparkleParticles, sparkleDuration)
-    getVariables("sparkleParticles", sparkleParticles)
+    cache.loadTable("sparkleParticles", sparkleParticles)
     updateSparkleParticles(t, m, sparkleParticles, sparkleDuration, sparkleSize)
-    saveVariables("sparkleParticles", sparkleParticles)
+    cache.saveTable("sparkleParticles", sparkleParticles)
     renderSparkleParticles(o, t, sparkleParticles, sparkleDuration, sparkleSize)
 end
 
@@ -236,7 +236,7 @@ function initializeSparkleParticles(_, t, sparkleParticles, numSparkleParticles,
         sparkleParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
     state.SetValue("initializeSparkleParticles", true)
-    saveVariables("sparkleParticles", sparkleParticles)
+    cache.saveTable("sparkleParticles", sparkleParticles)
 end
 
 -- Updates the particles of the sparkle trail

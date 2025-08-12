@@ -70,7 +70,7 @@ function renderMeasureDataWidget()
         roundedAvgSV = 0
     }
 
-    getVariables("measureWidget", widgetVars)
+    cache.loadTable("measureWidget", widgetVars)
 
     if #state.SelectedHitObjects < 2 then return end
     local uniqueDict = {}
@@ -103,5 +103,5 @@ function renderMeasureDataWidget()
     widgetVars.oldStartOffset = startOffset
     widgetVars.oldEndOffset = endOffset
 
-    saveVariables("measureWidget", widgetVars)
+    cache.saveTable("measureWidget", widgetVars)
 end

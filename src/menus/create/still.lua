@@ -31,6 +31,6 @@ function placeStillSVMenu()
     menuVars.settingVars = settingVars
     simpleActionMenu("Place SVs between selected notes", 2, placeStillSVsParent, menuVars)
 
-    saveVariables(currentSVType .. "StillSettings", settingVars)
-    saveVariables("placeStillMenu", menuVars)
+    cache.saveTable(currentSVType .. "StillSettings", settingVars)
+    cache.saveTable("placeStillMenu", menuVars)
 end

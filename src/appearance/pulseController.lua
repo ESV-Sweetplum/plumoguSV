@@ -5,7 +5,7 @@ function pulseController()
         pulsedThisFrame = false
     }
 
-    getVariables("pulseController", pulseVars)
+    cache.loadTable("pulseController", pulseVars)
 
     local timeOffset = 50 -- [`state.SongTime`](lua://state.SongTime) isn't entirely accurate while the song is playing, so this aims to correct that.
 
@@ -39,7 +39,7 @@ function pulseController()
 
     imgui.PushStyleColor(imgui_col.Border, pulseColor * pulseVars.pulseStatus + borderColor * (1 - pulseVars.pulseStatus))
 
-    saveVariables("pulseController", pulseVars)
+    cache.saveTable("pulseController", pulseVars)
     state.SetValue("cache_pulseValue", pulseVars.pulseStatus)
     state.SetValue("cache_pulseStatus", pulseVars.pulsedThisFrame)
 end

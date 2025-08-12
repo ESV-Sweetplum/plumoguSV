@@ -24,7 +24,7 @@ function renderReactiveStars()
         local sz = szList[i]
         local progress = x / dimX
         local brightness = clamp(-8 * progress * (progress - 1), 0, 1)
-        local pos = { x + topLeft.x, y + topLeft.y }
+        local pos = vector.New(x + topLeft.x, y + topLeft.y)
 
         ctx.AddCircleFilled(pos, sz, rgbaToUint(255, 255, 255, brightness * 255))
     end

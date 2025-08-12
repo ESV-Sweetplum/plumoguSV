@@ -66,8 +66,8 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         if (imgui.Button("Select##Preset" .. idx)) then
             local data = table.parse(preset.data)
             globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
-            saveVariables(preset.menu .. preset.type .. "Settings", data.settingVars)
-            saveVariables("place" .. preset.type .. "Menu", data.menuVars)
+            cache.saveTable(preset.menu .. preset.type .. "Settings", data.settingVars)
+            cache.saveTable("place" .. preset.type .. "Menu", data.menuVars)
             globalVars.showPresetMenu = false
         end
         if (imgui.IsItemClicked("Right")) then

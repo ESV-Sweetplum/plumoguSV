@@ -35,6 +35,6 @@ function placeVibratoSVMenu(separateWindow)
     if currentSVType == "Custom##Vibrato" then customVibratoMenu(menuVars, settingVars, separateWindow) end
 
     local labelText = currentSVType .. (menuVars.vibratoMode == 1 and "SV" or "SSF") .. "Vibrato"
-    saveVariables(labelText .. "Settings", settingVars)
-    saveVariables("placeVibratoMenu", menuVars)
+    cache.saveTable(labelText .. "Settings", settingVars)
+    cache.saveTable("placeVibratoMenu", menuVars)
 end

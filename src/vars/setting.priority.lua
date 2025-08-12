@@ -246,6 +246,6 @@ function getSettingVars(svType, label)
     local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[searchTerm])
 
     local labelText = svType .. label .. "Settings"
-    getVariables(labelText, settingVars)
+    cache.loadTable(labelText, settingVars)
     return settingVars
 end

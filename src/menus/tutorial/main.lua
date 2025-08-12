@@ -6,6 +6,8 @@ function renderTutorialMenu()
     imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
     imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
 
+    startNextWindowNotCollapsed("Tutorial")
+
     _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
     local tutorialWindowName = state.GetValue("tutorialWindowName", "")
 
@@ -40,7 +42,8 @@ function renderTutorialMenu()
         },
         ["Helpful Info"] = {
             ["Plugin Efficiency Tips"] = {
-
+                ["Hotkeys"] = nullFn,
+                ["Same Effect, Different Methods"] = nullFn,
             },
             ["The Math Behind SV"] = {
                 ["Preface"] = nullFn,

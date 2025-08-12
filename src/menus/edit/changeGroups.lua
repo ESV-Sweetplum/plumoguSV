@@ -32,7 +32,7 @@ function changeGroupsMenu()
 
     AddSeparator()
 
-    saveVariables("changeGroupsMenu", menuVars)
+    cache.saveTable("changeGroupsMenu", menuVars)
 
     simpleActionMenu("Move items to " .. menuVars.designatedTimingGroup, 2, changeGroups, menuVars)
 end

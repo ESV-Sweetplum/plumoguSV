@@ -7,7 +7,7 @@ function comboSettingsMenu(settingVars)
     local settingVars1 = getSettingVars(svType1, "Combo1")
     settingsChanged = showSettingsMenu(svType1, settingVars1, true, nil) or settingsChanged
     local labelText1 = svType1 .. "Combo1"
-    saveVariables(labelText1 .. "Settings", settingVars1)
+    cache.saveTable(labelText1 .. "Settings", settingVars1)
     imgui.End()
 
     startNextWindowNotCollapsed("svType2AutoOpen")
@@ -17,7 +17,7 @@ function comboSettingsMenu(settingVars)
     local settingVars2 = getSettingVars(svType2, "Combo2")
     settingsChanged = showSettingsMenu(svType2, settingVars2, true, nil) or settingsChanged
     local labelText2 = svType2 .. "Combo2"
-    saveVariables(labelText2 .. "Settings", settingVars2)
+    cache.saveTable(labelText2 .. "Settings", settingVars2)
     imgui.End()
 
     local maxComboPhase = settingVars1.svPoints + settingVars2.svPoints

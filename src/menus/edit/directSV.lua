@@ -111,5 +111,5 @@ function directSVMenu()
 
     imgui.EndTable()
 
-    saveVariables("directSVMenu", menuVars)
+    cache.saveTable("directSVMenu", menuVars)
 end

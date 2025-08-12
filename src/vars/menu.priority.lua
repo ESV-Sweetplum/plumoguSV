@@ -158,7 +158,7 @@ function getMenuVars(menuType, optionalLabel)
     local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuType])
 
     local labelText = menuType .. optionalLabel .. "Menu"
-    getVariables(labelText, menuVars)
+    cache.loadTable(labelText, menuVars)
 
     return menuVars
 end

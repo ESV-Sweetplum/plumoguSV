@@ -7,7 +7,7 @@ function deleteTab()
     imgui.SameLine(0, SAMELINE_SPACING + 3.5)
     _, menuVars.deleteTable[4] = imgui.Checkbox("Delete Bookmarks", menuVars.deleteTable[4])
 
-    saveVariables("deleteMenu", menuVars)
+    cache.saveTable("deleteMenu", menuVars)
 
     for i = 1, 4 do
         if (menuVars.deleteTable[i]) then goto continue end

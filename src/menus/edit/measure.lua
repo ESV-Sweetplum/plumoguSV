@@ -14,7 +14,7 @@ function measureMenu()
 
     AddSeparator()
     simpleActionMenu("Measure SVs between selected notes", 2, measureSVs, menuVars)
-    saveVariables("measureMenu", menuVars)
+    cache.saveTable("measureMenu", menuVars)
 end
 
 function displayMeasuredStatsRounded(menuVars)

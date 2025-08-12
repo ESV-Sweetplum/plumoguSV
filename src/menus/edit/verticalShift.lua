@@ -1,7 +1,7 @@
 function verticalShiftMenu()
     local menuVars = getMenuVars("verticalShift")
     chooseConstantShift(menuVars, 0)
-    saveVariables("verticalShiftMenu", menuVars)
+    cache.saveTable("verticalShiftMenu", menuVars)
 
     AddSeparator()
     local buttonText = "Vertically shift SVs between selected notes"

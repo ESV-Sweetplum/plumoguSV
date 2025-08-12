@@ -45,6 +45,6 @@ function placeStandardSVMenu()
     end
     simpleActionMenu("Place SSFs between selected notes", 2, placeSSFs, menuVars, true)
 
-    saveVariables(currentSVType .. "StandardSettings", settingVars)
-    saveVariables("placeStandardMenu", menuVars)
+    cache.saveTable(currentSVType .. "StandardSettings", settingVars)
+    cache.saveTable("placeStandardMenu", menuVars)
 end

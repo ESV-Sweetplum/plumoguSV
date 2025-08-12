@@ -3,7 +3,7 @@ function scaleDisplaceMenu()
     local menuVars = getMenuVars("scaleDisplace")
     menuVars.scaleSpotIndex = Combo("Displace Spot", DISPLACE_SCALE_SPOTS, menuVars.scaleSpotIndex)
     chooseScaleType(menuVars)
-    saveVariables("scaleDisplaceMenu", menuVars)
+    cache.saveTable("scaleDisplaceMenu", menuVars)
 
     AddSeparator()
     local buttonText = "Scale SVs between selected notes##displace"
@@ -13,7 +13,7 @@ end
 function scaleMultiplyMenu()
     local menuVars = getMenuVars("scaleMultiply")
     chooseScaleType(menuVars)
-    saveVariables("scaleMultiplyMenu", menuVars)
+    cache.saveTable("scaleMultiplyMenu", menuVars)
 
     AddSeparator()
     local buttonText = "Scale SVs between selected notes##multiply"

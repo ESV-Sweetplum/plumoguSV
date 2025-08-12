@@ -2,7 +2,7 @@ function selectAlternatingMenu()
     local menuVars = getMenuVars("selectAlternating")
     BasicInputInt(menuVars, "every", "Every __ notes", { 1, MAX_SV_POINTS })
     BasicInputInt(menuVars, "offset", "From note #__", { 1, menuVars.every })
-    saveVariables("selectAlternatingMenu", menuVars)
+    cache.saveTable("selectAlternatingMenu", menuVars)
 
     AddSeparator()
     simpleActionMenu(
