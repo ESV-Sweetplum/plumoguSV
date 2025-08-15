@@ -1,4 +1,5 @@
 require("packages.table.contains")
+require("packages.string.charAt")
 CONSONANTS = { "B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "X", "Z" }
 
 ---Very rudimentary function that returns a string depending on whether or not it should be plural.

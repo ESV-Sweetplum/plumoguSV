@@ -1,3 +1,4 @@
+require("packages.table.searchClosest")
 function game.getNoteOffsetAt(offset, forward)
     local startTimes = state.GetValue("hoStartTimes", {})
     if (not truthy(#startTimes)) then return -1 end

@@ -4,7 +4,7 @@ require("packages.table.dedupe")
 ---@param tbl { [string]: any } The table to search in.
 ---@return string[] keys A list of keys.
 function table.keys(tbl)
-    local resultsTbl = {}
+    local resultsTbl = table.construct()
 
     for k, _ in pairs(tbl) do
         table.insert(resultsTbl, k)

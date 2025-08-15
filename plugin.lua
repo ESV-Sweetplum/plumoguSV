@@ -1,7 +1,5 @@
 ---@diagnostic disable: param-type-mismatch
 cache = {}
-cache.get = state.GetValue
-cache.set = state.SetValue
 game = {}
 kb = {}
 matrix = {}
@@ -268,7 +266,8 @@ function kb.listenForAnyKeyPressed()
     end
     return prefixes, key
 end
-ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
+local ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+    "T", "U",
     "V", "W", "X", "Y", "Z" }
 function kb.numToKey(num)
     return ALPHABET_LIST[math.clamp(num - 64, 1, #ALPHABET_LIST)]
@@ -649,7 +648,7 @@ end
 ---@param tbl { [string]: any } The table to search in.
 ---@return string[] keys A list of keys.
 function table.keys(tbl)
-    local resultsTbl = {}
+    local resultsTbl = table.construct()
     for k, _ in pairs(tbl) do
         resultsTbl[#resultsTbl + 1] = k
     end
@@ -814,7 +813,7 @@ function sortAscendingNoteLaneTime(a, b)
     if (math.abs(a.StartTime - b.StartTime) > 0.1) then return a.StartTime < b.StartTime end
     return a.Lane < b.Lane
 end
----Sorts a table given a sorting function. Should be passed into [`table.sort`](lua://table.sort).
+---Sorts a table given a sorting function.
 ---@generic T
 ---@param tbl T[] The table to sort.
 ---@param compFn fun(a: T, b: T): boolean A comparison function. Given two elements `a` and `b`, how should they be sorted?
@@ -877,7 +876,7 @@ end
 ---@param tbl { [string]: any } The table to search in.
 ---@return string[] values A list of values.
 function table.values(tbl)
-    local resultsTbl = {}
+    local resultsTbl = table.construct()
     for k13 = 1, #tbl do
         local v = tbl[k13]
         resultsTbl[#resultsTbl + 1] = v
@@ -1345,7 +1344,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.hideAutomatic = truthy(tempGlobalVars.hideAutomatic)
     globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
     globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
-    globalVars.customStyle = tempGlobalVars.customStyle or table.construct()
+    globalVars.customStyle = tempGlobalVars.customStyle or {}
     if (globalVars.customStyle.border) then
         globalVars.customStyle.border = table.vectorize4(globalVars.customStyle
             .border)

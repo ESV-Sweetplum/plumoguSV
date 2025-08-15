@@ -1,4 +1,3 @@
-require("packages.table.construct")
 ---Transforms an array element-wise using a given function.
 ---@generic T: string | number | boolean
 ---@param tbl T[]

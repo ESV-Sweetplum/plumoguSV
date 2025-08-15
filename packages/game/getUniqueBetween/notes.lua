@@ -1,3 +1,5 @@
+require("packages.table.dedupe")
+
 ---Finds and returns a list of all unique offsets of notes between a start and an end time [Table]
 ---@param startOffset number
 ---@param endOffset number

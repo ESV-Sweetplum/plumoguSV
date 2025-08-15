@@ -3,7 +3,7 @@ require("packages.table.construct")
 ---@param tbl { [string]: any } The table to search in.
 ---@return string[] values A list of values.
 function table.values(tbl)
-    local resultsTbl = {}
+    local resultsTbl = table.construct()
 
     for _, v in ipairs(tbl) do
         table.insert(resultsTbl, v)

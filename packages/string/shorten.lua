@@ -1,4 +1,5 @@
 require("packages.string.removeVowels")
+require("packages.string.charAt")
 
 function string.shorten(str)
     local consonants = str:removeVowels()

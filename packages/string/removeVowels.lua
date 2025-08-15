@@ -1,3 +1,4 @@
+require("packages.string.charAt")
 function string.removeVowels(str)
     local VOWELS = { "a", "e", "i", "o", "u", "y" }
     local newStr = ""

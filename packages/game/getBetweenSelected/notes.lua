@@ -1,3 +1,5 @@
+require("packages.table.dedupe")
+
 ---Finds and returns a list of all unique offsets of notes between selected notes [Table]
 ---@param includeLN? boolean
 ---@return number[]

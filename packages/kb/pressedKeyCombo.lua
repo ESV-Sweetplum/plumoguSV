@@ -1,3 +1,5 @@
+require("packages.table.contains")
+
 function kb.pressedKeyCombo(keyCombo)
     keyCombo = keyCombo:upper()
     local comboList = {}

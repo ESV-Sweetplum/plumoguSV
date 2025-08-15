@@ -1,4 +1,4 @@
-require("packages.string.char")
+require("packages.string.charAt")
 
 ---Lots of imgui functions have ## in them as identifiers. This will remove everything after the ##.
 ---@param str string

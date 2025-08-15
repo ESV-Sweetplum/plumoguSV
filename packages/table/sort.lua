@@ -26,7 +26,7 @@ function sortAscendingNoteLaneTime(a, b)
     return a.Lane < b.Lane
 end
 
----Sorts a table given a sorting function. Should be passed into [`table.sort`](lua://table.sort).
+---Sorts a table given a sorting function.
 ---@generic T
 ---@param tbl T[] The table to sort.
 ---@param compFn fun(a: T, b: T): boolean A comparison function. Given two elements `a` and `b`, how should they be sorted?

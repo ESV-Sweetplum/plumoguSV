@@ -1,3 +1,4 @@
+require("packages.cache.initialize.priority")
 clock = {}
 
 ---Returns true every `interval` ms.
