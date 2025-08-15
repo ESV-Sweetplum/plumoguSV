@@ -2298,7 +2298,7 @@ function svVibrato(menuVars, heightFn)
     local svsToAdd = {} ---@type ScrollVelocity[]
     local svsToRemove = {} ---@type ScrollVelocity[]
     local svTimeIsAdded = {}
-    local fps = VIBRATO_FRAME_RATES[menuVars.vibratoQuality]
+    local fps = VIBRATO_FRAME_RATES[menuVars.vibratoQuality] + 0.69
     for i = 1, #offsets - 1 do
         local start = offsets[i]
         local next = offsets[i + 1]
