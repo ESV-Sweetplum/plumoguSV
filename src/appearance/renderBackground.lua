@@ -8,13 +8,14 @@
 ---@field size integer
 
 function renderBackground()
-    if (DYNAMIC_BACKGROUND_TYPES[globalVars.dynamicBackgroundIndex] == "Reactive Stars") then
+    local idx = globalVars.dynamicBackgroundIndex
+    if (DYNAMIC_BACKGROUND_TYPES[idx] == "Reactive Stars") then
         renderReactiveStars()
     end
-    if (DYNAMIC_BACKGROUND_TYPES[globalVars.dynamicBackgroundIndex] == "Reactive Singularity") then
+    if (DYNAMIC_BACKGROUND_TYPES[idx] == "Reactive Singularity") then
         renderReactiveSingularities()
     end
-    if (DYNAMIC_BACKGROUND_TYPES[globalVars.dynamicBackgroundIndex] == "Synthesis") then
+    if (DYNAMIC_BACKGROUND_TYPES[idx] == "Synthesis") then
         renderSynthesis()
     end
 end
