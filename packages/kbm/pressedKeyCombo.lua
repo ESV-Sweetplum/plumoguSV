@@ -1,6 +1,6 @@
 require("packages.table.contains")
 
-function kb.pressedKeyCombo(keyCombo)
+function kbm.pressedKeyCombo(keyCombo)
     keyCombo = keyCombo:upper()
     local comboList = {}
     for v in keyCombo:gmatch("%u+") do
@@ -22,4 +22,4 @@ function kb.pressedKeyCombo(keyCombo)
     return utils.IsKeyPressed(keys[keyReq])
 end
 
-kb.executedKeyCombo = kb.pressedKeyCombo
+kbm.executedKeyCombo = kbm.pressedKeyCombo

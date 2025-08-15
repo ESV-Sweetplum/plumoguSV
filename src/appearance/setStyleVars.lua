@@ -53,7 +53,7 @@ function setPluginAppearanceColors(colorTheme)
     if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
     if colorTheme == "CUSTOM" then borderColor = setCustomColors() end
 
-    state.SetValue("baseBorderColor", borderColor)
+    cache.borderColor = borderColor
 end
 
 function setClassicColors()

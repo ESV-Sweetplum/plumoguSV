@@ -24,7 +24,7 @@ function renderReactiveSingularities()
     local axList = state.GetValue("singularity_axList", {})
     local ayList = state.GetValue("singularity_ayList", {})
 
-    local pulseStatus = state.GetValue("cache_pulseValue", 0)
+    local pulseStatus = cache.pulseValue or 0
 
     local slowSpeedR = 89
     local slowSpeedG = 0
@@ -56,7 +56,7 @@ function renderReactiveSingularities()
         local r = lerp(clampedSpeed, slowSpeedR, fastSpeedR)
         local g = lerp(clampedSpeed, slowSpeedG, fastSpeedG)
         local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
-        local pos = { x + topLeft.x, y + topLeft.y }
+        local pos = vector.New(x + topLeft.x, y + topLeft.y)
         ctx.AddCircleFilled(pos, 2,
             rgbaToUint(r, g, b, 55 + pulseStatus * 200))
     end

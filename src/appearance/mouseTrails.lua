@@ -4,8 +4,8 @@ function drawCursorTrail()
     local t = imgui.GetTime()
     local sz = state.WindowSize
     local cursorTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
-    if cursorTrail ~= "Dust" then state.SetValue("initializeDustParticles", false) end
-    if cursorTrail ~= "Sparkle" then state.SetValue("initializeSparkleParticles", false) end
+    if cursorTrail ~= "Dust" then cache.boolean.dustParticlesInitialized = false end
+    if cursorTrail ~= "Sparkle" then cache.boolean.sparkleParticlesInitialized = false end
 
     if cursorTrail == "None" then return end
     if cursorTrail == "Snake" then drawSnakeTrail(o, m, t) end
@@ -36,7 +36,7 @@ end
 --    m                : current (x, y) mouse position [Table]
 --    trailPoints      : number of trail points for the snake trail [Int]
 function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
-    if (state.GetValue("initializeSnakeTrail")) then
+    if (cache.boolean.snakeTrailInitialized) then
         for i = 1, trailPoints do
             snakeTrailPoints[i] = {}
         end
@@ -45,7 +45,7 @@ function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
     for i = 1, trailPoints do
         snakeTrailPoints[i] = m
     end
-    state.SetValue("initializeSnakeTrail", true)
+    cache.boolean.snakeTrailInitialized = true
     cache.saveTable("snakeTrailPoints", snakeTrailPoints)
 end
 
@@ -139,7 +139,7 @@ end
 --    numDustParticles : total number of dust particles [Int]
 --    dustDuration     : lifespan of a dust particle [Int/Float]
 function initializeDustParticles(_, t, dustParticles, numDustParticles, dustDuration)
-    if state.GetValue("initializeDustParticles") then
+    if cache.boolean.dustParticlesInitialized then
         for i = 1, numDustParticles do
             dustParticles[i] = {}
         end
@@ -150,7 +150,7 @@ function initializeDustParticles(_, t, dustParticles, numDustParticles, dustDura
         local showParticle = false
         dustParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
-    state.SetValue("initializeDustParticles", true)
+    cache.boolean.dustParticlesInitialized = true
     cache.saveTable("dustParticles", dustParticles)
 end
 
@@ -224,7 +224,7 @@ end
 --    numSparkleParticles : total number of sparkle particles [Int]
 --    sparkleDuration     : lifespan of a sparkle particle [Int/Float]
 function initializeSparkleParticles(_, t, sparkleParticles, numSparkleParticles, sparkleDuration)
-    if state.GetValue("initializeSparkleParticles") then
+    if cache.boolean.sparkleParticlesInitialized then
         for i = 1, numSparkleParticles do
             sparkleParticles[i] = {}
         end
@@ -235,7 +235,7 @@ function initializeSparkleParticles(_, t, sparkleParticles, numSparkleParticles,
         local showParticle = false
         sparkleParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
-    state.SetValue("initializeSparkleParticles", true)
+    cache.boolean.sparkleParticlesInitialized = true
     cache.saveTable("sparkleParticles", sparkleParticles)
 end
 
@@ -307,14 +307,6 @@ function generateParticle(x, y, xRange, yRange, endTime, showParticle)
     return particle
 end
 
---[[ may implement in the future when making mouse click effects
-function  checkIfMouseClicked()
-    local mouseDownBefore = state.GetValue("wasMouseDown")
-    local mouseDownNow = imgui.IsAnyMouseDown()
-    state.SetValue("wasMouseDown", mouseDownNow)
-    return (not mouseDownBefore) and mouseDownNow
-end
---]]
 -- Checks and returns whether or not the mouse position has changed [Boolean]
 -- Parameters
 --    currentMousePosition : current (x, y) coordinates of the mouse [Table]

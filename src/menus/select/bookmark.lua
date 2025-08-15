@@ -1,9 +1,7 @@
 function selectBookmarkMenu()
     local bookmarks = map.bookmarks
 
-    local selectedIndex = state.GetValue("selectedIndex") or 0
-    local searchTerm = state.GetValue("searchTerm") or ""
-    local filterTerm = state.GetValue("filterTerm") or ""
+    local menuVars = getMenuVars("selectBookmark")
     local times = {}
 
     if (#bookmarks == 0) then
@@ -11,9 +9,9 @@ function selectBookmarkMenu()
     else
         imgui.PushItemWidth(70)
 
-        _, searchTerm = imgui.InputText("Search", searchTerm, 4096)
+        _, menuVars.searchTerm = imgui.InputText("Search", menuVars.searchTerm, 4096)
         KeepSameLine()
-        _, filterTerm = imgui.InputText("Ignore", filterTerm, 4096)
+        _, menuVars.filterTerm = imgui.InputText("Ignore", menuVars.filterTerm, 4096)
 
         imgui.Columns(3)
 
@@ -36,11 +34,11 @@ function selectBookmarkMenu()
                 goto continue
             end
 
-            if (searchTerm:len() > 0) and (not bm.Note:find(searchTerm)) then
+            if (menuVars.searchTerm:len() > 0) and (not bm.Note:find(menuVars.searchTerm)) then
                 skippedBookmarks = skippedBookmarks + 1
                 goto continue
             end
-            if (filterTerm:len() > 0) and (bm.Note:find(filterTerm)) then
+            if (menuVars.filterTerm:len() > 0) and (bm.Note:find(menuVars.filterTerm)) then
                 skippedBookmarks = skippedBookmarks + 1
                 goto continue
             end
@@ -80,7 +78,5 @@ function selectBookmarkMenu()
         imgui.Columns(1)
     end
 
-    state.SetValue("selectedIndex", selectedIndex)
-    state.SetValue("searchTerm", searchTerm)
-    state.SetValue("filterTerm", filterTerm)
+    cache.saveTable("selectBookmarkMenu", menuVars)
 end

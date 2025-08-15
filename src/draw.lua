@@ -1,8 +1,10 @@
+cache.indices = {}
+
 function draw()
     if (not state.CurrentTimingPoint) then return end
 
-    state.SetValue("ComputableInputFloatIndex", 1)
-    state.SetValue("StatedInputTextIndex", 1)
+    cache.indices.computableInputFloat = 1
+
     state.IsWindowHovered = imgui.IsWindowHovered()
 
     drawCapybaraParent()

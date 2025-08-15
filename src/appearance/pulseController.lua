@@ -32,7 +32,7 @@ function pulseController()
 
     pulseVars.pulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
 
-    local borderColor = state.GetValue("baseBorderColor") or vctr4(1)
+    local borderColor = cache.borderColor or vctr4(1)
     local negatedBorderColor = vctr4(1) - borderColor
 
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
@@ -40,6 +40,6 @@ function pulseController()
     imgui.PushStyleColor(imgui_col.Border, pulseColor * pulseVars.pulseStatus + borderColor * (1 - pulseVars.pulseStatus))
 
     cache.saveTable("pulseController", pulseVars)
-    state.SetValue("cache_pulseValue", pulseVars.pulseStatus)
-    state.SetValue("cache_pulseStatus", pulseVars.pulsedThisFrame)
+    cache.pulseValue = pulseVars.pulseStatus
+    cache.pulsedThisFrame = pulseVars.pulsedThisFrame
 end

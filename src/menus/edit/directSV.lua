@@ -5,13 +5,11 @@ function updateDirectEdit()
     local lastOffset = offsets[#offsets]
 
     if (#offsets < 2) then
-        state.SetValue("directSVList", {})
+        cache.lists.directSVList = {}
         return
     end
 
-    local svs = game.getSVsBetweenOffsets(firstOffset, lastOffset)
-
-    state.SetValue("directSVList", svs)
+    cache.lists.directSVList = game.getSVsBetweenOffsets(firstOffset, lastOffset)
 end
 
 function directSVMenu()
@@ -21,7 +19,7 @@ function directSVMenu()
     if (clock.listen("directSV", 500)) then
         updateDirectEdit()
     end
-    local svs = state.GetValue("directSVList") or {}
+    local svs = cache.lists.directSVList
     if (#svs == 0) then
         menuVars.selectableIndex = 1
         imgui.TextWrapped("Select two notes to view SVs.")

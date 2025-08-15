@@ -1,7 +1,9 @@
 ---@diagnostic disable: param-type-mismatch
-cache = {}
+cache = {
+    boolean = {}
+}
 game = {}
-kb = {}
+kbm = {}
 matrix = {}
 ---#### (NOTE: This function is impure and has no return value. This should be changed eventually.)
 ---Gets a list of variables.
@@ -23,6 +25,7 @@ function cache.saveTable(listName, variables)
     end
 end
 clock = {}
+cache.clock = {}
 ---Returns true every `interval` ms.
 ---@param id string The unique identifier of the clock.
 ---@param interval integer The interval at which the clock should run.
@@ -30,14 +33,12 @@ clock = {}
 function clock.listen(id, interval)
     local currentTime = state
         .UnixTime
-    local stateId = table.concat({ "clock_", id })
-    if (not state.GetValue(stateId)) then
-        state.SetValue(stateId,
-            currentTime)
+    local prevTime = cache.clock[id]
+    if (not prevTime) then
+        cache.clock[id] = currentTime
     end
-    local previousExecutionTime = state.GetValue(stateId)
-    if (currentTime - previousExecutionTime > interval) then
-        state.SetValue(stateId, currentTime)
+    if (currentTime - prevTime > interval) then
+        cache.clock[id] = currentTime
         return true
     end
     return false
@@ -48,7 +49,7 @@ function game.getTimingPointAt(offset)
     return { StartTime = -69420, Bpm = 42.69 }
 end
 function game.getNoteOffsetAt(offset, forward)
-    local startTimes = state.GetValue("hoStartTimes", {})
+    local startTimes = cache.lists.hitObjectStartTimes
     if (not truthy(#startTimes)) then return -1 end
     if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
     if (state.SongTime < startTimes[1]) then return startTimes[1] end
@@ -250,7 +251,7 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     return noteOffsetsBetween
 end
 game.getUniqueNoteOffsetsBetween = game.uniqueNoteOffsetsBetween
-function kb.listenForAnyKeyPressed()
+function kbm.listenForAnyKeyPressed()
     local isCtrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
     local isShiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)
     local isAltHeld = utils.IsKeyDown(keys.LeftAlt) or utils.IsKeyDown(keys.RightAlt)
@@ -268,10 +269,10 @@ function kb.listenForAnyKeyPressed()
 end
 local ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
     "T", "U", "V", "W", "X", "Y", "Z" }
-function kb.numToKey(num)
+function kbm.numToKey(num)
     return ALPHABET_LIST[math.clamp(num - 64, 1, #ALPHABET_LIST)]
 end
-function kb.pressedKeyCombo(keyCombo)
+function kbm.pressedKeyCombo(keyCombo)
     keyCombo = keyCombo:upper()
     local comboList = {}
     for v in keyCombo:gmatch("%u+") do
@@ -292,7 +293,7 @@ function kb.pressedKeyCombo(keyCombo)
     end
     return utils.IsKeyPressed(keys[keyReq])
 end
-kb.executedKeyCombo = kb.pressedKeyCombo
+kbm.executedKeyCombo = kbm.pressedKeyCombo
 ---Evaluates a simplified one-dimensional cubic bezier expression with points (0, p2, p3, 1).
 ---@param p2 number The second point in the cubic bezier.
 ---@param p3 number The third point in the cubic bezier.
@@ -575,12 +576,12 @@ function table.construct(...)
     return tbl
 end
 ---Creates a new array with a custom metatable, allowing for `:` syntactic sugar. All elements will be the given item.
----@generic T: string | number | boolean
+---@generic T: string | number | boolean | table
 ---@param item T The entry to use.
 ---@param num integer The number of entries to put into the table.
 ---@return T[] tbl A table with the given entries.
 function table.constructRepeating(item, num)
-    local tbl = {}
+    local tbl = table.construct()
     for _ = 1, num do
         tbl[#tbl + 1] = item
     end
@@ -1462,6 +1463,10 @@ DEFAULT_STARTING_MENU_VARS = {
     reverseScroll = {
         distance = 400
     },
+    scaleBookmark = {
+        searchTerm = "",
+        filterTerm = ""
+    },
     scaleDisplace = {
         scaleSpotIndex = 1,
         scaleTypeIndex = 1,
@@ -1780,9 +1785,9 @@ end]],
 ---@param label string A delineator to separate two categories with similar SV types (Standard/Still, etc).
 ---@return table
 function getSettingVars(svType, label)
-    searchTerm = svType:gsub("[%s%(%)#]+", "")
-    searchTerm = searchTerm:charAt(1):lower() .. searchTerm:sub(2)
-    local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[searchTerm])
+    settingKey = svType:gsub("[%s%(%)#]+", "")
+    settingKey = settingKey:charAt(1):lower() .. settingKey:sub(2)
+    local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[settingKey])
     local labelText = svType .. label .. "Settings"
     cache.loadTable(labelText, settingVars)
     return settingVars
@@ -3272,7 +3277,7 @@ function verticalShiftSVs(menuVars)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function changeNoteLockMode()
-    local mode = state.GetValue("note-lock-mode", 0)
+    local mode = cache.noteLockMode or 0
     mode = (mode + 1) % 4
     if (mode == 0) then
         print("s", "Notes have been unlocked.")
@@ -3289,14 +3294,14 @@ function changeNoteLockMode()
             "Notes can no longer be moved, only placed and deleted. To change the lock mode, press " ..
             globalVars.hotkeyList[10])
     end
-    state.SetValue("note-lock-mode", mode)
+    cache.noteLockMode = mode
 end
 function initializeNoteLockMode()
-    state.SetValue("note-lock-mode", 0)
+    cache.noteLockMode = 0
     listen(function(action, type, fromLua)
         if (fromLua) then return end
         local actionIndex = tonumber(action.Type) ---@cast actionIndex EditorActionType
-        local mode = state.GetValue("note-lock-mode", 0)
+        local mode = cache.noteLockMode or 0
         if (mode == 1) then
             if (actionIndex > 9) then return end
             actions.Undo()
@@ -3322,8 +3327,8 @@ function jumpToTg()
     state.SelectedScrollGroupId = tgId
 end
 function checkForGlobalHotkeys()
-    if (kb.pressedKeyCombo(globalVars.hotkeyList[9])) then jumpToTg() end
-    if (kb.pressedKeyCombo(globalVars.hotkeyList[10])) then changeNoteLockMode() end
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[9])) then jumpToTg() end
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[10])) then changeNoteLockMode() end
 end
 function getMapStats()
     local currentTg = state.SelectedScrollGroupId
@@ -3512,7 +3517,7 @@ function renderReactiveSingularities()
     local vyList = state.GetValue("singularity_vyList", {})
     local axList = state.GetValue("singularity_axList", {})
     local ayList = state.GetValue("singularity_ayList", {})
-    local pulseStatus = state.GetValue("cache_pulseValue", 0)
+    local pulseStatus = cache.pulseValue or 0
     local slowSpeedR = 89
     local slowSpeedG = 0
     local slowSpeedB = 255
@@ -3537,7 +3542,7 @@ function renderReactiveSingularities()
         local r = lerp(clampedSpeed, slowSpeedR, fastSpeedR)
         local g = lerp(clampedSpeed, slowSpeedG, fastSpeedG)
         local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
-        local pos = { x + topLeft.x, y + topLeft.y }
+        local pos = vector.New(x + topLeft.x, y + topLeft.y)
         ctx.AddCircleFilled(pos, 2,
             rgbaToUint(r, g, b, 55 + pulseStatus * 200))
     end
@@ -3973,8 +3978,8 @@ function drawCursorTrail()
     local t = imgui.GetTime()
     local sz = state.WindowSize
     local cursorTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
-    if cursorTrail ~= "Dust" then state.SetValue("initializeDustParticles", false) end
-    if cursorTrail ~= "Sparkle" then state.SetValue("initializeSparkleParticles", false) end
+    if cursorTrail ~= "Dust" then cache.boolean.dustParticlesInitialized = false end
+    if cursorTrail ~= "Sparkle" then cache.boolean.sparkleParticlesInitialized = false end
     if cursorTrail == "None" then return end
     if cursorTrail == "Snake" then drawSnakeTrail(o, m, t) end
     if cursorTrail == "Dust" then drawDustTrail(o, m, t, sz) end
@@ -3994,7 +3999,7 @@ function drawSnakeTrail(o, m, t)
         globalVars.cursorTrailGhost, trailShape)
 end
 function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
-    if (state.GetValue("initializeSnakeTrail")) then
+    if (cache.boolean.snakeTrailInitialized) then
         for i = 1, trailPoints do
             snakeTrailPoints[i] = {}
         end
@@ -4003,7 +4008,7 @@ function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
     for i = 1, trailPoints do
         snakeTrailPoints[i] = m
     end
-    state.SetValue("initializeSnakeTrail", true)
+    cache.boolean.snakeTrailInitialized = true
     cache.saveTable("snakeTrailPoints", snakeTrailPoints)
 end
 function updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoints,
@@ -4058,7 +4063,7 @@ function drawDustTrail(o, m, t, sz)
     renderDustParticles(globalVars.rgbPeriod, o, t, dustParticles, dustDuration, dustSize)
 end
 function initializeDustParticles(_, t, dustParticles, numDustParticles, dustDuration)
-    if state.GetValue("initializeDustParticles") then
+    if cache.boolean.dustParticlesInitialized then
         for i = 1, numDustParticles do
             dustParticles[i] = {}
         end
@@ -4069,7 +4074,7 @@ function initializeDustParticles(_, t, dustParticles, numDustParticles, dustDura
         local showParticle = false
         dustParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
-    state.SetValue("initializeDustParticles", true)
+    cache.boolean.dustParticlesInitialized = true
     cache.saveTable("dustParticles", dustParticles)
 end
 function updateDustParticles(t, m, dustParticles, dustDuration, dustSize)
@@ -4113,7 +4118,7 @@ function drawSparkleTrail(o, m, t, sz)
     renderSparkleParticles(o, t, sparkleParticles, sparkleDuration, sparkleSize)
 end
 function initializeSparkleParticles(_, t, sparkleParticles, numSparkleParticles, sparkleDuration)
-    if state.GetValue("initializeSparkleParticles") then
+    if cache.boolean.sparkleParticlesInitialized then
         for i = 1, numSparkleParticles do
             sparkleParticles[i] = {}
         end
@@ -4124,7 +4129,7 @@ function initializeSparkleParticles(_, t, sparkleParticles, numSparkleParticles,
         local showParticle = false
         sparkleParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
-    state.SetValue("initializeSparkleParticles", true)
+    cache.boolean.sparkleParticlesInitialized = true
     cache.saveTable("sparkleParticles", sparkleParticles)
 end
 function updateSparkleParticles(t, m, sparkleParticles, sparkleDuration, sparkleSize)
@@ -4234,13 +4239,13 @@ function pulseController()
         pulseVars.pulseStatus = 0
     end
     pulseVars.pulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
-    local borderColor = state.GetValue("baseBorderColor") or vctr4(1)
+    local borderColor = cache.borderColor or vctr4(1)
     local negatedBorderColor = vctr4(1) - borderColor
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
     imgui.PushStyleColor(imgui_col.Border, pulseColor * pulseVars.pulseStatus + borderColor * (1 - pulseVars.pulseStatus))
     cache.saveTable("pulseController", pulseVars)
-    state.SetValue("cache_pulseValue", pulseVars.pulseStatus)
-    state.SetValue("cache_pulseStatus", pulseVars.pulsedThisFrame)
+    cache.pulseValue = pulseVars.pulseStatus
+    cache.pulsedThisFrame = pulseVars.pulsedThisFrame
 end
 ---@class PhysicsObject
 ---@field pos Vector2
@@ -4301,7 +4306,7 @@ function setPluginAppearanceColors(colorTheme)
     if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
     if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
     if colorTheme == "CUSTOM" then borderColor = setCustomColors() end
-    state.SetValue("baseBorderColor", borderColor)
+    cache.borderColor = borderColor
 end
 function setClassicColors()
     local borderColor = vector.New(0.81, 0.88, 1.00, 0.30)
@@ -5089,7 +5094,7 @@ function NegatableComputableInputFloat(label, var, decimalPlaces, suffix)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
     local newValue = ComputableInputFloat(label, var, decimalPlaces, suffix)
     imgui.PopItemWidth()
-    if ((negateButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[4])) and newValue ~= 0) then
+    if ((negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[4])) and newValue ~= 0) then
         newValue = -newValue
     end
     return newValue, oldValue ~= newValue
@@ -5113,16 +5118,16 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     imgui.PopItemWidth()
     varsTable[lowerName] = newValues.x
     varsTable[higherName] = newValues.y
-    if (swapButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[3])) then
+    if (swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[3])) then
         varsTable[lowerName] = oldValues.y
         varsTable[higherName] = oldValues.x
     end
-    if (negateButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[4])) then
+    if (negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[4])) then
         varsTable[lowerName] = -oldValues.x
         varsTable[higherName] = -oldValues.y
     end
-    return swapButtonPressed or negateButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[3]) or
-        kb.pressedKeyCombo(globalVars.hotkeyList[4]) or
+    return swapButtonPressed or negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[3]) or
+        kbm.pressedKeyCombo(globalVars.hotkeyList[4]) or
         oldValues ~= newValues
 end
 ---Creates an `imgui.inputInt` element.
@@ -5182,7 +5187,7 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + tn(hideNoteReq)]
     local tooltip = ToolTip("Press \'" .. keyCombo ..
         "\' on your keyboard to do the same thing as this button")
-    executeFunctionIfTrue(kb.pressedKeyCombo(keyCombo), actionfunc, menuVars)
+    executeFunctionIfTrue(kbm.pressedKeyCombo(keyCombo), actionfunc, menuVars)
 end
 ---Runs a function with the given parameters if the given `condition` is true.
 ---@param condition boolean The condition that is used.
@@ -6067,11 +6072,10 @@ function updateDirectEdit()
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     if (#offsets < 2) then
-        state.SetValue("directSVList", {})
+        cache.lists.directSVList = {}
         return
     end
-    local svs = game.getSVsBetweenOffsets(firstOffset, lastOffset)
-    state.SetValue("directSVList", svs)
+    cache.lists.directSVList = game.getSVsBetweenOffsets(firstOffset, lastOffset)
 end
 function directSVMenu()
     local menuVars = getMenuVars("directSV")
@@ -6079,7 +6083,7 @@ function directSVMenu()
     if (clock.listen("directSV", 500)) then
         updateDirectEdit()
     end
-    local svs = state.GetValue("directSVList") or {}
+    local svs = cache.lists.directSVList
     if (#svs == 0) then
         menuVars.selectableIndex = 1
         imgui.TextWrapped("Select two notes to view SVs.")
@@ -6436,17 +6440,15 @@ function selectAlternatingMenu()
 end
 function selectBookmarkMenu()
     local bookmarks = map.bookmarks
-    local selectedIndex = state.GetValue("selectedIndex") or 0
-    local searchTerm = state.GetValue("searchTerm") or ""
-    local filterTerm = state.GetValue("filterTerm") or ""
+    local menuVars = getMenuVars("selectBookmark")
     local times = {}
     if (#bookmarks == 0) then
         imgui.TextWrapped("There are no bookmarks! Add one to navigate.")
     else
         imgui.PushItemWidth(70)
-        _, searchTerm = imgui.InputText("Search", searchTerm, 4096)
+        _, menuVars.searchTerm = imgui.InputText("Search", menuVars.searchTerm, 4096)
         KeepSameLine()
-        _, filterTerm = imgui.InputText("Ignore", filterTerm, 4096)
+        _, menuVars.filterTerm = imgui.InputText("Ignore", menuVars.filterTerm, 4096)
         imgui.Columns(3)
         imgui.Text("Time")
         imgui.NextColumn()
@@ -6463,11 +6465,11 @@ function selectBookmarkMenu()
                 skippedIndices = skippedIndices + 1
                 goto continue
             end
-            if (searchTerm:len() > 0) and (not bm.Note:find(searchTerm)) then
+            if (menuVars.searchTerm:len() > 0) and (not bm.Note:find(menuVars.searchTerm)) then
                 skippedBookmarks = skippedBookmarks + 1
                 goto continue
             end
-            if (filterTerm:len() > 0) and (bm.Note:find(filterTerm)) then
+            if (menuVars.filterTerm:len() > 0) and (bm.Note:find(menuVars.filterTerm)) then
                 skippedBookmarks = skippedBookmarks + 1
                 goto continue
             end
@@ -6494,9 +6496,7 @@ function selectBookmarkMenu()
         imgui.PopItemWidth()
         imgui.Columns(1)
     end
-    state.SetValue("selectedIndex", selectedIndex)
-    state.SetValue("searchTerm", searchTerm)
-    state.SetValue("filterTerm", filterTerm)
+    cache.saveTable("selectBookmarkMenu", menuVars)
 end
 function selectChordSizeMenu()
     local menuVars = getMenuVars("selectChordSize")
@@ -6659,7 +6659,7 @@ function showCustomThemeSettings()
     end
     KeepSameLine()
     if (imgui.Button("Import")) then
-        state.SetValue("importingCustomTheme", true)
+        cache.boolean.importingCustomTheme = true
     end
     KeepSameLine()
     if (imgui.Button("Export")) then
@@ -6667,7 +6667,7 @@ function showCustomThemeSettings()
         imgui.SetClipboardText(str)
         print("i!", "Exported custom theme to your clipboard.")
     end
-    if (state.GetValue("importingCustomTheme")) then
+    if (cache.boolean.importingCustomTheme) then
         local input = state.GetValue("importingCustomThemeInput", "")
         _, input = imgui.InputText("##customThemeStr", input, 69420)
         state.SetValue("importingCustomThemeInput", input)
@@ -6675,12 +6675,12 @@ function showCustomThemeSettings()
         if (imgui.Button("Send")) then
             setCustomStyleString(input)
             settingsChanged = true
-            state.SetValue("importingCustomTheme", false)
+            cache.boolean.importingCustomTheme = false
             state.SetValue("importingCustomThemeInput", "")
         end
         KeepSameLine()
         if (imgui.Button("X")) then
-            state.SetValue("importingCustomTheme", false)
+            cache.boolean.importingCustomTheme = false
             state.SetValue("importingCustomThemeInput", "")
         end
     end
@@ -7251,10 +7251,10 @@ function showKeybindSettings()
     end, nil, true, true)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
     if (awaitingIndex == 0) then return end
-    local prefixes, key = kb.listenForAnyKeyPressed()
+    local prefixes, key = kbm.listenForAnyKeyPressed()
     if (key == -1) then return end
     globalVars.hotkeyList[awaitingIndex] = table.concat(prefixes, "+") ..
-        (truthy(prefixes) and "+" or "") .. kb.numToKey(key)
+        (truthy(prefixes) and "+" or "") .. kbm.numToKey(key)
     awaitingIndex = 0
     write(globalVars)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
@@ -7790,7 +7790,7 @@ function chooseConstantShift(settingVars, defaultShift)
     local oldShift = settingVars.verticalShift
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[5])) then
+    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[5])) then
         settingVars.verticalShift = defaultShift
     end
     ToolTip("Reset vertical shift to initial values")
@@ -7813,7 +7813,7 @@ function chooseMsxVerticalShift(settingVars, defaultShift)
     local oldShift = settingVars.verticalShift
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[5])) then
+    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[5])) then
         settingVars.verticalShift = defaultShift or 0
     end
     ToolTip("Reset vertical shift to initial values")
@@ -8139,10 +8139,10 @@ function chooseCurrentScrollGroup()
     imgui.PushItemWidth(155)
     globalVars.scrollGroupIndex = Combo("##scrollGroup", groups, globalVars.scrollGroupIndex, cols, hiddenGroups)
     imgui.PopItemWidth()
-    if (kb.pressedKeyCombo(globalVars.hotkeyList[6])) then
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[6])) then
         globalVars.scrollGroupIndex = math.clamp(globalVars.scrollGroupIndex - 1, 1, #groups)
     end
-    if (kb.pressedKeyCombo(globalVars.hotkeyList[7])) then
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[7])) then
         globalVars.scrollGroupIndex = math.clamp(globalVars.scrollGroupIndex + 1, 1, #groups)
     end
     AddSeparator()
@@ -8300,7 +8300,7 @@ function chooseSVBehavior(settingVars)
     local oldBehaviorIndex = settingVars.behaviorIndex
     settingVars.behaviorIndex = Combo("Behavior", SV_BEHAVIORS, oldBehaviorIndex)
     imgui.PopItemWidth()
-    if (swapButtonPressed or kb.pressedKeyCombo(globalVars.hotkeyList[3])) then
+    if (swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[3])) then
         settingVars.behaviorIndex = tn(oldBehaviorIndex == 1) + 1
     end
     return oldBehaviorIndex ~= settingVars.behaviorIndex
@@ -9560,17 +9560,21 @@ function awake()
         print("e!", "Please place a timing point before attempting to use plumoguSV.")
     end
 end
+cache.lists = {}
 function listenForHitObjectChanges()
-    state.SetValue("hoStartTimes", table.dedupe(table.property(map.HitObjects, "StartTime")))
+    local function setHitObjectStartTimes()
+        cache.lists.hitObjectStartTimes = table.dedupe(table.property(map.HitObjects, "StartTime"))
+    end
+    setHitObjectStartTimes()
     listen(function(action, type, fromLua)
-        if (tonumber(action.Type) > 9) then return end
-        state.SetValue("hoStartTimes", table.dedupe(table.property(map.HitObjects, "StartTime")))
+        if (tonumber(action.Type) > 7) then return end
+        setHitObjectStartTimes()
     end)
 end
+cache.indices = {}
 function draw()
     if (not state.CurrentTimingPoint) then return end
-    state.SetValue("ComputableInputFloatIndex", 1)
-    state.SetValue("StatedInputTextIndex", 1)
+    cache.indices.computableInputFloat = 1
     state.IsWindowHovered = imgui.IsWindowHovered()
     drawCapybaraParent()
     drawCursorTrail()

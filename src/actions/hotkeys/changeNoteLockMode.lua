@@ -1,5 +1,5 @@
 function changeNoteLockMode()
-    local mode = state.GetValue("note-lock-mode", 0)
+    local mode = cache.noteLockMode or 0
 
     mode = (mode + 1) % 4
     if (mode == 0) then
@@ -18,16 +18,16 @@ function changeNoteLockMode()
             globalVars.hotkeyList[10])
     end
 
-    state.SetValue("note-lock-mode", mode)
+    cache.noteLockMode = mode
 end
 
 function initializeNoteLockMode()
-    state.SetValue("note-lock-mode", 0)
+    cache.noteLockMode = 0
 
     listen(function(action, type, fromLua)
         if (fromLua) then return end
         local actionIndex = tonumber(action.Type) ---@cast actionIndex EditorActionType
-        local mode = state.GetValue("note-lock-mode", 0)
+        local mode = cache.noteLockMode or 0
         if (mode == 1) then -- No note modification at all
             if (actionIndex > 9) then return end
             actions.Undo()

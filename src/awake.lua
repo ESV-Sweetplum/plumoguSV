@@ -23,12 +23,17 @@ function awake()
     end
 end
 
+cache.lists = {}
+
 function listenForHitObjectChanges()
-    state.SetValue("hoStartTimes", table.dedupe(table.property(map.HitObjects, "StartTime")))
+    local function setHitObjectStartTimes()
+        cache.lists.hitObjectStartTimes = table.dedupe(table.property(map.HitObjects, "StartTime"))
+    end
+
+    setHitObjectStartTimes()
 
     listen(function(action, type, fromLua)
-        if (tonumber(action.Type) > 9) then return end
-
-        state.SetValue("hoStartTimes", table.dedupe(table.property(map.HitObjects, "StartTime")))
+        if (tonumber(action.Type) > 7) then return end
+        setHitObjectStartTimes()
     end)
 end

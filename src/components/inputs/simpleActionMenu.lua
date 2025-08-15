@@ -19,7 +19,7 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + tn(hideNoteReq)]
     local tooltip = ToolTip("Press \'" .. keyCombo ..
         "\' on your keyboard to do the same thing as this button")
-    executeFunctionIfTrue(kb.pressedKeyCombo(keyCombo), actionfunc, menuVars)
+    executeFunctionIfTrue(kbm.pressedKeyCombo(keyCombo), actionfunc, menuVars)
 end
 
 ---Runs a function with the given parameters if the given `condition` is true.

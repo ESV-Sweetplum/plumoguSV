@@ -77,7 +77,7 @@ function showCustomThemeSettings()
     KeepSameLine()
 
     if (imgui.Button("Import")) then
-        state.SetValue("importingCustomTheme", true)
+        cache.boolean.importingCustomTheme = true
     end
     KeepSameLine()
 
@@ -87,7 +87,7 @@ function showCustomThemeSettings()
         print("i!", "Exported custom theme to your clipboard.")
     end
 
-    if (state.GetValue("importingCustomTheme")) then
+    if (cache.boolean.importingCustomTheme) then
         local input = state.GetValue("importingCustomThemeInput", "")
         _, input = imgui.InputText("##customThemeStr", input, 69420)
         state.SetValue("importingCustomThemeInput", input)
@@ -95,12 +95,12 @@ function showCustomThemeSettings()
         if (imgui.Button("Send")) then
             setCustomStyleString(input)
             settingsChanged = true
-            state.SetValue("importingCustomTheme", false)
+            cache.boolean.importingCustomTheme = false
             state.SetValue("importingCustomThemeInput", "")
         end
         KeepSameLine()
         if (imgui.Button("X")) then
-            state.SetValue("importingCustomTheme", false)
+            cache.boolean.importingCustomTheme = false
             state.SetValue("importingCustomThemeInput", "")
         end
     end

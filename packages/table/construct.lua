@@ -11,12 +11,12 @@ function table.construct(...)
 end
 
 ---Creates a new array with a custom metatable, allowing for `:` syntactic sugar. All elements will be the given item.
----@generic T: string | number | boolean
+---@generic T: string | number | boolean | table
 ---@param item T The entry to use.
 ---@param num integer The number of entries to put into the table.
 ---@return T[] tbl A table with the given entries.
 function table.constructRepeating(item, num)
-    local tbl = {}
+    local tbl = table.construct()
     for _ = 1, num do
         table.insert(tbl, item)
     end

@@ -108,6 +108,10 @@ DEFAULT_STARTING_MENU_VARS = {
     reverseScroll = {
         distance = 400
     },
+    scaleBookmark = {
+        searchTerm = "",
+        filterTerm = ""
+    },
     scaleDisplace = {
         scaleSpotIndex = 1,
         scaleTypeIndex = 1,

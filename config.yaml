@@ -3,12 +3,12 @@ dontReplaceSV: false
 upscroll: false
 colorThemeIndex: 16
 styleThemeIndex: 1
-effectFPS: 690
-cursorTrailIndex: 1
+effectFPS: 100
+cursorTrailIndex: 2
 cursorTrailShapeIndex: 1
 cursorTrailPoints: 20
-cursorTrailSize: 100
-snakeSpringConstant: 0.80000001192092896
+cursorTrailSize: 10
+snakeSpringConstant: 0.5
 cursorTrailGhost: false
 rgbPeriod: 1
 drawCapybara: true
@@ -16,7 +16,7 @@ drawCapybara2: false
 drawCapybara312: false
 selectTypeIndex: 1
 placeTypeIndex: 1
-editToolIndex: 11
+editToolIndex: 1
 showPresetMenu: false
 scrollGroupIndex: 1
 hideSVInfo: false
