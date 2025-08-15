@@ -2322,13 +2322,13 @@ function svVibrato(menuVars, heightFn)
         elseif (menuVars.sides == 2) then
             prepareDisplacingSVs(start, svsToAdd, svTimeIsAdded, nil,
                 -heightFn(startPos, 1), 0)
-            for tp = 1, teleportCount - 2 do
-                local x = tp / (teleportCount - 1)
+            for tp = 1, teleportCount - 1 do
+                local x = tp / teleportCount
                 local offset = next * x + start * (1 - x)
-                local initHeight = heightFn(tp / (teleportCount - 1) * posDifference +
-                    startPos, tp - 1)
-                local newHeight = heightFn((tp + 1) / (teleportCount - 1) * posDifference +
+                local initHeight = heightFn(tp / teleportCount * posDifference +
                     startPos, tp)
+                local newHeight = heightFn((tp + 1) / teleportCount * posDifference +
+                    startPos, tp + 1)
                 local height = initHeight + newHeight
                 if (tp % 2 == 0) then
                     height = -height
