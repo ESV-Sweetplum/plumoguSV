@@ -7415,6 +7415,9 @@ function renderTutorialMenu()
     local nullFn = function()
         imgui.Text("Select a tutorial menu on the left to view it.")
     end
+    local incompleteFn = function()
+        imgui.TextWrapped("Sorry, this tutorial is not ready yet. Please come back when a new version comes out.")
+    end
     local tutorialFn = state.GetValue("tutorialFn") or nullFn
     local tree = {
         ["For Beginners"] = {
@@ -7424,27 +7427,27 @@ function renderTutorialMenu()
                 ["Your Second Effect"] = showYourSecondEffectTutorial,
                 ["Working With Shapes"] = showWorkingWithShapesTutorial,
                 ["Editing/Removing SVs"] = showEditingRemovingSVTutorial,
-                ["Composite Effects"] = nullFn,
-                ["Stills and Displacement"] = nullFn,
+                ["Composite Effects"] = incompleteFn,
+                ["Stills and Displacement"] = incompleteFn,
             },
             ["Adding Effects"] = {},
             ["Vibrato"] = {},
             ["Deconstructing Effects"] = {
-                ["Preface"] = nullFn,
-                ["PK Rave"] = nullFn
+                ["Preface"] = incompleteFn,
+                ["PK Rave"] = incompleteFn
             }
         },
         ["Helpful Info"] = {
             ["Plugin Efficiency Tips"] = {
-                ["Hotkeys"] = nullFn,
-                ["Same Effect, Different Methods"] = nullFn,
+                ["Hotkeys"] = incompleteFn,
+                ["Same Effect, Different Methods"] = incompleteFn,
             },
             ["The Math Behind SV"] = {
-                ["Preface"] = nullFn,
-                ["What IS msx?"] = nullFn,
-                ["The calculus of SV"] = nullFn,
-                ["Why do we call them shapes?"] = nullFn,
-                ["Analogies to Physics"] = nullFn,
+                ["Preface"] = incompleteFn,
+                ["What IS msx?"] = incompleteFn,
+                ["The calculus of SV"] = incompleteFn,
+                ["Why do we call them shapes?"] = incompleteFn,
+                ["Analogies to Physics"] = incompleteFn,
             }
         }
     }
