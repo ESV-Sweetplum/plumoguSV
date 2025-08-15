@@ -58,11 +58,12 @@ function automateSVs(settingVars)
                 local currentTime = truthy(ho.EndTime) and ho.EndTime or ho.StartTime
                 local maxRelativeOffset = settingVars.copiedSVs[#settingVars.copiedSVs].relativeOffset
                 local progress = 1 - sv.relativeOffset / maxRelativeOffset
+                local tempMultiplier = sv.multiplier
                 if (settingVars.scaleSVs) then
                     local scalingFactor =
                         (currentTime - startTime) / (secondaryTime - startTime)
                     if (not settingVars.maintainMs) then scalingFactor = 1 / scalingFactor end
-                    sv.multiplier = sv.multiplier * scalingFactor
+                    tempMultiplier = tempMultiplier * scalingFactor
                 end
 
                 if (settingVars.maintainMs) then
@@ -70,7 +71,7 @@ function automateSVs(settingVars)
                 else
                     svTime = currentTime - progress * (currentTime - startTime)
                 end
-                table.insert(neededIds[idName].svs, createSV(svTime, sv.multiplier))
+                table.insert(neededIds[idName].svs, createSV(svTime, tempMultiplier))
             end
         end
         ::continue::
