@@ -5,7 +5,7 @@ function showYourSecondEffectTutorial()
 
     imgui.Dummy(vector.New(0, 10))
     imgui.SetCursorPosX(40)
-    gpsim("Your Second Effect Stutter Example", vector2(0.5), function(t)
+    gpsim("Your Second Effect Stutter Example", vctr2(0.5), function(t)
         local highT = math.frac(t * 4)
         local reductionIdx = math.floor(t * 4)
 
@@ -19,7 +19,7 @@ function showYourSecondEffectTutorial()
     end, { { 1, 2 }, { 3 }, { 4 }, { 3 } }, 4000, true)
     KeepSameLine()
     imgui.SetCursorPosX(200)
-    gpsim("Your Second Effect Teleport Stutter Example", vector2(0.5), function(t)
+    gpsim("Your Second Effect Teleport Stutter Example", vctr2(0.5), function(t)
         local highT = math.frac(t * 4)
         local reductionIdx = math.floor(t * 4)
 

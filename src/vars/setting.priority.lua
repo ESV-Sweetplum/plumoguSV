@@ -85,8 +85,8 @@ end]]
         distanceMode = 1
     },
     bezier = {
-        p1 = vector2(0),
-        p2 = vector2(1),
+        p1 = vctr2(0),
+        p2 = vctr2(1),
         verticalShift = 0,
         avgSV = 1,
         svPoints = 16,

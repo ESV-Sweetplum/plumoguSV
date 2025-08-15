@@ -36,7 +36,7 @@ function showWorkingWithShapesTutorial()
     ForceHeight(490)
     imgui.TextWrapped(
         "Take a look at the SV info window, and notice how the notes are jumping. This is exactly what the effect will look like when placed in game:")
-    gpsim("Working With Shapes Jumping", vector2(1), function(t)
+    gpsim("Working With Shapes Jumping", vctr2(1), function(t)
         return 0.9 - 2 * (t - t ^ 2)
     end, { { 1, 2, 3, 4 }, {}, {}, {} }, 500)
     imgui.TextColored(GUIDELINE_COLOR,

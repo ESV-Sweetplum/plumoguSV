@@ -3,7 +3,7 @@ function showYourFirstEffectTutorial()
     imgui.TextWrapped(
         "At the absolute basics of SV are the pulse effects, effects that highlight significant parts of the song, such as a repeating drum. We will apply a very basic stutter SV effect on the drum beat (assuming your song has that), like so:")
 
-    gpsim("Your First Effect Stutter Example", vector2(1), function(t)
+    gpsim("Your First Effect Stutter Example", vctr2(1), function(t)
         if (t < 0.05) then
             return 4 * t
         elseif (t < 0.25) then
@@ -39,7 +39,7 @@ function showYourFirstEffectTutorial()
     ForceHeight(610)
     if (settingVars.stutterDuration ~= 20) then return end
     ForceHeight(570)
-    imgui.TextColored(vector4(0), "penis")
+    imgui.TextColored(vctr4(0), "penis")
     imgui.TextWrapped(
         'If you want, you can change some of the other settings; try seeing what happens when you increase the stutter count. However, for the sake of this tutorial, you are done.')
     imgui.TextColored(GUIDELINE_COLOR,

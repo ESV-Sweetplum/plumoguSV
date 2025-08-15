@@ -890,7 +890,7 @@ end
 ---@param tbl number[] | { x: number, y: number, z: number, w: number } The table to convert.
 ---@return Vector4 vctr The output vector.
 function table.vectorize4(tbl)
-    if (not tbl) then return vector4(0) end
+    if (not tbl) then return vctr4(0) end
     if (type(tbl) == "userdata") then return tbl end
     if (tbl[1] and tbl[2] and tbl[3] and tbl[4]) then return vector.New(tbl[1], tbl[2], tbl[3], tbl[4]) end
     return vector.New(tbl.x, tbl.y, tbl.z, tbl.w)
@@ -899,7 +899,7 @@ end
 ---@param tbl number[] | { x: number, y: number, z: number } The table to convert.
 ---@return Vector3 vctr The output vector.
 function table.vectorize3(tbl)
-    if (not tbl) then return vector3(0) end
+    if (not tbl) then return vctr3(0) end
     if (type(tbl) == "userdata") then return tbl end
     if (tbl[1] and tbl[2] and tbl[3]) then return vector.New(tbl[1], tbl[2], tbl[3]) end
     return vector.New(tbl.x, tbl.y, tbl.z)
@@ -908,7 +908,7 @@ end
 ---@param tbl number[] | { x: number, y: number } The table to convert.
 ---@return Vector2 vctr The output vector.
 function table.vectorize2(tbl)
-    if (not tbl) then return vector2(0) end
+    if (not tbl) then return vctr2(0) end
     if (type(tbl) == "userdata") then return tbl end
     if (tbl[1] and tbl[2]) then return vector.New(tbl[1], tbl[2]) end
     return vector.New(tbl.x, tbl.y)
@@ -944,19 +944,19 @@ end
 ---Creates a new [`Vector4`](lua://Vector4) with all elements being the given number.
 ---@param n number The number to use as the entries.
 ---@return Vector4 vctr The resultant vector of style `<n, n, n, n>`.
-function vector4(n)
+function vctr4(n)
     return vector.New(n, n, n, n)
 end
 ---Creates a new [`Vector3`](lua://Vector4) with all elements being the given number.
 ---@param n number The number to use as the entries.
 ---@return Vector3 vctr The resultant vector of style `<n, n, n>`.
-function vector3(n)
+function vctr3(n)
     return vector.New(n, n, n)
 end
 ---Creates a new [`Vector2`](lua://Vector2) with all elements being the given number.
 ---@param n number The number to use as the entries.
 ---@return Vector2 vctr The resultant vector of style `<n, n>`.
-function vector2(n)
+function vctr2(n)
     return vector.New(n, n)
 end
 imgui_disable_vector_packing = true
@@ -1628,8 +1628,8 @@ end]]
         distanceMode = 1
     },
     bezier = {
-        p1 = vector2(0),
-        p2 = vector2(1),
+        p1 = vctr2(0),
+        p2 = vctr2(1),
         verticalShift = 0,
         avgSV = 1,
         svPoints = 16,
@@ -4172,7 +4172,7 @@ function generateParticle(x, y, xRange, yRange, endTime, showParticle)
     return particle
 end
 function checkIfMouseMoved(currentMousePosition)
-    oldMousePosition = state.GetValue("oldMousePosition", vector2(0))
+    oldMousePosition = state.GetValue("oldMousePosition", vctr2(0))
     local mousePositionChanged = currentMousePosition ~= oldMousePosition
     state.SetValue("oldMousePosition", currentMousePosition)
     return mousePositionChanged
@@ -4236,8 +4236,8 @@ function pulseController()
         pulseVars.pulseStatus = 0
     end
     pulseVars.pulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
-    local borderColor = state.GetValue("baseBorderColor") or vector4(1)
-    local negatedBorderColor = vector4(1) - borderColor
+    local borderColor = state.GetValue("baseBorderColor") or vctr4(1)
+    local negatedBorderColor = vctr4(1) - borderColor
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
     imgui.PushStyleColor(imgui_col.Border, pulseColor * pulseVars.pulseStatus + borderColor * (1 - pulseVars.pulseStatus))
     cache.saveTable("pulseController", pulseVars)
@@ -4286,7 +4286,7 @@ function setPluginAppearanceStyles(styleTheme)
     imgui.PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessValue)
 end
 function setPluginAppearanceColors(colorTheme)
-    local borderColor = vector4(1)
+    local borderColor = vctr4(1)
     if colorTheme == "Classic" or not colorTheme then borderColor = setClassicColors() end
     if colorTheme == "Strawberry" then borderColor = setStrawberryColors() end
     if colorTheme == "Amethyst" then borderColor = setAmethystColors() end
@@ -7277,7 +7277,7 @@ function showPluginSettingsWindow()
     imgui.PushStyleColor(imgui_col.WindowBg, bgColor)
     imgui.PushStyleColor(imgui_col.TitleBg, bgColor)
     imgui.PushStyleColor(imgui_col.TitleBgActive, bgColor)
-    imgui.PushStyleColor(imgui_col.Border, vector4(1))
+    imgui.PushStyleColor(imgui_col.Border, vctr4(1))
     startNextWindowNotCollapsed("Settings")
     _, settingsOpened = imgui.Begin("plumoguSV Settings", true, 42)
     imgui.SetWindowSize("plumoguSV Settings", vector.New(433, 400))
@@ -7482,7 +7482,7 @@ function renderTutorialMenu()
     imgui.SetCursorPosY(0)
     function ForceHeight(h)
         imgui.SetCursorPosY(h)
-        imgui.TextColored(vector4(0), "penis")
+        imgui.TextColored(vctr4(0), "penis")
     end
     if (game.keyCount ~= 4) then
         imgui.SeparatorText("This tutorial does not support this key mode.")
@@ -7561,7 +7561,7 @@ function showWorkingWithShapesTutorial()
     ForceHeight(490)
     imgui.TextWrapped(
         "Take a look at the SV info window, and notice how the notes are jumping. This is exactly what the effect will look like when placed in game:")
-    gpsim("Working With Shapes Jumping", vector2(1), function(t)
+    gpsim("Working With Shapes Jumping", vctr2(1), function(t)
         return 0.9 - 2 * (t - t * t)
     end, { { 1, 2, 3, 4 }, {}, {}, {} }, 500)
     imgui.TextColored(GUIDELINE_COLOR,
@@ -7580,7 +7580,7 @@ function showYourFirstEffectTutorial()
     imgui.SeparatorText("Making your first SV effect")
     imgui.TextWrapped(
         "At the absolute basics of SV are the pulse effects, effects that highlight significant parts of the song, such as a repeating drum. We will apply a very basic stutter SV effect on the drum beat (assuming your song has that), like so:")
-    gpsim("Your First Effect Stutter Example", vector2(1), function(t)
+    gpsim("Your First Effect Stutter Example", vctr2(1), function(t)
         if (t < 0.05) then
             return 4 * t
         elseif (t < 0.25) then
@@ -7615,7 +7615,7 @@ function showYourFirstEffectTutorial()
     ForceHeight(610)
     if (settingVars.stutterDuration ~= 20) then return end
     ForceHeight(570)
-    imgui.TextColored(vector4(0), "penis")
+    imgui.TextColored(vctr4(0), "penis")
     imgui.TextWrapped(
         'If you want, you can change some of the other settings; try seeing what happens when you increase the stutter count. However, for the sake of this tutorial, you are done.')
     imgui.TextColored(GUIDELINE_COLOR,
@@ -7628,7 +7628,7 @@ function showYourSecondEffectTutorial()
         "Stutters are cool and all, but there's another type of stutter that's more versatile: teleport stutters. Usually, these would not be possible in engines like osu, but since Quaver has no limitations on SV size, we can do it here. Take a look at the difference between normal stutter and teleport stutter:")
     imgui.Dummy(vector.New(0, 10))
     imgui.SetCursorPosX(40)
-    gpsim("Your Second Effect Stutter Example", vector2(0.5), function(t)
+    gpsim("Your Second Effect Stutter Example", vctr2(0.5), function(t)
         local highT = math.frac(t * 4)
         local reductionIdx = math.floor(t * 4)
         if (highT < 0.05) then
@@ -7641,7 +7641,7 @@ function showYourSecondEffectTutorial()
     end, { { 1, 2 }, { 3 }, { 4 }, { 3 } }, 4000, true)
     KeepSameLine()
     imgui.SetCursorPosX(200)
-    gpsim("Your Second Effect Teleport Stutter Example", vector2(0.5), function(t)
+    gpsim("Your Second Effect Teleport Stutter Example", vctr2(0.5), function(t)
         local highT = math.frac(t * 4)
         local reductionIdx = math.floor(t * 4)
         return (0.5 * highT + 0.5 + reductionIdx) / 4
@@ -9600,6 +9600,11 @@ function draw()
     end
     if (state.GetValue("showTutorialWindow")) then
         renderTutorialMenu()
+    end
+    for _, k in pairs(table.keys(_G)) do
+        imgui.Text(k)
+    end
+    if (clock.listen("id", 3000)) then
     end
     imgui.End()
     pulseController()

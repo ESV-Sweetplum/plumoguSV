@@ -32,8 +32,8 @@ function pulseController()
 
     pulseVars.pulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
 
-    local borderColor = state.GetValue("baseBorderColor") or vector4(1)
-    local negatedBorderColor = vector4(1) - borderColor
+    local borderColor = state.GetValue("baseBorderColor") or vctr4(1)
+    local negatedBorderColor = vctr4(1) - borderColor
 
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
 

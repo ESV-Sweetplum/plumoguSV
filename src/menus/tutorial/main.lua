@@ -94,7 +94,7 @@ function renderTutorialMenu()
 
     function ForceHeight(h)
         imgui.SetCursorPosY(h)
-        imgui.TextColored(vector4(0), "penis")
+        imgui.TextColored(vctr4(0), "penis")
     end
 
     if (game.keyCount ~= 4) then
