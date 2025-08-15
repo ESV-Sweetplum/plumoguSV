@@ -9604,8 +9604,6 @@ function draw()
     for _, k in pairs(table.keys(_G)) do
         imgui.Text(k)
     end
-    if (clock.listen("id", 3000)) then
-    end
     imgui.End()
     pulseController()
     checkForGlobalHotkeys()

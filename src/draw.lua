@@ -41,10 +41,6 @@ function draw()
         imgui.Text(k)
     end
 
-    if (clock.listen("id", 3000)) then
-
-    end
-
     imgui.End()
 
     pulseController()

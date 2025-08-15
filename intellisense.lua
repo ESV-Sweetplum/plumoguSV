@@ -1154,6 +1154,20 @@ function bit32.rrotate(x, disp) end
 ---@return integer n
 function bit32.rshift(x, disp) end
 
+json = {}
+
+---##### (READ-ONLY)
+---### Returns a stringified version of `data`, no matter what it is. The string can then be passed around, and when the code needs it again, running [`json.parse`](lua://json.parse) will restore it.
+---@param data any The data to stringify.
+---@return string str The result.
+function json.serialize(data) end
+
+---##### (READ-ONLY)
+---### Transforms a string into data that is manipulable by Lua. The string will almost always be obtained via [`json.serialize`](lua://json.serialize).
+---@param str string The string to parse.
+---@return any data The resulting data.
+function json.parse(str) end
+
 ---##### (READ-ONLY)
 ---#### Invokes the function whenever any [editor action](lua://EditorAction) has occurred. This includes actions invoked by this and other plugins.
 ---@param fn fun(action: EditorAction, type: HistoryType, fromLua: boolean): nil The function that will be invoked during any [editor action](lua://EditorAction).
