@@ -33,7 +33,7 @@ cache.clock = {}
 function clock.listen(id, interval)
     local currentTime = state
         .UnixTime
-    local prevTime = cache.clock[id]
+    local prevTime = cache.clock[id] or 0
     if (not prevTime) then
         cache.clock[id] = currentTime
     end
@@ -9605,9 +9605,6 @@ function draw()
     end
     if (state.GetValue("showTutorialWindow")) then
         renderTutorialMenu()
-    end
-    for _, k in pairs(table.keys(_G)) do
-        imgui.Text(k)
     end
     imgui.End()
     pulseController()

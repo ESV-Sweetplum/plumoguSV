@@ -39,10 +39,6 @@ function draw()
         renderTutorialMenu()
     end
 
-    for _, k in pairs(table.keys(_G)) do
-        imgui.Text(k)
-    end
-
     imgui.End()
 
     pulseController()

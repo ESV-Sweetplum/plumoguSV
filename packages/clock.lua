@@ -9,7 +9,7 @@ cache.clock = {}
 function clock.listen(id, interval)
     local currentTime = state
         .UnixTime -- Avoid calling state global multiple times, which causes a heavy load on performance
-    local prevTime = cache.clock[id]
+    local prevTime = cache.clock[id] or 0
     if (not prevTime) then
         cache.clock[id] = currentTime
     end
