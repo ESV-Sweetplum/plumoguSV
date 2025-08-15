@@ -145,8 +145,9 @@ end
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@param includeEnd? boolean Whether or not to include any SVs on the end time.
+---@param dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
 ---@return ScrollSpeedFactor[] ssfs All of the [scroll speed factors](lua://ScrollSpeedFactor) within the area.
-function game.getSSFsBetweenOffsets(startOffset, endOffset, includeEnd)
+function game.getSSFsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
     local ssfsBetweenOffsets = {} ---@type ScrollSpeedFactor[]
     local ssfs = map.ScrollSpeedFactors
     if (ssfs == nil) then
@@ -158,13 +159,14 @@ function game.getSSFsBetweenOffsets(startOffset, endOffset, includeEnd)
             if ssfIsInRange then ssfsBetweenOffsets[#ssfsBetweenOffsets + 1] = ssf end
         end
     end
+    if (dontSort) then return ssfsBetweenOffsets end
     return sort(ssfsBetweenOffsets, sortAscendingStartTime)
 end
 ---Returns a list of [scroll velocities](lua://ScrollVelocity) between two times, inclusive.
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@param includeEnd? boolean Whether or not to include any SVs on the end time.
----@paramk dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
+---@param dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function game.getSVsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
@@ -2366,7 +2368,7 @@ function svVibrato(menuVars, heightFn)
                 heightFn(endPos, teleportCount), 0, nil)
         end
     end
-    getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
+    getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset, svsToAdd)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function deleteItems(menuVars)
@@ -3120,6 +3122,22 @@ function mergeSVs()
         end
     end
     actions.Perform(utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove))
+end
+function mergeSSFs()
+    local offsets = game.uniqueSelectedNoteOffsets()
+    if (not truthy(offsets)) then return end
+    local startOffset = offsets[1]
+    local endOffset = offsets[#offsets]
+    local ssfTimeDict = {}
+    local ssfsToRemove = {}
+    for _, ssf in ipairs(table.reverse(game.getSSFsBetweenOffsets(startOffset, endOffset, true, true))) do
+        if (ssfTimeDict[ssf.StartTime]) then
+            ssfsToRemove[#ssfsToRemove + 1] = ssf
+        else
+            ssfTimeDict[ssf.StartTime] = true
+        end
+    end
+    actions.Perform(utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
 end
 function reverseScrollSVs(menuVars)
     local offsets = game.uniqueNoteOffsetsBetweenSelected()
@@ -6350,6 +6368,7 @@ function CopiableBox(text, label, content)
 end
 function mergeMenu()
     simpleActionMenu("Merge duplicate SVs between selected notes", 2, mergeSVs, nil)
+    simpleActionMenu("Merge duplicate SSFs between selected notes", 2, mergeSSFs, nil)
 end
 function reverseScrollMenu()
     local menuVars = getMenuVars("reverseScroll")

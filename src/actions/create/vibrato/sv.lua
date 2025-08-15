@@ -75,6 +75,6 @@ function svVibrato(menuVars, heightFn)
         end
     end
 
-    getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
+    getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset, svsToAdd)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end

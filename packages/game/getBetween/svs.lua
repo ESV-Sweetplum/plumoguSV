@@ -2,7 +2,7 @@
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@param includeEnd? boolean Whether or not to include any SVs on the end time.
----@paramk dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
+---@param dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function game.getSVsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]

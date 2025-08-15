@@ -4,7 +4,7 @@ upscroll: false
 colorThemeIndex: 16
 styleThemeIndex: 1
 effectFPS: 100
-cursorTrailIndex: 2
+cursorTrailIndex: 1
 cursorTrailShapeIndex: 1
 cursorTrailPoints: 20
 cursorTrailSize: 10
@@ -570,6 +570,9 @@ defaultProperties:
       roundedAvgSVDisplaceless: 0
     reverseScroll:
       distance: 400
+    scaleBookmark:
+      searchTerm: ''
+      filterTerm: ''
     scaleDisplace:
       scaleSpotIndex: 1
       scaleTypeIndex: 1
