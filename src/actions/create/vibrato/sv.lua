@@ -1,3 +1,6 @@
+---comment
+---@param menuVars any
+---@param heightFn fun(t: number, idx?: integer): number
 function svVibrato(menuVars, heightFn)
     local offsets = game.uniqueNoteOffsetsBetweenSelected()
     local startOffset = offsets[1]
@@ -33,7 +36,7 @@ function svVibrato(menuVars, heightFn)
         elseif (menuVars.sides == 2) then
             prepareDisplacingSVs(start, svsToAdd, svTimeIsAdded, nil,
                 -heightFn(startPos, 1), 0)
-            for tp = 1, teleportCount - 1 do
+            for tp = 1, teleportCount - 2 do
                 local x = tp / teleportCount
                 local offset = next * x + start * (1 - x)
                 local initHeight = heightFn(tp / teleportCount * posDifference +
@@ -47,8 +50,8 @@ function svVibrato(menuVars, heightFn)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     height, 0)
             end
-            prepareDisplacingSVs(next, svsToAdd, svTimeIsAdded,
-                heightFn(endPos, teleportCount), 0, nil)
+            prepareDisplacingSVs(next * (1 - 1 / teleportCount) + start * (1 / teleportCount), svsToAdd, svTimeIsAdded,
+                heightFn((teleportCount - 2) / teleportCount * posDifference + startPos, teleportCount), 0, nil)
         else
             prepareDisplacingSVs(start, svsToAdd, svTimeIsAdded, nil,
                 -heightFn(startPos, 1), 0)

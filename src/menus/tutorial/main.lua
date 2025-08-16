@@ -43,7 +43,6 @@ function renderTutorialMenu()
                 ["Hotkeys"] = showHotkeyTutorial,
             },
             ["The Math Behind SV"] = {
-                ["Preface"] = incompleteFn,
                 ["What IS msx?"] = incompleteFn,
                 ["The calculus of SV"] = incompleteFn,
                 ["Why do we call them shapes?"] = incompleteFn,
