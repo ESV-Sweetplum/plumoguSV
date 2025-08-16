@@ -3301,16 +3301,17 @@ function changeNoteLockMode()
         print("s", "Notes have been unlocked.")
     end
     if (mode == 1) then
-        print("e", "Notes have been fully locked. To change the lock mode, press " .. globalVars.hotkeyList[10])
+        print("e", table.concat({"Notes have been fully locked. To change the lock mode, press ", globalVars.hotkeyList[10], "."}))
     end
     if (mode == 2) then
         print("w",
-            "Notes can no longer be placed, only moved. To change the lock mode, press " .. globalVars.hotkeyList[10])
+            "Notes can no longer be placed, only moved. To change the lock mode, press " ..
+            globalVars.hotkeyList[10] .. ".")
     end
     if (mode == 3) then
         print("w",
             "Notes can no longer be moved, only placed and deleted. To change the lock mode, press " ..
-            globalVars.hotkeyList[10])
+            globalVars.hotkeyList[10] .. ".")
     end
     cache.noteLockMode = mode
 end
@@ -7419,110 +7420,6 @@ function createMenuTab(tabName)
     if tabName == "Delete" then deleteTab() end
     imgui.EndTabItem()
 end
-function renderTutorialMenu()
-    INSTRUCTION_COLOR = vector.New(1, 0.5, 0.5, 1)
-    GUIDELINE_COLOR = vector.New(0.5, 0.5, 1, 1)
-    imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
-    imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
-    imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
-    startNextWindowNotCollapsed("Tutorial")
-    _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
-    local tutorialWindowName = state.GetValue("tutorialWindowName", "")
-    if (not opened) then
-        state.SetValue("showTutorialWindow", false)
-    end
-    local navigatorWidth = 200
-    local nullFn = function()
-        imgui.Text("Select a tutorial menu on the left to view it.")
-    end
-    local incompleteFn = function()
-        imgui.TextWrapped("Sorry, this tutorial is not ready yet. Please come back when a new version comes out.")
-    end
-    local tutorialFn = state.GetValue("tutorialFn") or nullFn
-    local tree = {
-        ["For Beginners"] = {
-            ["Start Here"] = showStartingTutorial,
-            ["Placing Basic SVs"] = {
-                ["Your First Effect"] = showYourFirstEffectTutorial,
-                ["Your Second Effect"] = showYourSecondEffectTutorial,
-                ["Working With Shapes"] = showWorkingWithShapesTutorial,
-                ["Editing/Removing SVs"] = showEditingRemovingSVTutorial,
-                ["Stills and Displacement"] = showStillsAndDisplacementTutorial,
-                ["Composite Effects"] = incompleteFn,
-            },
-            ["Adding Effects"] = {},
-            ["Vibrato"] = {},
-            ["Deconstructing Effects"] = {
-                ["Preface"] = incompleteFn,
-                ["PK Rave"] = incompleteFn
-            }
-        },
-        ["Helpful Info"] = {
-            ["Plugin Efficiency Tips"] = {
-                ["Hotkeys"] = incompleteFn,
-                ["Same Effect, Different Methods"] = incompleteFn,
-            },
-            ["The Math Behind SV"] = {
-                ["Preface"] = incompleteFn,
-                ["What IS msx?"] = incompleteFn,
-                ["The calculus of SV"] = incompleteFn,
-                ["Why do we call them shapes?"] = incompleteFn,
-                ["Analogies to Physics"] = incompleteFn,
-            }
-        }
-    }
-    imgui.Columns(2)
-    imgui.SetColumnWidth(0, 200)
-    imgui.SetColumnWidth(1, 400)
-    imgui.BeginChild("Tutorial Navigator")
-    function renderBranch(branch)
-        for text, data in pairs(branch) do
-            if (type(data) == "table") then
-                if (imgui.TreeNode(text)) then
-                    renderBranch(data)
-                    imgui.TreePop()
-                end
-            else
-                if (imgui.GetCursorPosX() < 10) then imgui.SetCursorPosX(10) end
-                imgui.Selectable(text)
-                if (imgui.IsItemClicked()) then
-                    tutorialWindowName = text
-                    tutorialFn = data
-                end
-            end
-        end
-    end
-    for text, data in pairs(tree) do
-        imgui.SeparatorText(text)
-        renderBranch(data)
-    end
-    imgui.EndChild()
-    imgui.NextColumn()
-    imgui.BeginChild("Tutorial Data", vector.New(380, 500), imgui_child_flags
-        .AlwaysUseWindowPadding)
-    imgui.SetCursorPosY(0)
-    function ForceHeight(h)
-        imgui.SetCursorPosY(h)
-        imgui.TextColored(vctr4(0), "penis")
-    end
-    if (game.keyCount ~= 4) then
-        imgui.SeparatorText("This tutorial does not support this key mode.")
-        imgui.Text("Please go to a 4K map to continue.")
-        goto dontRenderTutorial
-    end
-    if (state.GetValue("tutorialWindowQueue", nil)) then
-        tutorialWindowName = state.GetValue("tutorialWindowQueue")
-        state.SetValue("tutorialWindowQueue", nil)
-    end
-    tutorialFn()
-    ::dontRenderTutorial::
-    imgui.EndChild()
-    imgui.Columns(1)
-    imgui.End()
-    imgui.PopStyleColor(2)
-    state.SetValue("tutorialWindowName", tutorialWindowName)
-    state.SetValue("tutorialFn", tutorialFn)
-end
 function showEditingRemovingSVTutorial()
     imgui.SeparatorText("Directly Editing SVs")
     imgui.TextWrapped(
@@ -7774,6 +7671,132 @@ function showStartingTutorial()
         "If you come from osu!, you may not be familiar with SSFs, or scroll speed factors; objects that change the player's scroll speed to some multiplier. The critical difference between SSFs and SVs is that while SVs do not instantly change the position of notes, SSFs do.")
     imgui.SeparatorText("Now, let's start making some effects!")
     imgui.Text('Click "Placing Basic SVs" at the left, and start from "Your First Effect".')
+end
+function showHotkeyTutorial()
+    imgui.SeparatorText("Basic Hotkeys")
+    imgui.TextWrapped(
+        "The most basic hotkeys are ones that can simply speed up your SV making process; whether that be placing SVs/SSFs or quickly editing settings.")
+    imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[1] .. '" to quickly place SVs.')
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[2] .. '" to quickly place SSFs.')
+    imgui.BulletText('If you have a vibrato window, press "' ..
+        globalVars.hotkeyList[8] .. '" to quickly place vibrato.')
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[3] .. '" to quickly swap any swappable parameters.')
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[4] .. '" to quickly negatable any negatable parameters.')
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[4] .. '" to quickly resest any resettable parameters.')
+    imgui.PopStyleColor()
+    imgui.SeparatorText("Advanced Hotkeys")
+    imgui.TextWrapped(
+        "Typically, these hotkeys are used in combination with advanced mode to efficiently switch between timing groups:")
+    imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[6] .. '" to go to the previous timing group.')
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[7] .. '" to go to the next timing group.')
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[9] .. '" to go to the timing group of the selected note.')
+    imgui.PopStyleColor()
+    imgui.SeparatorText("Lock Mode")
+    imgui.TextWrapped(
+        'Sometimes, typing letters/numbers on your keyboard will unintentionally interact with the editor in ways you don\'t want. You can remedy this by using the built-in "NOTE LOCK" feature.')
+    imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[10] .. '" to change the locking mode.')
+    imgui.PopStyleColor()
+end
+function renderTutorialMenu()
+    INSTRUCTION_COLOR = vector.New(1, 0.5, 0.5, 1)
+    GUIDELINE_COLOR = vector.New(0.5, 0.5, 1, 1)
+    imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
+    imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
+    imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
+    startNextWindowNotCollapsed("Tutorial")
+    _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
+    local tutorialWindowName = state.GetValue("tutorialWindowName", "")
+    if (not opened) then
+        state.SetValue("showTutorialWindow", false)
+    end
+    local navigatorWidth = 200
+    local nullFn = function()
+        imgui.Text("Select a tutorial menu on the left to view it.")
+    end
+    local incompleteFn = function()
+        imgui.TextWrapped("Sorry, this tutorial is not ready yet. Please come back when a new version comes out.")
+    end
+    local tutorialFn = state.GetValue("tutorialFn") or nullFn
+    local tree = {
+        ["For Beginners"] = {
+            ["Start Here"] = showStartingTutorial,
+            ["Placing Basic SVs"] = {
+                ["Your First Effect"] = showYourFirstEffectTutorial,
+                ["Your Second Effect"] = showYourSecondEffectTutorial,
+                ["Working With Shapes"] = showWorkingWithShapesTutorial,
+                ["Editing/Removing SVs"] = showEditingRemovingSVTutorial,
+                ["Stills and Displacement"] = showStillsAndDisplacementTutorial,
+                ["Composite Effects"] = incompleteFn,
+            },
+            ["Adding Effects"] = {},
+        },
+        ["Helpful Info"] = {
+            ["Plugin Efficiency Tips"] = {
+                ["Hotkeys"] = showHotkeyTutorial,
+            },
+            ["The Math Behind SV"] = {
+                ["Preface"] = incompleteFn,
+                ["What IS msx?"] = incompleteFn,
+                ["The calculus of SV"] = incompleteFn,
+                ["Why do we call them shapes?"] = incompleteFn,
+                ["Analogies to Physics"] = incompleteFn,
+            }
+        }
+    }
+    imgui.Columns(2)
+    imgui.SetColumnWidth(0, 200)
+    imgui.SetColumnWidth(1, 400)
+    imgui.BeginChild("Tutorial Navigator")
+    function renderBranch(branch)
+        for text, data in pairs(branch) do
+            if (type(data) == "table") then
+                if (imgui.TreeNode(text)) then
+                    renderBranch(data)
+                    imgui.TreePop()
+                end
+            else
+                if (imgui.GetCursorPosX() < 10) then imgui.SetCursorPosX(10) end
+                imgui.Selectable(text)
+                if (imgui.IsItemClicked()) then
+                    tutorialWindowName = text
+                    tutorialFn = data
+                end
+            end
+        end
+    end
+    for text, data in pairs(tree) do
+        imgui.SeparatorText(text)
+        renderBranch(data)
+    end
+    imgui.EndChild()
+    imgui.NextColumn()
+    imgui.BeginChild("Tutorial Data", vector.New(380, 500), imgui_child_flags
+        .AlwaysUseWindowPadding)
+    imgui.SetCursorPosY(0)
+    function ForceHeight(h)
+        imgui.SetCursorPosY(h)
+        imgui.TextColored(vctr4(0), "penis")
+    end
+    if (game.keyCount ~= 4) then
+        imgui.SeparatorText("This tutorial does not support this key mode.")
+        imgui.Text("Please go to a 4K map to continue.")
+        goto dontRenderTutorial
+    end
+    if (state.GetValue("tutorialWindowQueue", nil)) then
+        tutorialWindowName = state.GetValue("tutorialWindowQueue")
+        state.SetValue("tutorialWindowQueue", nil)
+    end
+    tutorialFn()
+    ::dontRenderTutorial::
+    imgui.EndChild()
+    imgui.Columns(1)
+    imgui.End()
+    imgui.PopStyleColor(2)
+    state.SetValue("tutorialWindowName", tutorialWindowName)
+    state.SetValue("tutorialFn", tutorialFn)
 end
 function chooseAddComboMultipliers(settingVars)
     local oldValues = vector.New(settingVars.comboMultiplier1, settingVars.comboMultiplier2)

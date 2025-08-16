@@ -37,16 +37,10 @@ function renderTutorialMenu()
                 ["Composite Effects"] = incompleteFn,
             },
             ["Adding Effects"] = {},
-            ["Vibrato"] = {},
-            ["Deconstructing Effects"] = {
-                ["Preface"] = incompleteFn,
-                ["PK Rave"] = incompleteFn
-            }
         },
         ["Helpful Info"] = {
             ["Plugin Efficiency Tips"] = {
-                ["Hotkeys"] = incompleteFn,
-                ["Same Effect, Different Methods"] = incompleteFn,
+                ["Hotkeys"] = showHotkeyTutorial,
             },
             ["The Math Behind SV"] = {
                 ["Preface"] = incompleteFn,
