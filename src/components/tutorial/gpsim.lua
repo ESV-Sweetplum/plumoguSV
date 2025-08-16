@@ -15,7 +15,7 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
 
     for i = 1, #colTbl do
         for _, col in ipairs(colTbl[i]) do
-            local height = 50 * (#colTbl * distanceFn(math.wrap(progress + 0.25, 0, 1)) + #colTbl - i)
+            local height = 50 * (#colTbl * distanceFn(math.wrap(progress + 0.25, 0, 1), i) + #colTbl - i)
             if (height > 150) then
                 height = height - 50 * #colTbl
             end

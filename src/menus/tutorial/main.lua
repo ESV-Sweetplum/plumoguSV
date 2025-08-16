@@ -33,7 +33,7 @@ function renderTutorialMenu()
                 ["Your Second Effect"] = showYourSecondEffectTutorial,
                 ["Working With Shapes"] = showWorkingWithShapesTutorial,
                 ["Editing/Removing SVs"] = showEditingRemovingSVTutorial,
-                ["Stills and Displacement"] = incompleteFn,
+                ["Stills and Displacement"] = showStillsAndDisplacementTutorial,
                 ["Composite Effects"] = incompleteFn,
             },
             ["Adding Effects"] = {},
