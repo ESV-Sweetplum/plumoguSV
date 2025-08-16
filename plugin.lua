@@ -2368,7 +2368,7 @@ function svVibrato(menuVars, heightFn)
                 heightFn(endPos, teleportCount), 0, nil)
         end
     end
-    getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset, svsToAdd)
+    getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function deleteItems(menuVars)
@@ -7447,8 +7447,8 @@ function renderTutorialMenu()
                 ["Your Second Effect"] = showYourSecondEffectTutorial,
                 ["Working With Shapes"] = showWorkingWithShapesTutorial,
                 ["Editing/Removing SVs"] = showEditingRemovingSVTutorial,
-                ["Composite Effects"] = incompleteFn,
                 ["Stills and Displacement"] = incompleteFn,
+                ["Composite Effects"] = incompleteFn,
             },
             ["Adding Effects"] = {},
             ["Vibrato"] = {},
