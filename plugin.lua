@@ -4298,7 +4298,7 @@ function pulseController()
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
     imgui.PushStyleColor(imgui_col.Border, pulseColor * outputPulseStatus + borderColor * (1 - outputPulseStatus))
     cache.saveTable("pulseController", pulseVars)
-    cache.pulseValue = pulseVars.pulseStatus
+    cache.pulseValue = math.max(pulseVars.pulseStatus, 0)
     cache.pulsedThisFrame = pulseVars.pulsedThisFrame
 end
 ---@class PhysicsObject
