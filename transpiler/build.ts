@@ -10,7 +10,7 @@ console.log(
         chalk.bold(`Transpiling ${chalk.redBright('plugin.lua')}...`)
     )
 );
-transpiler();
+transpiler(false, true);
 
 const versionNumber = `v${fs.readFileSync('.version', 'utf-8')}`;
 
@@ -27,7 +27,7 @@ const pluginLines = fs.readFileSync('plugin.lua', 'utf-8').split('\n');
 pluginLines.forEach((line, idx) => {
     if (line.includes('plumoguSV') && line.includes('AlwaysAutoResize')) {
         pluginLines[idx] = pluginLines[idx].replaceAll(
-            /"[A-z]+"/g,
+            /"[a-zA-Z]+"/g,
             `"plumoguSV-${versionNumber}"`
         );
     }

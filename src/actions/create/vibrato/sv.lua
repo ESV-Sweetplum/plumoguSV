@@ -51,7 +51,7 @@ function svVibrato(menuVars, heightFn)
                     height, 0)
             end
             prepareDisplacingSVs(next * (1 - 1 / teleportCount) + start * (1 / teleportCount), svsToAdd, svTimeIsAdded,
-                heightFn((teleportCount - 2) / teleportCount * posDifference + startPos, teleportCount), 0, nil)
+                heightFn((1 - 2 / teleportCount) * posDifference + startPos, teleportCount), 0, nil)
         else
             prepareDisplacingSVs(start, svsToAdd, svTimeIsAdded, nil,
                 -heightFn(startPos, 1), 0)
