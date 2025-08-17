@@ -27,7 +27,6 @@ function cache.saveTable(listName, variables)
     end
 end
 clock = {}
-cache.clock = {}
 ---Returns true every `interval` ms.
 ---@param id string The unique identifier of the clock.
 ---@param interval integer The interval at which the clock should run.
@@ -51,7 +50,7 @@ function game.getTimingPointAt(offset)
     return { StartTime = -69420, Bpm = 42.69 }
 end
 function game.getNoteOffsetAt(offset, forward)
-    local startTimes = cache.lists.hitObjectStartTimes
+    local startTimes = state.GetValue("lists.hitObjectStartTimes")
     if (not truthy(startTimes)) then return -1 end
     if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
     if (state.SongTime < startTimes[1]) then return startTimes[1] end
@@ -3329,7 +3328,7 @@ function verticalShiftSVs(menuVars)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function changeNoteLockMode()
-    local mode = cache.noteLockMode or 0
+    local mode = state.GetValue("noteLockMode") or 0
     mode = (mode + 1) % 4
     if (mode == 0) then
         print("s", "Notes have been unlocked.")
@@ -3347,14 +3346,14 @@ function changeNoteLockMode()
             "Notes can no longer be moved, only placed and deleted. To change the lock mode, press " ..
             globalVars.hotkeyList[10] .. ".")
     end
-    cache.noteLockMode = mode
+    state.SetValue("noteLockMode", mode)
 end
 function initializeNoteLockMode()
-    cache.noteLockMode = 0
+    state.SetValue("noteLockMode", 0)
     listen(function(action, type, fromLua)
         if (fromLua) then return end
         local actionIndex = tonumber(action.Type) ---@cast actionIndex EditorActionType
-        local mode = cache.noteLockMode or 0
+        local mode = state.GetValue("noteLockMode") or 0
         if (mode == 1) then
             if (actionIndex > 9) then return end
             actions.Undo()
@@ -3570,7 +3569,7 @@ function renderReactiveSingularities()
     local vyList = state.GetValue("singularity_vyList", {})
     local axList = state.GetValue("singularity_axList", {})
     local ayList = state.GetValue("singularity_ayList", {})
-    local pulseStatus = cache.pulseValue or 0
+    local pulseStatus = state.GetValue("pulseValue") or 0
     local slowSpeedR = 89
     local slowSpeedG = 0
     local slowSpeedB = 255
@@ -3597,7 +3596,7 @@ function renderReactiveSingularities()
         local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
         ctx.AddCircleFilled(pos, 2,
-            rgbaToUint(r, g, b, 55 + pulseStatus * 200))
+            rgbaToUint(r, g, b, 100 + pulseStatus * 155))
     end
     ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
     ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
@@ -4032,8 +4031,8 @@ function drawCursorTrail()
     local m = imgui.GetMousePos()
     local t = imgui.GetTime()
     local sz = state.WindowSize
-    if cursorTrail ~= "Dust" then cache.boolean.dustParticlesInitialized = false end
-    if cursorTrail ~= "Sparkle" then cache.boolean.sparkleParticlesInitialized = false end
+    if cursorTrail ~= "Dust" then state.SetValue("boolean.dustParticlesInitialized", false) end
+    if cursorTrail ~= "Sparkle" then state.SetValue("boolean.sparkleParticlesInitialized", false) end
     if cursorTrail == "Snake" then drawSnakeTrail(o, m, t) end
     if cursorTrail == "Dust" then drawDustTrail(o, m, t, sz) end
     if cursorTrail == "Sparkle" then drawSparkleTrail(o, m, t, sz) end
@@ -4052,7 +4051,7 @@ function drawSnakeTrail(o, m, t)
         globalVars.cursorTrailGhost, trailShape)
 end
 function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
-    if (cache.boolean.snakeTrailInitialized) then
+    if (state.GetValue("boolean.snakeTrailInitialized")) then
         for i = 1, trailPoints do
             snakeTrailPoints[i] = {}
         end
@@ -4061,7 +4060,7 @@ function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
     for i = 1, trailPoints do
         snakeTrailPoints[i] = m
     end
-    cache.boolean.snakeTrailInitialized = true
+    state.SetValue("boolean.snakeTrailInitialized", true)
     cache.saveTable("snakeTrailPoints", snakeTrailPoints)
 end
 function updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoints,
@@ -4116,7 +4115,7 @@ function drawDustTrail(o, m, t, sz)
     renderDustParticles(globalVars.rgbPeriod, o, t, dustParticles, dustDuration, dustSize)
 end
 function initializeDustParticles(_, t, dustParticles, numDustParticles, dustDuration)
-    if cache.boolean.dustParticlesInitialized then
+    if state.GetValue("boolean.dustParticlesInitialized") then
         for i = 1, numDustParticles do
             dustParticles[i] = {}
         end
@@ -4127,7 +4126,7 @@ function initializeDustParticles(_, t, dustParticles, numDustParticles, dustDura
         local showParticle = false
         dustParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
-    cache.boolean.dustParticlesInitialized = true
+    state.SetValue("boolean.dustParticlesInitialized", true)
     cache.saveTable("dustParticles", dustParticles)
 end
 function updateDustParticles(t, m, dustParticles, dustDuration, dustSize)
@@ -4171,7 +4170,7 @@ function drawSparkleTrail(o, m, t, sz)
     renderSparkleParticles(o, t, sparkleParticles, sparkleDuration, sparkleSize)
 end
 function initializeSparkleParticles(_, t, sparkleParticles, numSparkleParticles, sparkleDuration)
-    if cache.boolean.sparkleParticlesInitialized then
+    if state.GetValue("boolean.sparkleParticlesInitialized") then
         for i = 1, numSparkleParticles do
             sparkleParticles[i] = {}
         end
@@ -4182,7 +4181,7 @@ function initializeSparkleParticles(_, t, sparkleParticles, numSparkleParticles,
         local showParticle = false
         sparkleParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
-    cache.boolean.sparkleParticlesInitialized = true
+    state.SetValue("boolean.sparkleParticlesInitialized", true)
     cache.saveTable("sparkleParticles", sparkleParticles)
 end
 function updateSparkleParticles(t, m, sparkleParticles, sparkleDuration, sparkleSize)
@@ -4292,13 +4291,13 @@ function pulseController()
         pulseVars.pulseStatus = 0
     end
     outputPulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
-    local borderColor = cache.borderColor or vctr4(1)
+    local borderColor = state.GetValue("borderColor") or vctr4(1)
     local negatedBorderColor = vctr4(1) - borderColor
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
     imgui.PushStyleColor(imgui_col.Border, pulseColor * outputPulseStatus + borderColor * (1 - outputPulseStatus))
     cache.saveTable("pulseController", pulseVars)
-    cache.pulseValue = math.max(pulseVars.pulseStatus, 0)
-    cache.pulsedThisFrame = pulseVars.pulsedThisFrame
+    state.SetValue("pulseValue", math.max(pulseVars.pulseStatus, 0))
+    state.SetValue("pulsedThisFrame", pulseVars.pulsedThisFrame)
 end
 ---@class PhysicsObject
 ---@field pos Vector2
@@ -4360,7 +4359,7 @@ function setPluginAppearanceColors(colorTheme)
     if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
     if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
     if colorTheme == "CUSTOM" then borderColor = setCustomColors() end
-    cache.borderColor = borderColor
+    state.SetValue("borderColor", borderColor)
 end
 function setClassicColors()
     local borderColor = vector.New(0.81, 0.88, 1.00, 0.30)
@@ -6126,10 +6125,10 @@ function updateDirectEdit()
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     if (#offsets < 2) then
-        cache.lists.directSVList = {}
+        state.SetValue("lists.directSVList", {})
         return
     end
-    cache.lists.directSVList = game.getSVsBetweenOffsets(firstOffset, lastOffset)
+    state.SetValue("lists.directSVList", game.getSVsBetweenOffsets(firstOffset, lastOffset))
 end
 function directSVMenu()
     local menuVars = getMenuVars("directSV")
@@ -6137,7 +6136,7 @@ function directSVMenu()
     if (clock.listen("directSV", 500)) then
         updateDirectEdit()
     end
-    local svs = cache.lists.directSVList
+    local svs = state.GetValue("lists.directSVList")
     if (#svs == 0) then
         menuVars.selectableIndex = 1
         imgui.TextWrapped("Select two notes to view SVs.")
@@ -6462,7 +6461,7 @@ function infoTab()
     AddPadding()
     AddPadding()
     if (imgui.Button("Click Here to Edit Settings", ACTION_BUTTON_SIZE)) then
-        cache.windows.showSettingsWindow = not cache.windows.showSettingsWindow
+        state.SetValue("windows.showSettingsWindow", not state.GetValue("windows.showSettingsWindow"))
         local windowDim = state.WindowSize
         local pluginDim = imgui.GetWindowSize()
         local centeringX = (windowDim[1] - 433) * 0.5
@@ -6475,7 +6474,7 @@ function infoTab()
     end
     KeepSameLine()
     if (imgui.Button("View Tutorials", HALF_ACTION_BUTTON_SIZE)) then
-        cache.windows.showTutorialWindow = not cache.windows.showTutorialWindow
+        state.SetValue("windows.showTutorialWindow", not state.GetValue("windows.showTutorialWindow"))
         local windowDim = state.WindowSize
         local pluginDim = imgui.GetWindowSize()
         local centeringX = (windowDim[1] - 600) * 0.5
@@ -6717,7 +6716,7 @@ function showCustomThemeSettings()
     end
     KeepSameLine()
     if (imgui.Button("Import")) then
-        cache.boolean.importingCustomTheme = true
+        state.SetValue("boolean.importingCustomTheme", true)
     end
     KeepSameLine()
     if (imgui.Button("Export")) then
@@ -6725,7 +6724,7 @@ function showCustomThemeSettings()
         imgui.SetClipboardText(str)
         print("i!", "Exported custom theme to your clipboard.")
     end
-    if (cache.boolean.importingCustomTheme) then
+    if (state.GetValue("boolean.importingCustomTheme")) then
         local input = state.GetValue("importingCustomThemeInput", "")
         _, input = imgui.InputText("##customThemeStr", input, 69420)
         state.SetValue("importingCustomThemeInput", input)
@@ -6733,12 +6732,12 @@ function showCustomThemeSettings()
         if (imgui.Button("Send")) then
             setCustomStyleString(input)
             settingsChanged = true
-            cache.boolean.importingCustomTheme = false
+            state.SetValue("boolean.importingCustomTheme", false)
             state.SetValue("importingCustomThemeInput", "")
         end
         KeepSameLine()
         if (imgui.Button("X")) then
-            cache.boolean.importingCustomTheme = false
+            state.SetValue("boolean.importingCustomTheme", false)
             state.SetValue("importingCustomThemeInput", "")
         end
     end
@@ -7383,7 +7382,7 @@ function showPluginSettingsWindow()
     imgui.Columns(1)
     state.SetValue("settings_typeIndex", typeIndex)
     if (not settingsOpened) then
-        cache.windows.showSettingsWindow = false
+        state.SetValue("windows.showSettingsWindow", false)
         state.SetValue("settings_typeIndex", 1)
         state.SetValue("crazy", "Crazy?")
         state.SetValue("activateCrazy", false)
@@ -7761,9 +7760,9 @@ function renderTutorialMenu()
     imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
     startNextWindowNotCollapsed("Tutorial")
     _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
-    local tutorialWindowName = cache.tutorialWindowName or ""
+    local tutorialWindowName = state.GetValue("tutorialWindowName") or ""
     if (not opened) then
-        cache.windows.showTutorialWindow = false
+        state.SetValue("windows.showTutorialWindow", false)
     end
     local navigatorWidth = 200
     local nullFn = function()
@@ -7817,7 +7816,7 @@ function renderTutorialMenu()
                 imgui.Selectable(text)
                 if (imgui.IsItemClicked()) then
                     tutorialWindowName = leafName
-                    cache.tutorialWindowName = tutorialWindowName
+                    state.SetValue("tutorialWindowName", tutorialWindowName)
                 end
             end
         end
@@ -7840,9 +7839,9 @@ function renderTutorialMenu()
         imgui.Text("Please go to a 4K map to continue.")
         goto dontRenderTutorial
     end
-    if (cache.tutorialWindowQueue) then
-        tutorialWindowName = cache.tutorialWindowQueue
-        cache.tutorialWindowQueue = nil
+    if (state.GetValue("tutorialWindowQueue")) then
+        tutorialWindowName = state.GetValue("tutorialWindowQueue")
+        state.SetValue("tutorialWindowQueue", nil)
     end
     if (not truthy(tutorialWindowName:len())) then
         nullFn()
@@ -9696,7 +9695,7 @@ function awake()
 end
 function listenForHitObjectChanges()
     local function setHitObjectStartTimes()
-        cache.lists.hitObjectStartTimes = table.dedupe(table.property(map.HitObjects, "StartTime"))
+        state.SetValue("lists.hitObjectStartTimes", table.dedupe(table.property(map.HitObjects, "StartTime")))
     end
     setHitObjectStartTimes()
     listen(function(action, type, fromLua)
@@ -9704,10 +9703,9 @@ function listenForHitObjectChanges()
         setHitObjectStartTimes()
     end)
 end
-cache.indices = {}
 function draw()
     if (not state.CurrentTimingPoint) then return end
-    cache.indices.computableInputFloat = 1
+    state.SetValue("indices.computableInputFloat", 1)
     state.IsWindowHovered = imgui.IsWindowHovered()
     drawCapybaraParent()
     drawCursorTrail()
@@ -9733,10 +9731,10 @@ function draw()
     if (globalVars.showMeasureDataWidget) then
         renderMeasureDataWidget()
     end
-    if (cache.windows.showTutorialWindow) then
+    if (state.GetValue("windows.showTutorialWindow")) then
         renderTutorialMenu()
     end
-    if (cache.windows.showSettingsWindow) then
+    if (state.GetValue("windows.showSettingsWindow")) then
         showPluginSettingsWindow()
     end
     imgui.End()

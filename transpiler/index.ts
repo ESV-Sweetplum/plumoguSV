@@ -109,36 +109,36 @@ export default async function transpiler(devMode = false, lint = true) {
         );
     } // Remove integer exponentiation and replace with repeated multiplication
 
-    // output = output.replaceAll(/\ncache.+ = \{\}\n/g, '\n'); // Remove cache dictionary instantiation
+    output = output.replaceAll(/\ncache.+ = \{\}\n/g, '\n'); // Remove cache dictionary instantiation
 
-    // for (let i = 9; i >= 1; i--) {
-    //     const obtainmentRegex = new RegExp(
-    //         `cache\\.(?!saveTable|loadTable)([a-zA-Z0-9_]+)${'\\.([a-zA-Z0-9_]+)'.repeat(
-    //             i - 1
-    //         )}`,
-    //         'g'
-    //     );
-    //     const assignmentRegex = new RegExp(
-    //         `cache${'\\.([a-zA-Z0-9_]+)'.repeat(
-    //             i
-    //         )} = ([a-z ]{0,4}(?:[^ \n,]|, )+)`,
-    //         'g'
-    //     );
-    //     output = output.replaceAll(
-    //         assignmentRegex,
-    //         `state.SetValue("${Array(i)
-    //             .fill(0)
-    //             .map((_, idx) => `$${idx + 1}`)
-    //             .join('.')}", $${i + 1})`
-    //     );
-    //     output = output.replaceAll(
-    //         obtainmentRegex,
-    //         `state.GetValue("${Array(i)
-    //             .fill(0)
-    //             .map((_, idx) => `$${idx + 1}`)
-    //             .join('.')}")`
-    //     );
-    // } // Change all cache assignments and cache calls to use state instead
+    for (let i = 9; i >= 1; i--) {
+        const obtainmentRegex = new RegExp(
+            `cache\\.(?!saveTable|loadTable|[a-zA-Z0-9_\\.]+\\[)([a-zA-Z0-9_]+)${'\\.([a-zA-Z0-9_]+)'.repeat(
+                i - 1
+            )}`,
+            'g'
+        );
+        const assignmentRegex = new RegExp(
+            `cache${'\\.([a-zA-Z0-9_]+)'.repeat(
+                i
+            )} = ([a-z ]{0,4}(?:[^ \n,]|, )+)`,
+            'g'
+        );
+        output = output.replaceAll(
+            assignmentRegex,
+            `state.SetValue("${Array(i)
+                .fill(0)
+                .map((_, idx) => `$${idx + 1}`)
+                .join('.')}", $${i + 1})`
+        );
+        output = output.replaceAll(
+            obtainmentRegex,
+            `state.GetValue("${Array(i)
+                .fill(0)
+                .map((_, idx) => `$${idx + 1}`)
+                .join('.')}")`
+        );
+    } // Change all cache assignments and cache calls to use state instead
 
     output = output.replaceAll('\n\n', '\n').trimStart();
     if (lint) {
