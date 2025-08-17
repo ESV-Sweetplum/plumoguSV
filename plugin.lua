@@ -3801,16 +3801,16 @@ function drawCapybara()
     drawHorizontalPillShape(o, headCoords1, headCoords2, headRadius, bodyColor, 12)
     drawHorizontalPillShape(o, eyeCoords1, eyeCoords2, eyeRadius, eyeColor, 12)
     o.AddRectFilled(sz, headCoords1, bodyColor)
-    o.AddRectFilled(vector.New(stemCoords[1], stemCoords[2]), vector.New(stemCoords[1] + 10, stemCoords[2] + 20),
+    o.AddRectFilled(vector.New(stemCoords.x, stemCoords.y), vector.New(stemCoords.x + 10, stemCoords.y + 20),
         stemColor)
-    o.AddRectFilled(vector.New(stemCoords[1] - 10, stemCoords[2]), vector.New(stemCoords[1] + 20, stemCoords[2] - 5),
+    o.AddRectFilled(vector.New(stemCoords.x - 10, stemCoords.y), vector.New(stemCoords.x + 20, stemCoords.y - 5),
         stemColor)
 end
 function drawCapybara2()
     if not globalVars.drawCapybara2 then return end
     local o = imgui.GetForegroundDrawList()
     local sz = state.WindowSize
-    local topLeftCapyPoint = { 0, sz[2] - 165 }
+    local topLeftCapyPoint = vector.New(0, sz[2] - 165)
     local p1 = relativePoint(topLeftCapyPoint, 0, 95)
     local p2 = relativePoint(topLeftCapyPoint, 0, 165)
     local p3 = relativePoint(topLeftCapyPoint, 58, 82)
