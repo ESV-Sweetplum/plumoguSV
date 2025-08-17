@@ -12,5 +12,5 @@ end
 --    xChange : change in x coordinate [Int]
 --    yChange : change in y coordinate [Int]
 function relativePoint(point, xChange, yChange)
-    return { point[1] + xChange, point[2] + yChange }
+    return point + vector.New(xChange, yChange)
 end

@@ -1,13 +1,14 @@
 function drawCursorTrail()
+    local cursorTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
+    if cursorTrail == "None" then return end
+
     local o = imgui.GetForegroundDrawList()
     local m = imgui.GetMousePos()
     local t = imgui.GetTime()
     local sz = state.WindowSize
-    local cursorTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
     if cursorTrail ~= "Dust" then cache.boolean.dustParticlesInitialized = false end
     if cursorTrail ~= "Sparkle" then cache.boolean.sparkleParticlesInitialized = false end
 
-    if cursorTrail == "None" then return end
     if cursorTrail == "Snake" then drawSnakeTrail(o, m, t) end
     if cursorTrail == "Dust" then drawDustTrail(o, m, t, sz) end
     if cursorTrail == "Sparkle" then drawSparkleTrail(o, m, t, sz) end
