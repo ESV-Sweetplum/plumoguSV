@@ -14,7 +14,7 @@ function createMenuTab(tabName)
     if tabName == "Info" then
         infoTab()
     else
-        state.SetValue("showSettingsWindow", false)
+        cache.windows.showSettingsWindow = false
     end
     if tabName == "Select" then selectTab() end
     if tabName == "Create" then createSVTab() end

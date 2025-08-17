@@ -17,7 +17,7 @@ function infoTab()
     AddPadding()
     AddPadding()
     if (imgui.Button("Click Here to Edit Settings", ACTION_BUTTON_SIZE)) then
-        state.SetValue("showSettingsWindow", not state.GetValue("showSettingsWindow", false))
+        cache.windows.showSettingsWindow = not cache.windows.showSettingsWindow
         local windowDim = state.WindowSize
         local pluginDim = imgui.GetWindowSize()
         local centeringX = (windowDim[1] - pluginDim.x) * 0.5
@@ -25,7 +25,7 @@ function infoTab()
         local coordinatesToCenter = vector.New(centeringX, centeringY)
         imgui.SetWindowPos("plumoguSV Settings", coordinatesToCenter)
     end
-    if (state.GetValue("showSettingsWindow")) then
+    if (cache.windows.showSettingsWindow) then
         showPluginSettingsWindow()
     end
     if (imgui.Button("Get Map Stats", HALF_ACTION_BUTTON_SIZE)) then
@@ -33,6 +33,6 @@ function infoTab()
     end
     KeepSameLine()
     if (imgui.Button("View Tutorials", HALF_ACTION_BUTTON_SIZE)) then
-        state.SetValue("showTutorialWindow", not state.GetValue("showTutorialWindow", false))
+        cache.windows.showTutorialWindow = not cache.windows.showTutorialWindow
     end
 end

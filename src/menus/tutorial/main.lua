@@ -9,10 +9,10 @@ function renderTutorialMenu()
     startNextWindowNotCollapsed("Tutorial")
 
     _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
-    local tutorialWindowName = state.GetValue("tutorialWindowName", "")
+    local tutorialWindowName = cache.tutorialWindowName or ""
 
     if (not opened) then
-        state.SetValue("showTutorialWindow", false)
+        cache.windows.showTutorialWindow = false
     end
 
     local navigatorWidth = 200
@@ -23,7 +23,6 @@ function renderTutorialMenu()
     local incompleteFn = function()
         imgui.TextWrapped("Sorry, this tutorial is not ready yet. Please come back when a new version comes out.")
     end
-    local tutorialFn = state.GetValue("tutorialFn") or nullFn
 
     local tree = {
         ["For Beginners"] = {
@@ -57,19 +56,20 @@ function renderTutorialMenu()
 
     imgui.BeginChild("Tutorial Navigator")
 
-    function renderBranch(branch)
+    function renderBranch(branch, branchName)
         for text, data in pairs(branch) do
+            local leafName = table.concat({ branchName, ".", text })
             if (type(data) == "table") then
                 if (imgui.TreeNode(text)) then
-                    renderBranch(data)
+                    renderBranch(data, leafName)
                     imgui.TreePop()
                 end
             else
                 if (imgui.GetCursorPosX() < 10) then imgui.SetCursorPosX(10) end
                 imgui.Selectable(text)
                 if (imgui.IsItemClicked()) then
-                    tutorialWindowName = text
-                    tutorialFn = data
+                    tutorialWindowName = leafName
+                    cache.tutorialWindowName = tutorialWindowName
                 end
             end
         end
@@ -77,7 +77,7 @@ function renderTutorialMenu()
 
     for text, data in pairs(tree) do
         imgui.SeparatorText(text)
-        renderBranch(data)
+        renderBranch(data, text)
     end
 
     imgui.EndChild()
@@ -99,12 +99,17 @@ function renderTutorialMenu()
         goto dontRenderTutorial
     end
 
-    if (state.GetValue("tutorialWindowQueue", nil)) then
-        tutorialWindowName = state.GetValue("tutorialWindowQueue")
-        state.SetValue("tutorialWindowQueue", nil)
+    if (cache.tutorialWindowQueue) then
+        tutorialWindowName = cache.tutorialWindowQueue
+        cache.tutorialWindowQueue = nil
     end
 
-    tutorialFn()
+    if (not truthy(tutorialWindowName:len())) then
+        nullFn()
+        goto dontRenderTutorial
+    end
+
+    table.nestedValue(tree, tutorialWindowName:split("."))()
 
     ::dontRenderTutorial::
     imgui.EndChild()
@@ -113,7 +118,4 @@ function renderTutorialMenu()
     imgui.End()
 
     imgui.PopStyleColor(2)
-
-    state.SetValue("tutorialWindowName", tutorialWindowName)
-    state.SetValue("tutorialFn", tutorialFn)
 end

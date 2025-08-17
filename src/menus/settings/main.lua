@@ -72,7 +72,7 @@ function showPluginSettingsWindow()
     imgui.Columns(1)
     state.SetValue("settings_typeIndex", typeIndex)
     if (not settingsOpened) then
-        state.SetValue("showSettingsWindow", false)
+        cache.windows.showSettingsWindow = false
         state.SetValue("settings_typeIndex", 1)
         state.SetValue("crazy", "Crazy?")
         state.SetValue("activateCrazy", false)

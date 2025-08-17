@@ -35,7 +35,7 @@ function draw()
     if (globalVars.showMeasureDataWidget) then
         renderMeasureDataWidget()
     end
-    if (state.GetValue("showTutorialWindow")) then
+    if (cache.windows.showTutorialWindow) then
         renderTutorialMenu()
     end
 

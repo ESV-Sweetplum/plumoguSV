@@ -23,8 +23,6 @@ function awake()
     end
 end
 
-cache.lists = {}
-
 function listenForHitObjectChanges()
     local function setHitObjectStartTimes()
         cache.lists.hitObjectStartTimes = table.dedupe(table.property(map.HitObjects, "StartTime"))

@@ -1,6 +1,8 @@
 ---@diagnostic disable: param-type-mismatch
 cache = {
-    boolean = {}
+    boolean = {},
+    windows = {},
+    lists = {}
 }
 game = {}
 kbm = {}
@@ -538,6 +540,17 @@ function string.shorten(str)
     local consonants = str:removeVowels()
     return table.concat({ consonants:charAt(1), consonants:charAt(2), consonants:charAt(-1) })
 end
+---Splits a string into a table via the given separator.
+---@param str string
+---@param sep string
+---@return string[]
+function string.split(str, sep)
+    local tbl = {}
+    for s in str:gmatch(table.concat({"([^", sep, "]+)"})) do
+        tbl[#tbl + 1] = s
+    end
+    return tbl
+end
 ---Returns the average value of an array.
 ---@param values number[] The list of numbers.
 ---@param includeLastValue? boolean Whether or not to include the last value in the table.
@@ -668,6 +681,16 @@ function table.map(tbl, fn)
         newTbl[#newTbl + 1] = fn(v)
     end
     return newTbl
+end
+---Navigates a tree with dot notation and returns the corresponding value. For example, if you had a table { foo = { bar = 1}}, then this returns 1 if the given value is "foo.bar".
+---@param tree { [string] : any}
+---@param value string[]
+---@return any
+function table.nestedValue(tree, value)
+    if (#value > 1) then
+        return table.nestedValue(tree[value[1]], { table.unpack(value, 2) })
+    end
+    return tree[value[1]]
 end
 ---Normalizes a table of numbers to achieve a target average.
 ---@param values number[] The table to normalize.
@@ -6431,7 +6454,7 @@ function infoTab()
     AddPadding()
     AddPadding()
     if (imgui.Button("Click Here to Edit Settings", ACTION_BUTTON_SIZE)) then
-        state.SetValue("showSettingsWindow", not state.GetValue("showSettingsWindow", false))
+        cache.windows.showSettingsWindow = not cache.windows.showSettingsWindow
         local windowDim = state.WindowSize
         local pluginDim = imgui.GetWindowSize()
         local centeringX = (windowDim[1] - pluginDim.x) * 0.5
@@ -6439,7 +6462,7 @@ function infoTab()
         local coordinatesToCenter = vector.New(centeringX, centeringY)
         imgui.SetWindowPos("plumoguSV Settings", coordinatesToCenter)
     end
-    if (state.GetValue("showSettingsWindow")) then
+    if (cache.windows.showSettingsWindow) then
         showPluginSettingsWindow()
     end
     if (imgui.Button("Get Map Stats", HALF_ACTION_BUTTON_SIZE)) then
@@ -6447,7 +6470,7 @@ function infoTab()
     end
     KeepSameLine()
     if (imgui.Button("View Tutorials", HALF_ACTION_BUTTON_SIZE)) then
-        state.SetValue("showTutorialWindow", not state.GetValue("showTutorialWindow", false))
+        cache.windows.showTutorialWindow = not cache.windows.showTutorialWindow
     end
 end
 function selectAlternatingMenu()
@@ -7349,7 +7372,7 @@ function showPluginSettingsWindow()
     imgui.Columns(1)
     state.SetValue("settings_typeIndex", typeIndex)
     if (not settingsOpened) then
-        state.SetValue("showSettingsWindow", false)
+        cache.windows.showSettingsWindow = false
         state.SetValue("settings_typeIndex", 1)
         state.SetValue("crazy", "Crazy?")
         state.SetValue("activateCrazy", false)
@@ -7415,7 +7438,7 @@ function createMenuTab(tabName)
     if tabName == "Info" then
         infoTab()
     else
-        state.SetValue("showSettingsWindow", false)
+        cache.windows.showSettingsWindow = false
     end
     if tabName == "Select" then selectTab() end
     if tabName == "Create" then createSVTab() end
@@ -7711,9 +7734,9 @@ function renderTutorialMenu()
     imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
     startNextWindowNotCollapsed("Tutorial")
     _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
-    local tutorialWindowName = state.GetValue("tutorialWindowName", "")
+    local tutorialWindowName = cache.tutorialWindowName or ""
     if (not opened) then
-        state.SetValue("showTutorialWindow", false)
+        cache.windows.showTutorialWindow = false
     end
     local navigatorWidth = 200
     local nullFn = function()
@@ -7722,7 +7745,6 @@ function renderTutorialMenu()
     local incompleteFn = function()
         imgui.TextWrapped("Sorry, this tutorial is not ready yet. Please come back when a new version comes out.")
     end
-    local tutorialFn = state.GetValue("tutorialFn") or nullFn
     local tree = {
         ["For Beginners"] = {
             ["Start Here"] = showStartingTutorial,
@@ -7752,26 +7774,27 @@ function renderTutorialMenu()
     imgui.SetColumnWidth(0, 200)
     imgui.SetColumnWidth(1, 400)
     imgui.BeginChild("Tutorial Navigator")
-    function renderBranch(branch)
+    function renderBranch(branch, branchName)
         for text, data in pairs(branch) do
+            local leafName = table.concat({ branchName, ".", text })
             if (type(data) == "table") then
                 if (imgui.TreeNode(text)) then
-                    renderBranch(data)
+                    renderBranch(data, leafName)
                     imgui.TreePop()
                 end
             else
                 if (imgui.GetCursorPosX() < 10) then imgui.SetCursorPosX(10) end
                 imgui.Selectable(text)
                 if (imgui.IsItemClicked()) then
-                    tutorialWindowName = text
-                    tutorialFn = data
+                    tutorialWindowName = leafName
+                    cache.tutorialWindowName = tutorialWindowName
                 end
             end
         end
     end
     for text, data in pairs(tree) do
         imgui.SeparatorText(text)
-        renderBranch(data)
+        renderBranch(data, text)
     end
     imgui.EndChild()
     imgui.NextColumn()
@@ -7787,18 +7810,20 @@ function renderTutorialMenu()
         imgui.Text("Please go to a 4K map to continue.")
         goto dontRenderTutorial
     end
-    if (state.GetValue("tutorialWindowQueue", nil)) then
-        tutorialWindowName = state.GetValue("tutorialWindowQueue")
-        state.SetValue("tutorialWindowQueue", nil)
+    if (cache.tutorialWindowQueue) then
+        tutorialWindowName = cache.tutorialWindowQueue
+        cache.tutorialWindowQueue = nil
     end
-    tutorialFn()
+    if (not truthy(tutorialWindowName:len())) then
+        nullFn()
+        goto dontRenderTutorial
+    end
+    table.nestedValue(tree, tutorialWindowName:split("."))()
     ::dontRenderTutorial::
     imgui.EndChild()
     imgui.Columns(1)
     imgui.End()
     imgui.PopStyleColor(2)
-    state.SetValue("tutorialWindowName", tutorialWindowName)
-    state.SetValue("tutorialFn", tutorialFn)
 end
 function chooseAddComboMultipliers(settingVars)
     local oldValues = vector.New(settingVars.comboMultiplier1, settingVars.comboMultiplier2)
@@ -9639,7 +9664,6 @@ function awake()
         print("e!", "Please place a timing point before attempting to use plumoguSV.")
     end
 end
-cache.lists = {}
 function listenForHitObjectChanges()
     local function setHitObjectStartTimes()
         cache.lists.hitObjectStartTimes = table.dedupe(table.property(map.HitObjects, "StartTime"))
@@ -9679,7 +9703,7 @@ function draw()
     if (globalVars.showMeasureDataWidget) then
         renderMeasureDataWidget()
     end
-    if (state.GetValue("showTutorialWindow")) then
+    if (cache.windows.showTutorialWindow) then
         renderTutorialMenu()
     end
     imgui.End()
