@@ -5,8 +5,10 @@ CONSONANTS = { "B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", 
 ---Very rudimentary function that returns a string depending on whether or not it should be plural.
 ---@param str string The inital string, which should be a noun (e.g. `bookmark`)
 ---@param val number The value, or count, of the noun, which will determine if it should be plural.
+---@param pos? integer Where the pluralization letter(s) should be inserted.
 ---@return string pluralizedStr A new string that is pluralized if `val ~= 1`.
 function pluralize(str, val, pos)
+    local strEnding = ""
     if (pos) then
         strEnding = str:sub(pos + 1, -1)
         str = str:sub(1, pos)

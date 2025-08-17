@@ -471,8 +471,10 @@ CONSONANTS = { "B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", 
 ---Very rudimentary function that returns a string depending on whether or not it should be plural.
 ---@param str string The inital string, which should be a noun (e.g. `bookmark`)
 ---@param val number The value, or count, of the noun, which will determine if it should be plural.
+---@param pos? integer Where the pluralization letter(s) should be inserted.
 ---@return string pluralizedStr A new string that is pluralized if `val ~= 1`.
 function pluralize(str, val, pos)
+    local strEnding = ""
     if (pos) then
         strEnding = str:sub(pos + 1, -1)
         str = str:sub(1, pos)
@@ -1332,6 +1334,7 @@ globalVars = {
     showMeasureDataWidget = false,
     ignoreNotesOutsideTg = false,
     advancedMode = false,
+    performanceMode = false,
     hideAutomatic = false,
     pulseCoefficient = 0,
     pulseColor = { 0, 0, 0, 0 },
@@ -1373,6 +1376,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
     globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
     globalVars.advancedMode = truthy(tempGlobalVars.advancedMode)
+    globalVars.performanceMode = truthy(tempGlobalVars.performanceMode)
     globalVars.hideAutomatic = truthy(tempGlobalVars.hideAutomatic)
     globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
     globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
@@ -5230,7 +5234,7 @@ end
 function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNoteReq, disableKeyInput,
                           optionalKeyOverride)
     local enoughSelectedNotes = checkEnoughSelectedNotes(minimumNotes)
-    local infoText = table.concat({"Select ", minimumNotes, " or more "}) .. pluralize("note", minimumNotes)
+    local infoText = table.concat({ "Select ", minimumNotes, " or more ", pluralize("note", minimumNotes) })
     if (not enoughSelectedNotes) then
         if (not hideNoteReq) then imgui.Text(infoText) end
         return
@@ -7257,6 +7261,8 @@ function showDefaultPropertiesSettings()
     end
 end
 function showGeneralSettings()
+    GlobalCheckbox("performanceMode", "Enable Performance Mode",
+        "Disables some visual enhancement to boost performance.")
     GlobalCheckbox("advancedMode", "Enable Advanced Mode",
         "Advanced mode enables a few features that simplify SV creation, at the cost of making the plugin more cluttered.")
     if (not globalVars.advancedMode) then imgui.BeginDisabled() end
@@ -9359,7 +9365,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
                           stutterDuration, skipDistGraph)
     if (globalVars.hideSVInfo) then return end
     imgui.Begin(windowText, imgui_window_flags.AlwaysAutoResize)
-    if (globalVars.showSVInfoVisualizer) then
+    if (globalVars.showSVInfoVisualizer and not globalVars.performanceMode) then
         local ctx = imgui.GetWindowDrawList()
         local topLeft = imgui.GetWindowPos()
         local dim = imgui.GetWindowSize()
@@ -9705,14 +9711,19 @@ function listenForHitObjectChanges()
 end
 function draw()
     if (not state.CurrentTimingPoint) then return end
+    local performanceMode = globalVars.performanceMode
     state.SetValue("indices.computableInputFloat", 1)
     state.IsWindowHovered = imgui.IsWindowHovered()
-    drawCapybaraParent()
-    drawCursorTrail()
-    setPluginAppearance()
+    if (not performanceMode) then
+        drawCapybaraParent()
+        drawCursorTrail()
+        setPluginAppearance()
+    end
     startNextWindowNotCollapsed("plumoguSV-autoOpen")
     imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
-    renderBackground()
+    if (not performanceMode) then
+        renderBackground()
+    end
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     imgui.BeginTabBar("SV tabs")
     for i = 1, #TAB_MENUS do
@@ -9738,7 +9749,9 @@ function draw()
         showPluginSettingsWindow()
     end
     imgui.End()
-    pulseController()
+    if (not performanceMode) then
+        pulseController()
+    end
     checkForGlobalHotkeys()
 end
 function renderNoteDataWidget()

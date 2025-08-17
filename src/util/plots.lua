@@ -170,7 +170,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
                           stutterDuration, skipDistGraph)
     if (globalVars.hideSVInfo) then return end
     imgui.Begin(windowText, imgui_window_flags.AlwaysAutoResize)
-    if (globalVars.showSVInfoVisualizer) then
+    if (globalVars.showSVInfoVisualizer and not globalVars.performanceMode) then
         local ctx = imgui.GetWindowDrawList()
         local topLeft = imgui.GetWindowPos()
         local dim = imgui.GetWindowSize()

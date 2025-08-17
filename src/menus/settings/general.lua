@@ -1,4 +1,6 @@
 function showGeneralSettings()
+    GlobalCheckbox("performanceMode", "Enable Performance Mode",
+        "Disables some visual enhancement to boost performance.")
     GlobalCheckbox("advancedMode", "Enable Advanced Mode",
         "Advanced mode enables a few features that simplify SV creation, at the cost of making the plugin more cluttered.")
     if (not globalVars.advancedMode) then imgui.BeginDisabled() end

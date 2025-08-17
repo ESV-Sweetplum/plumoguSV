@@ -3,18 +3,24 @@ cache.indices = {}
 function draw()
     if (not state.CurrentTimingPoint) then return end
 
+    local performanceMode = globalVars.performanceMode
+
     cache.indices.computableInputFloat = 1
 
     state.IsWindowHovered = imgui.IsWindowHovered()
 
-    drawCapybaraParent()
-    drawCursorTrail()
-    setPluginAppearance()
+    if (not performanceMode) then
+        drawCapybaraParent()
+        drawCursorTrail()
+        setPluginAppearance()
+    end
 
     startNextWindowNotCollapsed("plumoguSV-autoOpen")
     imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
 
-    renderBackground()
+    if (not performanceMode) then
+        renderBackground()
+    end
 
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     imgui.BeginTabBar("SV tabs")
@@ -44,7 +50,9 @@ function draw()
 
     imgui.End()
 
-    pulseController()
+    if (not performanceMode) then
+        pulseController()
+    end
     checkForGlobalHotkeys()
 end
 

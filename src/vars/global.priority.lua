@@ -27,6 +27,7 @@ globalVars = {
     showMeasureDataWidget = false,
     ignoreNotesOutsideTg = false,
     advancedMode = false,
+    performanceMode = false,
     hideAutomatic = false,
     pulseCoefficient = 0,
     pulseColor = { 0, 0, 0, 0 },
@@ -70,6 +71,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
     globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
     globalVars.advancedMode = truthy(tempGlobalVars.advancedMode)
+    globalVars.performanceMode = truthy(tempGlobalVars.performanceMode)
     globalVars.hideAutomatic = truthy(tempGlobalVars.hideAutomatic)
     globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
     globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
