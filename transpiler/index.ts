@@ -82,7 +82,7 @@ export default async function transpiler(devMode = false, lint = true) {
     ); // Remove double string concats with table
 
     output = output.replaceAll(
-        /\(("[a-z]+!"), "([^"]+?)" \.\. (.+) \.\. (.+)\)/g,
+        /\(("[a-z]{1,7}!"), "([^"]+?)" \.\. (.+) \.\. (.+)\)/g,
         '($1, table.concat({"$2", $3, $4}))'
     ); // Same as above, but with notification type parameter
 
