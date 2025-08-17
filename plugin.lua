@@ -9725,13 +9725,13 @@ function draw()
         createMenuTab(TAB_MENUS[i])
     end
     imgui.EndTabBar()
-    if (globalVars.showVibratoWidget) then
-        imgui.Begin("plumoguSV-Vibrato", imgui_window_flags.AlwaysAutoResize)
-        imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
-        placeVibratoSVMenu(true)
-        imgui.End()
-    end
     if (not performanceMode) then
+        if (globalVars.showVibratoWidget) then
+            imgui.Begin("plumoguSV-Vibrato", imgui_window_flags.AlwaysAutoResize)
+            imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
+            placeVibratoSVMenu(true)
+            imgui.End()
+        end
         if (globalVars.showNoteDataWidget) then
             renderNoteDataWidget()
         end
@@ -9748,8 +9748,8 @@ function draw()
     imgui.End()
     if (not performanceMode) then
         pulseController()
+        checkForGlobalHotkeys()
     end
-    checkForGlobalHotkeys()
 end
 function renderNoteDataWidget()
     if (#state.SelectedHitObjects ~= 1) then return end
