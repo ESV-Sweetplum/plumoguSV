@@ -39,7 +39,9 @@ For more information, please refer to <https://unlicense.org>
 
 ---@alias NoteLane 1|2|3|4|5|6|7|8|9|10
 ---@alias SnapNumber 1|2|3|4|5|6|8|12|16 The denominator of the corresponding snap.
+---@alias fmt string | number | boolean | table
 
+-- STARTING LINE
 ---@class (exact) ScrollGroup
 ---##### (READ-ONLY)
 ---#### The initial [sv](lua://ScrollVelocity) multiplier of this [scroll group](lua://ScrollGroup).
@@ -1799,7 +1801,7 @@ function imgui.BeginTooltip() end
 function imgui.Bullet() end
 
 ---##### (READ-ONLY)
----@param fmt string
+---@param fmt fmt
 function imgui.BulletText(fmt) end
 
 ---##### (READ-ONLY)
@@ -2139,7 +2141,7 @@ function imgui.DebugCheckVersionAndDataLayout(version_str, sz_io, sz_style, sz_v
 function imgui.DebugFlashStyleColor(idx) end
 
 ---##### (READ-ONLY)
----@param fmt string
+---@param fmt fmt
 function imgui.DebugLog(fmt) end
 
 ---##### (READ-ONLY)
@@ -4127,7 +4129,7 @@ function imgui.IsWindowHovered(flags) end
 
 ---##### (READ-ONLY)
 ---@param label string
----@param fmt string
+---@param fmt fmt
 function imgui.LabelText(label, fmt) end
 
 ---##### (READ-ONLY)
@@ -4167,7 +4169,7 @@ function imgui.LogButtons() end
 function imgui.LogFinish() end
 
 ---##### (READ-ONLY)
----@param fmt string
+---@param fmt fmt
 function imgui.LogText(fmt) end
 
 ---##### (READ-ONLY)
@@ -4733,7 +4735,7 @@ function imgui.SetItemDefaultFocus() end
 function imgui.SetItemKeyOwner(key) end
 
 ---##### (READ-ONLY)
----@param fmt string
+---@param fmt fmt
 function imgui.SetItemTooltip(fmt) end
 
 ---##### (READ-ONLY)
@@ -4907,7 +4909,7 @@ function imgui.SetStateStorage(storage) end
 function imgui.SetTabItemClosed(tab_or_docked_window_label) end
 
 ---##### (READ-ONLY)
----@param fmt string
+---@param fmt fmt
 function imgui.SetTooltip(fmt) end
 
 ---##### (READ-ONLY)
@@ -5599,16 +5601,16 @@ function imgui.TableSetupColumn(label, flags, init_width_or_weight, user_id) end
 function imgui.TableSetupScrollFreeze(cols, rows) end
 
 ---##### (READ-ONLY)
----@param fmt string
+---@param fmt fmt
 function imgui.Text(fmt) end
 
 ---##### (READ-ONLY)
 ---@param col Vector4
----@param fmt string
+---@param fmt fmt
 function imgui.TextColored(col, fmt) end
 
 ---##### (READ-ONLY)
----@param fmt string
+---@param fmt fmt
 function imgui.TextDisabled(fmt) end
 
 ---##### (READ-ONLY)
@@ -5630,7 +5632,7 @@ function imgui.TextLinkOpenURL(label, url) end
 function imgui.TextUnformatted(text) end
 
 ---##### (READ-ONLY)
----@param fmt string
+---@param fmt fmt
 function imgui.TextWrapped(fmt) end
 
 ---##### (READ-ONLY)
@@ -5643,13 +5645,13 @@ function imgui.TreeNode(label) end
 
 ---##### (READ-ONLY)
 ---@param str_id string
----@param fmt string
+---@param fmt fmt
 ---@return boolean
 function imgui.TreeNode(str_id, fmt) end
 
 ---##### (READ-ONLY)
 ---@param ptr_id lightuserdata
----@param fmt string
+---@param fmt fmt
 ---@return boolean
 function imgui.TreeNode(ptr_id, fmt) end
 
@@ -5667,14 +5669,14 @@ function imgui.TreeNodeEx(label, flags) end
 ---##### (READ-ONLY)
 ---@param str_id string
 ---@param flags ImGuiTreeNodeFlags|integer|"None"|"Selected"|"Framed"|"AllowOverlap"|"NoTreePushOnOpen"|"NoAutoOpenOnLog"|"CollapsingHeader"|"DefaultOpen"|"OpenOnDoubleClick"|"OpenOnArrow"|"Leaf"|"Bullet"|"FramePadding"|"SpanAvailWidth"|"SpanFullWidth"|"SpanTextWidth"|"SpanAllColumns"|"NavLeftJumpsBackHere"
----@param fmt string
+---@param fmt fmt
 ---@return boolean
 function imgui.TreeNodeEx(str_id, flags, fmt) end
 
 ---##### (READ-ONLY)
 ---@param ptr_id lightuserdata
 ---@param flags ImGuiTreeNodeFlags|integer|"None"|"Selected"|"Framed"|"AllowOverlap"|"NoTreePushOnOpen"|"NoAutoOpenOnLog"|"CollapsingHeader"|"DefaultOpen"|"OpenOnDoubleClick"|"OpenOnArrow"|"Leaf"|"Bullet"|"FramePadding"|"SpanAvailWidth"|"SpanFullWidth"|"SpanTextWidth"|"SpanAllColumns"|"NavLeftJumpsBackHere"
----@param fmt string
+---@param fmt fmt
 ---@return boolean
 function imgui.TreeNodeEx(ptr_id, flags, fmt) end
 
