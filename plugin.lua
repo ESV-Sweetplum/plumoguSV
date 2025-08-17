@@ -9375,9 +9375,9 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
         local subProgress = progress * (#svDistances - 1) + 1 - beforeIdx
         local curDist = afterDist * subProgress + (1 - subProgress) * beforeDist - minDist
         local heightValue = topLeft.y + dim.y - curDist * dim.y / (maxDist - minDist)
-        for i = 1, 4 do
-            ctx.AddRectFilled(vector.New(topLeft.x + (i - 1) * dim.x / 4 + 5, heightValue),
-                vector.New(topLeft.x + i * dim.x / 4 - 5, heightValue + 20),
+        for i = 1, game.keyCount do
+            ctx.AddRectFilled(vector.New(topLeft.x + (i - 1) * dim.x / game.keyCount + 5, heightValue),
+                vector.New(topLeft.x + i * dim.x / game.keyCount - 5, heightValue + 20),
                 imgui.GetColorU32(imgui_col.Header, (1 - (1 - progress) ^ 10)))
         end
     end
