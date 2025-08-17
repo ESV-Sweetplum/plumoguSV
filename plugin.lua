@@ -1,4 +1,3 @@
----@diagnostic disable: param-type-mismatch
 cache = {
     boolean = {},
     windows = {},
@@ -1338,7 +1337,7 @@ globalVars = {
     performanceMode = false,
     hideAutomatic = false,
     pulseCoefficient = 0,
-    pulseColor = { 0, 0, 0, 0 },
+    pulseColor = vector.New(0, 0, 0, 0),
     useCustomPulseColor = false,
     hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST),
     customStyle = {},
