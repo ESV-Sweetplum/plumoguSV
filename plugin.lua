@@ -6198,7 +6198,7 @@ function directSVMenu()
     imgui.Separator()
     local startingPoint = 10 * menuVars.pageNumber - 10
     imgui.BeginTable("Test", 2)
-    for idx, v in pairs({ table.unpack(svs, startingPoint + 1, startingPoint + 10) }) do
+    for idx, v in pairs(table.slice(svs, startingPoint + 1, startingPoint + 10)) do
         imgui.PushID(idx)
         imgui.TableNextRow()
         imgui.TableSetColumnIndex(0)
