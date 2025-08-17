@@ -22,18 +22,18 @@ function deleteItems(menuVars)
             utils.CreateEditorAction(
                 action_type.RemoveBookmarkBatch, bmsToRemove) })
     end
-    if (truthy(#linesToRemove)) then
+    if (truthy(linesToRemove)) then
         toggleablePrint("e!", "Deleted " .. #linesToRemove .. pluralize(" timing point.", #linesToRemove, -2))
     end
-    if (truthy(#svsToRemove)) then
+    if (truthy(svsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #svsToRemove .. pluralize(" scroll velocity.", #svsToRemove, -2))
     end
-    if (truthy(#ssfsToRemove)) then
+    if (truthy(ssfsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #ssfsToRemove .. pluralize(" scroll speed factor.", #ssfsToRemove, -2))
     end
-    if (truthy(#bmsToRemove)) then
+    if (truthy(bmsToRemove)) then
         toggleablePrint("e!", "Deleted " .. #bmsToRemove .. pluralize(" bookmark.", #bmsToRemove, -2))
     end
 end

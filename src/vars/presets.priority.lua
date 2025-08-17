@@ -21,7 +21,7 @@ function checkPresetValidity(preset)
     if (preset.type == "Vibrato") then
         validMenus = table.duplicate(VIBRATO_SVS)
     end
-    if (not truthy(#validMenus)) then return false, nil end
+    if (not truthy(validMenus)) then return false, nil end
     if (not table.includes(validMenus, preset.menu)) then return false, nil end
 
     local realType = "place" .. preset.type

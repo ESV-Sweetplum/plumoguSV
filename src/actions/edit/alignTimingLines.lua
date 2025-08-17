@@ -17,7 +17,7 @@ function alignTimingLines()
 
     for time = starttime, endtime, msptl do
         local originalTime = math.floor(time)
-        while (truthy(#noteTimes) and (noteTimes[1] < originalTime - 5)) do
+        while (truthy(noteTimes) and (noteTimes[1] < originalTime - 5)) do
             table.remove(noteTimes, 1)
         end
         if (#noteTimes == 0) then

@@ -154,38 +154,38 @@ function pasteItems(menuVars)
         utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
         utils.CreateEditorAction(action_type.AddBookmarkBatch, bmsToAdd),
     })
-    if (truthy(#linesToRemove)) then
+    if (truthy(linesToRemove)) then
         toggleablePrint("e!", "Deleted " .. #linesToRemove .. pluralize(" timing point.", #linesToRemove, -2))
     end
-    if (truthy(#svsToRemove)) then
+    if (truthy(svsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #svsToRemove .. pluralize(" scroll velocity.", #svsToRemove, -2))
     end
-    if (truthy(#ssfsToRemove)) then
+    if (truthy(ssfsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #ssfsToRemove .. pluralize(" scroll speed factor.", #ssfsToRemove, -2))
     end
-    if (truthy(#bmsToRemove)) then
+    if (truthy(bmsToRemove)) then
         toggleablePrint("e!", "Deleted " .. #bmsToRemove .. pluralize(" bookmark.", #bmsToRemove, -2))
     end
-    if (truthy(#linesToAdd)) then
+    if (truthy(linesToAdd)) then
         toggleablePrint("s!", "Created " .. #linesToAdd .. pluralize(" timing point.", #linesToAdd, -2))
     end
-    if (truthy(#svsToAdd)) then
+    if (truthy(svsToAdd)) then
         toggleablePrint("s!",
             "Created " .. #svsToAdd .. pluralize(" scroll velocity.", #svsToAdd, -2))
     end
-    if (truthy(#ssfsToAdd)) then
+    if (truthy(ssfsToAdd)) then
         toggleablePrint("s!",
             "Created " .. #ssfsToAdd .. pluralize(" scroll speed factor.", #ssfsToAdd, -2))
     end
-    if (truthy(#bmsToAdd)) then
+    if (truthy(bmsToAdd)) then
         toggleablePrint("s!", "Created " .. #bmsToAdd .. pluralize(" bookmark.", #bmsToAdd, -2))
     end
 end
 
 function tryAlignToHitObjects(time, hitObjectTimes, alignWindow)
-    if not truthy(#hitObjectTimes) then
+    if not truthy(hitObjectTimes) then
         return time
     end
 

@@ -52,7 +52,7 @@ function game.getTimingPointAt(offset)
 end
 function game.getNoteOffsetAt(offset, forward)
     local startTimes = cache.lists.hitObjectStartTimes
-    if (not truthy(#startTimes)) then return -1 end
+    if (not truthy(startTimes)) then return -1 end
     if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
     if (state.SongTime < startTimes[1]) then return startTimes[1] end
     local startTime = table.searchClosest(startTimes, offset, tn(forward) + 1)
@@ -866,7 +866,6 @@ function table.stringify(var)
     if (type(var) == "number") then return var end
     if (type(var) ~= "table") then return "UNKNOWN" end
     if (var[1] ~= nil) then
-        if (not truthy(#var)) then return "[]" end
         local str = "["
         for k11 = 1, #var do
             local v = var[k11]
@@ -874,7 +873,7 @@ function table.stringify(var)
         end
         return str:sub(1, -2) .. "]"
     end
-    if (not truthy(#table.keys(var))) then return "[]" end
+    if (not truthy(table.keys(var))) then return "[]" end
     local str = "{"
     for k, v in pairs(var) do
         str = str .. k .. table.concat({"=", table.stringify(v), ","})
@@ -1574,7 +1573,7 @@ function checkPresetValidity(preset)
     if (preset.type == "Vibrato") then
         validMenus = table.duplicate(VIBRATO_SVS)
     end
-    if (not truthy(#validMenus)) then return false, nil end
+    if (not truthy(validMenus)) then return false, nil end
     if (not table.includes(validMenus, preset.menu)) then return false, nil end
     local realType = "place" .. preset.type
     return true, preset.data
@@ -2430,18 +2429,18 @@ function deleteItems(menuVars)
             utils.CreateEditorAction(
                 action_type.RemoveBookmarkBatch, bmsToRemove) })
     end
-    if (truthy(#linesToRemove)) then
+    if (truthy(linesToRemove)) then
         toggleablePrint("e!", table.concat({"Deleted ", #linesToRemove, pluralize(" timing point.", #linesToRemove, -2)}))
     end
-    if (truthy(#svsToRemove)) then
+    if (truthy(svsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #svsToRemove .. pluralize(" scroll velocity.", #svsToRemove, -2))
     end
-    if (truthy(#ssfsToRemove)) then
+    if (truthy(ssfsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #ssfsToRemove .. pluralize(" scroll speed factor.", #ssfsToRemove, -2))
     end
-    if (truthy(#bmsToRemove)) then
+    if (truthy(bmsToRemove)) then
         toggleablePrint("e!", table.concat({"Deleted ", #bmsToRemove, pluralize(" bookmark.", #bmsToRemove, -2)}))
     end
 end
@@ -2483,7 +2482,7 @@ function alignTimingLines()
     local timingpoints = {}
     for time = starttime, endtime, msptl do
         local originalTime = math.floor(time)
-        while (truthy(#noteTimes) and (noteTimes[1] < originalTime - 5)) do
+        while (truthy(noteTimes) and (noteTimes[1] < originalTime - 5)) do
             table.remove(noteTimes, 1)
         end
         if (#noteTimes == 0) then
@@ -2754,37 +2753,37 @@ function pasteItems(menuVars)
         utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
         utils.CreateEditorAction(action_type.AddBookmarkBatch, bmsToAdd),
     })
-    if (truthy(#linesToRemove)) then
+    if (truthy(linesToRemove)) then
         toggleablePrint("e!", table.concat({"Deleted ", #linesToRemove, pluralize(" timing point.", #linesToRemove, -2)}))
     end
-    if (truthy(#svsToRemove)) then
+    if (truthy(svsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #svsToRemove .. pluralize(" scroll velocity.", #svsToRemove, -2))
     end
-    if (truthy(#ssfsToRemove)) then
+    if (truthy(ssfsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #ssfsToRemove .. pluralize(" scroll speed factor.", #ssfsToRemove, -2))
     end
-    if (truthy(#bmsToRemove)) then
+    if (truthy(bmsToRemove)) then
         toggleablePrint("e!", table.concat({"Deleted ", #bmsToRemove, pluralize(" bookmark.", #bmsToRemove, -2)}))
     end
-    if (truthy(#linesToAdd)) then
+    if (truthy(linesToAdd)) then
         toggleablePrint("s!", table.concat({"Created ", #linesToAdd, pluralize(" timing point.", #linesToAdd, -2)}))
     end
-    if (truthy(#svsToAdd)) then
+    if (truthy(svsToAdd)) then
         toggleablePrint("s!",
             "Created " .. #svsToAdd .. pluralize(" scroll velocity.", #svsToAdd, -2))
     end
-    if (truthy(#ssfsToAdd)) then
+    if (truthy(ssfsToAdd)) then
         toggleablePrint("s!",
             "Created " .. #ssfsToAdd .. pluralize(" scroll speed factor.", #ssfsToAdd, -2))
     end
-    if (truthy(#bmsToAdd)) then
+    if (truthy(bmsToAdd)) then
         toggleablePrint("s!", table.concat({"Created ", #bmsToAdd, pluralize(" bookmark.", #bmsToAdd, -2)}))
     end
 end
 function tryAlignToHitObjects(time, hitObjectTimes, alignWindow)
-    if not truthy(#hitObjectTimes) then
+    if not truthy(hitObjectTimes) then
         return time
     end
     local closestTime = table.searchClosest(hitObjectTimes, time)
@@ -3373,7 +3372,7 @@ function initializeNoteLockMode()
     end)
 end
 function jumpToTg()
-    if (not truthy(#state.SelectedHitObjects)) then return end
+    if (not truthy(state.SelectedHitObjects)) then return end
     local tgId = state.SelectedHitObjects[1].TimingGroup
     for _, ho in pairs(state.SelectedHitObjects) do
         if (ho.TimingGroup ~= tgId) then return end
