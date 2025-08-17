@@ -21,7 +21,7 @@ export function getCounterAndIncrement() {
 export default async function transpiler(devMode = false, lint = true) {
     counter = 0;
     let fileCount = 0;
-    let output = '---@diagnostic disable: param-type-mismatch\n';
+    let output = '';
 
     const entryPoints = ['draw.lua', 'awake.lua'];
     const ignoredFiles = [
