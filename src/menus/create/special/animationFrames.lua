@@ -25,7 +25,7 @@ function animationFramesSetupMenu(settingVars)
         chooseCurrentFrame(settingVars)
         drawCurrentFrame(settingVars)
         imgui.Columns(1)
-        local invisibleButtonSize = { 2 * (ACTION_BUTTON_SIZE.x + 1.5 * SAMELINE_SPACING), 1 }
+        local invisibleButtonSize = vector.New(2 * (ACTION_BUTTON_SIZE.x + 1.5 * SAMELINE_SPACING), 1)
         imgui.InvisibleButton("sv isnt a real skill", invisibleButtonSize)
     else
         KeepSameLine()
@@ -103,7 +103,7 @@ function displayFrameTimes(settingVars)
     end
     HelpMarker("Make sure to select ALL lanes from a chord with multiple notes, not just one lane")
     AddPadding()
-    local frameTimeSelectionArea = { ACTION_BUTTON_SIZE.x, 120 }
+    local frameTimeSelectionArea = vector.New(ACTION_BUTTON_SIZE.x, 120)
     imgui.BeginChild("FrameTimes", frameTimeSelectionArea, 1)
     for i = 1, #settingVars.frameTimes do
         local frameTimeData = {}
