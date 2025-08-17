@@ -67,6 +67,8 @@ function renderNoteDataWidget()
 end
 
 function renderMeasureDataWidget()
+    if #state.SelectedHitObjects < 2 then return end
+
     local widgetVars = {
         oldStartOffset = -69,
         oldEndOffset = -69,
@@ -77,7 +79,6 @@ function renderMeasureDataWidget()
 
     cache.loadTable("measureWidget", widgetVars)
 
-    if #state.SelectedHitObjects < 2 then return end
     local uniqueDict = {}
     for _, ho in ipairs(state.SelectedHitObjects) do -- game.uniqueSelectedNoteOffsets was not used here because this approach exits the function faster
         if (not table.contains(uniqueDict, ho.StartTime)) then
