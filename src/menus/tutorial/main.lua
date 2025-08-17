@@ -35,7 +35,10 @@ function renderTutorialMenu()
                 ["Stills and Displacement"] = showStillsAndDisplacementTutorial,
                 ["Composite Effects"] = incompleteFn,
             },
-            ["Adding Effects"] = {},
+            ["Adding Effects"] = {
+                ["Flickers"] = incompleteFn,
+                ["Vibrato"] = incompleteFn,
+            },
         },
         ["Helpful Info"] = {
             ["Plugin Efficiency Tips"] = {
