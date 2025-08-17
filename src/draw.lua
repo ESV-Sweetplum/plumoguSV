@@ -38,6 +38,9 @@ function draw()
     if (cache.windows.showTutorialWindow) then
         renderTutorialMenu()
     end
+    if (cache.windows.showSettingsWindow) then
+        showPluginSettingsWindow()
+    end
 
     imgui.End()
 

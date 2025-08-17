@@ -11,11 +11,7 @@ TAB_MENUS = { -- names of the tab menus
 function createMenuTab(tabName)
     if not imgui.BeginTabItem(tabName) then return end
     AddPadding()
-    if tabName == "Info" then
-        infoTab()
-    else
-        cache.windows.showSettingsWindow = false
-    end
+    if tabName == "Info" then infoTab() end
     if tabName == "Select" then selectTab() end
     if tabName == "Create" then createSVTab() end
     if tabName == "Edit" then editSVTab() end
