@@ -688,7 +688,7 @@ end
 ---@return any
 function table.nestedValue(tree, value)
     if (#value > 1) then
-        return table.nestedValue(tree[value[1]], { table.unpack(value, 2) })
+        return table.nestedValue(tree[value[1]], table.slice(value, 2))
     end
     return tree[value[1]]
 end
@@ -814,6 +814,15 @@ function table.searchClosest(tbl, item, searchMode)
     else
         return tbl[rightIdx], rightIdx
     end
+end
+---Returns a copy of a table containing all values between indices `i` and `j` (inclusive). If `j` is not passed in, will slice to the end of the table.
+---@generic T
+---@param tbl T[]
+---@param i integer
+---@param j? integer
+---@return T[]
+function table.slice(tbl, i, j)
+    return { table.unpack(tbl, i, j or #tbl) }
 end
 ---Sorting function for sorting objects by their numerical value. Should be passed into [`table.sort`](lua://table.sort).
 ---@param a number
