@@ -3556,6 +3556,12 @@ function selectBySnap(menuVars)
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
+local xList = {}
+local yList = {}
+local vxList = {}
+local vyList = {}
+local axList = {}
+local ayList = {}
 function renderReactiveSingularities()
     local imgui = imgui
     local math = math
@@ -3568,12 +3574,6 @@ function renderReactiveSingularities()
     local dimY = dim.y
     local sqrt = math.sqrt
     local clamp = math.clamp
-    local xList = state.GetValue("singularity_xList", {})
-    local yList = state.GetValue("singularity_yList", {})
-    local vxList = state.GetValue("singularity_vxList", {})
-    local vyList = state.GetValue("singularity_vyList", {})
-    local axList = state.GetValue("singularity_axList", {})
-    local ayList = state.GetValue("singularity_ayList", {})
     local pulseStatus = state.GetValue("pulseValue") or 0
     local slowSpeedR = 89
     local slowSpeedG = 0
@@ -3583,8 +3583,8 @@ function renderReactiveSingularities()
     local fastSpeedB = 117
     local speed = clamp(math.abs(multiplier), 0, 4)
     if (dimX < 100 or imgui.GetTime() < 0.3) then return end
-    createParticle(xList, yList, vxList, vyList, axList, ayList, dimX, dimY, 150)
-    updateParticles(xList, yList, vxList, vyList, axList, ayList, dimX, dimY,
+    createParticle(dimX, dimY, 150)
+    updateParticles(dimX, dimY,
         state.DeltaTime * speed, multiplier)
     local lerp = function(w, l, h)
         return w * h + (1 - w) * l
@@ -3606,35 +3606,29 @@ function renderReactiveSingularities()
     ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
     ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
     ctx.AddCircle(dim / 2 + topLeft, 24 - pulseStatus * 8, 16777215 + math.floor(pulseStatus * 255) * 16777216)
-    state.SetValue("singularity_xList", xList)
-    state.SetValue("singularity_yList", yList)
-    state.SetValue("singularity_vxList", vxList)
-    state.SetValue("singularity_vyList", vyList)
-    state.SetValue("singularity_axList", axList)
-    state.SetValue("singularity_ayList", ayList)
 end
-function createParticle(x, y, vx, vy, ax, ay, dimX, dimY, n)
-    if (#x >= n) then return end
-    x[#x + 1] = math.random() * dimX
-    y[#y + 1] = math.random() * dimY
-    vx[#vx + 1] = 0
-    vy[#vy + 1] = 0
-    ax[#ax + 1] = 0
-    ay[#ay + 1] = 0
+function createParticle(dimX, dimY, n)
+    if (#xList >= n) then return end
+    xList[#xList + 1] = math.random() * dimX
+    yList[#yList + 1] = math.random() * dimY
+    vxList[#vxList + 1] = 0
+    vyList[#vyList + 1] = 0
+    axList[#axList + 1] = 0
+    ayList[#ayList + 1] = 0
 end
-function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt, multiplier)
+function updateParticles(dimX, dimY, dt, multiplier)
     local sqrt = math.sqrt
     local clamp = math.clamp
     local spinDir = math.sign(multiplier)
     local movementSpeed = 0.1
     local bounceCoefficient = 0.8
-    for i = 1, #xl do
-        local x = xl[i]
-        local y = yl[i]
-        local vx = vxl[i]
-        local vy = vyl[i]
-        local ax = axl[i]
-        local ay = ayl[i]
+    for i = 1, #xList do
+        local x = xList[i]
+        local y = yList[i]
+        local vx = vxList[i]
+        local vy = vyList[i]
+        local ax = axList[i]
+        local ay = ayList[i]
         local sgPosx = bit32.rshift(dimX, 1)
         local sgPosy = bit32.rshift(dimY, 1)
         local xDist = sgPosx - x
@@ -3645,24 +3639,24 @@ function updateParticles(xl, yl, vxl, vyl, axl, ayl, dimX, dimY, dt, multiplier)
         local gx = xDist / gravityFactor
         local gy = yDist / gravityFactor
         local spinFactor = 10 * spinDir / sqrt(dist)
-        axl[i] = gx + gy * spinFactor
-        ayl[i] = gy - gx * spinFactor
+        axList[i] = gx + gy * spinFactor
+        ayList[i] = gy - gx * spinFactor
         local movementDist = dt * movementSpeed
-        vxl[i] = vx + ax * movementDist
-        vyl[i] = vy + ay * movementDist
-        xl[i] = x + vx * movementDist
-        yl[i] = y + vy * movementDist
+        vxList[i] = vx + ax * movementDist
+        vyList[i] = vy + ay * movementDist
+        xList[i] = x + vx * movementDist
+        yList[i] = y + vy * movementDist
         if (x < 0 or x > dimX) then
-            vxl[i] = -vxl[i] * bounceCoefficient
-            xl[i] = clamp(xl[i], 1, dimX - 1)
+            vxList[i] = -vxList[i] * bounceCoefficient
+            xList[i] = clamp(xList[i], 1, dimX - 1)
         end
         if (y < 0 or y > dimY) then
-            vyl[i] = -vyl[i] * bounceCoefficient
-            yl[i] = clamp(yl[i], 1, dimY - 1)
+            vyList[i] = -vyList[i] * bounceCoefficient
+            yList[i] = clamp(yList[i], 1, dimY - 1)
         end
         local dragFactor = 1 - dt / 500
-        vxl[i] = clamp(vxl[i] * dragFactor, -5, 5)
-        vyl[i] = clamp(vyl[i] * dragFactor, -5, 5)
+        vxList[i] = clamp(vxList[i] * dragFactor, -5, 5)
+        vyList[i] = clamp(vyList[i] * dragFactor, -5, 5)
     end
 end
 function renderReactiveStars()
@@ -9737,11 +9731,13 @@ function draw()
         placeVibratoSVMenu(true)
         imgui.End()
     end
-    if (globalVars.showNoteDataWidget) then
-        renderNoteDataWidget()
-    end
-    if (globalVars.showMeasureDataWidget) then
-        renderMeasureDataWidget()
+    if (not performanceMode) then
+        if (globalVars.showNoteDataWidget) then
+            renderNoteDataWidget()
+        end
+        if (globalVars.showMeasureDataWidget) then
+            renderMeasureDataWidget()
+        end
     end
     if (state.GetValue("windows.showTutorialWindow")) then
         renderTutorialMenu()

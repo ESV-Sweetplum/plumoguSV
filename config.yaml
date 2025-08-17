@@ -26,6 +26,7 @@ showNoteDataWidget: true
 showMeasureDataWidget: true
 ignoreNotesOutsideTg: false
 advancedMode: true
+performanceMode: true
 hideAutomatic: false
 pulseCoefficient: 1
 pulseColor:

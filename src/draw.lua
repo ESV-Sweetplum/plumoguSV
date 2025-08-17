@@ -35,11 +35,13 @@ function draw()
         placeVibratoSVMenu(true)
         imgui.End()
     end
-    if (globalVars.showNoteDataWidget) then
-        renderNoteDataWidget()
-    end
-    if (globalVars.showMeasureDataWidget) then
-        renderMeasureDataWidget()
+    if (not performanceMode) then
+        if (globalVars.showNoteDataWidget) then
+            renderNoteDataWidget()
+        end
+        if (globalVars.showMeasureDataWidget) then
+            renderMeasureDataWidget()
+        end
     end
     if (cache.windows.showTutorialWindow) then
         renderTutorialMenu()
