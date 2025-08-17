@@ -1,6 +1,5 @@
 require("packages.cache.initialize.priority")
-clock = {}
-cache.clock = {}
+clock = {}; cache.clock = {}
 
 ---Returns true every `interval` ms.
 ---@param id string The unique identifier of the clock.
@@ -9,9 +8,10 @@ cache.clock = {}
 function clock.listen(id, interval)
     local currentTime = state
         .UnixTime -- Avoid calling state global multiple times, which causes a heavy load on performance
-    local prevTime = cache.clock[id] or 0
+    local prevTime = cache.clock[id]
     if (not prevTime) then
         cache.clock[id] = currentTime
+        prevTime = currentTime
     end
     if (currentTime - prevTime > interval) then
         cache.clock[id] = currentTime

@@ -113,13 +113,13 @@ export default async function transpiler(devMode = false, lint = true) {
 
     for (let i = 9; i >= 1; i--) {
         const obtainmentRegex = new RegExp(
-            `cache\\.(?!saveTable|loadTable|[a-zA-Z0-9_\\.]+\\[)([a-zA-Z0-9_]+)${'\\.([a-zA-Z0-9_]+)'.repeat(
+            `(?<!; )cache\\.(?!saveTable|loadTable|[a-zA-Z0-9_\\.]+\\[)([a-zA-Z0-9_]+)${'\\.([a-zA-Z0-9_]+)'.repeat(
                 i - 1
             )}`,
             'g'
         );
         const assignmentRegex = new RegExp(
-            `cache${'\\.([a-zA-Z0-9_]+)'.repeat(
+            `(?<!; )cache${'\\.([a-zA-Z0-9_]+)'.repeat(
                 i
             )} = ([a-z ]{0,4}(?:[^ \n,]|, )+)`,
             'g'

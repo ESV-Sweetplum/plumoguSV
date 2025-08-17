@@ -26,7 +26,7 @@ function cache.saveTable(listName, variables)
         state.SetValue(listName .. key, value)
     end
 end
-clock = {}
+clock = {}; cache.clock = {}
 ---Returns true every `interval` ms.
 ---@param id string The unique identifier of the clock.
 ---@param interval integer The interval at which the clock should run.
@@ -34,9 +34,10 @@ clock = {}
 function clock.listen(id, interval)
     local currentTime = state
         .UnixTime
-    local prevTime = cache.clock[id] or 0
+    local prevTime = cache.clock[id]
     if (not prevTime) then
         cache.clock[id] = currentTime
+        prevTime = currentTime
     end
     if (currentTime - prevTime > interval) then
         cache.clock[id] = currentTime
