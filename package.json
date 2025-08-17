@@ -1,6 +1,6 @@
 {
     "name": "plumogu-sv",
-    "version": "2a",
+    "version": "2b",
     "description": "The ultimate SV plugin for Quaver.",
     "scripts": {
         "test": "npm run transpile && node dist/tests",
