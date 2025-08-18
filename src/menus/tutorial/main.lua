@@ -107,7 +107,7 @@ function renderTutorialMenu()
         cache.tutorialWindowQueue = nil
     end
 
-    if (not truthy(tutorialWindowName:len())) then
+    if (tutorialWindowName == "") then
         nullFn()
         goto dontRenderTutorial
     end
