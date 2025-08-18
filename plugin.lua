@@ -7843,7 +7843,7 @@ function renderTutorialMenu()
         tutorialWindowName = state.GetValue("tutorialWindowQueue")
         state.SetValue("tutorialWindowQueue", nil)
     end
-    if (not truthy(tutorialWindowName:len())) then
+    if (tutorialWindowName == "") then
         nullFn()
         goto dontRenderTutorial
     end
