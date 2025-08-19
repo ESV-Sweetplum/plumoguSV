@@ -1,11 +1,7 @@
-cache.indices = {}
-
 function draw()
     if (not state.CurrentTimingPoint) then return end
 
     local performanceMode = globalVars.performanceMode
-
-    cache.indices.computableInputFloat = 1
 
     state.IsWindowHovered = imgui.IsWindowHovered()
 
