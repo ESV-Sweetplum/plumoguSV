@@ -90,6 +90,11 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     if (48 / v > 16) then return 5 end
     return 48 / v
 end
+function game.getSSFStartTimeAt(offset, tgId)
+    local sv = map.GetScrollSpeedFactorAt(offset, tgId)
+    if sv then return sv.StartTime end
+    return -1
+end
 function game.getSSFMultiplierAt(offset)
     local ssf = map.GetScrollSpeedFactorAt(offset)
     if ssf then return ssf.Multiplier end
@@ -312,6 +317,13 @@ end
 function math.quadraticBezier(p2, t)
     return 2 * t * (1 - t) * p2 + t * t
 end
+---Returns n choose r, or nCr.
+---@param n integer
+---@param r integer
+---@return integer
+function math.binom(n, r)
+    return math.factorial(n) / (math.factorial(r) * math.factorial(n - r))
+end
 ---Restricts a number to be within a chosen bound.
 ---@param number number
 ---@param lowerBound number
@@ -355,6 +367,52 @@ function math.hermite(m1, m2, y2, t)
     local b = 3 * y2 - 2 * m1 - m2
     local c = m1
     return a * t * t * t + b * t * t + c * t
+end
+---Interpolates circular parameters of the form (x-h)^2+(y-k)^2=r^2 with three, non-colinear points.
+---@param p1 Vector2
+---@param p2 Vector2
+---@param p3 Vector2
+---@return number, number, number
+function math.interpolateCircle(p1, p2, p3)
+    local mtrx = {
+        vector.Table(2 * (p2 - p1)),
+        vector.Table(2 * (p3 - p1))
+    }
+    local vctr = {
+        vector.Length(p2) ^ 2 - vector.Length(p1) ^ 2,
+        vector.Length(p3) ^ 2 - vector.Length(p1) ^ 2
+    }
+    h, k = matrix.solve(mtrx, vctr)
+    r = math.sqrt((p1.x) ^ 2 + (p1.y) ^ 2 + h * h + k * k - 2 * h * p1.x - 2 * k * p1.y)
+    ---@type number, number, number
+    return h, k, r
+end
+---Interpolates quadratic parameters of the form y=ax^2+bx+c with three, non-colinear points.
+---@param p1 Vector2
+---@param p2 Vector2
+---@param p3 Vector2
+---@return number, number, number
+function math.interpolateQuadratic(p1, p2, p3)
+    local mtrx = {
+        (p2.x) ^ 2 - (p1.x) ^ 2, (p2 - p1).x,
+        (p3.x) ^ 2 - (p1.x) ^ 2, (p3 - p1).x,
+    }
+    local vctr = {
+        (p2 - p1).y,
+        (p3 - p1).y
+    }
+    a, b = matrix.solve(mtrx, vctr)
+    c = p1.y - p1.x * b - (p1.x) ^ 2 * a
+    ---@type number, number, number
+    return a, b, c
+end
+---Returns a number that is `(weight * 100)%` of the way from travelling between `lowerBound` and `upperBound`.
+---@param weight number
+---@param lowerBound number
+---@param upperBound number
+---@return number
+function math.lerp(weight, lowerBound, upperBound)
+    return upperBound * weight + lowerBound * (1 - weight)
 end
 ---Returns the weight of a number between `lowerBound` and `upperBound`.
 ---@param num number
@@ -413,6 +471,11 @@ function matrix.solve(mtrx, vctr)
         end
     end
     return table.unpack(table.property(augMtrx, #mtrx + 1))
+end
+function matrix.swapRows(mtrx, rowIdx1, rowIdx2)
+    local temp = mtrx[rowIdx1]
+    mtrx[rowIdx1] = mtrx[rowIdx2]
+    mtrx[rowIdx2] = temp
 end
 ---Rounds a number to a given amount of decimal places.
 ---@param number number
@@ -991,6 +1054,9 @@ end
 ---@return Vector2 vctr The resultant vector of style `<n, n>`.
 function vctr2(n)
     return vector.New(n, n)
+end
+function unit2(theta)
+    return vector.New(math.cos(theta), math.sin(theta))
 end
 imgui_disable_vector_packing = true
 DEFAULT_WIDGET_HEIGHT = 26
@@ -5120,6 +5186,8 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
     imgui.EndCombo()
     return newListIndex
 end
+function BasicInputFloat(label, var, decimalPlaces, suffix, step)
+end
 function ComputableInputFloat(label, var, decimalPlaces, suffix)
     local previousValue = var
     local fmt = table.concat({"%.", decimalPlaces, "f"})
@@ -5308,6 +5376,7 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
         imgui.Dummy(vector.New(0, 10))
     end
 end
+devMode = true
 function checkEnoughSelectedNotes(minimumNotes)
     if minimumNotes == 0 then return true end
     local selectedNotes = state.SelectedHitObjects
@@ -5610,6 +5679,9 @@ function addSelectedNoteTimesToList(menuVars)
     end
     menuVars.noteTimes = table.dedupe(menuVars.noteTimes)
     menuVars.noteTimes = sort(menuVars.noteTimes, sortAscending)
+end
+function animationPaletteMenu(settingVars)
+    CodeInput(settingVars, "instructions", "", "Write instructions here.")
 end
 function automateSVMenu(settingVars)
     local copiedSVCount = #settingVars.copiedSVs
@@ -8522,10 +8594,19 @@ NONDUA = { "!", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/",
     "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f",
     "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}",
     "~" }
+---Converts rgba to an unsigned integer (0-4294967295)
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return integer
 function rgbaToUint(r, g, b, a)
     local flr = math.floor
     return flr(a) * 16 ^ 6 + flr(b) * 16 ^ 4 + flr(g) * 16 ^ 2 + flr(r)
 end
+---Converts an unsigned integer to a Vector4 of color values (0-1 for each element)
+---@param n integer
+---@return Vector4
 function uintToRgba(n)
     local tbl = {}
     for i = 0, 3 do
@@ -8533,6 +8614,23 @@ function uintToRgba(n)
     end
     return table.vectorize4(tbl)
 end
+---Converts rgba to a hexa string.
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return string
+function rgbaToHexa(r, g, b, a)
+    local flr = math.floor
+    local hexaStr = ""
+    for _, col in ipairs({ r, g, b, a }) do
+        hexaStr = hexaStr .. HEXADECIMAL[flr(col / 16) + 1] .. HEXADECIMAL[flr(col) % 16 + 1]
+    end
+    return hexaStr
+end
+---Converts a hexa string to an rgba Vector4 (0-1 for each element).
+---@param hexa string
+---@return Vector4
 function hexaToRgba(hexa)
     local rgbaTable = {}
     for i = 1, 8, 2 do
@@ -8541,6 +8639,12 @@ function hexaToRgba(hexa)
     end
     return table.vectorize4(rgbaTable)
 end
+---Converts rgba to an ndua string (base 92).
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return string
 function rgbaToNdua(r, g, b, a)
     local uint = rgbaToUint(r, g, b, a)
     local str = ""
@@ -8549,6 +8653,9 @@ function rgbaToNdua(r, g, b, a)
     end
     return str:reverse()
 end
+---Converts an ndua string (base 92) to an rgba Vector4 (0-1 for each element).
+---@param ndua string
+---@return Vector4
 function nduaToRgba(ndua)
     local num = 0
     for i = 1, 5 do
@@ -9087,6 +9194,9 @@ end
 function createSSF(startTime, multiplier)
     return utils.CreateScrollSpeedFactor(startTime, multiplier)
 end
+function createEA(actionType, ...)
+    return utils.CreateEditorAction(actionType, ...)
+end
 ---Removes and adds SVs.
 ---@param svsToRemove ScrollVelocity[]
 ---@param svsToAdd ScrollVelocity[]
@@ -9186,6 +9296,22 @@ function getHypotheticalSVMultiplierAt(svs, offset)
         end
     end
     return 1
+end
+---Returns the SV time in a given array of SVs.
+---@param svs ScrollVelocity[]
+---@param offset number
+---@return number
+function getHypotheticalSVTimeAt(svs, offset)
+    if (#svs == 1) then return svs[1].StartTime end
+    local index = #svs
+    while (index >= 1) do
+        if (svs[index].StartTime > offset) then
+            index = index - 1
+        else
+            return svs[index].StartTime
+        end
+    end
+    return -69
 end
 ---Given a predetermined set of SVs, returns a list of [scroll velocities](lua://ScrollVelocity) within a temporal boundary.
 ---@param startOffset number The lower bound of the search area.

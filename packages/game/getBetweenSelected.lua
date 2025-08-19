@@ -34,6 +34,8 @@ function game.uniqueSelectedNoteOffsets()
     return offsets
 end
 
+---Returns an array of hit objects within the selection time.
+---@return HitObject[]
 function game.uniqueNotesBetweenSelected()
     local selectedNoteOffsets = game.uniqueSelectedNoteOffsets()
     if (not selectedNoteOffsets) then
@@ -43,11 +45,11 @@ function game.uniqueNotesBetweenSelected()
     end
     local startOffset = selectedNoteOffsets[1]
     local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
-    local offsets = game.getNotesBetweenOffsets(startOffset, endOffset)
-    if (#offsets < 2) then
+    local hos = game.getNotesBetweenOffsets(startOffset, endOffset)
+    if (#hos < 2) then
         toggleablePrint("e!",
             "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
         return {}
     end
-    return offsets
+    return hos
 end

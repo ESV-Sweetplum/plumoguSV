@@ -6,11 +6,20 @@ NONDUA = { "!", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/",
     "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}",
     "~" }
 
+---Converts rgba to an unsigned integer (0-4294967295)
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return integer
 function rgbaToUint(r, g, b, a)
     local flr = math.floor
     return flr(a) * 16 ^ 6 + flr(b) * 16 ^ 4 + flr(g) * 16 ^ 2 + flr(r)
 end
 
+---Converts an unsigned integer to a Vector4 of color values (0-1 for each element)
+---@param n integer
+---@return Vector4
 function uintToRgba(n)
     local tbl = {}
     for i = 0, 3 do
@@ -20,15 +29,24 @@ function uintToRgba(n)
     return table.vectorize4(tbl)
 end
 
+---Converts rgba to a hexa string.
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return string
 function rgbaToHexa(r, g, b, a)
     local flr = math.floor
     local hexaStr = ""
     for _, col in ipairs({ r, g, b, a }) do
-        hexaStr = hexaStr .. HEXADECIMAL[math.floor(col / 16) + 1] .. HEXADECIMAL[flr(col) % 16 + 1]
+        hexaStr = hexaStr .. HEXADECIMAL[flr(col / 16) + 1] .. HEXADECIMAL[flr(col) % 16 + 1]
     end
     return hexaStr
 end
 
+---Converts a hexa string to an rgba Vector4 (0-1 for each element).
+---@param hexa string
+---@return Vector4
 function hexaToRgba(hexa)
     local rgbaTable = {}
     for i = 1, 8, 2 do
@@ -38,6 +56,12 @@ function hexaToRgba(hexa)
     return table.vectorize4(rgbaTable)
 end
 
+---Converts rgba to an ndua string (base 92).
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return string
 function rgbaToNdua(r, g, b, a)
     local uint = rgbaToUint(r, g, b, a)
     local str = ""
@@ -49,6 +73,9 @@ function rgbaToNdua(r, g, b, a)
     return str:reverse()
 end
 
+---Converts an ndua string (base 92) to an rgba Vector4 (0-1 for each element).
+---@param ndua string
+---@return Vector4
 function nduaToRgba(ndua)
     local num = 0
     for i = 1, 5 do
