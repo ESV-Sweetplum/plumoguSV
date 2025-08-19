@@ -103,6 +103,7 @@ function chooseConstantShift(settingVars, defaultShift)
     _, settingVars.verticalShift = imgui.InputFloat(inputText, settingVars.verticalShift, 0, 0, "%.3fx")
     imgui.PopItemWidth()
 
+    imgui.PopStyleVar(3)
     return oldShift ~= settingVars.verticalShift
 end
 
@@ -133,6 +134,7 @@ function chooseMsxVerticalShift(settingVars, defaultShift)
     _, settingVars.verticalShift = imgui.InputFloat(inputText, settingVars.verticalShift, 0, 0, "%.0f msx")
     imgui.PopItemWidth()
 
+    imgui.PopStyleVar(3)
     return oldShift ~= settingVars.verticalShift
 end
 
@@ -669,6 +671,7 @@ function chooseSVBehavior(settingVars)
     if (swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[3])) then
         settingVars.behaviorIndex = tn(oldBehaviorIndex == 1) + 1
     end
+    imgui.PopStyleVar()
     return oldBehaviorIndex ~= settingVars.behaviorIndex
 end
 

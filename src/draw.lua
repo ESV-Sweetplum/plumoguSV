@@ -9,17 +9,16 @@ function draw()
 
     state.IsWindowHovered = imgui.IsWindowHovered()
 
-    if (not performanceMode) then
-        drawCapybaraParent()
-        drawCursorTrail()
-        setPluginAppearance()
-    end
-
     startNextWindowNotCollapsed("plumoguSV-autoOpen")
     imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
 
     if (not performanceMode) then
         renderBackground()
+        drawCapybaraParent()
+        drawCursorTrail()
+        setPluginAppearance()
+        pulseController()
+        checkForGlobalHotkeys()
     end
 
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
@@ -51,11 +50,6 @@ function draw()
     end
 
     imgui.End()
-
-    if (not performanceMode) then
-        pulseController()
-        checkForGlobalHotkeys()
-    end
 end
 
 function renderNoteDataWidget()

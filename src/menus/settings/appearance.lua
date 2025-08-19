@@ -1,5 +1,10 @@
 function showAppearanceSettings()
     imgui.PushItemWidth(150)
+    if (globalVars.performanceMode) then
+        imgui.TextColored(vector.New(1, 0, 0, 1),
+            "Performance mode is currently enabled.\nPlease disable it to access appearance features.")
+        imgui.BeginDisabled()
+    end
     chooseStyleTheme()
     chooseColorTheme()
     AddSeparator()
@@ -36,5 +41,8 @@ function showAppearanceSettings()
     globalVars.dynamicBackgroundIndex = Combo("Dynamic BG", DYNAMIC_BACKGROUND_TYPES, oldDynamicBgIndex)
     if (oldDynamicBgIndex ~= globalVars.dynamicBackgroundIndex) then
         write(globalVars)
+    end
+    if (globalVars.performanceMode) then
+        imgui.EndDisabled()
     end
 end

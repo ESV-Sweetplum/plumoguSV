@@ -35,6 +35,7 @@ function NegatableComputableInputFloat(label, var, decimalPlaces, suffix)
     if ((negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[4])) and newValue ~= 0) then
         newValue = -newValue
     end
+    imgui.PopStyleVar(2)
     return newValue, oldValue ~= newValue
 end
 
@@ -65,6 +66,7 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
         varsTable[lowerName] = -oldValues.x
         varsTable[higherName] = -oldValues.y
     end
+    imgui.PopStyleVar(3)
     return swapButtonPressed or negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[3]) or
         kbm.pressedKeyCombo(globalVars.hotkeyList[4]) or
         oldValues ~= newValues

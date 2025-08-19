@@ -5149,6 +5149,7 @@ function NegatableComputableInputFloat(label, var, decimalPlaces, suffix)
     if ((negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[4])) and newValue ~= 0) then
         newValue = -newValue
     end
+    imgui.PopStyleVar(2)
     return newValue, oldValue ~= newValue
 end
 function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, suffix, digits, widthFactor)
@@ -5178,6 +5179,7 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
         varsTable[lowerName] = -oldValues.x
         varsTable[higherName] = -oldValues.y
     end
+    imgui.PopStyleVar(3)
     return swapButtonPressed or negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[3]) or
         kbm.pressedKeyCombo(globalVars.hotkeyList[4]) or
         oldValues ~= newValues
@@ -6602,6 +6604,11 @@ function selectBySnapMenu()
 end
 function showAppearanceSettings()
     imgui.PushItemWidth(150)
+    if (globalVars.performanceMode) then
+        imgui.TextColored(vector.New(1, 0, 0, 1),
+            "Performance mode is currently enabled.\nPlease disable it to access appearance features.")
+        imgui.BeginDisabled()
+    end
     chooseStyleTheme()
     chooseColorTheme()
     AddSeparator()
@@ -6638,6 +6645,9 @@ function showAppearanceSettings()
     globalVars.dynamicBackgroundIndex = Combo("Dynamic BG", DYNAMIC_BACKGROUND_TYPES, oldDynamicBgIndex)
     if (oldDynamicBgIndex ~= globalVars.dynamicBackgroundIndex) then
         write(globalVars)
+    end
+    if (globalVars.performanceMode) then
+        imgui.EndDisabled()
     end
 end
 local customStyleIds = {
@@ -7326,14 +7336,16 @@ SETTING_TYPES = {
     "Keybinds",
 }
 function showPluginSettingsWindow()
-    local bgColor = vector.New(0.2, 0.2, 0.2, 1)
-    imgui.PopStyleColor(20)
-    setIncognitoColors()
-    setPluginAppearanceStyles("Rounded + Border")
-    imgui.PushStyleColor(imgui_col.WindowBg, bgColor)
-    imgui.PushStyleColor(imgui_col.TitleBg, bgColor)
-    imgui.PushStyleColor(imgui_col.TitleBgActive, bgColor)
-    imgui.PushStyleColor(imgui_col.Border, vctr4(1))
+    if (not globalVars.performanceMode) then
+        local bgColor = vector.New(0.2, 0.2, 0.2, 1)
+        imgui.PopStyleColor(20)
+        setIncognitoColors()
+        setPluginAppearanceStyles("Rounded + Border")
+        imgui.PushStyleColor(imgui_col.WindowBg, bgColor)
+        imgui.PushStyleColor(imgui_col.TitleBg, bgColor)
+        imgui.PushStyleColor(imgui_col.TitleBgActive, bgColor)
+        imgui.PushStyleColor(imgui_col.Border, vctr4(1))
+    end
     startNextWindowNotCollapsed("Settings")
     _, settingsOpened = imgui.Begin("plumoguSV Settings", true, 42)
     imgui.SetWindowSize("plumoguSV Settings", vector.New(433, 400))
@@ -7345,7 +7357,7 @@ function showPluginSettingsWindow()
     imgui.Text("Setting Type")
     imgui.Separator()
     for idx, v in pairs(SETTING_TYPES) do
-        if (v == "Custom Theme" and COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM") then goto skip end
+        if (v == "Custom Theme" and (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)) then goto skip end
         if (imgui.Selectable(v, typeIndex == idx)) then
             typeIndex = idx
         end
@@ -7389,9 +7401,11 @@ function showPluginSettingsWindow()
         state.SetValue("activateCrazy", false)
         state.SetValue("crazyIdx", 1)
     end
-    imgui.PopStyleColor(41)
-    setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
-    setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
+    if (not globalVars.performanceMode) then
+        imgui.PopStyleColor(41)
+        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
+        setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
+    end
     imgui.End()
 end
 function renderMemeButtons()
@@ -7422,6 +7436,11 @@ end
 function showWindowSettings()
     GlobalCheckbox("hideSVInfo", "Hide SV Info Window",
         "Disables the window that shows note distances when placing Standard, Special, or Still SVs.")
+    if (globalVars.performanceMode) then
+        imgui.TextColored(vector.New(1, 0, 0, 1),
+            "Performance mode is currently enabled.\nPlease disable it to access widgets and windows.")
+        imgui.BeginDisabled()
+    end
     if (globalVars.hideSVInfo) then imgui.BeginDisabled() end
     GlobalCheckbox("showSVInfoVisualizer", "Show SV Info Visualizer",
         "Enables a visualizer behind the SV info window that shows the general movement of the notes.")
@@ -7433,6 +7452,9 @@ function showWindowSettings()
         "If one note is selected, shows simple data about that note.")
     GlobalCheckbox("showMeasureDataWidget", "Show Measure Data Of Selection",
         "If two notes are selected, shows measure data within the selected region.")
+    if (globalVars.performanceMode) then
+        imgui.EndDisabled()
+    end
 end
 TAB_MENUS = {
     "Info",
@@ -7941,6 +7963,7 @@ function chooseConstantShift(settingVars, defaultShift)
     local inputText = "Vertical Shift"
     _, settingVars.verticalShift = imgui.InputFloat(inputText, settingVars.verticalShift, 0, 0, "%.3fx")
     imgui.PopItemWidth()
+    imgui.PopStyleVar(3)
     return oldShift ~= settingVars.verticalShift
 end
 function chooseMsxVerticalShift(settingVars, defaultShift)
@@ -7964,6 +7987,7 @@ function chooseMsxVerticalShift(settingVars, defaultShift)
     local inputText = "Vertical Shift"
     _, settingVars.verticalShift = imgui.InputFloat(inputText, settingVars.verticalShift, 0, 0, "%.0f msx")
     imgui.PopItemWidth()
+    imgui.PopStyleVar(3)
     return oldShift ~= settingVars.verticalShift
 end
 function chooseControlSecondSV(settingVars)
@@ -8437,6 +8461,7 @@ function chooseSVBehavior(settingVars)
     if (swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[3])) then
         settingVars.behaviorIndex = tn(oldBehaviorIndex == 1) + 1
     end
+    imgui.PopStyleVar()
     return oldBehaviorIndex ~= settingVars.behaviorIndex
 end
 function chooseSVPerQuarterPeriod(settingVars)
@@ -9709,15 +9734,15 @@ function draw()
     local performanceMode = globalVars.performanceMode
     state.SetValue("indices.computableInputFloat", 1)
     state.IsWindowHovered = imgui.IsWindowHovered()
-    if (not performanceMode) then
-        drawCapybaraParent()
-        drawCursorTrail()
-        setPluginAppearance()
-    end
     startNextWindowNotCollapsed("plumoguSV-autoOpen")
     imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
     if (not performanceMode) then
         renderBackground()
+        drawCapybaraParent()
+        drawCursorTrail()
+        setPluginAppearance()
+        pulseController()
+        checkForGlobalHotkeys()
     end
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     imgui.BeginTabBar("SV tabs")
@@ -9746,10 +9771,6 @@ function draw()
         showPluginSettingsWindow()
     end
     imgui.End()
-    if (not performanceMode) then
-        pulseController()
-        checkForGlobalHotkeys()
-    end
 end
 function renderNoteDataWidget()
     if (#state.SelectedHitObjects ~= 1) then return end

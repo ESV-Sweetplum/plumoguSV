@@ -8,15 +8,16 @@ SETTING_TYPES = {
 }
 
 function showPluginSettingsWindow()
-    local bgColor = vector.New(0.2, 0.2, 0.2, 1)
-
-    imgui.PopStyleColor(20)
-    setIncognitoColors()
-    setPluginAppearanceStyles("Rounded + Border")
-    imgui.PushStyleColor(imgui_col.WindowBg, bgColor)
-    imgui.PushStyleColor(imgui_col.TitleBg, bgColor)
-    imgui.PushStyleColor(imgui_col.TitleBgActive, bgColor)
-    imgui.PushStyleColor(imgui_col.Border, vctr4(1))
+    if (not globalVars.performanceMode) then
+        local bgColor = vector.New(0.2, 0.2, 0.2, 1)
+        imgui.PopStyleColor(20)
+        setIncognitoColors()
+        setPluginAppearanceStyles("Rounded + Border")
+        imgui.PushStyleColor(imgui_col.WindowBg, bgColor)
+        imgui.PushStyleColor(imgui_col.TitleBg, bgColor)
+        imgui.PushStyleColor(imgui_col.TitleBgActive, bgColor)
+        imgui.PushStyleColor(imgui_col.Border, vctr4(1))
+    end
     startNextWindowNotCollapsed("Settings")
     _, settingsOpened = imgui.Begin("plumoguSV Settings", true, 42)
     imgui.SetWindowSize("plumoguSV Settings", vector.New(433, 400))
@@ -32,7 +33,7 @@ function showPluginSettingsWindow()
     imgui.Text("Setting Type")
     imgui.Separator()
     for idx, v in pairs(SETTING_TYPES) do
-        if (v == "Custom Theme" and COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM") then goto skip end
+        if (v == "Custom Theme" and (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)) then goto skip end
         if (imgui.Selectable(v, typeIndex == idx)) then
             typeIndex = idx
         end
@@ -78,9 +79,11 @@ function showPluginSettingsWindow()
         state.SetValue("activateCrazy", false)
         state.SetValue("crazyIdx", 1)
     end
-    imgui.PopStyleColor(41)
-    setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
-    setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
+    if (not globalVars.performanceMode) then
+        imgui.PopStyleColor(41)
+        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
+        setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
+    end
     imgui.End()
 end
 
