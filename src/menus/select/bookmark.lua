@@ -55,7 +55,7 @@ function selectBookmarkMenu()
 
             bmData = {}
 
-            imgui.Text(bm.Note:fixToSize(110))
+            imgui.Text(bm.Note:fixToSize(95))
 
             imgui.NextColumn()
 

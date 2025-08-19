@@ -6536,7 +6536,7 @@ function selectBookmarkMenu()
             imgui.NextColumn()
             imgui.SetCursorPosY(vPos)
             bmData = {}
-            imgui.Text(bm.Note:fixToSize(110))
+            imgui.Text(bm.Note:fixToSize(95))
             imgui.NextColumn()
             if (imgui.Button("Go to #" .. idx - skippedIndices, vector.New(65, 24))) then
                 actions.GoToObjects(bm.StartTime)
