@@ -10,12 +10,9 @@ function deleteTab()
     cache.saveTable("deleteMenu", menuVars)
 
     for i = 1, 4 do
-        if (menuVars.deleteTable[i]) then goto continue end
+        if (menuVars.deleteTable[i]) then
+            simpleActionMenu("Delete items between selected notes", 2, deleteItems, menuVars)
+            return
+        end
     end
-
-    do return end
-
-    ::continue::
-
-    simpleActionMenu("Delete items between selected notes", 2, deleteItems, menuVars)
 end
