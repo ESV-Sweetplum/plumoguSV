@@ -594,7 +594,7 @@ function actions.ResetTimingPoint(tp) end
 
 ---##### (READ-ONLY)
 ---#### Moves the [`song time`](lua://state.SongTime) to the designated objects.
----@param input string The input string with navigation directions, usually obtained from copying notes in-game.
+---@param input string | number The input string with navigation directions, usually obtained from copying notes in-game. If a number is given, this function will set the [`song time`](lua://state.SongTime) to the given value, in milliseconds.
 function actions.GoToObjects(input) end
 
 ---##### (READ-ONLY)
