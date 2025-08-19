@@ -132,6 +132,10 @@ DEFAULT_STARTING_MENU_VARS = {
         every = 1,
         offset = 0
     },
+    selectBookmark = {
+        searchTerm = "",
+        filterTerm = "",
+    },
     selectChordSize = {
         select1 = true,
         select2 = false,

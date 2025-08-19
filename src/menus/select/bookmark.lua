@@ -1,5 +1,5 @@
 function selectBookmarkMenu()
-    local bookmarks = map.bookmarks
+    local bookmarks = map.Bookmarks
 
     local menuVars = getMenuVars("selectBookmark")
     local times = {}
@@ -27,20 +27,20 @@ function selectBookmarkMenu()
         local skippedBookmarks = 0
         local skippedIndices = 0
 
-        for idx, bm in pairs(bookmarks) do
+        for idx, bm in ipairs(bookmarks) do
             if (bm.StartTime < 0) then
                 skippedBookmarks = skippedBookmarks + 1
                 skippedIndices = skippedIndices + 1
-                goto continue
+                goto skipBookmark
             end
 
             if (menuVars.searchTerm:len() > 0) and (not bm.Note:find(menuVars.searchTerm)) then
                 skippedBookmarks = skippedBookmarks + 1
-                goto continue
+                goto skipBookmark
             end
             if (menuVars.filterTerm:len() > 0) and (bm.Note:find(menuVars.filterTerm)) then
                 skippedBookmarks = skippedBookmarks + 1
-                goto continue
+                goto skipBookmark
             end
 
             vPos = 126.5 + (idx - skippedBookmarks) * 32
@@ -65,10 +65,10 @@ function selectBookmarkMenu()
             imgui.NextColumn()
 
             if (idx ~= #bookmarks) then imgui.Separator() end
-            ::continue::
+            ::skipBookmark::
         end
 
-        local maxTimeLength = #tostring(math.max(table.unpack(times) or 0))
+        local maxTimeLength = math.log(math.max(table.unpack(times) or 0), 10) + 0.75
 
         imgui.SetColumnWidth(0, maxTimeLength * 10.25)
         imgui.SetColumnWidth(1, 110)
