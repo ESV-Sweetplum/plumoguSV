@@ -2,6 +2,7 @@
 ---@param n number
 ---@param lowerBound number
 ---@param upperBound number
+---@return number
 function math.wrap(n, lowerBound, upperBound)
     if (upperBound <= lowerBound) then return n end
     if (n >= lowerBound and n <= upperBound) then return n end

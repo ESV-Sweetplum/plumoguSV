@@ -13,7 +13,7 @@ function deleteTab()
         if (menuVars.deleteTable[i]) then goto continue end
     end
 
-    do return 69 end
+    do return end
 
     ::continue::
 

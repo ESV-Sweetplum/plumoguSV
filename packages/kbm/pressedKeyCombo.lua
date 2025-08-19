@@ -1,5 +1,8 @@
 require("packages.table.contains")
 
+---Returns true if the given key combo is pressed (e.g. "Ctrl+Shift+L")
+---@param keyCombo string
+---@return boolean
 function kbm.pressedKeyCombo(keyCombo)
     keyCombo = keyCombo:upper()
     local comboList = {}

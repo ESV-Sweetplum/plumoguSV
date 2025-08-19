@@ -44,11 +44,18 @@ function clock.listen(id, interval)
     end
     return false
 end
+---Gets the most recent timing point, or a dummy timing point if none exists.
+---@param offset number
+---@return TimingPoint
 function game.getTimingPointAt(offset)
     local line = map.getTimingPointAt(offset)
     if line then return line end
-    return { StartTime = -69420, Bpm = 42.69 }
+    return { StartTime = -69420, Bpm = 42.69, Signature = 4, Hidden = false }
 end
+---Gets the start time of the most recent note, or returns -1 if there is no note beforehand.
+---@param offset number
+---@param forward? boolean If true, will only search for notes above the offset. If false, will only search for notes below the offset.
+---@return integer
 function game.getNoteOffsetAt(offset, forward)
     local startTimes = state.GetValue("lists.hitObjectStartTimes")
     if (not truthy(startTimes)) then return -1 end
@@ -90,26 +97,46 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     if (48 / v > 16) then return 5 end
     return 48 / v
 end
+---Gets the start time of the most recent SSF, or returns -1 if there is no SSF before the given offset.
+---@param offset number
+---@param tgId? string
+---@return number
 function game.getSSFStartTimeAt(offset, tgId)
-    local sv = map.GetScrollSpeedFactorAt(offset, tgId)
-    if sv then return sv.StartTime end
+    local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
+    if ssf then return ssf.StartTime end
     return -1
 end
-function game.getSSFMultiplierAt(offset)
-    local ssf = map.GetScrollSpeedFactorAt(offset)
+---Gets the multiplier of the most recent SSF, or returns 1 if there is no SSF before the given offset.
+---@param offset number
+---@param tgId? string
+---@return number
+function game.getSSFMultiplierAt(offset, tgId)
+    local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
     if ssf then return ssf.Multiplier end
     return 1
 end
-function game.getSVStartTimeAt(offset)
-    local sv = map.GetScrollVelocityAt(offset)
+---Gets the start time of the most recent SV, or returns -1 if there is no SV before the given offset.
+---@param offset number
+---@param tgId? string
+---@return number
+function game.getSVStartTimeAt(offset, tgId)
+    local sv = map.GetScrollVelocityAt(offset, tgId)
     if sv then return sv.StartTime end
     return -1
 end
-function game.getSVMultiplierAt(offset)
-    local sv = map.GetScrollVelocityAt(offset)
+---Gets the multiplier of the most recent SV, or returns the initial scroll velocity or 1 if there is no SV before the given offset.
+---@param offset number
+---@param tgId? string
+---@return number
+function game.getSVMultiplierAt(offset, tgId)
+    local sv = map.GetScrollVelocityAt(offset, tgId)
     if sv then return sv.Multiplier end
-    if (map.InitialScrollVelocity == 0) then return 1 end
-    return map.InitialScrollVelocity or 1
+    local ogTgId = state.SelectedScrollGroupId
+    state.SelectedScrollGroupId = tgId
+    local initSV = map.InitialScrollVelocity
+    if (initSV == 0) then initSV = 1 end
+    state.SelectedScrollGroupId = tgId
+    return initSV or 1
 end
 ---Returns a list of [bookmarks](lua://Bookmark) between two times, inclusive.
 ---@param startOffset number The lower bound of the search area.
@@ -216,6 +243,8 @@ function game.uniqueSelectedNoteOffsets()
     if (#offsets == 0) then return {} end
     return offsets
 end
+---Returns an array of hit objects within the selection time.
+---@return HitObject[]
 function game.uniqueNotesBetweenSelected()
     local selectedNoteOffsets = game.uniqueSelectedNoteOffsets()
     if (not selectedNoteOffsets) then
@@ -225,13 +254,13 @@ function game.uniqueNotesBetweenSelected()
     end
     local startOffset = selectedNoteOffsets[1]
     local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
-    local offsets = game.getNotesBetweenOffsets(startOffset, endOffset)
-    if (#offsets < 2) then
+    local hos = game.getNotesBetweenOffsets(startOffset, endOffset)
+    if (#hos < 2) then
         toggleablePrint("e!",
             "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
         return {}
     end
-    return offsets
+    return hos
 end
 ---Finds and returns a list of all unique offsets of notes between a start and an end time [Table]
 ---@param startOffset number
@@ -259,6 +288,9 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     return noteOffsetsBetween
 end
 game.getUniqueNoteOffsetsBetween = game.uniqueNoteOffsetsBetween
+---Listens to the keyboard and returns specific values based on if keys are pressed.
+---@return string[] prefixes An array of prefixes like "Ctrl" or "Shift".
+---@return integer key The key enum of the pressed key.
 function kbm.listenForAnyKeyPressed()
     local isCtrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
     local isShiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)
@@ -277,9 +309,15 @@ function kbm.listenForAnyKeyPressed()
 end
 local ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
     "T", "U", "V", "W", "X", "Y", "Z" }
+---Converts a key enum to a specific character.
+---@param num integer
+---@return string
 function kbm.numToKey(num)
     return ALPHABET_LIST[math.clamp(num - 64, 1, #ALPHABET_LIST)]
 end
+---Returns true if the given key combo is pressed (e.g. "Ctrl+Shift+L")
+---@param keyCombo string
+---@return boolean
 function kbm.pressedKeyCombo(keyCombo)
     keyCombo = keyCombo:upper()
     local comboList = {}
@@ -508,6 +546,7 @@ tn = math.toNumber
 ---@param n number
 ---@param lowerBound number
 ---@param upperBound number
+---@return number
 function math.wrap(n, lowerBound, upperBound)
     if (upperBound <= lowerBound) then return n end
     if (n >= lowerBound and n <= upperBound) then return n end
@@ -562,6 +601,7 @@ end
 ---Returns the `idx`th character in a string. Simply used for shorthand. Also supports negative indexes.
 ---@param str string The string to search.
 ---@param idx integer If positive, returns the `i`th character. If negative, returns the `i`th character from the end of the string (e.g. -1 returns the last character).
+---@return string
 function string.charAt(str, idx)
     return str:sub(idx, idx)
 end
@@ -589,6 +629,9 @@ function removeTrailingTag(str)
     end
     return table.concat(newStr)
 end
+---Removes vowels from a string.
+---@param str string
+---@return string
 function string.removeVowels(str)
     local VOWELS = { "a", "e", "i", "o", "u", "y" }
     local newStr = ""
@@ -600,8 +643,12 @@ function string.removeVowels(str)
     end
     return newStr
 end
+---Shortens a string to three consonants; the first, the second, and the last.
+---@param str string
+---@return string
 function string.shorten(str)
     local consonants = str:removeVowels()
+    if (consonants:len() < 3) then return consonants end
     return table.concat({ consonants:charAt(1), consonants:charAt(2), consonants:charAt(-1) })
 end
 ---Splits a string into a table via the given separator.
@@ -6101,7 +6148,7 @@ function deleteTab()
     for i = 1, 4 do
         if (menuVars.deleteTable[i]) then goto continue end
     end
-    do return 69 end
+    do return end
     ::continue::
     simpleActionMenu("Delete items between selected notes", 2, deleteItems, menuVars)
 end
@@ -9188,12 +9235,24 @@ function createFrameTime(thisTime, thisLanes, thisFrame, thisPosition)
     }
     return frameTime
 end
+---Alias for [`utils.CreateScrollVelocity`](lua://utils.CreateScrollVelocity).
+---@param startTime number
+---@param multiplier number
+---@return ScrollVelocity
 function createSV(startTime, multiplier)
     return utils.CreateScrollVelocity(startTime, multiplier)
 end
+---Alias for [`utils.CreateScrollSpeedFactor`](lua://utils.CreateScrollSpeedFactor).
+---@param startTime number
+---@param multiplier number
+---@return ScrollSpeedFactor
 function createSSF(startTime, multiplier)
     return utils.CreateScrollSpeedFactor(startTime, multiplier)
 end
+---Alias for [`utils.CreateEditorAction`](lua://utils.CreateEditorAction).
+---@param actionType EditorActionType
+---@param ... any
+---@return EditorAction
 function createEA(actionType, ...)
     return utils.CreateEditorAction(actionType, ...)
 end

@@ -1,3 +1,6 @@
+---Listens to the keyboard and returns specific values based on if keys are pressed.
+---@return string[] prefixes An array of prefixes like "Ctrl" or "Shift".
+---@return integer key The key enum of the pressed key.
 function kbm.listenForAnyKeyPressed()
     local isCtrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
     local isShiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)

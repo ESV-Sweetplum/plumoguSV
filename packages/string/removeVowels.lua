@@ -1,4 +1,9 @@
 require("packages.string.charAt")
+require("packages.table.contains")
+
+---Removes vowels from a string.
+---@param str string
+---@return string
 function string.removeVowels(str)
     local VOWELS = { "a", "e", "i", "o", "u", "y" }
     local newStr = ""

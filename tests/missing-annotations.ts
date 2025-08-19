@@ -42,7 +42,7 @@ export default function checkMissingAnnotations(file: string[]) {
         index = originalIndex;
         let returningValue = false;
         while (file[index] !== 'end') {
-            if (file[index].includes('return')) returningValue = true;
+            if (file[index].match(/return(?!($| end))/)) returningValue = true;
             index++;
         }
         if (!returnAnnotated && returningValue) {
