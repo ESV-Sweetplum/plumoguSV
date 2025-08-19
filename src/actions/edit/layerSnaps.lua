@@ -55,8 +55,8 @@ function layerSnaps()
     for layerName, layerData in pairs(layerDict) do
         local layer = utils.CreateEditorLayer(layerName, layerData.Hidden, layerData.ColorRgb)
         table.insert(createLayerQueue,
-            utils.CreateEditorAction(action_type.CreateLayer, layer))
-        table.insert(moveNoteQueue, utils.CreateEditorAction(action_type.MoveToLayer, layer, layerData.hos))
+            createEA(action_type.CreateLayer, layer))
+        table.insert(moveNoteQueue, createEA(action_type.MoveToLayer, layer, layerData.hos))
     end
     actions.PerformBatch(createLayerQueue)
     actions.PerformBatch(moveNoteQueue)
@@ -102,10 +102,10 @@ function collapseSnaps()
         originalLayerName = hoLayer.Name:match("^([^-]+)-")
 
         table.insert(moveNoteActions,
-            utils.CreateEditorAction(action_type.MoveToLayer,
+            createEA(action_type.MoveToLayer,
                 map.EditorLayers[table.indexOf(table.property(map.EditorLayers, "Name"), originalLayerName)], { ho }))
         table.insert(removeLayerActions,
-            utils.CreateEditorAction(action_type.RemoveLayer, hoLayer))
+            createEA(action_type.RemoveLayer, hoLayer))
         ::continue::
     end
     actions.PerformBatch(moveNoteActions)
@@ -114,9 +114,9 @@ function collapseSnaps()
         return
     end
     actions.PerformBatch({
-        utils.CreateEditorAction(action_type.AddTimingPointBatch, normalTpsToAdd),
-        utils.CreateEditorAction(action_type.AddTimingPointBatch, snapTpsToAdd),
-        utils.CreateEditorAction(action_type.RemoveTimingPointBatch, tpsToRemove),
+        createEA(action_type.AddTimingPointBatch, normalTpsToAdd),
+        createEA(action_type.AddTimingPointBatch, snapTpsToAdd),
+        createEA(action_type.RemoveTimingPointBatch, tpsToRemove),
     })
 end
 
@@ -124,7 +124,7 @@ function clearSnappedLayers()
     local removeLayerActions = {}
     for _, layer in ipairs(map.EditorLayers) do
         if layer.Name:find("plumoguSV") then
-            table.insert(removeLayerActions, utils.CreateEditorAction(action_type.RemoveLayer, layer))
+            table.insert(removeLayerActions, createEA(action_type.RemoveLayer, layer))
         end
     end
     if (#removeLayerActions == 0) then

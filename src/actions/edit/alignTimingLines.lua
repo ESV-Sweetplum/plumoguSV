@@ -35,8 +35,8 @@ function alignTimingLines()
         table.insert(timingpoints, utils.CreateTimingPoint(time, bpm, signature))
     end
     actions.PerformBatch({
-        utils.CreateEditorAction(action_type.AddTimingPointBatch, timingpoints),
-        utils.CreateEditorAction(action_type.RemoveTimingPointBatch, tpsToRemove)
+        createEA(action_type.AddTimingPointBatch, timingpoints),
+        createEA(action_type.RemoveTimingPointBatch, tpsToRemove)
     })
 
     toggleablePrint("s!", "Created " .. #timingpoints .. pluralize(" timing point.", #timingpoints, -2))

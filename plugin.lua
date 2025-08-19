@@ -97,15 +97,6 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     if (48 / v > 16) then return 5 end
     return 48 / v
 end
----Gets the start time of the most recent SSF, or returns -1 if there is no SSF before the given offset.
----@param offset number
----@param tgId? string
----@return number
-function game.getSSFStartTimeAt(offset, tgId)
-    local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
-    if ssf then return ssf.StartTime end
-    return -1
-end
 ---Gets the multiplier of the most recent SSF, or returns 1 if there is no SSF before the given offset.
 ---@param offset number
 ---@param tgId? string
@@ -355,13 +346,6 @@ end
 function math.quadraticBezier(p2, t)
     return 2 * t * (1 - t) * p2 + t * t
 end
----Returns n choose r, or nCr.
----@param n integer
----@param r integer
----@return integer
-function math.binom(n, r)
-    return math.factorial(n) / (math.factorial(r) * math.factorial(n - r))
-end
 ---Restricts a number to be within a chosen bound.
 ---@param number number
 ---@param lowerBound number
@@ -405,52 +389,6 @@ function math.hermite(m1, m2, y2, t)
     local b = 3 * y2 - 2 * m1 - m2
     local c = m1
     return a * t * t * t + b * t * t + c * t
-end
----Interpolates circular parameters of the form (x-h)^2+(y-k)^2=r^2 with three, non-colinear points.
----@param p1 Vector2
----@param p2 Vector2
----@param p3 Vector2
----@return number, number, number
-function math.interpolateCircle(p1, p2, p3)
-    local mtrx = {
-        vector.Table(2 * (p2 - p1)),
-        vector.Table(2 * (p3 - p1))
-    }
-    local vctr = {
-        vector.Length(p2) ^ 2 - vector.Length(p1) ^ 2,
-        vector.Length(p3) ^ 2 - vector.Length(p1) ^ 2
-    }
-    h, k = matrix.solve(mtrx, vctr)
-    r = math.sqrt((p1.x) ^ 2 + (p1.y) ^ 2 + h * h + k * k - 2 * h * p1.x - 2 * k * p1.y)
-    ---@type number, number, number
-    return h, k, r
-end
----Interpolates quadratic parameters of the form y=ax^2+bx+c with three, non-colinear points.
----@param p1 Vector2
----@param p2 Vector2
----@param p3 Vector2
----@return number, number, number
-function math.interpolateQuadratic(p1, p2, p3)
-    local mtrx = {
-        (p2.x) ^ 2 - (p1.x) ^ 2, (p2 - p1).x,
-        (p3.x) ^ 2 - (p1.x) ^ 2, (p3 - p1).x,
-    }
-    local vctr = {
-        (p2 - p1).y,
-        (p3 - p1).y
-    }
-    a, b = matrix.solve(mtrx, vctr)
-    c = p1.y - p1.x * b - (p1.x) ^ 2 * a
-    ---@type number, number, number
-    return a, b, c
-end
----Returns a number that is `(weight * 100)%` of the way from travelling between `lowerBound` and `upperBound`.
----@param weight number
----@param lowerBound number
----@param upperBound number
----@return number
-function math.lerp(weight, lowerBound, upperBound)
-    return upperBound * weight + lowerBound * (1 - weight)
 end
 ---Returns the weight of a number between `lowerBound` and `upperBound`.
 ---@param num number
@@ -509,11 +447,6 @@ function matrix.solve(mtrx, vctr)
         end
     end
     return table.unpack(table.property(augMtrx, #mtrx + 1))
-end
-function matrix.swapRows(mtrx, rowIdx1, rowIdx2)
-    local temp = mtrx[rowIdx1]
-    mtrx[rowIdx1] = mtrx[rowIdx2]
-    mtrx[rowIdx2] = temp
 end
 ---Rounds a number to a given amount of decimal places.
 ---@param number number
@@ -1011,7 +944,7 @@ function table.validate(checkList, tbl, extrapolateData, inferTypes)
             outputTable[key] = checkList[key]
         end
         if (inferTypes and outputTable[key]) then
-            outputTable[key] = parseProperty(outputTable[key], checkList[key]) or outputTable[key]
+            outputTable[key] = parseDefaultProperty(outputTable[key], checkList[key]) or outputTable[key]
         end
     end
     return outputTable
@@ -1101,9 +1034,6 @@ end
 ---@return Vector2 vctr The resultant vector of style `<n, n>`.
 function vctr2(n)
     return vector.New(n, n)
-end
-function unit2(theta)
-    return vector.New(math.cos(theta), math.sin(theta))
 end
 imgui_disable_vector_packing = true
 DEFAULT_WIDGET_HEIGHT = 26
@@ -1380,7 +1310,7 @@ function loadDefaultProperties(defaultProperties)
         for settingName, settingValue in pairs(tbl) do
             local defaultTable = DEFAULT_STARTING_MENU_VARS[label]
             if (not defaultTable) then break end
-            local defaultSetting = parseProperty(settingValue, defaultTable[settingName])
+            local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
             if (not defaultSetting) then
                 goto skipSetting
             end
@@ -1393,7 +1323,7 @@ function loadDefaultProperties(defaultProperties)
         for settingName, settingValue in pairs(tbl) do
             local defaultTable = DEFAULT_STARTING_SETTING_VARS[label]
             if (not defaultTable) then break end
-            local defaultSetting = parseProperty(settingValue, defaultTable[settingName])
+            local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
             if (not defaultSetting) then
                 goto skipSetting
             end
@@ -1403,7 +1333,7 @@ function loadDefaultProperties(defaultProperties)
     end
     globalVars.defaultProperties = { settings = DEFAULT_STARTING_SETTING_VARS, menu = DEFAULT_STARTING_MENU_VARS }
 end
-function parseProperty(v, default)
+function parseDefaultProperty(v, default)
     if (not default or type(default) == "table" or type(default) == "userdata") then
         return nil
     end
@@ -2063,7 +1993,7 @@ function automateSVs(settingVars)
         local g = math.random(255)
         local b = math.random(255)
         local tg = utils.CreateScrollGroup(data.svs, settingVars.initialSV or 1, table.concat({ r, g, b }, ","))
-        local action = utils.CreateEditorAction(action_type.CreateTimingGroup, id, tg, data.hos)
+        local action = createEA(action_type.CreateTimingGroup, id, tg, data.hos)
         actionList[#actionList + 1] = action
     end
     actions.PerformBatch(actionList)
@@ -2443,7 +2373,7 @@ function ssfVibrato(menuVars, func1, func2)
     end
     addFinalSSF(ssfs, endTime, game.getSSFMultiplierAt(endTime))
     actions.PerformBatch({
-        utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfs)
+        createEA(action_type.AddScrollSpeedFactorBatch, ssfs)
     })
     toggleablePrint("s!", table.concat({"Created ", #ssfs, pluralize(" SSF.", #ssfs, -2)}))
 end
@@ -2540,13 +2470,13 @@ function deleteItems(menuVars)
     if (not menuVars.deleteTable[4]) then bmsToRemove = {} end
     if (truthy(linesToRemove) or truthy(svsToRemove) or truthy(ssfsToRemove) or truthy(bmsToRemove)) then
         actions.PerformBatch({
-            utils.CreateEditorAction(
+            createEA(
                 action_type.RemoveTimingPointBatch, linesToRemove),
-            utils.CreateEditorAction(
+            createEA(
                 action_type.RemoveScrollVelocityBatch, svsToRemove),
-            utils.CreateEditorAction(
+            createEA(
                 action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
-            utils.CreateEditorAction(
+            createEA(
                 action_type.RemoveBookmarkBatch, bmsToRemove) })
     end
     if (truthy(linesToRemove)) then
@@ -2621,8 +2551,8 @@ function alignTimingLines()
         table.insert(timingpoints, utils.CreateTimingPoint(time, bpm, signature))
     end
     actions.PerformBatch({
-        utils.CreateEditorAction(action_type.AddTimingPointBatch, timingpoints),
-        utils.CreateEditorAction(action_type.RemoveTimingPointBatch, tpsToRemove)
+        createEA(action_type.AddTimingPointBatch, timingpoints),
+        createEA(action_type.RemoveTimingPointBatch, tpsToRemove)
     })
     toggleablePrint("s!", table.concat({"Created ", #timingpoints, pluralize(" timing point.", #timingpoints, -2)}))
     toggleablePrint("e!", table.concat({"Deleted ", #tpsToRemove, pluralize(" timing point.", #tpsToRemove, -2)}))
@@ -2652,15 +2582,15 @@ function changeGroups(menuVars)
     local willChangeSVs = menuVars.changeSVs and #svsToRemove ~= 0
     local willChangeSSFs = menuVars.changeSSFs and #ssfsToRemove ~= 0
     if (willChangeSVs) then
-        table.insert(actionList, utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove))
+        table.insert(actionList, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
         state.SelectedScrollGroupId = menuVars
             .designatedTimingGroup
-        table.insert(actionList, utils.CreateEditorAction(action_type.AddScrollVelocityBatch, svsToAdd))
+        table.insert(actionList, createEA(action_type.AddScrollVelocityBatch, svsToAdd))
     end
     if (willChangeSSFs) then
-        table.insert(actionList, utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
+        table.insert(actionList, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
         state.SelectedScrollGroupId = menuVars.designatedTimingGroup
-        table.insert(actionList, utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfsToAdd))
+        table.insert(actionList, createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd))
     end
     if (#actionList == 0) then
         state.SelectedScrollGroupId = oldGroup
@@ -2690,14 +2620,14 @@ function convertSVSSF(menuVars)
             local sv = svs[k18]
             table.insert(objects, { StartTime = sv.StartTime, Multiplier = sv.Multiplier })
         end
-        table.insert(editorActions, utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svs))
+        table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svs))
     else
         local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset, false)
         for k19 = 1, #ssfs do
             local ssf = ssfs[k19]
             table.insert(objects, { StartTime = ssf.StartTime, Multiplier = ssf.Multiplier })
         end
-        table.insert(editorActions, utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfs))
+        table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfs))
     end
     local createTable = {}
     for k20 = 1, #objects do
@@ -2710,9 +2640,9 @@ function convertSVSSF(menuVars)
         end
     end
     if (menuVars.conversionDirection) then
-        table.insert(editorActions, utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, createTable))
+        table.insert(editorActions, createEA(action_type.AddScrollSpeedFactorBatch, createTable))
     else
-        table.insert(editorActions, utils.CreateEditorAction(action_type.AddScrollVelocityBatch, createTable))
+        table.insert(editorActions, createEA(action_type.AddScrollVelocityBatch, createTable))
     end
     actions.PerformBatch(editorActions)
     toggleablePrint("w!", "Successfully converted.")
@@ -2864,14 +2794,14 @@ function pasteItems(menuVars)
         end
     end
     actions.PerformBatch({
-        utils.CreateEditorAction(action_type.RemoveTimingPointBatch, linesToRemove),
-        utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
-        utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
-        utils.CreateEditorAction(action_type.RemoveBookmarkBatch, bmsToRemove),
-        utils.CreateEditorAction(action_type.AddTimingPointBatch, linesToAdd),
-        utils.CreateEditorAction(action_type.AddScrollVelocityBatch, svsToAdd),
-        utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
-        utils.CreateEditorAction(action_type.AddBookmarkBatch, bmsToAdd),
+        createEA(action_type.RemoveTimingPointBatch, linesToRemove),
+        createEA(action_type.RemoveScrollVelocityBatch, svsToRemove),
+        createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
+        createEA(action_type.RemoveBookmarkBatch, bmsToRemove),
+        createEA(action_type.AddTimingPointBatch, linesToAdd),
+        createEA(action_type.AddScrollVelocityBatch, svsToAdd),
+        createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
+        createEA(action_type.AddBookmarkBatch, bmsToAdd),
     })
     if (truthy(linesToRemove)) then
         toggleablePrint("e!", table.concat({"Deleted ", #linesToRemove, pluralize(" timing point.", #linesToRemove, -2)}))
@@ -3151,8 +3081,8 @@ function layerSnaps()
     for layerName, layerData in pairs(layerDict) do
         local layer = utils.CreateEditorLayer(layerName, layerData.Hidden, layerData.ColorRgb)
         table.insert(createLayerQueue,
-            utils.CreateEditorAction(action_type.CreateLayer, layer))
-        table.insert(moveNoteQueue, utils.CreateEditorAction(action_type.MoveToLayer, layer, layerData.hos))
+            createEA(action_type.CreateLayer, layer))
+        table.insert(moveNoteQueue, createEA(action_type.MoveToLayer, layer, layerData.hos))
     end
     actions.PerformBatch(createLayerQueue)
     actions.PerformBatch(moveNoteQueue)
@@ -3194,10 +3124,10 @@ function collapseSnaps()
         end
         originalLayerName = hoLayer.Name:match("^([^-]+)-")
         table.insert(moveNoteActions,
-            utils.CreateEditorAction(action_type.MoveToLayer,
+            createEA(action_type.MoveToLayer,
                 map.EditorLayers[table.indexOf(table.property(map.EditorLayers, "Name"), originalLayerName)], { ho }))
         table.insert(removeLayerActions,
-            utils.CreateEditorAction(action_type.RemoveLayer, hoLayer))
+            createEA(action_type.RemoveLayer, hoLayer))
         ::continue::
     end
     actions.PerformBatch(moveNoteActions)
@@ -3206,16 +3136,16 @@ function collapseSnaps()
         return
     end
     actions.PerformBatch({
-        utils.CreateEditorAction(action_type.AddTimingPointBatch, normalTpsToAdd),
-        utils.CreateEditorAction(action_type.AddTimingPointBatch, snapTpsToAdd),
-        utils.CreateEditorAction(action_type.RemoveTimingPointBatch, tpsToRemove),
+        createEA(action_type.AddTimingPointBatch, normalTpsToAdd),
+        createEA(action_type.AddTimingPointBatch, snapTpsToAdd),
+        createEA(action_type.RemoveTimingPointBatch, tpsToRemove),
     })
 end
 function clearSnappedLayers()
     local removeLayerActions = {}
     for _, layer in ipairs(map.EditorLayers) do
         if layer.Name:find("plumoguSV") then
-            table.insert(removeLayerActions, utils.CreateEditorAction(action_type.RemoveLayer, layer))
+            table.insert(removeLayerActions, createEA(action_type.RemoveLayer, layer))
         end
     end
     if (#removeLayerActions == 0) then
@@ -3275,7 +3205,7 @@ function mergeSVs()
             svTimeDict[sv.StartTime] = true
         end
     end
-    actions.Perform(utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove))
+    actions.Perform(createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
 end
 function mergeSSFs()
     local offsets = game.uniqueSelectedNoteOffsets()
@@ -3291,7 +3221,7 @@ function mergeSSFs()
             ssfTimeDict[ssf.StartTime] = true
         end
     end
-    actions.Perform(utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
+    actions.Perform(createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
 end
 function reverseScrollSVs(menuVars)
     local offsets = game.uniqueNoteOffsetsBetweenSelected()
@@ -5139,7 +5069,7 @@ function PresetButton()
     globalVars.showPresetMenu = not globalVars.showPresetMenu
 end
 ---Creates a checkbox that directly saves to globalVars and the universal `.yaml` file.
----@param varsTable { [string]: any }The table that is meant to be modified.
+---@param varsTable { [string]: any } The table that is meant to be modified.
 ---@param parameterName string The key of globalVars that will be used for data storage.
 ---@param label string The label for the input.
 ---@param tooltipText? string Optional text for a tooltip that is shown when the element is hovered.
@@ -5233,8 +5163,6 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
     imgui.EndCombo()
     return newListIndex
 end
-function BasicInputFloat(label, var, decimalPlaces, suffix, step)
-end
 function ComputableInputFloat(label, var, decimalPlaces, suffix)
     local previousValue = var
     local fmt = table.concat({"%.", decimalPlaces, "f"})
@@ -5300,7 +5228,7 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
         oldValues ~= newValues
 end
 ---Creates an `imgui.inputInt` element.
----@param varsTable { [string]: any }The table that is meant to be modified.
+---@param varsTable { [string]: any } The table that is meant to be modified.
 ---@param parameterName string The key of globalVars that will be used for data storage.
 ---@param label string The label for the input.
 ---@param bounds? [number, number] A tuple representing the minimum and maximum bounds this input should have.
@@ -5371,7 +5299,7 @@ function executeFunctionIfTrue(condition, fn, menuVars)
     fn()
 end
 function KeepSameLine()
-    return imgui.SameLine(0, SAMELINE_SPACING)
+    imgui.SameLine(0, SAMELINE_SPACING)
 end
 function AddPadding()
     imgui.Dummy(vector.New(0, 0))
@@ -5423,7 +5351,6 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
         imgui.Dummy(vector.New(0, 10))
     end
 end
-devMode = true
 function checkEnoughSelectedNotes(minimumNotes)
     if minimumNotes == 0 then return true end
     local selectedNotes = state.SelectedHitObjects
@@ -5726,9 +5653,6 @@ function addSelectedNoteTimesToList(menuVars)
     end
     menuVars.noteTimes = table.dedupe(menuVars.noteTimes)
     menuVars.noteTimes = sort(menuVars.noteTimes, sortAscending)
-end
-function animationPaletteMenu(settingVars)
-    CodeInput(settingVars, "instructions", "", "Write instructions here.")
 end
 function automateSVMenu(settingVars)
     local copiedSVCount = #settingVars.copiedSVs
@@ -6146,11 +6070,11 @@ function deleteTab()
     _, menuVars.deleteTable[4] = imgui.Checkbox("Delete Bookmarks", menuVars.deleteTable[4])
     cache.saveTable("deleteMenu", menuVars)
     for i = 1, 4 do
-        if (menuVars.deleteTable[i]) then goto continue end
+        if (menuVars.deleteTable[i]) then
+            simpleActionMenu("Delete items between selected notes", 2, deleteItems, menuVars)
+            return
+        end
     end
-    do return end
-    ::continue::
-    simpleActionMenu("Delete items between selected notes", 2, deleteItems, menuVars)
 end
 function addTeleportMenu()
     local menuVars = getMenuVars("addTeleport")
@@ -6275,8 +6199,8 @@ function directSVMenu()
         if (not primeStartTime) then goto continue1 end
         primeStartTime = false
         local newSV = createSV(state.GetValue("savedStartTime") or 0, menuVars.multiplier)
-        actions.PerformBatch({ utils.CreateEditorAction(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
-            utils.CreateEditorAction(action_type.AddScrollVelocity, newSV) })
+        actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
+            createEA(action_type.AddScrollVelocity, newSV) })
     end
     ::continue1::
     if (oldMultiplier ~= menuVars.multiplier) then
@@ -6285,8 +6209,8 @@ function directSVMenu()
         if (not primeMultiplier) then goto continue2 end
         primeMultiplier = false
         local newSV = createSV(menuVars.startTime, state.GetValue("savedMultiplier") or 1)
-        actions.PerformBatch({ utils.CreateEditorAction(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
-            utils.CreateEditorAction(action_type.AddScrollVelocity, newSV) })
+        actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
+            createEA(action_type.AddScrollVelocity, newSV) })
     end
     ::continue2::
     state.SetValue("primeStartTime", primeStartTime)
@@ -8661,20 +8585,6 @@ function uintToRgba(n)
     end
     return table.vectorize4(tbl)
 end
----Converts rgba to a hexa string.
----@param r integer
----@param g integer
----@param b integer
----@param a integer
----@return string
-function rgbaToHexa(r, g, b, a)
-    local flr = math.floor
-    local hexaStr = ""
-    for _, col in ipairs({ r, g, b, a }) do
-        hexaStr = hexaStr .. HEXADECIMAL[flr(col / 16) + 1] .. HEXADECIMAL[flr(col) % 16 + 1]
-    end
-    return hexaStr
-end
 ---Converts a hexa string to an rgba Vector4 (0-1 for each element).
 ---@param hexa string
 ---@return Vector4
@@ -9269,8 +9179,8 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
         end
     end
     local editorActions = {
-        utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
-        utils.CreateEditorAction(action_type.AddScrollVelocityBatch, svsToAdd)
+        createEA(action_type.RemoveScrollVelocityBatch, svsToRemove),
+        createEA(action_type.AddScrollVelocityBatch, svsToAdd)
     }
     actions.PerformBatch(editorActions)
     toggleablePrint("s!", table.concat({"Created ", #svsToAdd, pluralize(" SV.", #svsToAdd, -2)}))
@@ -9278,8 +9188,8 @@ end
 function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
     if #ssfsToAdd == 0 then return end
     local editorActions = {
-        utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
-        utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)
+        createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
+        createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)
     }
     actions.PerformBatch(editorActions)
     toggleablePrint("s!", table.concat({"Created ", #ssfsToAdd, pluralize(" SSF.", #ssfsToAdd, -2)}))
@@ -9355,22 +9265,6 @@ function getHypotheticalSVMultiplierAt(svs, offset)
         end
     end
     return 1
-end
----Returns the SV time in a given array of SVs.
----@param svs ScrollVelocity[]
----@param offset number
----@return number
-function getHypotheticalSVTimeAt(svs, offset)
-    if (#svs == 1) then return svs[1].StartTime end
-    local index = #svs
-    while (index >= 1) do
-        if (svs[index].StartTime > offset) then
-            index = index - 1
-        else
-            return svs[index].StartTime
-        end
-    end
-    return -69
 end
 ---Given a predetermined set of SVs, returns a list of [scroll velocities](lua://ScrollVelocity) within a temporal boundary.
 ---@param startOffset number The lower bound of the search area.

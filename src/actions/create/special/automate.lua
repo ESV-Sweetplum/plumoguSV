@@ -83,7 +83,7 @@ function automateSVs(settingVars)
         local b = math.random(255)
 
         local tg = utils.CreateScrollGroup(data.svs, settingVars.initialSV or 1, table.concat({ r, g, b }, ","))
-        local action = utils.CreateEditorAction(action_type.CreateTimingGroup, id, tg, data.hos)
+        local action = createEA(action_type.CreateTimingGroup, id, tg, data.hos)
 
         table.insert(actionList, action)
     end

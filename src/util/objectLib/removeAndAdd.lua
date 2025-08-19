@@ -11,8 +11,8 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
         end
     end
     local editorActions = {
-        utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
-        utils.CreateEditorAction(action_type.AddScrollVelocityBatch, svsToAdd)
+        createEA(action_type.RemoveScrollVelocityBatch, svsToRemove),
+        createEA(action_type.AddScrollVelocityBatch, svsToAdd)
     }
     actions.PerformBatch(editorActions)
     toggleablePrint("s!", "Created " .. #svsToAdd .. pluralize(" SV.", #svsToAdd, -2))
@@ -21,8 +21,8 @@ end
 function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
     if #ssfsToAdd == 0 then return end
     local editorActions = {
-        utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
-        utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)
+        createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
+        createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)
     }
     actions.PerformBatch(editorActions)
     toggleablePrint("s!", "Created " .. #ssfsToAdd .. pluralize(" SSF.", #ssfsToAdd, -2))

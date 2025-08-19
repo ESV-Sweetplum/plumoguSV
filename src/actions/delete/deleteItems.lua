@@ -13,13 +13,13 @@ function deleteItems(menuVars)
     if (not menuVars.deleteTable[4]) then bmsToRemove = {} end
     if (truthy(linesToRemove) or truthy(svsToRemove) or truthy(ssfsToRemove) or truthy(bmsToRemove)) then
         actions.PerformBatch({
-            utils.CreateEditorAction(
+            createEA(
                 action_type.RemoveTimingPointBatch, linesToRemove),
-            utils.CreateEditorAction(
+            createEA(
                 action_type.RemoveScrollVelocityBatch, svsToRemove),
-            utils.CreateEditorAction(
+            createEA(
                 action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
-            utils.CreateEditorAction(
+            createEA(
                 action_type.RemoveBookmarkBatch, bmsToRemove) })
     end
     if (truthy(linesToRemove)) then

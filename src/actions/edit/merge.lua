@@ -13,7 +13,7 @@ function mergeSVs()
         end
     end
 
-    actions.Perform(utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove))
+    actions.Perform(createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
 end
 
 function mergeSSFs()
@@ -31,5 +31,5 @@ function mergeSSFs()
         end
     end
 
-    actions.Perform(utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
+    actions.Perform(createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
 end

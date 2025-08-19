@@ -145,14 +145,14 @@ function pasteItems(menuVars)
         end
     end
     actions.PerformBatch({
-        utils.CreateEditorAction(action_type.RemoveTimingPointBatch, linesToRemove),
-        utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
-        utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
-        utils.CreateEditorAction(action_type.RemoveBookmarkBatch, bmsToRemove),
-        utils.CreateEditorAction(action_type.AddTimingPointBatch, linesToAdd),
-        utils.CreateEditorAction(action_type.AddScrollVelocityBatch, svsToAdd),
-        utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
-        utils.CreateEditorAction(action_type.AddBookmarkBatch, bmsToAdd),
+        createEA(action_type.RemoveTimingPointBatch, linesToRemove),
+        createEA(action_type.RemoveScrollVelocityBatch, svsToRemove),
+        createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
+        createEA(action_type.RemoveBookmarkBatch, bmsToRemove),
+        createEA(action_type.AddTimingPointBatch, linesToAdd),
+        createEA(action_type.AddScrollVelocityBatch, svsToAdd),
+        createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
+        createEA(action_type.AddBookmarkBatch, bmsToAdd),
     })
     if (truthy(linesToRemove)) then
         toggleablePrint("e!", "Deleted " .. #linesToRemove .. pluralize(" timing point.", #linesToRemove, -2))

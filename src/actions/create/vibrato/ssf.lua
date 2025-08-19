@@ -26,7 +26,7 @@ function ssfVibrato(menuVars, func1, func2)
     addFinalSSF(ssfs, endTime, game.getSSFMultiplierAt(endTime))
 
     actions.PerformBatch({
-        utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfs)
+        createEA(action_type.AddScrollSpeedFactorBatch, ssfs)
     })
     toggleablePrint("s!", "Created " .. #ssfs .. pluralize(" SSF.", #ssfs, -2))
 end

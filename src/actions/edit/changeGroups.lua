@@ -26,15 +26,15 @@ function changeGroups(menuVars)
     local willChangeSVs = menuVars.changeSVs and #svsToRemove ~= 0
     local willChangeSSFs = menuVars.changeSSFs and #ssfsToRemove ~= 0
     if (willChangeSVs) then
-        table.insert(actionList, utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove))
+        table.insert(actionList, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
         state.SelectedScrollGroupId = menuVars
             .designatedTimingGroup -- must change in the middle because previous line applies to previous tg, next line applies to next tg
-        table.insert(actionList, utils.CreateEditorAction(action_type.AddScrollVelocityBatch, svsToAdd))
+        table.insert(actionList, createEA(action_type.AddScrollVelocityBatch, svsToAdd))
     end
     if (willChangeSSFs) then
-        table.insert(actionList, utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
+        table.insert(actionList, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
         state.SelectedScrollGroupId = menuVars.designatedTimingGroup
-        table.insert(actionList, utils.CreateEditorAction(action_type.AddScrollSpeedFactorBatch, ssfsToAdd))
+        table.insert(actionList, createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd))
     end
 
     if (#actionList == 0) then
