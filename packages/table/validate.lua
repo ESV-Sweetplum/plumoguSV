@@ -19,7 +19,7 @@ function table.validate(checkList, tbl, extrapolateData, inferTypes)
             outputTable[key] = checkList[key]
         end
         if (inferTypes and outputTable[key]) then
-            outputTable[key] = parseProperty(outputTable[key], checkList[key]) or outputTable[key]
+            outputTable[key] = parseDefaultProperty(outputTable[key], checkList[key]) or outputTable[key]
         end
     end
     return outputTable
