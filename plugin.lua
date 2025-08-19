@@ -2752,7 +2752,7 @@ function pasteItems(menuVars)
     local svsToAdd = {}
     local ssfsToAdd = {}
     local bmsToAdd = {}
-    local hitObjectTimes = table.property(map.HitObjects, "StartTime")
+    local hitObjectTimes = state.GetValue("lists.hitObjectStartTimes")
     for i = 1, #offsets do
         local pasteOffset = offsets[i]
         local nextOffset = offsets[math.clamp(i + 1, 1, #offsets)]

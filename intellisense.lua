@@ -175,7 +175,7 @@ For more information, please refer to <https://unlicense.org>
 vector = {}
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Returns the absolute value of each element of a vector.
 ---@param v T The initial vector.
 ---@return T vctr The resultant vector.
@@ -183,7 +183,7 @@ vector = {}
 function vector.Abs(v) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Returns the sum of two vectors.
 ---@param v1 T The first vector.
 ---@param v2 T The second vector.
@@ -192,7 +192,7 @@ function vector.Abs(v) end
 function vector.Add(v1, v2) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Clamps a vector between two others.
 ---@param v T The vector to clamp.
 ---@param min T The floor of the resultant vector.
@@ -201,7 +201,7 @@ function vector.Add(v1, v2) end
 ---@nodiscard
 function vector.Clamp(v, min, max) end
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Takes a cross product between two vectors (only works with [`Vector3`](lua://Vector3)).
 ---@param v1 Vector3 The first vector.
 ---@param v2 Vector3 The second vector.
@@ -210,7 +210,7 @@ function vector.Clamp(v, min, max) end
 function vector.Cross(v1, v2) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Finds the distance between two vectors.
 ---@param v1 T The first vector.
 ---@param v2 T The second vector.
@@ -219,7 +219,7 @@ function vector.Cross(v1, v2) end
 function vector.Distance(v1, v2) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Finds the distance between two vectors, squared.
 ---@param v1 T The first vector.
 ---@param v2 T The second vector.
@@ -228,7 +228,7 @@ function vector.Distance(v1, v2) end
 function vector.DistanceSquared(v1, v2) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Divides two vectors, termwise.
 ---@param v1 T The first vector.
 ---@param v2 T The second vector.
@@ -237,7 +237,7 @@ function vector.DistanceSquared(v1, v2) end
 function vector.Divide(v1, v2) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Takes the dot product of two vectors; that is, multiplies the two vectors termwise then returns the sum of the resulting terms.
 ---@param v1 T The first vector.
 ---@param v2 T The second vector.
@@ -246,7 +246,7 @@ function vector.Divide(v1, v2) end
 function vector.Dot(v1, v2) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Determines the literal length of a vector. DOES NOT DETERMINE ITS MAGNITUDE.
 ---@param v T The vector to measure.
 ---@return 2|3|4 length `4` if the input is a [`Vector4`](lua://Vector4), `3` if the input is a [`Vector3`](lua://Vector3), and `2` otherwise.
@@ -254,7 +254,7 @@ function vector.Dot(v1, v2) end
 function vector.Length(v) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Returns a vector that is `(f * 100)%` of the way from travelling between `v1` and `v2`.
 ---@param v1 T The first vector.
 ---@param v2 T The second vector.
@@ -264,7 +264,7 @@ function vector.Length(v) end
 function vector.Lerp(v1, v2, f) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Returns a vector which has the maximum value of both vectors, termwise.
 ---@param v1 T The first vector.
 ---@param v2 T The second vector.
@@ -273,7 +273,7 @@ function vector.Lerp(v1, v2, f) end
 function vector.Max(v1, v2) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Returns a vector which has the minimum value of both vectors, termwise.
 ---@param v1 T The first vector.
 ---@param v2 T The second vector.
@@ -282,7 +282,7 @@ function vector.Max(v1, v2) end
 function vector.Min(v1, v2) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Returns a vector which has the remainder of the first vector divided by the second, termwise.
 ---@param v1 T The first vector.
 ---@param v2 T The second vector.
@@ -291,7 +291,7 @@ function vector.Min(v1, v2) end
 function vector.Modulo(v1, v2) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Multiplies the two vectors termwise and returns the product.
 ---@param v1 T The first vector.
 ---@param v2 T The second vector.
@@ -300,14 +300,14 @@ function vector.Modulo(v1, v2) end
 function vector.Multiply(v1, v2) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Negates the given vector termwise.
 ---@param v T The vector to negate.
 ---@return T vctr The resultant vector.
 ---@nodiscard
 function vector.Negate(v) end
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Creates a new [`Vector2`](lua://Vector2).
 ---@param s1 number The first element.
 ---@param s2 number The second element.
@@ -315,7 +315,7 @@ function vector.Negate(v) end
 ---@nodiscard
 function vector.New(s1, s2) end
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Creates a new [`Vector3`](lua://Vector3).
 ---@param s1 number The first element.
 ---@param s2 number The second element.
@@ -324,7 +324,7 @@ function vector.New(s1, s2) end
 ---@nodiscard
 function vector.New(s1, s2, s3) end
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Creates a new [`Vector4`](lua://Vector4).
 ---@param s1 number The first element.
 ---@param s2 number The second element.
@@ -335,7 +335,7 @@ function vector.New(s1, s2, s3) end
 function vector.New(s1, s2, s3, s4) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Normalizes the given vector such that it has a magnitude of 1.
 ---@param v T The vector to normalize.
 ---@return T vctr The resultant vector.
@@ -343,14 +343,14 @@ function vector.New(s1, s2, s3, s4) end
 function vector.Normalize(v) end
 
 ---@generic T : Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Returns a vector of a requested dimension, with all elements being `1`.
 ---@param n T The dimension of the vector. Assuming a vector is given as the argument, the dimension of the given vector is used.
 ---@return T vctr A vector of dimension `n` with all elements being `1`.
 ---@nodiscard
 function vector.One(n) end
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Returns a [`Vector2`](lua://Vector2), with all elements being `1`.
 ---@param n number Any number.
 ---@return Vector2 vctr A [`Vector2`](lua://Vector2) with all elements being `1`.
@@ -358,7 +358,7 @@ function vector.One(n) end
 function vector.One(n) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Reflects a vector across a surface given by its normal vector and pivot point [`vector.Zero`](lua://vector.Zero).
 ---@param v T The vector to reflect.
 ---@param norm T The normal vector of the surface in which to reflect `v`.
@@ -367,7 +367,7 @@ function vector.One(n) end
 function vector.Reflect(v, norm) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Returns a vector which has the euclidean remainder of the first vector divided by the second, termwise. A euclidean remainder is like a normal remainder, but if the closest normal remainder is negative then the divisor is added to make it positive.
 ---@param v1 T The first vector.
 ---@param v2 T The second vector.
@@ -376,7 +376,7 @@ function vector.Reflect(v, norm) end
 function vector.RemEuclid(v1, v2) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Square roots the given vector, termwise.
 ---@param v T The vector to root.
 ---@return T vctr The resultant vector.
@@ -384,7 +384,7 @@ function vector.RemEuclid(v1, v2) end
 function vector.SquareRoot(v) end
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Returns the difference of two vectors.
 ---@param v1 T The first vector.
 ---@param v2 T The second vector.
@@ -392,21 +392,21 @@ function vector.SquareRoot(v) end
 ---@nodiscard
 function vector.Subtract(v1, v2) end
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Coerces a [`Vector2`](lua://Vector2) to become a numerically-indexed table.
 ---@param v Vector2 The vector to pack.
 ---@return [number, number] table The resultant table.
 ---@nodiscard
 function vector.Table(v) end
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Coerces a [`Vector3`](lua://Vector3) to become a numerically-indexed table.
 ---@param v Vector3 The vector to pack.
 ---@return [number, number, number] table The resultant table.
 ---@nodiscard
 function vector.Table(v) end
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Coerces a [`Vector4`](lua://Vector4) to become a numerically-indexed table.
 ---@param v Vector4 The vector to pack.
 ---@return [number, number, number, number] table The resultant table.
@@ -414,7 +414,7 @@ function vector.Table(v) end
 function vector.Table(v) end
 
 ---@generic T : Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Creates a unit vector in the `W` direction with the given dimension.
 ---@param dim T The dimension of the vector to produce. Assuming a vector is given as the argument, the dimension of that vector is used instead.
 ---@return T vctr The resultant vector.
@@ -422,7 +422,7 @@ function vector.Table(v) end
 function vector.UnitW(dim) end
 
 ---@generic T : Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Creates a unit vector in the `X` direction with the given dimension.
 ---@param dim T The dimension of the vector to produce. Assuming a vector is given as the argument, the dimension of that vector is used instead.
 ---@return T vctr The resultant vector.
@@ -430,7 +430,7 @@ function vector.UnitW(dim) end
 function vector.UnitX(dim) end
 
 ---@generic T : Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Creates a unit vector in the `Y` direction with the given dimension.
 ---@param dim T The dimension of the vector to produce. Assuming a vector is given as the argument, the dimension of that vector is used instead.
 ---@return T vctr The resultant vector.
@@ -438,7 +438,7 @@ function vector.UnitX(dim) end
 function vector.UnitY(dim) end
 
 ---@generic T : Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Creates a unit vector in the `Z` direction with the given dimension.
 ---@param dim T The dimension of the vector to produce. Assuming a vector is given as the argument, the dimension of that vector is used instead.
 ---@return T vctr The resultant vector.
@@ -446,14 +446,14 @@ function vector.UnitY(dim) end
 function vector.UnitZ(dim) end
 
 ---@generic T : Vector2 | Vector3 | Vector4
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Returns a vector of a requested dimension, with all elements being `0`.
 ---@param n T The dimension of the vector. Assuming a vector is given as the argument, the dimension of the given vector is used.
 ---@return T vctr A vector of dimension `n` with all elements being `0`.
 ---@nodiscard
 function vector.Zero(n) end
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Returns a [`Vector2`](lua://Vector2), with all elements being `0`.
 ---@param n number Any number.
 ---@return Vector2 vctr A [`Vector2`](lua://Vector2) with all elements being `0`.
@@ -721,11 +721,11 @@ function actions.MoveObjectsToTimingGroup(hos, id) end
 
 state                          = {}
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The current song time in milliseconds.
 state.SongTime                 = 0.0 ---@type number
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### A list of all [hit objects](lua://HitObject) within the current selection.
 ---#### If multiple [hit objects](lua://HitObject) are selected at once, the table will be in order of their `StartTime`. If they were selected one at a time using <kbd>Ctrl-Click</kbd>, then the table will be in order of their selection order.
 state.SelectedHitObjects       = {} ---@type HitObject[]
@@ -733,61 +733,61 @@ state.SelectedHitObjects       = {} ---@type HitObject[]
 ---#### The `id`, or name, of the current selected [scroll group](lua://ScrollGroup).
 state.SelectedScrollGroupId    = "$Default" ---@type string
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The current selected [scroll group](lua://ScrollGroup).
 state.SelectedScrollGroup      = {} ---@type ScrollGroup
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The nearest [bookmark](lua://Bookmark) before the current `state.SongTime`.
 state.CurrentBookmark          = {} ---@type Bookmark
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The nearest [scroll velocity](lua://ScrollVelocity) before the current `state.SongTime`.
 state.CurrentScrollVelocity    = {} ---@type ScrollVelocity
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The nearest [scroll speed factor](lua://ScrollSpeedFactor) before the current `state.SongTime`.
 state.CurrentScrollSpeedFactor = {} ---@type ScrollSpeedFactor
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The nearest [timing point](lua://TimingPoint) before the current `state.SongTime`.
 state.CurrentTimingPoint       = {} ---@type TimingPoint
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The current selected [editor layer](lua://EditorLayer).
 state.CurrentEditorLayer       = {} ---@type EditorLayer
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The selected snap's denominator. (e.g. 1/3 snap returns `3`, etc.)
 state.CurrentSnap              = 1 ---@type integer
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The time elapsed between the last frame and the current frame, in milliseconds.
 state.DeltaTime                = 0 ---@type number
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The current unix timestamp.
 state.UnixTime                 = 0 ---@type integer
 
 ---#### MUST BE SET MANUALLY - Indicates to the game that the window is hovered.
 state.IsWindowHovered          = false ---@type boolean
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The current ImGui scale.
 state.Scale                    = 1 ---@type number
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The size of the Quaver window.
 state.WindowSize               = { 69, 69 } ---@type Vector2
 
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Stores a value that can be retrieved by [`state.GetValue`](lua://state.GetValue). Mainly used to persist data between hot-reloads.
 ---@param key string The identifier for this particular value.
 ---@param value any The value to store.
 function state.SetValue(key, value) end
 
 ---@generic T
----##### (READ-ONLY)
+---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Gets a value previously stored by [`state.SetValue`](lua://state.SetValue). If the value doesn't exist, return `fallback` instead. Note that `nil` is considered a value, meaning if you store `nil` using [`state.SetValue`](lua://state.SetValue), then the `fallback` will not be used.
 ---@param key string The identifier for the value set by `state.SetValue`.
 ---@param fallback? T An optional term to return, if the result is `nil`.
