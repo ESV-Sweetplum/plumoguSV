@@ -3,7 +3,6 @@ function BasicInputFloat(label, var, decimalPlaces, suffix, step)
 end
 
 function ComputableInputFloat(label, var, decimalPlaces, suffix)
-    local computableStateIndex = state.GetValue("ComputableInputFloatIndex") or 1
     local previousValue = var
 
     local fmt = "%." .. decimalPlaces .. "f"
@@ -14,12 +13,10 @@ function ComputableInputFloat(label, var, decimalPlaces, suffix)
             math.toNumber(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")) or 0),
         4096,
         imgui_input_text_flags.AutoSelectAll)
-    if (not imgui.IsItemActive() and state.GetValue("previouslyActiveImguiFloat" .. computableStateIndex, false)) then
+    if (imgui.IsItemDeactivatedAfterEdit()) then
         local desiredComp = tostring(var):gsub(" ", "")
         var = expr(desiredComp)
     end
-    state.SetValue("previouslyActiveImguiFloat" .. computableStateIndex, imgui.IsItemActive())
-    state.SetValue("ComputableInputFloatIndex", computableStateIndex + 1)
 
     return math.toNumber(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")),
         previousValue ~= var
