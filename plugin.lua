@@ -8310,7 +8310,7 @@ function chooseScaleType(menuVars)
     local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
     if scaleType == "Average SV" then chooseAverageSV(menuVars) end
     if scaleType == "Absolute Distance" then chooseDistance(menuVars) end
-    if scaleType == "Relative Ratio" then ComputableInputFloat("Ratio", menuVars.ratio, 3) end
+    if scaleType == "Relative Ratio" then menuVars.ratio = ComputableInputFloat("Ratio", menuVars.ratio, 3) end
 end
 function chooseSnakeSpringConstant()
     local currentTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
