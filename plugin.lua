@@ -122,12 +122,9 @@ end
 function game.getSVMultiplierAt(offset, tgId)
     local sv = map.GetScrollVelocityAt(offset, tgId)
     if sv then return sv.Multiplier end
-    local ogTgId = state.SelectedScrollGroupId
-    state.SelectedScrollGroupId = tgId
     local initSV = map.InitialScrollVelocity
-    if (initSV == 0) then initSV = 1 end
-    state.SelectedScrollGroupId = tgId
-    return initSV or 1
+    if (not truthy(initSV)) then return 1 end
+    return initSV
 end
 ---Returns a list of [bookmarks](lua://Bookmark) between two times, inclusive.
 ---@param startOffset number The lower bound of the search area.
@@ -7452,10 +7449,25 @@ function showPluginSettingsWindow()
     imgui.End()
 end
 function renderMemeButtons()
-    if (imgui.Button("show me the quzz (quaver huzz)")) then
+    imgui.PushStyleColor(imgui_col.Text,
+        vector.New(1, math.sin(state.UnixTime / 1000) / 2 + 0.5, math.sin(state.UnixTime / 1000) / 2 + 0.5, 1))
+    if (imgui.Button("show me the quzz\n(quaver huzz)")) then
         ---@diagnostic disable-next-line: param-type-mismatch
         imgui.Text(nil)
     end
+    ToolTip("Press this button once (if you don't have any work saved) and never again.")
+    if (imgui.Button("fuck you and\nyour editor.")) then
+        state.SetValue("boolean.destroyEditor", true)
+        ---@diagnostic disable-next-line: param-type-mismatch
+    end
+    ToolTip("Press this button once (if you don't have any work saved) and never again.")
+    if (state.GetValue("boolean.destroyEditor")) then
+        actions.GoToObjects(math.floor(math.random() * map.TrackLength))
+        local ho1 = map.HitObjects[1]
+        actions.RemoveHitObject(ho1)
+        actions.Undo()
+    end
+    imgui.PopStyleColor()
     local text = state.GetValue("crazy", "Crazy?")
     local full =
     " I was crazy once. They put me in a map. A ranked map. A ranked map with no SV. And no SV makes me crazy. Crazy?"
@@ -9794,7 +9806,7 @@ function awake()
     listenForHitObjectChanges()
     game.keyCount = map.GetKeyCount()
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
-    if (not state.CurrentTimingPoint) then
+    if (not truthy(#map.TimingPoints)) then
         print("e!", "Please place a timing point before attempting to use plumoguSV.")
     end
 end
@@ -9809,7 +9821,6 @@ function listenForHitObjectChanges()
     end)
 end
 function draw()
-    if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed("plumoguSV-autoOpen")

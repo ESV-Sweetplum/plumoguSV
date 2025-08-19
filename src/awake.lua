@@ -18,7 +18,7 @@ function awake()
 
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
 
-    if (not state.CurrentTimingPoint) then
+    if (not truthy(#map.TimingPoints)) then
         print("e!", "Please place a timing point before attempting to use plumoguSV.")
     end
 end

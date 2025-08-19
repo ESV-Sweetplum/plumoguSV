@@ -1,5 +1,5 @@
 function draw()
-    if (not state.CurrentTimingPoint) then return end
+    -- if (not state.CurrentTimingPoint) then return end
 
     local performanceMode = globalVars.performanceMode
 
