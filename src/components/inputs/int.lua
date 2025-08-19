@@ -1,5 +1,5 @@
 ---Creates an `imgui.inputInt` element.
----@param varsTable { [string]: any }The table that is meant to be modified.
+---@param varsTable { [string]: any } The table that is meant to be modified.
 ---@param parameterName string The key of globalVars that will be used for data storage.
 ---@param label string The label for the input.
 ---@param bounds? [number, number] A tuple representing the minimum and maximum bounds this input should have.
