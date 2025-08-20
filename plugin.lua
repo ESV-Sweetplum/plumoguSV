@@ -9847,11 +9847,14 @@ function listenForHitObjectChanges()
     end
     setHitObjectStartTimes()
     listen(function(action, type, fromLua)
-        if (tonumber(action.Type) > 7) then return end
-        setHitObjectStartTimes()
+        state.SetValue("boolean.changeOccurred", true)
+        if (tonumber(action.Type) <= 7) then
+            setHitObjectStartTimes()
+        end
     end)
 end
 function draw()
+    if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed("plumoguSV-autoOpen")
@@ -9893,6 +9896,7 @@ function draw()
         showPluginSettingsWindow()
     end
     imgui.End()
+    state.SetValue("boolean.changeOccurred", false)
 end
 function renderNoteDataWidget()
     if (#state.SelectedHitObjects ~= 1) then return end
@@ -9931,7 +9935,7 @@ function renderMeasureDataWidget()
     local startOffset = uniqueDict[1]
     local endOffset = uniqueDict[2] or uniqueDict[1]
     if (math.abs(endOffset - startOffset) < 1e-10) then return end
-    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset) then
+    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or state.GetValue("boolean.changeOccurred")) then
         svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
         widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)

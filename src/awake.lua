@@ -33,7 +33,9 @@ function listenForHitObjectChanges()
     setHitObjectStartTimes()
 
     listen(function(action, type, fromLua)
-        if (tonumber(action.Type) > 7) then return end
-        setHitObjectStartTimes()
+        cache.boolean.changeOccurred = true
+        if (tonumber(action.Type) <= 7) then
+            setHitObjectStartTimes()
+        end
     end)
 end
