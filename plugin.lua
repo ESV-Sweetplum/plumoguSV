@@ -3599,12 +3599,12 @@ function selectBySnap(menuVars)
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
-local xList = {}
-local yList = {}
-local vxList = {}
-local vyList = {}
-local axList = {}
-local ayList = {}
+local singularity_xList = {}
+local singularity_yList = {}
+local singularity_vxList = {}
+local singularity_vyList = {}
+local singularity_axList = {}
+local singularity_ayList = {}
 function renderReactiveSingularities()
     local imgui = imgui
     local math = math
@@ -3632,11 +3632,11 @@ function renderReactiveSingularities()
     local lerp = function(w, l, h)
         return w * h + (1 - w) * l
     end
-    for i = 1, #xList do
-        local x = xList[i]
-        local y = yList[i]
-        local vx = vxList[i]
-        local vy = vyList[i]
+    for i = 1, #singularity_xList do
+        local x = singularity_xList[i]
+        local y = singularity_yList[i]
+        local vx = singularity_vxList[i]
+        local vy = singularity_vyList[i]
         local s = sqrt(vx ^ 2 + vy ^ 2)
         local clampedSpeed = clamp(s / 5, 0, 1)
         local r = lerp(clampedSpeed, slowSpeedR, fastSpeedR)
@@ -3651,13 +3651,13 @@ function renderReactiveSingularities()
     ctx.AddCircle(dim / 2 + topLeft, 24 - pulseStatus * 8, 16777215 + math.floor(pulseStatus * 255) * 16777216)
 end
 function createParticle(dimX, dimY, n)
-    if (#xList >= n) then return end
-    xList[#xList + 1] = math.random() * dimX
-    yList[#yList + 1] = math.random() * dimY
-    vxList[#vxList + 1] = 0
-    vyList[#vyList + 1] = 0
-    axList[#axList + 1] = 0
-    ayList[#ayList + 1] = 0
+    if (#singularity_xList >= n) then return end
+    singularity_xList[#singularity_xList + 1] = math.random() * dimX
+    singularity_yList[#singularity_yList + 1] = math.random() * dimY
+    singularity_vxList[#singularity_vxList + 1] = 0
+    singularity_vyList[#singularity_vyList + 1] = 0
+    singularity_axList[#singularity_axList + 1] = 0
+    singularity_ayList[#singularity_ayList + 1] = 0
 end
 function updateParticles(dimX, dimY, dt, multiplier)
     local sqrt = math.sqrt
@@ -3665,13 +3665,13 @@ function updateParticles(dimX, dimY, dt, multiplier)
     local spinDir = math.sign(multiplier)
     local movementSpeed = 0.1
     local bounceCoefficient = 0.8
-    for i = 1, #xList do
-        local x = xList[i]
-        local y = yList[i]
-        local vx = vxList[i]
-        local vy = vyList[i]
-        local ax = axList[i]
-        local ay = ayList[i]
+    for i = 1, #singularity_xList do
+        local x = singularity_xList[i]
+        local y = singularity_yList[i]
+        local vx = singularity_vxList[i]
+        local vy = singularity_vyList[i]
+        local ax = singularity_axList[i]
+        local ay = singularity_ayList[i]
         local sgPosx = bit32.rshift(dimX, 1)
         local sgPosy = bit32.rshift(dimY, 1)
         local xDist = sgPosx - x
@@ -3682,26 +3682,30 @@ function updateParticles(dimX, dimY, dt, multiplier)
         local gx = xDist / gravityFactor
         local gy = yDist / gravityFactor
         local spinFactor = 10 * spinDir / sqrt(dist)
-        axList[i] = gx + gy * spinFactor
-        ayList[i] = gy - gx * spinFactor
+        singularity_axList[i] = gx + gy * spinFactor
+        singularity_ayList[i] = gy - gx * spinFactor
         local movementDist = dt * movementSpeed
-        vxList[i] = vx + ax * movementDist
-        vyList[i] = vy + ay * movementDist
-        xList[i] = x + vx * movementDist
-        yList[i] = y + vy * movementDist
+        singularity_vxList[i] = vx + ax * movementDist
+        singularity_vyList[i] = vy + ay * movementDist
+        singularity_xList[i] = x + vx * movementDist
+        singularity_yList[i] = y + vy * movementDist
         if (x < 0 or x > dimX) then
-            vxList[i] = -vxList[i] * bounceCoefficient
-            xList[i] = clamp(xList[i], 1, dimX - 1)
+            singularity_vxList[i] = -singularity_vxList[i] * bounceCoefficient
+            singularity_xList[i] = clamp(singularity_xList[i], 1, dimX - 1)
         end
         if (y < 0 or y > dimY) then
-            vyList[i] = -vyList[i] * bounceCoefficient
-            yList[i] = clamp(yList[i], 1, dimY - 1)
+            singularity_vyList[i] = -singularity_vyList[i] * bounceCoefficient
+            singularity_yList[i] = clamp(singularity_yList[i], 1, dimY - 1)
         end
         local dragFactor = 1 - dt / 500
-        vxList[i] = clamp(vxList[i] * dragFactor, -5, 5)
-        vyList[i] = clamp(vyList[i] * dragFactor, -5, 5)
+        singularity_vxList[i] = clamp(singularity_vxList[i] * dragFactor, -5, 5)
+        singularity_vyList[i] = clamp(singularity_vyList[i] * dragFactor, -5, 5)
     end
 end
+local stars_xList = {}
+local stars_yList = {}
+local stars_vxList = {}
+local stars_szList = {}
 function renderReactiveStars()
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
@@ -3709,43 +3713,35 @@ function renderReactiveStars()
     local dimX = dim.x
     local dimY = dim.y
     local clamp = math.clamp
-    local xList = state.GetValue("stars_xList", {})
-    local yList = state.GetValue("stars_yList", {})
-    local vxList = state.GetValue("stars_vxList", {})
-    local szList = state.GetValue("stars_szList", {})
     if (dimX < 100 or imgui.GetTime() < 0.3) then return end
-    createStar(xList, yList, vxList, szList, dimX, dimY, 100)
-    updateStars(xList, yList, vxList, szList, dimX, dimY, state.DeltaTime)
-    for i = 1, #xList do
-        local x = xList[i]
-        local y = yList[i]
-        local sz = szList[i]
+    createStar(dimX, dimY, 100)
+    updateStars(dimX, dimY, state.DeltaTime)
+    for i = 1, #stars_xList do
+        local x = stars_xList[i]
+        local y = stars_yList[i]
+        local sz = stars_szList[i]
         local progress = x / dimX
         local brightness = clamp(-8 * progress * (progress - 1), 0, 1)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
         ctx.AddCircleFilled(pos, sz, rgbaToUint(255, 255, 255, brightness * 255))
     end
-    state.SetValue("stars_xList", xList)
-    state.SetValue("stars_yList", yList)
-    state.SetValue("stars_vxList", vxList)
-    state.SetValue("stars_szList", szList)
 end
-function createStar(x, y, vx, sz, dimX, dimY, n)
-    if (#x >= n) then return end
-    x[#x + 1] = math.random() * dimX
-    y[#y + 1] = math.random() * dimY
-    vx[#vx + 1] = math.random() * 3 + 1
-    sz[#sz + 1] = math.random(3) * 0.5
+function createStar(dimX, dimY, n)
+    if (#stars_xList >= n) then return end
+    stars_xList[#stars_xList + 1] = math.random() * dimX
+    stars_yList[#stars_yList + 1] = math.random() * dimY
+    stars_vxList[#stars_vxList + 1] = math.random() * 3 + 1
+    stars_szList[#stars_szList + 1] = math.random(3) * 0.5
 end
-function updateStars(xl, yl, vxl, szl, dimX, dimY, dt)
+function updateStars(dimX, dimY, dt)
     local random = math.random
     local clamp = math.clamp
     local m = game.getSVMultiplierAt(state.SongTime)
-    for i = 1, #xl do
+    for i = 1, #stars_xList do
         local starWrapped = false
-        local x = xl[i]
-        local y = yl[i]
-        local vx = vxl[i]
+        local x = stars_xList[i]
+        local y = stars_yList[i]
+        local vx = stars_vxList[i]
         while (x > dimX + 10) do
             starWrapped = true
             x = x - dimX - 20
@@ -3754,13 +3750,13 @@ function updateStars(xl, yl, vxl, szl, dimX, dimY, dt)
             starWrapped = true
             x = x + dimX + 20
         end
-        xl[i] = x
+        stars_xList[i] = x
         if (starWrapped) then
-            yl[i] = random() * dimY
-            vxl[i] = random() * 3 + 1
-            szl[i] = random(3) * 0.5
+            stars_yList[i] = random() * dimY
+            stars_vxList[i] = random() * 3 + 1
+            stars_szList[i] = random(3) * 0.5
         else
-            xl[i] = x + vx * dt * 0.05 *
+            stars_xList[i] = x + vx * dt * 0.05 *
                 clamp(2 * m, -50, 50)
         end
     end
@@ -9829,9 +9825,11 @@ function draw()
         renderBackground()
         drawCapybaraParent()
         drawCursorTrail()
-        setPluginAppearance()
         pulseController()
         checkForGlobalHotkeys()
+        if (clock.listen("appearanceRefresh", 1000)) then
+            setPluginAppearance()
+        end
     end
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     imgui.BeginTabBar("SV tabs")

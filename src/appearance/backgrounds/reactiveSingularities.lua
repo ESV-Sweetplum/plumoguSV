@@ -1,9 +1,9 @@
-local xList = {}
-local yList = {}
-local vxList = {}
-local vyList = {}
-local axList = {}
-local ayList = {}
+local singularity_xList = {}
+local singularity_yList = {}
+local singularity_vxList = {}
+local singularity_vyList = {}
+local singularity_axList = {}
+local singularity_ayList = {}
 
 function renderReactiveSingularities()
     local imgui = imgui
@@ -45,11 +45,11 @@ function renderReactiveSingularities()
         return w * h + (1 - w) * l
     end
 
-    for i = 1, #xList do
-        local x = xList[i]
-        local y = yList[i]
-        local vx = vxList[i]
-        local vy = vyList[i]
+    for i = 1, #singularity_xList do
+        local x = singularity_xList[i]
+        local y = singularity_yList[i]
+        local vx = singularity_vxList[i]
+        local vy = singularity_vyList[i]
 
         local s = sqrt(vx ^ 2 + vy ^ 2)
         local clampedSpeed = clamp(s / 5, 0, 1)
@@ -67,13 +67,13 @@ function renderReactiveSingularities()
 end
 
 function createParticle(dimX, dimY, n)
-    if (#xList >= n) then return end
-    xList[#xList + 1] = math.random() * dimX
-    yList[#yList + 1] = math.random() * dimY
-    vxList[#vxList + 1] = 0
-    vyList[#vyList + 1] = 0
-    axList[#axList + 1] = 0
-    ayList[#ayList + 1] = 0
+    if (#singularity_xList >= n) then return end
+    singularity_xList[#singularity_xList + 1] = math.random() * dimX
+    singularity_yList[#singularity_yList + 1] = math.random() * dimY
+    singularity_vxList[#singularity_vxList + 1] = 0
+    singularity_vyList[#singularity_vyList + 1] = 0
+    singularity_axList[#singularity_axList + 1] = 0
+    singularity_ayList[#singularity_ayList + 1] = 0
 end
 
 function updateParticles(dimX, dimY, dt, multiplier)
@@ -84,13 +84,13 @@ function updateParticles(dimX, dimY, dt, multiplier)
     local movementSpeed = 0.1
     local bounceCoefficient = 0.8
 
-    for i = 1, #xList do
-        local x = xList[i]
-        local y = yList[i]
-        local vx = vxList[i]
-        local vy = vyList[i]
-        local ax = axList[i]
-        local ay = ayList[i]
+    for i = 1, #singularity_xList do
+        local x = singularity_xList[i]
+        local y = singularity_yList[i]
+        local vx = singularity_vxList[i]
+        local vy = singularity_vyList[i]
+        local ax = singularity_axList[i]
+        local ay = singularity_ayList[i]
 
         local sgPosx = bit32.rshift(dimX, 1)
         local sgPosy = bit32.rshift(dimY, 1)
@@ -106,28 +106,28 @@ function updateParticles(dimX, dimY, dt, multiplier)
 
         local spinFactor = 10 * spinDir / sqrt(dist)
 
-        axList[i] = gx + gy * spinFactor
-        ayList[i] = gy - gx * spinFactor
+        singularity_axList[i] = gx + gy * spinFactor
+        singularity_ayList[i] = gy - gx * spinFactor
 
         local movementDist = dt * movementSpeed
 
-        vxList[i] = vx + ax * movementDist
-        vyList[i] = vy + ay * movementDist
-        xList[i] = x + vx * movementDist
-        yList[i] = y + vy * movementDist
+        singularity_vxList[i] = vx + ax * movementDist
+        singularity_vyList[i] = vy + ay * movementDist
+        singularity_xList[i] = x + vx * movementDist
+        singularity_yList[i] = y + vy * movementDist
 
         if (x < 0 or x > dimX) then
-            vxList[i] = -vxList[i] * bounceCoefficient
-            xList[i] = clamp(xList[i], 1, dimX - 1)
+            singularity_vxList[i] = -singularity_vxList[i] * bounceCoefficient
+            singularity_xList[i] = clamp(singularity_xList[i], 1, dimX - 1)
         end
         if (y < 0 or y > dimY) then
-            vyList[i] = -vyList[i] * bounceCoefficient
-            yList[i] = clamp(yList[i], 1, dimY - 1)
+            singularity_vyList[i] = -singularity_vyList[i] * bounceCoefficient
+            singularity_yList[i] = clamp(singularity_yList[i], 1, dimY - 1)
         end
 
         local dragFactor = 1 - dt / 500
 
-        vxList[i] = clamp(vxList[i] * dragFactor, -5, 5)
-        vyList[i] = clamp(vyList[i] * dragFactor, -5, 5)
+        singularity_vxList[i] = clamp(singularity_vxList[i] * dragFactor, -5, 5)
+        singularity_vyList[i] = clamp(singularity_vyList[i] * dragFactor, -5, 5)
     end
 end

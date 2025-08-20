@@ -1,3 +1,8 @@
+local stars_xList = {}
+local stars_yList = {}
+local stars_vxList = {}
+local stars_szList = {}
+
 function renderReactiveStars()
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
@@ -8,53 +13,43 @@ function renderReactiveStars()
 
     local clamp = math.clamp
 
-    local xList = state.GetValue("stars_xList", {})
-    local yList = state.GetValue("stars_yList", {})
-    local vxList = state.GetValue("stars_vxList", {})
-    local szList = state.GetValue("stars_szList", {})
-
     if (dimX < 100 or imgui.GetTime() < 0.3) then return end
 
-    createStar(xList, yList, vxList, szList, dimX, dimY, 100)
-    updateStars(xList, yList, vxList, szList, dimX, dimY, state.DeltaTime)
+    createStar(dimX, dimY, 100)
+    updateStars(dimX, dimY, state.DeltaTime)
 
-    for i = 1, #xList do
-        local x = xList[i]
-        local y = yList[i]
-        local sz = szList[i]
+    for i = 1, #stars_xList do
+        local x = stars_xList[i]
+        local y = stars_yList[i]
+        local sz = stars_szList[i]
         local progress = x / dimX
         local brightness = clamp(-8 * progress * (progress - 1), 0, 1)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
 
         ctx.AddCircleFilled(pos, sz, rgbaToUint(255, 255, 255, brightness * 255))
     end
-
-    state.SetValue("stars_xList", xList)
-    state.SetValue("stars_yList", yList)
-    state.SetValue("stars_vxList", vxList)
-    state.SetValue("stars_szList", szList)
 end
 
-function createStar(x, y, vx, sz, dimX, dimY, n)
-    if (#x >= n) then return end
-    x[#x + 1] = math.random() * dimX
-    y[#y + 1] = math.random() * dimY
-    vx[#vx + 1] = math.random() * 3 + 1
-    sz[#sz + 1] = math.random(3) * 0.5
+function createStar(dimX, dimY, n)
+    if (#stars_xList >= n) then return end
+    stars_xList[#stars_xList + 1] = math.random() * dimX
+    stars_yList[#stars_yList + 1] = math.random() * dimY
+    stars_vxList[#stars_vxList + 1] = math.random() * 3 + 1
+    stars_szList[#stars_szList + 1] = math.random(3) * 0.5
 end
 
-function updateStars(xl, yl, vxl, szl, dimX, dimY, dt)
+function updateStars(dimX, dimY, dt)
     local random = math.random
     local clamp = math.clamp
 
     local m = game.getSVMultiplierAt(state.SongTime)
 
-    for i = 1, #xl do
+    for i = 1, #stars_xList do
         local starWrapped = false
 
-        local x = xl[i]
-        local y = yl[i]
-        local vx = vxl[i]
+        local x = stars_xList[i]
+        local y = stars_yList[i]
+        local vx = stars_vxList[i]
 
         while (x > dimX + 10) do
             starWrapped = true
@@ -64,13 +59,13 @@ function updateStars(xl, yl, vxl, szl, dimX, dimY, dt)
             starWrapped = true
             x = x + dimX + 20
         end
-        xl[i] = x
+        stars_xList[i] = x
         if (starWrapped) then
-            yl[i] = random() * dimY
-            vxl[i] = random() * 3 + 1
-            szl[i] = random(3) * 0.5
+            stars_yList[i] = random() * dimY
+            stars_vxList[i] = random() * 3 + 1
+            stars_szList[i] = random(3) * 0.5
         else
-            xl[i] = x + vx * dt * 0.05 *
+            stars_xList[i] = x + vx * dt * 0.05 *
                 clamp(2 * m, -50, 50)
         end
     end

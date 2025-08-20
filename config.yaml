@@ -612,5 +612,5 @@ defaultProperties:
       snap: 1
 presets:
 - 
-dynamicBackgroundIndex: 3
+dynamicBackgroundIndex: 2
 ignoreNotes: false

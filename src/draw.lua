@@ -12,9 +12,12 @@ function draw()
         renderBackground()
         drawCapybaraParent()
         drawCursorTrail()
-        setPluginAppearance()
         pulseController()
         checkForGlobalHotkeys()
+
+        if (clock.listen("appearanceRefresh", 1000)) then
+            setPluginAppearance()
+        end
     end
 
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
