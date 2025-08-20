@@ -5039,6 +5039,18 @@ function getCurrentRGBColors(rgbPeriod)
     end
     return { red = red, green = green, blue = blue }
 end
+---Similar to [`imgui.PushStyleColor`](lua://imgui.PushStyleColor), but pushes a changing color instead.
+---@param color1 Vector4 The first color.
+---@param color2 Vector4 The second color.
+---@param property ImGuiCol The property to change.
+---@param oscillationPeriod? integer The amount of time to switch from color 1 -> 2 -> 1, in milliseconds.
+function PushGradientStyle(color1, color2, property, oscillationPeriod)
+    local x = math.sin(6.28318531 * state.UnixTime / (oscillationPeriod or 1000)) / 2 + 0.5
+    local currentColor = color1 * x + color2 * (1 - x)
+    imgui.PushStyleColor(property, currentColor)
+end
+INSTRUCTION_COLOR = vector.New(1, 0.5, 0.5, 1)
+GUIDELINE_COLOR = vector.New(0.5, 0.5, 1, 1)
 ---Creates an imgui button.
 ---@param text string The text that the button should have.
 ---@param size Vector2 The size of the button.
@@ -5060,6 +5072,12 @@ function PresetButton()
     KeepSameLine()
     if not buttonPressed then return end
     globalVars.showPresetMenu = not globalVars.showPresetMenu
+end
+function GradientButton(label, color1, color2, oscillationPeriod)
+    PushGradientStyle(color1, color2, imgui_col.Text, oscillationPeriod)
+    local btn = imgui.Button(label)
+    imgui.PopStyleColor()
+    return btn
 end
 ---Creates a checkbox that directly saves to globalVars and the universal `.yaml` file.
 ---@param varsTable { [string]: any } The table that is meant to be modified.
@@ -7445,14 +7463,12 @@ function showPluginSettingsWindow()
     imgui.End()
 end
 function renderMemeButtons()
-    imgui.PushStyleColor(imgui_col.Text,
-        vector.New(1, math.sin(state.UnixTime / 1000) / 2 + 0.5, math.sin(state.UnixTime / 1000) / 2 + 0.5, 1))
-    if (imgui.Button("show me the quzz\n(quaver huzz)")) then
+    if (GradientButton("show me the quzz\n(quaver huzz)", vector.New(1, 0, 0, 1), vector.New(1, 1, 1, 1), 1500)) then
         ---@diagnostic disable-next-line: param-type-mismatch
         imgui.Text(nil)
     end
     ToolTip("Press this button once (if you don't have any work saved) and never again.")
-    if (imgui.Button("fuck you and\nyour editor.")) then
+    if (GradientButton("fuck you and\nyour stupid editor", vector.New(1, 0, 0, 1), vector.New(1, 1, 1, 1), 1500)) then
         state.SetValue("boolean.destroyEditor", true)
         ---@diagnostic disable-next-line: param-type-mismatch
     end
@@ -7463,7 +7479,6 @@ function renderMemeButtons()
         actions.RemoveHitObject(ho1)
         actions.Undo()
     end
-    imgui.PopStyleColor()
     local text = state.GetValue("crazy", "Crazy?")
     local full =
     " I was crazy once. They put me in a map. A ranked map. A ranked map with no SV. And no SV makes me crazy. Crazy?"
@@ -7827,8 +7842,6 @@ function showWhatIsMsxTutorial()
     "Hopefully the nomenclature for msx makes sense; it is quite literally ms * x. If you know a little bit of dimensional analysis, you can use this fact to easily compute average SVs and displacements.")
 end
 function renderTutorialMenu()
-    INSTRUCTION_COLOR = vector.New(1, 0.5, 0.5, 1)
-    GUIDELINE_COLOR = vector.New(0.5, 0.5, 1, 1)
     imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
     imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
     imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
@@ -9800,6 +9813,7 @@ function awake()
     end
     initializeNoteLockMode()
     listenForHitObjectChanges()
+    setPluginAppearance()
     game.keyCount = map.GetKeyCount()
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
     if (not truthy(#map.TimingPoints)) then

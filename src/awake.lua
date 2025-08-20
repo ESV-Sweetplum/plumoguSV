@@ -14,6 +14,8 @@ function awake()
 
     initializeNoteLockMode()
     listenForHitObjectChanges()
+    setPluginAppearance()
+
     game.keyCount = map.GetKeyCount()
 
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]

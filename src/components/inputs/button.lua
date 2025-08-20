@@ -28,3 +28,11 @@ function PresetButton()
 
     globalVars.showPresetMenu = not globalVars.showPresetMenu
 end
+
+function GradientButton(label, color1, color2, oscillationPeriod)
+    PushGradientStyle(color1, color2, imgui_col.Text, oscillationPeriod)
+    local btn = imgui.Button(label)
+    imgui.PopStyleColor()
+
+    return btn
+end

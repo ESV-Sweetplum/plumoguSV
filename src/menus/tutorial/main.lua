@@ -1,7 +1,4 @@
 function renderTutorialMenu()
-    INSTRUCTION_COLOR = vector.New(1, 0.5, 0.5, 1)
-    GUIDELINE_COLOR = vector.New(0.5, 0.5, 1, 1)
-
     imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
     imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
     imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)

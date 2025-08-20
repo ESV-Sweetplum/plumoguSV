@@ -88,14 +88,12 @@ function showPluginSettingsWindow()
 end
 
 function renderMemeButtons()
-    imgui.PushStyleColor(imgui_col.Text,
-        vector.New(1, math.sin(state.UnixTime / 1000) / 2 + 0.5, math.sin(state.UnixTime / 1000) / 2 + 0.5, 1))
-    if (imgui.Button("show me the quzz\n(quaver huzz)")) then
+    if (GradientButton("show me the quzz\n(quaver huzz)", vector.New(1, 0, 0, 1), vector.New(1, 1, 1, 1), 1500)) then
         ---@diagnostic disable-next-line: param-type-mismatch
         imgui.Text(nil)
     end
     ToolTip("Press this button once (if you don't have any work saved) and never again.")
-    if (imgui.Button("fuck you and\nyour editor.")) then
+    if (GradientButton("fuck you and\nyour stupid editor", vector.New(1, 0, 0, 1), vector.New(1, 1, 1, 1), 1500)) then
         cache.boolean.destroyEditor = true
         ---@diagnostic disable-next-line: param-type-mismatch
     end
@@ -107,7 +105,6 @@ function renderMemeButtons()
         actions.RemoveHitObject(ho1)
         actions.Undo()
     end
-    imgui.PopStyleColor()
     local text = state.GetValue("crazy", "Crazy?")
     local full =
     " I was crazy once. They put me in a map. A ranked map. A ranked map with no SV. And no SV makes me crazy. Crazy?"
