@@ -18,7 +18,10 @@ function automateCopySVs(settingVars)
         }
         table.insert(settingVars.copiedSVs, copiedSV)
     end
-    if (#settingVars.copiedSVs > 0) then toggleablePrint("s!", "Copied " .. #settingVars.copiedSVs .. " SVs.") end
+    if (#settingVars.copiedSVs > 0) then
+        toggleablePrint("s!",
+            "Copied " .. #settingVars.copiedSVs .. pluralize(" SV.", #settingVars.copiedSVs, -2))
+    end
 end
 
 function clearAutomateSVs(settingVars)

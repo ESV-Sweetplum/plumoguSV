@@ -48,19 +48,23 @@ function copyItems(menuVars)
     ::continue4::
     if (#menuVars.copied.BMs[menuVars.curSlot] > 0) then
         toggleablePrint("s!",
-            "Copied " .. #menuVars.copied.BMs[menuVars.curSlot] .. " Bookmarks.")
+            "Copied " ..
+            #menuVars.copied.BMs[menuVars.curSlot] .. pluralize(" Bookmark.", #menuVars.copied.BMs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.SSFs[menuVars.curSlot] > 0) then
         toggleablePrint("s!",
-            "Copied " .. #menuVars.copied.SSFs[menuVars.curSlot] .. " SSFs.")
+            "Copied " ..
+            #menuVars.copied.SSFs[menuVars.curSlot] .. pluralize(" SSF.", #menuVars.copied.SSFs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.SVs[menuVars.curSlot] > 0) then
         toggleablePrint("s!",
-            "Copied " .. #menuVars.copied.SVs[menuVars.curSlot] .. " SVs.")
+            "Copied " ..
+            #menuVars.copied.SVs[menuVars.curSlot] .. pluralize(" SV.", #menuVars.copied.SVs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.lines[menuVars.curSlot] > 0) then
         toggleablePrint("s!",
-            "Copied " .. #menuVars.copied.lines[menuVars.curSlot] .. " Lines.")
+            "Copied " ..
+            #menuVars.copied.lines[menuVars.curSlot] .. pluralize(" Line.", #menuVars.copied.lines[menuVars.curSlot], -2))
     end
 end
 
