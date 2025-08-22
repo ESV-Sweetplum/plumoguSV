@@ -1932,7 +1932,10 @@ function automateCopySVs(settingVars)
         }
         table.insert(settingVars.copiedSVs, copiedSV)
     end
-    if (#settingVars.copiedSVs > 0) then toggleablePrint("s!", table.concat({"Copied ", #settingVars.copiedSVs, " SVs."})) end
+    if (#settingVars.copiedSVs > 0) then
+        toggleablePrint("s!",
+            "Copied " .. #settingVars.copiedSVs .. pluralize(" SV.", #settingVars.copiedSVs, -2))
+    end
 end
 function clearAutomateSVs(settingVars)
     settingVars.copiedSVs = {}
@@ -2698,19 +2701,23 @@ function copyItems(menuVars)
     ::continue4::
     if (#menuVars.copied.BMs[menuVars.curSlot] > 0) then
         toggleablePrint("s!",
-            table.concat({"Copied ", #menuVars.copied.BMs[menuVars.curSlot], " Bookmarks."}))
+            "Copied " ..
+            #menuVars.copied.BMs[menuVars.curSlot] .. pluralize(" Bookmark.", #menuVars.copied.BMs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.SSFs[menuVars.curSlot] > 0) then
         toggleablePrint("s!",
-            table.concat({"Copied ", #menuVars.copied.SSFs[menuVars.curSlot], " SSFs."}))
+            "Copied " ..
+            #menuVars.copied.SSFs[menuVars.curSlot] .. pluralize(" SSF.", #menuVars.copied.SSFs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.SVs[menuVars.curSlot] > 0) then
         toggleablePrint("s!",
-            table.concat({"Copied ", #menuVars.copied.SVs[menuVars.curSlot], " SVs."}))
+            "Copied " ..
+            #menuVars.copied.SVs[menuVars.curSlot] .. pluralize(" SV.", #menuVars.copied.SVs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.lines[menuVars.curSlot] > 0) then
         toggleablePrint("s!",
-            table.concat({"Copied ", #menuVars.copied.lines[menuVars.curSlot], " Lines."}))
+            "Copied " ..
+            #menuVars.copied.lines[menuVars.curSlot] .. pluralize(" Line.", #menuVars.copied.lines[menuVars.curSlot], -2))
     end
 end
 function clearCopiedItems(menuVars)
@@ -2975,9 +2982,8 @@ function fixFlippedLNEnds()
     if endOffset == 0 then endOffset = map.HitObjects[#map.HitObjects].StartTime end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
-    local type = "s!"
-    if (fixedLNEndsCount == 0) then type = "!" end
-    print(type, table.concat({"Fixed ", fixedLNEndsCount, " flipped LN ends"}))
+    local type = truthy(fixedLNEndsCount) and "s!" or "w!"
+    print(type, "Fixed " .. fixedLNEndsCount .. pluralize(" flipped LN end.", fixedLNEndsCount, -2))
 end
 function flickerSVs(menuVars)
     local svsToAdd = {}
@@ -3445,9 +3451,10 @@ function getMapStats()
         "That's an average of " ..
         math.round(svSum * 1000 / map.TrackLength, 2) ..
         table.concat({" SVs per second, or ", math.round(ssfSum * 1000 / map.TrackLength, 2), " SSFs per second."}))
-    print("s!", table.concat({"This map also contains ", #map.TimingPoints, " timing points."}))
+    print("s!", table.concat({"This map also contains ", #map.TimingPoints, pluralize(" timing point.", #map.TimingPoints, -2)}))
     print("s!",
-        table.concat({"This map has ", svSum .. " SVs and " .. ssfSum .. " SSFs across " .. #tgList, " timing groups."}))
+        "This map has " ..
+        svSum .. table.concat({" SVs and ", ssfSum, " SSFs across "}) .. #tgList .. pluralize(" timing group.", #tgList, -2))
     print("w!",
         "Remember that the quality of map has no correlation with the object count! Try to be optimal in your object usage.")
     state.SelectedScrollGroupId = currentTg
