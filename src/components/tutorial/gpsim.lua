@@ -13,11 +13,12 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
 
+    local red = rgbaToUint(225, 0, 0, 255)
+    local blue = rgbaToUint(75, 75, 255, 255)
+    local yellow = rgbaToUint(200, 200, 0, 255)
+
     local colorTable = {
-        rgbaToUint(225, 0, 0, 255),
-        rgbaToUint(200, 200, 0, 255),
-        rgbaToUint(75, 75, 255, 255),
-        rgbaToUint(200, 200, 0, 255),
+        red, yellow, blue, yellow
     }
 
     for i = 1, #colTbl do
