@@ -5231,14 +5231,15 @@ end
 ---@param listIndex integer The currently selected combo index.
 ---@param colorList? string[] An optional list containing an array of colors to use for each item.
 ---@param hiddenGroups? string[] An optional list, where if any items in list show up here, they will not be shown on the dropdown.
+---@param tooltipList? string[] An optional list, showing tooltips that should appear when an element is hovered over.
 ---@return number newListIndex The new combo index.
-function Combo(label, list, listIndex, colorList, hiddenGroups)
+function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     local newListIndex = math.clamp(listIndex, 1, #list)
     local currentComboItem = list[listIndex]
     local comboFlag = imgui_combo_flags.HeightLarge
     rgb = {}
     hiddenGroups = hiddenGroups or {}
-    if (colorList) then
+    if (colorList and truthy(colorList)) then
         colorList[newListIndex]:gsub("(%d+)", function(c)
             rgb[#rgb + 1] = c
         end)
@@ -5247,13 +5248,13 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
             vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, alpha))
     end
     if not imgui.BeginCombo(label, currentComboItem, comboFlag) then
-        if (colorList) then imgui.PopStyleColor() end
+        if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
         return newListIndex
     end
-    if (colorList) then imgui.PopStyleColor() end
+    if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
     for i = 1, #list do
         rgb = {}
-        if (colorList) then
+        if (colorList and truthy(colorList)) then
             colorList[i]:gsub("(%d+)", function(c)
                 rgb[#rgb + 1] = c
             end)
@@ -5264,8 +5265,11 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
         if imgui.Selectable(listItem) then
             newListIndex = i
         end
+        if (tooltipList and truthy(tooltipList)) then
+            ToolTip(tooltipList[i])
+        end
         ::skipRender::
-        if (colorList) then imgui.PopStyleColor() end
+        if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
     end
     imgui.EndCombo()
     return newListIndex
@@ -5514,12 +5518,18 @@ function createSVTab()
     if placeType == "Vibrato" then placeVibratoSVMenu(false) end
 end
 function chooseCreateTool()
+    local tooltipList = {
+        "Place standard shapes.",
+        "Non-standard effects.",
+        "Still shapes keep notes normal distance/spacing apart.",
+        "Make notes vibrate or appear to duplicate."
+    }
     imgui.AlignTextToFramePadding()
     imgui.Text("  Type:  ")
     KeepSameLine()
-    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex)
+    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex, {}, {}, tooltipList)
+    ToolTip(tooltipList[globalVars.placeTypeIndex])
     local placeType = CREATE_TYPES[globalVars.placeTypeIndex]
-    if placeType == "Still" then ToolTip("Still keeps notes normal distance/spacing apart") end
 end
 function renderPresetMenu(menuLabel, menuVars, settingVars)
     local newPresetName = state.GetValue("newPresetName", "")
@@ -6526,31 +6536,34 @@ function editSVTab()
     if toolName == "Vertical Shift" then verticalShiftMenu() end
 end
 function chooseEditTool()
+    local tooltipList = {
+        "Add a large teleport SV to move far away.",
+        "Create timing lines at notes to avoid desync.",
+        "Moves SVs and SSFs to a designated timing group.",
+        "Convert multipliers between SV/SSF.",
+        "Copy SVs and SSFs and paste them somewhere else.",
+        "Directly update SVs within your selection.",
+        "Move where notes are hit on the screen.",
+        "Temporarily displace the playfield view.",
+        "Copy everything in a section and paste it somewhere else.",
+        "Dynamically scale SVs across notes.",
+        "Fix flipped LN ends.",
+        "Flash notes on and off the screen.",
+        "Transfer snap colors into layers, to be loaded later.",
+        "Get stats about SVs in a section.",
+        "Combine SVs that overlap.",
+        "Reverse the scroll direction using SVs.",
+        "Scale SV values by multiplying.",
+        "Scale SV values by adding teleport SVs.",
+        "Swap positions of notes using SVs.",
+        "Adds a constant value to SVs in a range.",
+    }
     imgui.AlignTextToFramePadding()
     imgui.Text("  Current Tool:")
     KeepSameLine()
-    globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, globalVars.editToolIndex)
+    globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, globalVars.editToolIndex, {}, {}, tooltipList)
+    ToolTip(tooltipList[globalVars.editToolIndex])
     local svTool = EDIT_SV_TOOLS[globalVars.editToolIndex]
-    if svTool == "Add Teleport" then ToolTip("Add a large teleport SV to move far away") end
-    if svTool == "Align Timing Lines" then ToolTip("Create timing lines at notes to avoid desync") end
-    if svTool == "Change Timing Group" then ToolTip("Moves SVs and SSFs to a designated timing group.") end
-    if svTool == "Convert SV <-> SSF" then ToolTip("Convert multipliers between SV/SSF") end
-    if svTool == "Copy & Paste" then ToolTip("Copy SVs and SSFs and paste them somewhere else") end
-    if svTool == "Direct SV" then ToolTip("Directly update SVs within your selection") end
-    if svTool == "Displace Note" then ToolTip("Move where notes are hit on the screen") end
-    if svTool == "Displace View" then ToolTip("Temporarily displace the playfield view") end
-    if svTool == "Duplicate Holistic" then ToolTip("Copy everything in a section and paste it somewhere else") end
-    if svTool == "Dynamic Scale" then ToolTip("Dynamically scale SVs across notes") end
-    if svTool == "Fix LN Ends" then ToolTip("Fix flipped LN ends") end
-    if svTool == "Flicker" then ToolTip("Flash notes on and off the screen") end
-    if svTool == "Layer Snaps" then ToolTip("Transfer snap colors into layers, to be loaded later") end
-    if svTool == "Measure" then ToolTip("Get stats about SVs in a section") end
-    if svTool == "Merge" then ToolTip("Combine SVs that overlap") end
-    if svTool == "Reverse Scroll" then ToolTip("Reverse the scroll direction using SVs") end
-    if svTool == "Scale (Multiply)" then ToolTip("Scale SV values by multiplying") end
-    if svTool == "Scale (Displace)" then ToolTip("Scale SV values by adding teleport SVs") end
-    if svTool == "Swap Notes" then ToolTip("Swap positions of notes using SVs") end
-    if svTool == "Vertical Shift" then ToolTip("Adds a constant value to SVs in a range") end
 end
 function measureMenu()
     local menuVars = getMenuVars("measure")
@@ -6788,16 +6801,19 @@ function selectTab()
     if toolName == "Note Type" then selectNoteTypeMenu() end
 end
 function chooseSelectTool()
+    local tooltipList = {
+        "Skip over notes then select one, and repeat.",
+        "Select all notes with a certain snap color.",
+        "Jump to a bookmark.",
+        "Select all notes with a certain chord size.",
+        "Select rice/ln notes."
+    }
     imgui.AlignTextToFramePadding()
     imgui.Text("Current Type:")
     KeepSameLine()
-    globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, globalVars.selectTypeIndex)
+    globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, globalVars.selectTypeIndex, {}, {}, tooltipList)
+    ToolTip(tooltipList[globalVars.selectTypeIndex])
     local selectTool = SELECT_TOOLS[globalVars.selectTypeIndex]
-    if selectTool == "Alternating" then ToolTip("Skip over notes then select one, and repeat") end
-    if selectTool == "By Snap" then ToolTip("Select all notes with a certain snap color") end
-    if selectTool == "Bookmark" then ToolTip("Jump to a bookmark") end
-    if selectTool == "Chord Size" then ToolTip("Select all notes with a certain chord size") end
-    if selectTool == "Note Type" then ToolTip("Select rice/ln notes") end
 end
 function selectNoteTypeMenu()
     local menuVars = getMenuVars("selectNoteType")
@@ -8586,6 +8602,13 @@ function chooseStartSVPercent(settingVars)
     _, settingVars.svPercent2 = imgui.InputFloat(label2, settingVars.svPercent2, 1, 1, "%.2f%%")
 end
 function chooseStillType(menuVars)
+    local tooltipList = {
+        "Don't use an initial or end displacement.",
+        "Use an initial starting displacement for the still.",
+        "Have a displacement to end at for the still.",
+        "Use last displacement of the previous still to start.",
+        "Use next displacement of the next still to end at.",
+    }
     local stillType = STILL_TYPES[menuVars.stillTypeIndex]
     local dontChooseDistance = stillType == "No" or
         stillType == "Auto" or
@@ -8600,12 +8623,8 @@ function chooseStillType(menuVars)
         imgui.PopItemWidth()
     end
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.4)
-    menuVars.stillTypeIndex = Combo("Displacement", STILL_TYPES, menuVars.stillTypeIndex)
-    if stillType == "No" then ToolTip("Don't use an initial or end displacement") end
-    if stillType == "Start" then ToolTip("Use an initial starting displacement for the still") end
-    if stillType == "End" then ToolTip("Have a displacement to end at for the still") end
-    if stillType == "Auto" then ToolTip("Use last displacement of the previous still to start") end
-    if stillType == "Otua" then ToolTip("Use next displacement of the next still to end at") end
+    menuVars.stillTypeIndex = Combo("Displacement", STILL_TYPES, menuVars.stillTypeIndex, {}, {}, tooltipList)
+    ToolTip(tooltipList[menuVars.stillTypeIndex])
     if dontChooseDistance then
         imgui.Unindent(indentWidth)
     end

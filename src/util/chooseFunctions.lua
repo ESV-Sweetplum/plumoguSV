@@ -561,6 +561,14 @@ function chooseStartSVPercent(settingVars)
 end
 
 function chooseStillType(menuVars)
+    local tooltipList = {
+        "Don't use an initial or end displacement.",
+        "Use an initial starting displacement for the still.",
+        "Have a displacement to end at for the still.",
+        "Use last displacement of the previous still to start.",
+        "Use next displacement of the next still to end at.",
+    }
+
     local stillType = STILL_TYPES[menuVars.stillTypeIndex]
     local dontChooseDistance = stillType == "No" or
         stillType == "Auto" or
@@ -575,13 +583,9 @@ function chooseStillType(menuVars)
         imgui.PopItemWidth()
     end
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.4)
-    menuVars.stillTypeIndex = Combo("Displacement", STILL_TYPES, menuVars.stillTypeIndex)
+    menuVars.stillTypeIndex = Combo("Displacement", STILL_TYPES, menuVars.stillTypeIndex, {}, {}, tooltipList)
 
-    if stillType == "No" then ToolTip("Don't use an initial or end displacement") end
-    if stillType == "Start" then ToolTip("Use an initial starting displacement for the still") end
-    if stillType == "End" then ToolTip("Have a displacement to end at for the still") end
-    if stillType == "Auto" then ToolTip("Use last displacement of the previous still to start") end
-    if stillType == "Otua" then ToolTip("Use next displacement of the next still to end at") end
+    ToolTip(tooltipList[menuVars.stillTypeIndex])
 
     if dontChooseDistance then
         imgui.Unindent(indentWidth)

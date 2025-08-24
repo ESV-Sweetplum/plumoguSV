@@ -4,15 +4,16 @@
 ---@param listIndex integer The currently selected combo index.
 ---@param colorList? string[] An optional list containing an array of colors to use for each item.
 ---@param hiddenGroups? string[] An optional list, where if any items in list show up here, they will not be shown on the dropdown.
+---@param tooltipList? string[] An optional list, showing tooltips that should appear when an element is hovered over.
 ---@return number newListIndex The new combo index.
-function Combo(label, list, listIndex, colorList, hiddenGroups)
+function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     local newListIndex = math.clamp(listIndex, 1, #list)
     local currentComboItem = list[listIndex]
     local comboFlag = imgui_combo_flags.HeightLarge
     rgb = {}
     hiddenGroups = hiddenGroups or {}
 
-    if (colorList) then
+    if (colorList and truthy(colorList)) then
         colorList[newListIndex]:gsub("(%d+)", function(c)
             table.insert(rgb, c)
         end)
@@ -22,14 +23,14 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
     end
 
     if not imgui.BeginCombo(label, currentComboItem, comboFlag) then
-        if (colorList) then imgui.PopStyleColor() end
+        if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
         return newListIndex
     end
-    if (colorList) then imgui.PopStyleColor() end
+    if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
 
     for i = 1, #list do
         rgb = {}
-        if (colorList) then
+        if (colorList and truthy(colorList)) then
             colorList[i]:gsub("(%d+)", function(c)
                 table.insert(rgb, c)
             end)
@@ -40,8 +41,11 @@ function Combo(label, list, listIndex, colorList, hiddenGroups)
         if imgui.Selectable(listItem) then
             newListIndex = i
         end
+        if (tooltipList and truthy(tooltipList)) then
+            ToolTip(tooltipList[i])
+        end
         ::skipRender::
-        if (colorList) then imgui.PopStyleColor() end
+        if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
     end
     imgui.EndCombo()
     return newListIndex

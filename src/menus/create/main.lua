@@ -16,10 +16,19 @@ function createSVTab()
 end
 
 function chooseCreateTool()
+    local tooltipList = {
+        "Place standard shapes.",
+        "Non-standard effects.",
+        "Still shapes keep notes normal distance/spacing apart.",
+        "Make notes vibrate or appear to duplicate."
+    }
+
     imgui.AlignTextToFramePadding()
     imgui.Text("  Type:  ")
     KeepSameLine()
-    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex)
+    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex, {}, {}, tooltipList)
+
+    ToolTip(tooltipList[globalVars.placeTypeIndex])
+
     local placeType = CREATE_TYPES[globalVars.placeTypeIndex]
-    if placeType == "Still" then ToolTip("Still keeps notes normal distance/spacing apart") end
 end
