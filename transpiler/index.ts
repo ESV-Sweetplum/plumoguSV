@@ -121,7 +121,7 @@ export default async function transpiler(devMode = false, lint = true) {
         const assignmentRegex = new RegExp(
             `(?<!; )cache${'\\.([a-zA-Z0-9_]+)'.repeat(
                 i
-            )} = ([a-z ]{0,4}(?:[^ \n,]|, )+)`,
+            )} = ([a-z ]{0,4}(?:[^ \n,]|, | [\\+\\-\\*\\/\\%\\^] )+)`,
             'g'
         );
         output = output.replaceAll(

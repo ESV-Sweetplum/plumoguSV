@@ -7,6 +7,7 @@ EDIT_SV_TOOLS = { -- tools for editing SVs
     "Direct SV",
     "Displace Note",
     "Displace View",
+    "Duplicate Holistic",
     "Dynamic Scale",
     "Fix LN Ends",
     "Flicker",
@@ -33,6 +34,7 @@ function editSVTab()
     if toolName == "Direct SV" then directSVMenu() end
     if toolName == "Displace Note" then displaceNoteMenu() end
     if toolName == "Displace View" then displaceViewMenu() end
+    if toolName == "Duplicate Holistic" then duplicateHolisticMenu() end
     if toolName == "Dynamic Scale" then dynamicScaleMenu() end
     if toolName == "Fix LN Ends" then fixLNEndsMenu() end
     if toolName == "Flicker" then flickerMenu() end

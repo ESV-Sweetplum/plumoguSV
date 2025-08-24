@@ -1504,6 +1504,15 @@ DEFAULT_STARTING_MENU_VARS = {
     displaceView = {
         distance = 200
     },
+    duplicateHolistic = {
+        instanceStartTime = 0,
+        HOs = {},
+        TLs = {},
+        SVs = {},
+        SSFs = {},
+        BMs = {},
+        instanceTGIds = {}
+    },
     dynamicScale = {
         noteTimes = {},
         svTypeIndex = 1,
@@ -2920,6 +2929,57 @@ function displaceViewSVs(menuVars)
     end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
+end
+function instanceItems(menuVars)
+    clearInstance(menuVars)
+    local offsets = game.uniqueSelectedNoteOffsets()
+    local startOffset = offsets[1]
+    local endOffset = offsets[#offsets]
+    menuVars.HOs = game.getNotesBetweenOffsets(startOffset, endOffset)
+    menuVars.TLs = game.getLinesBetweenOffsets(startOffset, endOffset)
+    menuVars.BMs = game.getBookmarksBetweenOffsets(startOffset, endOffset)
+    local ogTgId = state.SelectedScrollGroupId
+    for tgId, _ in pairs(map.TimingGroups) do
+        state.SelectedScrollGroupId = tgId
+        menuVars.SVs = table.combine(menuVars.SVs, game.getSVsBetweenOffsets(startOffset, endOffset))
+        menuVars.SSFs = table.combine(menuVars.SSFs, game.getSSFsBetweenOffsets(startOffset, endOffset))
+        table.insert(menuVars.instanceTGIds, tgId)
+    end
+    state.SelectedScrollGroupId = ogTgId
+    menuVars.instanceStartTime = startOffset
+end
+function clearInstance(menuVars)
+    menuVars.HOs = {}
+    menuVars.TLs = {}
+    menuVars.SVs = {}
+    menuVars.SSFs = {}
+    menuVars.BMs = {}
+    menuVars.instanceTGIds = {}
+    menuVars.instanceStartTime = 0
+end
+function pasteInstance(menuVars)
+    local offset = state.SongTime - menuVars.instanceStartTime
+    local hos = {}
+    local tls = {}
+    local svs = {}
+    local ssfs = {}
+    local bms = {}
+    for _, ho in ipairs(menuVars.HOs) do
+        table.insert(hos, utils.CreateHitObject(ho.StartTime, ho.Lane, ho.EndTime, ho.HitSounds, ho.EditorLayer))
+    end
+    for _, tl in ipairs(menuVars.TLs) do
+        table.insert(tls, utils.CreateTimingPoint(tl.StartTime, tl.Bpm, tl.Signature, tl.Hidden))
+    end
+    for _, bm in ipairs(menuVars.BMs) do
+        table.insert(bms, utils.CreateBookmark(bm.StartTime, bm.Note))
+    end
+    actions.PerformBatch({
+        createEA(action_type.PlaceHitObjectBatch, hos),
+        createEA(action_type.AddTimingPointBatch, tls),
+        createEA(action_type.AddScrollVelocityBatch, svs),
+        createEA(action_type.AddScrollSpeedFactorBatch, ssfs),
+        createEA(action_type.AddBookmarkBatch, bms)
+    })
 end
 function dynamicScaleSVs(menuVars)
     local offsets = menuVars.noteTimes
@@ -6290,6 +6350,22 @@ function displaceViewMenu()
     AddSeparator()
     simpleActionMenu("Displace view between selected notes", 2, displaceViewSVs, menuVars)
 end
+function duplicateHolisticMenu()
+    local menuVars = getMenuVars("duplicateHolistic")
+    local copiedItemCount = #menuVars.HOs + #menuVars.TLs + #menuVars.BMs + #menuVars.SVs + #menuVars.SSFs
+    if (copiedItemCount == 0) then
+        simpleActionMenu("Copy items between selected notes", 2, instanceItems, menuVars)
+    else
+        FunctionButton("Clear copied items", ACTION_BUTTON_SIZE, clearInstance, menuVars)
+    end
+    if copiedItemCount == 0 then
+        cache.saveTable("duplicateHolisticMenu", menuVars)
+        return
+    end
+    cache.saveTable("duplicateHolisticMenu", menuVars)
+    AddSeparator()
+    simpleActionMenu("Paste items at current time", 0, pasteInstance, menuVars)
+end
 function dynamicScaleMenu()
     local menuVars = getMenuVars("dynamicScale")
     local numNoteTimes = #menuVars.noteTimes
@@ -6373,6 +6449,7 @@ EDIT_SV_TOOLS = {
     "Direct SV",
     "Displace Note",
     "Displace View",
+    "Duplicate Holistic",
     "Dynamic Scale",
     "Fix LN Ends",
     "Flicker",
@@ -6398,6 +6475,7 @@ function editSVTab()
     if toolName == "Direct SV" then directSVMenu() end
     if toolName == "Displace Note" then displaceNoteMenu() end
     if toolName == "Displace View" then displaceViewMenu() end
+    if toolName == "Duplicate Holistic" then duplicateHolisticMenu() end
     if toolName == "Dynamic Scale" then dynamicScaleMenu() end
     if toolName == "Fix LN Ends" then fixLNEndsMenu() end
     if toolName == "Flicker" then flickerMenu() end
