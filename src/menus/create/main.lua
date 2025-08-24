@@ -14,3 +14,12 @@ function createSVTab()
     if placeType == "Still" then placeStillSVMenu() end
     if placeType == "Vibrato" then placeVibratoSVMenu(false) end
 end
+
+function chooseCreateTool()
+    imgui.AlignTextToFramePadding()
+    imgui.Text("  Type:  ")
+    KeepSameLine()
+    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex)
+    local placeType = CREATE_TYPES[globalVars.placeTypeIndex]
+    if placeType == "Still" then ToolTip("Still keeps notes normal distance/spacing apart") end
+end

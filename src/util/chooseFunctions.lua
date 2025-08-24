@@ -256,48 +256,6 @@ function chooseVaryingDistance(settingVars)
     return SwappableNegatableInputFloat2(settingVars, "distance1", "distance2", "Dist.", "msx", 2)
 end
 
-function chooseSelectTool()
-    imgui.AlignTextToFramePadding()
-    imgui.Text("Current Type:")
-    KeepSameLine()
-    globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, globalVars.selectTypeIndex)
-
-    local selectTool = SELECT_TOOLS[globalVars.selectTypeIndex]
-    if selectTool == "Alternating" then ToolTip("Skip over notes then select one, and repeat") end
-    if selectTool == "By Snap" then ToolTip("Select all notes with a certain snap color") end
-    if selectTool == "Bookmark" then ToolTip("Jump to a bookmark") end
-    if selectTool == "Chord Size" then ToolTip("Select all notes with a certain chord size") end
-    if selectTool == "Note Type" then ToolTip("Select rice/ln notes") end
-end
-
-function chooseEditTool()
-    imgui.AlignTextToFramePadding()
-    imgui.Text("  Current Tool:")
-    KeepSameLine()
-    globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, globalVars.editToolIndex)
-
-    local svTool = EDIT_SV_TOOLS[globalVars.editToolIndex]
-    if svTool == "Add Teleport" then ToolTip("Add a large teleport SV to move far away") end
-    if svTool == "Align Timing Lines" then ToolTip("Create timing lines at notes to avoid desync") end
-    if svTool == "Change Timing Group" then ToolTip("Moves SVs and SSFs to a designated timing group.") end
-    if svTool == "Convert SV <-> SSF" then ToolTip("Convert multipliers between SV/SSF") end
-    if svTool == "Copy & Paste" then ToolTip("Copy SVs and SSFs and paste them somewhere else") end
-    if svTool == "Direct SV" then ToolTip("Directly update SVs within your selection") end
-    if svTool == "Displace Note" then ToolTip("Move where notes are hit on the screen") end
-    if svTool == "Displace View" then ToolTip("Temporarily displace the playfield view") end
-    if svTool == "Dynamic Scale" then ToolTip("Dynamically scale SVs across notes") end
-    if svTool == "Fix LN Ends" then ToolTip("Fix flipped LN ends") end
-    if svTool == "Flicker" then ToolTip("Flash notes on and off the screen") end
-    if svTool == "Layer Snaps" then ToolTip("Transfer snap colors into layers, to be loaded later") end
-    if svTool == "Measure" then ToolTip("Get stats about SVs in a section") end
-    if svTool == "Merge" then ToolTip("Combine SVs that overlap") end
-    if svTool == "Reverse Scroll" then ToolTip("Reverse the scroll direction using SVs") end
-    if svTool == "Scale (Multiply)" then ToolTip("Scale SV values by multiplying") end
-    if svTool == "Scale (Displace)" then ToolTip("Scale SV values by adding teleport SVs") end
-    if svTool == "Swap Notes" then ToolTip("Swap positions of notes using SVs") end
-    if svTool == "Vertical Shift" then ToolTip("Adds a constant value to SVs in a range") end
-end
-
 function chooseEffectFPS()
     local currentTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
     if currentTrail ~= "Snake" then return end
@@ -455,15 +413,6 @@ function choosePeriodShift(settingVars)
     newShift = math.wrappedClamp(newShift, -0.75, 1)
     settingVars.periodsShift = newShift
     return oldShift ~= newShift
-end
-
-function chooseCreateTool()
-    imgui.AlignTextToFramePadding()
-    imgui.Text("  Type:  ")
-    KeepSameLine()
-    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex)
-    local placeType = CREATE_TYPES[globalVars.placeTypeIndex]
-    if placeType == "Still" then ToolTip("Still keeps notes normal distance/spacing apart") end
 end
 
 function chooseCurrentScrollGroup()
