@@ -13,6 +13,13 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
 
+    local colorTable = {
+        rgbaToUint(225, 0, 0, 255),
+        rgbaToUint(200, 200, 0, 255),
+        rgbaToUint(75, 75, 255, 255),
+        rgbaToUint(200, 200, 0, 255),
+    }
+
     for i = 1, #colTbl do
         for _, col in ipairs(colTbl[i]) do
             local height = 50 * (#colTbl * distanceFn(math.wrap(progress + 0.25, 0, 1), i) + #colTbl - i)
@@ -22,8 +29,10 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
             local notePos = vector.New((col - 1) * 60 + 20, height) * szFactor
             local noteSize = vector.New(50, 20) * szFactor
 
-            ctx.AddRectFilledMultiColor(topLeft + notePos, topLeft + notePos + noteSize, rgbaToUint(255, 0, 0, 100),
-                rgbaToUint(255, 0, 0, 100), rgbaToUint(255, 0, 200, 255), rgbaToUint(255, 0, 200, 255))
+            local uintColor = rgbaToUint(255, 0, 0, 255)
+
+            ctx.AddRectFilledMultiColor(topLeft + notePos, topLeft + notePos + noteSize, colorTable[i], colorTable[i],
+                colorTable[i], colorTable[i])
         end
     end
     imgui.EndChild()
