@@ -5449,7 +5449,7 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
     local blue = rgbaToUint(75, 75, 255, 255)
     local yellow = rgbaToUint(200, 200, 0, 255)
     local colorTable = {
-        red, yellow, blue, yellow
+        [4] = { red, yellow, blue, yellow }
     }
     for i = 1, #colTbl do
         for _, col in ipairs(colTbl[i]) do
@@ -5460,8 +5460,9 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
             local notePos = vector.New((col - 1) * 60 + 20, height) * szFactor
             local noteSize = vector.New(50, 20) * szFactor
             local uintColor = rgbaToUint(255, 0, 0, 255)
-            ctx.AddRectFilledMultiColor(topLeft + notePos, topLeft + notePos + noteSize, colorTable[i], colorTable[i],
-                colorTable[i], colorTable[i])
+            ctx.AddRectFilledMultiColor(topLeft + notePos, topLeft + notePos + noteSize, colorTable[#colTbl][i],
+                colorTable[#colTbl][i],
+                colorTable[#colTbl][i], colorTable[#colTbl][i])
         end
     end
     imgui.EndChild()
@@ -5536,7 +5537,6 @@ function chooseCreateTool()
     KeepSameLine()
     globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex, {}, {}, tooltipList)
     ToolTip(tooltipList[globalVars.placeTypeIndex])
-    local placeType = CREATE_TYPES[globalVars.placeTypeIndex]
 end
 function renderPresetMenu(menuLabel, menuVars, settingVars)
     local newPresetName = state.GetValue("newPresetName", "")
@@ -6570,7 +6570,6 @@ function chooseEditTool()
     KeepSameLine()
     globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, globalVars.editToolIndex, {}, {}, tooltipList)
     ToolTip(tooltipList[globalVars.editToolIndex])
-    local svTool = EDIT_SV_TOOLS[globalVars.editToolIndex]
 end
 function measureMenu()
     local menuVars = getMenuVars("measure")

@@ -29,6 +29,4 @@ function chooseCreateTool()
     globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex, {}, {}, tooltipList)
 
     ToolTip(tooltipList[globalVars.placeTypeIndex])
-
-    local placeType = CREATE_TYPES[globalVars.placeTypeIndex]
 end

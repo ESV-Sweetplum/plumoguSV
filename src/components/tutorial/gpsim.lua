@@ -18,7 +18,7 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
     local yellow = rgbaToUint(200, 200, 0, 255)
 
     local colorTable = {
-        red, yellow, blue, yellow
+        [4] = { red, yellow, blue, yellow }
     }
 
     for i = 1, #colTbl do
@@ -32,8 +32,9 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
 
             local uintColor = rgbaToUint(255, 0, 0, 255)
 
-            ctx.AddRectFilledMultiColor(topLeft + notePos, topLeft + notePos + noteSize, colorTable[i], colorTable[i],
-                colorTable[i], colorTable[i])
+            ctx.AddRectFilledMultiColor(topLeft + notePos, topLeft + notePos + noteSize, colorTable[#colTbl][i],
+                colorTable[#colTbl][i],
+                colorTable[#colTbl][i], colorTable[#colTbl][i])
         end
     end
     imgui.EndChild()

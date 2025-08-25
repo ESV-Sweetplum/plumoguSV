@@ -78,6 +78,4 @@ function chooseEditTool()
     globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, globalVars.editToolIndex, {}, {}, tooltipList)
 
     ToolTip(tooltipList[globalVars.editToolIndex])
-
-    local svTool = EDIT_SV_TOOLS[globalVars.editToolIndex]
 end
