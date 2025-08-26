@@ -295,6 +295,14 @@ function kbm.listenForAnyKeyPressed()
     end
     return prefixes, key
 end
+---Gets the amount of distance the mouse moved THIS FRAME.
+---@param button? ImGuiMouseButton
+---@return Vector2 delta
+function kbm.mouseDelta(button)
+    local delta = imgui.GetMouseDragDelta(button or 0)
+    imgui.ResetMouseDragDelta(button or 0)
+    return delta
+end
 local ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
     "T", "U", "V", "W", "X", "Y", "Z" }
 ---Converts a key enum to a specific character.
@@ -8171,8 +8179,7 @@ function chooseBezier(settingVars)
         selectedBezier1 = true
     end
     if (imgui.IsMouseDragging("Left") and selectedBezier1) then
-        pos1 = pos1 + imgui.GetMouseDragDelta(0)
-        imgui.ResetMouseDragDelta(0)
+        pos1 = pos1 + kbm.mouseDelta()
     end
     if (not freeMode) then
         pos1 = vector.Clamp(pos1, vctr2(0), vctr2(150))
@@ -8183,8 +8190,7 @@ function chooseBezier(settingVars)
         selectedBezier2 = true
     end
     if (imgui.IsMouseDragging("Left") and selectedBezier2) then
-        pos2 = pos2 + imgui.GetMouseDragDelta(0)
-        imgui.ResetMouseDragDelta(0)
+        pos2 = pos2 + kbm.mouseDelta()
     end
     if (not freeMode) then
         pos2 = vector.Clamp(pos2, vctr2(0), vctr2(150))

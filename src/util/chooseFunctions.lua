@@ -39,8 +39,7 @@ function chooseBezier(settingVars)
     end
 
     if (imgui.IsMouseDragging("Left") and selectedBezier1) then
-        pos1 = pos1 + imgui.GetMouseDragDelta(0)
-        imgui.ResetMouseDragDelta(0)
+        pos1 = pos1 + kbm.mouseDelta()
     end
 
     if (not freeMode) then
@@ -55,8 +54,7 @@ function chooseBezier(settingVars)
     end
 
     if (imgui.IsMouseDragging("Left") and selectedBezier2) then
-        pos2 = pos2 + imgui.GetMouseDragDelta(0)
-        imgui.ResetMouseDragDelta(0)
+        pos2 = pos2 + kbm.mouseDelta()
     end
 
     if (not freeMode) then
