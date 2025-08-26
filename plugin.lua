@@ -361,6 +361,14 @@ function math.clamp(number, lowerBound, upperBound)
     if number > upperBound then return upperBound end
     return number
 end
+function math.evaluatePolynomial(ceff, x)
+    local sum = 0
+    local degree = #ceff - 1
+    for i, c in ipairs(ceff) do
+        sum = sum + c * x ^ (degree - i + 1)
+    end
+    return sum
+end
 ---Clamps a number between `lowerBound` and `upperBound` by repeatedly multiplying or dividing by the `multiplicativeFactor`.
 ---@param n number
 ---@param lowerBound number
@@ -1668,7 +1676,9 @@ DEFAULT_STARTING_SETTING_VARS = {
         startMsx = 0,
         endMsx = 100,
         controlPointCount = 3,
-        controlPoints = { vector.New(0, 230), vector.New(115, 0), vector.New(230, 230) }
+        controlPoints = { vector.New(0, 230), vector.New(115, 0), vector.New(230, 230) },
+        plotPoints = {},
+        plotCoefficients = {},
     },
     exponentialVibratoSV = {
         startMsx = 100,
@@ -5381,12 +5391,15 @@ end
 ---@param gridSize? integer To what degree you'd like the points to snap to.
 ---@param yScale? Vector2 If included, will create labels corresponding to this scale.
 ---@return ImDrawListPtr
+---@return boolean changed
 function renderGraph(label, size, points, preferForeground, gridSize, yScale)
     local gray = rgbaToUint(100, 100, 100, 100)
     local tableLabel = table.concat({ "graph_points_", label })
     local initDragList = {}
+    local initPointList = {}
     for i = 1, #points do
         initDragList[#initDragList + 1] = false
+        initPointList[#initPointList + 1] = points[i].pos
     end
     local dragList = state.GetValue(tableLabel, initDragList)
     local ctx = imgui.GetWindowDrawList()
@@ -5445,8 +5458,15 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
             end
         end
     end
+    local pointChanged = false
+    for i = 1, #points do
+        if (points[i].pos ~= initPointList[i]) then
+            pointChanged = true
+            break
+        end
+    end
     state.SetValue(tableLabel, dragList)
-    return ctx
+    return ctx, pointChanged
 end
 ---Creates an `imgui.inputInt` element.
 ---@param varsTable { [string]: any } The table that is meant to be modified.
@@ -6199,8 +6219,10 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Bounds##Vibrato", " msx", 0, 0.875)
         _, settingVars.controlPointCount = imgui.InputInt("Control Points", settingVars.controlPointCount)
         settingVars.controlPointCount = math.clamp(settingVars.controlPointCount, 1, 10)
+        local pointList = {}
         AddSeparator()
         local size = 220
+        local RESOLUTION = 50
         while (settingVars.controlPointCount > #settingVars.controlPoints) do
             local points = table.duplicate(settingVars.controlPoints)
             table.insert(points, vector.New(math.random(size), math.random(size)))
@@ -6209,14 +6231,14 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         while (settingVars.controlPointCount < #settingVars.controlPoints) do
             table.remove(settingVars.controlPoints, #settingVars.controlPoints)
         end
-        local pointList = {}
         for _, point in pairs(settingVars.controlPoints) do
             table.insert(pointList,
                 { pos = table.vectorize2(point), col = rgbaToUint(255, 255, 255, 255), size = 5 })
         end
         imgui.SetCursorPosX(26)
         imgui.BeginChild("Polynomial Vibrato Interactive Window" .. tostring(separateWindow), vctr2(size), 67, 31)
-        local ctx = renderGraph("Polynomial Vibrato Menu" .. tostring(separateWindow), vctr2(size), pointList, false, 11,
+        local ctx, changedPoints = renderGraph("Polynomial Vibrato Menu" .. tostring(separateWindow), vctr2(size),
+            pointList, false, 11,
             vector.New(settingVars.startMsx, settingVars.endMsx))
         for i = 1, settingVars.controlPointCount do
             settingVars.controlPoints[i] = vector.Clamp(pointList[i].pos, vctr2(0), vctr2(size))
@@ -6225,53 +6247,51 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         for _, point in pairs(settingVars.controlPoints) do
             table.insert(normalizedPoints, vector.New(point.x, size - point.y))
         end
-        local mtrx = {}
-        local vctr = {}
-        local pointCount = settingVars.controlPointCount
-        for i, point in pairs(settingVars.controlPoints) do
-            table.insert(mtrx, 1, {})
-            for j = 1, pointCount do
-                mtrx[1][#mtrx[1] + 1] = point.x ^ (pointCount - j)
+        if (changedPoints) then
+            plotPoints = {}
+            local mtrx = {}
+            local vctr = {}
+            local pointCount = settingVars.controlPointCount
+            for i, point in pairs(settingVars.controlPoints) do
+                table.insert(mtrx, 1, {})
+                for j = 1, pointCount do
+                    mtrx[1][#mtrx[1] + 1] = point.x ^ (pointCount - j)
+                end
+                table.insert(vctr, 1, size - point.y)
             end
-            table.insert(vctr, 1, size - point.y)
-        end
-        local sorted = false
-        while (not sorted) do
-            sorted = true
-            for i = 1, #mtrx - 1 do
-                if (mtrx[i][2] < mtrx[i + 1][2]) then
-                    local tempRow = table.duplicate(mtrx[i])
-                    mtrx[i] = table.duplicate(mtrx[i + 1])
-                    mtrx[i + 1] = tempRow
-                    local tempValue = vctr[i]
-                    vctr[i] = vctr[i + 1]
-                    vctr[i + 1] = tempValue
-                    sorted = false
+            local sorted = false
+            while (not sorted) do
+                sorted = true
+                for i = 1, #mtrx - 1 do
+                    if (mtrx[i][2] < mtrx[i + 1][2]) then
+                        local tempRow = table.duplicate(mtrx[i])
+                        mtrx[i] = table.duplicate(mtrx[i + 1])
+                        mtrx[i + 1] = tempRow
+                        local tempValue = vctr[i]
+                        vctr[i] = vctr[i + 1]
+                        vctr[i + 1] = tempValue
+                        sorted = false
+                    end
                 end
             end
-        end
-        local coefficients = matrix.solve(mtrx, vctr) ---@cast coefficients number[]
-        local RESOLUTION = 50
-        local topLeft = imgui.GetWindowPos()
-        local function evaluatePolynomial(ceff, x)
-            local sum = 0
-            local degree = #ceff - 1
-            for i, c in ipairs(ceff) do
-                sum = sum + c * x ^ (degree - i + 1)
+            local coefficients = matrix.solve(mtrx, vctr) ---@cast coefficients number[]
+            for i = 0, RESOLUTION - 1 do
+                local x = i / RESOLUTION * size
+                local y = size - math.clamp(math.evaluatePolynomial(coefficients, x), 0, size)
+                table.insert(plotPoints, vector.New(x, y))
             end
-            return math.clamp(sum, 0, size)
+            settingVars.plotPoints = table.duplicate(plotPoints)
+            settingVars.plotCoefficients = table.duplicate(coefficients)
         end
-        for i = 0, RESOLUTION - 1 do
-            local currentX = i / RESOLUTION * size
-            local nextX = (i + 1) / RESOLUTION * size
-            local currentY = size - evaluatePolynomial(coefficients, currentX)
-            local nextY = size - evaluatePolynomial(coefficients, nextX)
-            ctx.AddLine(topLeft + vector.New(currentX, currentY), topLeft + vector.New(nextX, nextY),
+        local topLeft = imgui.GetWindowPos()
+        for i = 1, #settingVars.plotPoints - 1 do
+            ctx.AddLine(topLeft + settingVars.plotPoints[i], topLeft + settingVars.plotPoints[i + 1],
                 imgui.GetColorU32("PlotLines", 0.5), 3)
         end
         imgui.EndChild()
         local func = function(t)
-            return (settingVars.startMsx - settingVars.endMsx) * (1 - evaluatePolynomial(coefficients, t * size) / size) +
+            return (settingVars.startMsx - settingVars.endMsx) *
+                (1 - math.clamp(math.evaluatePolynomial(settingVars.plotCoefficients, t * size) / size, 0, size)) +
                 settingVars.endMsx
         end
         AddSeparator()

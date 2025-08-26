@@ -11,12 +11,15 @@
 ---@param gridSize? integer To what degree you'd like the points to snap to.
 ---@param yScale? Vector2 If included, will create labels corresponding to this scale.
 ---@return ImDrawListPtr
+---@return boolean changed
 function renderGraph(label, size, points, preferForeground, gridSize, yScale)
     local gray = rgbaToUint(100, 100, 100, 100)
     local tableLabel = table.concat({ "graph_points_", label })
     local initDragList = {}
+    local initPointList = {}
     for i = 1, #points do
         table.insert(initDragList, false)
+        table.insert(initPointList, points[i].pos)
     end
     local dragList = state.GetValue(tableLabel, initDragList)
 
@@ -86,7 +89,15 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
         end
     end
 
+    local pointChanged = false
+    for i = 1, #points do
+        if (points[i].pos ~= initPointList[i]) then
+            pointChanged = true
+            break
+        end
+    end
+
     state.SetValue(tableLabel, dragList)
 
-    return ctx
+    return ctx, pointChanged
 end

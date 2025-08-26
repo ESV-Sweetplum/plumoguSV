@@ -7,7 +7,9 @@ DEFAULT_STARTING_SETTING_VARS = {
         startMsx = 0,
         endMsx = 100,
         controlPointCount = 3,
-        controlPoints = { vector.New(0, 230), vector.New(115, 0), vector.New(230, 230) }
+        controlPoints = { vector.New(0, 230), vector.New(115, 0), vector.New(230, 230) },
+        plotPoints = {},
+        plotCoefficients = {},
     },
     exponentialVibratoSV = {
         startMsx = 100,
