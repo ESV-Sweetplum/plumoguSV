@@ -8213,8 +8213,11 @@ function chooseBezier(settingVars)
     local freeMode = state.GetValue("boolean.bezierFreeMode") or false
     local red = 4278190335
     local blue = 4294901760
-    local pointList = state.GetValue("bezier_pointList",
-        { { pos = vector.New(30, 75), col = red, size = 10 }, { pos = vector.New(120, 75), col = blue, size = 10 } })
+    local pos1 = (settingVars.p1 * vctr2(150)) or vector.New(30, 75)
+    local pos2 = (settingVars.p2 * vctr2(150)) or vector.New(120, 75)
+    pos1.y = 150 - pos1.y
+    pos2.y = 150 - pos2.y
+    local pointList = { { pos = pos1, col = red, size = 10 }, { pos = pos2, col = blue, size = 10 } }
     local ctx = renderGraph("Bezier Interactive Window", vctr2(150), pointList, freeMode)
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
@@ -8240,8 +8243,8 @@ function chooseBezier(settingVars)
     KeepSameLine()
     imgui.BeginChild("Bezier Data", vector.New(100, 150))
     imgui.SetCursorPosX(7)
-    pos1 = vector.New(pos1.x, 150 - pos1.y)
-    pos2 = vector.New(pos2.x, 150 - pos2.y)
+    pos1.y = 150 - pos1.y
+    pos2.y = 150 - pos2.y
     local normalizedPos1 = pos1 / vctr2(150)
     local normalizedPos2 = pos2 / vctr2(150)
     imgui.Text("\n\n         Point 1:\n      (" ..
