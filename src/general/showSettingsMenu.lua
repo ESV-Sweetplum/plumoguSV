@@ -5,13 +5,13 @@
 --    settingVars   : list of variables used for the current menu [Table]
 --    skipFinalSV   : whether or not to skip choosing the final SV [Boolean]
 --    svPointsForce : number of SV points to force [Int or nil]
-function showSettingsMenu(currentSVType, settingVars, skipFinalSV, svPointsForce)
+function showSettingsMenu(currentSVType, settingVars, skipFinalSV, svPointsForce, optionalLabel)
     if currentSVType == "Linear" then
         return linearSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     elseif currentSVType == "Exponential" then
         return exponentialSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     elseif currentSVType == "Bezier" then
-        return bezierSettingsMenu(settingVars, skipFinalSV, svPointsForce)
+        return bezierSettingsMenu(settingVars, skipFinalSV, svPointsForce, optionalLabel)
     elseif currentSVType == "Hermite" then
         return hermiteSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     elseif currentSVType == "Sinusoidal" then

@@ -26,7 +26,7 @@ function placeStandardSVMenu()
         return
     end
 
-    needSVUpdate = showSettingsMenu(currentSVType, settingVars, false, nil) or needSVUpdate
+    needSVUpdate = showSettingsMenu(currentSVType, settingVars, false, nil, "Standard") or needSVUpdate
     AddSeparator()
 
     needSVUpdate = chooseInterlace(menuVars) or needSVUpdate

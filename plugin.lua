@@ -1751,8 +1751,8 @@ end]]
         distanceMode = 1
     },
     bezier = {
-        p1 = vctr2(0),
-        p2 = vctr2(1),
+        p1 = vector.New(0.1, 0.9),
+        p2 = vector.New(0.9, 0.1),
         verticalShift = 0,
         avgSV = 1,
         svPoints = 16,
@@ -5589,13 +5589,13 @@ function checkEnoughSelectedNotes(minimumNotes)
     if numSelectedNotes > game.keyCount then return true end
     return selectedNotes[1].StartTime ~= selectedNotes[numSelectedNotes].StartTime
 end
-function showSettingsMenu(currentSVType, settingVars, skipFinalSV, svPointsForce)
+function showSettingsMenu(currentSVType, settingVars, skipFinalSV, svPointsForce, optionalLabel)
     if currentSVType == "Linear" then
         return linearSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     elseif currentSVType == "Exponential" then
         return exponentialSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     elseif currentSVType == "Bezier" then
-        return bezierSettingsMenu(settingVars, skipFinalSV, svPointsForce)
+        return bezierSettingsMenu(settingVars, skipFinalSV, svPointsForce, optionalLabel)
     elseif currentSVType == "Hermite" then
         return hermiteSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     elseif currentSVType == "Sinusoidal" then
@@ -6013,7 +6013,7 @@ function placeStandardSVMenu()
         renderPresetMenu("Standard", menuVars, settingVars)
         return
     end
-    needSVUpdate = showSettingsMenu(currentSVType, settingVars, false, nil) or needSVUpdate
+    needSVUpdate = showSettingsMenu(currentSVType, settingVars, false, nil, "Standard") or needSVUpdate
     AddSeparator()
     needSVUpdate = chooseInterlace(menuVars) or needSVUpdate
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, false) end
@@ -6048,7 +6048,7 @@ function placeStillSVMenu()
     menuVars.stillBehavior = Combo("Still Behavior", STILL_BEHAVIOR_TYPES, menuVars.stillBehavior)
     chooseStillType(menuVars)
     AddSeparator()
-    needSVUpdate = showSettingsMenu(currentSVType, settingVars, false, nil) or needSVUpdate
+    needSVUpdate = showSettingsMenu(currentSVType, settingVars, false, nil, "Still") or needSVUpdate
     AddSeparator()
     needSVUpdate = chooseInterlace(menuVars) or needSVUpdate
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, false) end
@@ -6653,7 +6653,7 @@ function dynamicScaleMenu()
         return
     end
     local settingVars = getSettingVars(currentSVType, "DynamicScale")
-    needSVUpdate = showSettingsMenu(currentSVType, settingVars, true, numSVPoints) or needSVUpdate
+    needSVUpdate = showSettingsMenu(currentSVType, settingVars, true, numSVPoints, "DynamicScale") or needSVUpdate
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, true) end
     startNextWindowNotCollapsed("svInfoAutoOpen")
     makeSVInfoWindow("SV Info", menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
@@ -8341,8 +8341,8 @@ function chooseAverageSV(menuVars)
     menuVars.avgSV = outputValue
     return settingsChanged
 end
-function chooseBezier(settingVars)
-    imgui.BeginChild("Bezier Interactive Window", vctr2(150), 67, 31)
+function chooseBezier(settingVars, optionalLabel)
+    imgui.BeginChild("Bezier Interactive Window" .. optionalLabel, vctr2(150), 67, 31)
     local freeMode = state.GetValue("boolean.bezierFreeMode") or false
     local red = 4278190335
     local blue = 4294901760
@@ -8351,7 +8351,7 @@ function chooseBezier(settingVars)
     pos1.y = 150 - pos1.y
     pos2.y = 150 - pos2.y
     local pointList = { { pos = pos1, col = red, size = 10 }, { pos = pos2, col = blue, size = 10 } }
-    local ctx = renderGraph("Bezier Interactive Window", vctr2(150), pointList, freeMode, 5)
+    local ctx = renderGraph("Bezier Interactive Window" .. optionalLabel, vctr2(150), pointList, freeMode)
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
     if (not freeMode) then
@@ -9982,9 +9982,9 @@ function displayStutterSVWindows(settingVars)
             settingVars.svMultipliers, settingVars.stutterDuration, false)
     end
 end
-function bezierSettingsMenu(settingVars, skipFinalSV, svPointsForce)
+function bezierSettingsMenu(settingVars, skipFinalSV, svPointsForce, optionalLabel)
     local settingsChanged = false
-    settingsChanged = chooseBezier(settingVars) or settingsChanged
+    settingsChanged = chooseBezier(settingVars, optionalLabel or "") or settingsChanged
     settingsChanged = chooseConstantShift(settingVars, 0) or settingsChanged
     settingsChanged = chooseAverageSV(settingVars) or settingsChanged
     settingsChanged = chooseSVPoints(settingVars, svPointsForce) or settingsChanged
@@ -10032,7 +10032,7 @@ function comboSettingsMenu(settingVars)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     local svType1 = STANDARD_SVS[settingVars.svType1Index]
     local settingVars1 = getSettingVars(svType1, "Combo1")
-    settingsChanged = showSettingsMenu(svType1, settingVars1, true, nil) or settingsChanged
+    settingsChanged = showSettingsMenu(svType1, settingVars1, true, nil, "Combo1") or settingsChanged
     local labelText1 = svType1 .. "Combo1"
     cache.saveTable(labelText1 .. "Settings", settingVars1)
     imgui.End()
@@ -10041,7 +10041,7 @@ function comboSettingsMenu(settingVars)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     local svType2 = STANDARD_SVS[settingVars.svType2Index]
     local settingVars2 = getSettingVars(svType2, "Combo2")
-    settingsChanged = showSettingsMenu(svType2, settingVars2, true, nil) or settingsChanged
+    settingsChanged = showSettingsMenu(svType2, settingVars2, true, nil, "Combo2") or settingsChanged
     local labelText2 = svType2 .. "Combo2"
     cache.saveTable(labelText2 .. "Settings", settingVars2)
     imgui.End()

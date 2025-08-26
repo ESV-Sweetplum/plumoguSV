@@ -19,8 +19,8 @@ function chooseAverageSV(menuVars)
     return settingsChanged
 end
 
-function chooseBezier(settingVars)
-    imgui.BeginChild("Bezier Interactive Window", vctr2(150), 67, 31)
+function chooseBezier(settingVars, optionalLabel)
+    imgui.BeginChild("Bezier Interactive Window" .. optionalLabel, vctr2(150), 67, 31)
 
     local freeMode = cache.boolean.bezierFreeMode or false
 
@@ -35,7 +35,7 @@ function chooseBezier(settingVars)
 
     local pointList = { { pos = pos1, col = red, size = 10 }, { pos = pos2, col = blue, size = 10 } }
 
-    local ctx = renderGraph("Bezier Interactive Window", vctr2(150), pointList, freeMode, 5)
+    local ctx = renderGraph("Bezier Interactive Window" .. optionalLabel, vctr2(150), pointList, freeMode)
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
 

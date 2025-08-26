@@ -17,7 +17,7 @@ function placeStillSVMenu()
     chooseStillType(menuVars)
 
     AddSeparator()
-    needSVUpdate = showSettingsMenu(currentSVType, settingVars, false, nil) or needSVUpdate
+    needSVUpdate = showSettingsMenu(currentSVType, settingVars, false, nil, "Still") or needSVUpdate
 
     AddSeparator()
     needSVUpdate = chooseInterlace(menuVars) or needSVUpdate

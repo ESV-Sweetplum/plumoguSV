@@ -91,8 +91,8 @@ end]]
         distanceMode = 1
     },
     bezier = {
-        p1 = vctr2(0),
-        p2 = vctr2(1),
+        p1 = vector.New(0.1, 0.9),
+        p2 = vector.New(0.9, 0.1),
         verticalShift = 0,
         avgSV = 1,
         svPoints = 16,
