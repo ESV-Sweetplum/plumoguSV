@@ -5,6 +5,7 @@
 ---@param multiplicativeFactor? number
 ---@return number
 function math.expoClamp(n, lowerBound, upperBound, multiplicativeFactor)
+    if (upperBound <= lowerBound) then return n end
     if (n <= upperBound and n >= lowerBound) then return n end
     local factor = multiplicativeFactor < 1 and 1 / multiplicativeFactor or multiplicativeFactor
     while (n < lowerBound) do
