@@ -6166,7 +6166,7 @@ VIBRATO_SVS = {
 }
 function placeVibratoSVMenu(separateWindow)
     PresetButton()
-    local menuVars = getMenuVars("placeVibrato")
+    local menuVars = getMenuVars("placeVibrato", tostring(separateWindow))
     chooseVibratoSVType(menuVars)
     AddSeparator()
     imgui.Text("Vibrato Settings:")
@@ -6176,7 +6176,8 @@ function placeVibratoSVMenu(separateWindow)
         chooseVibratoSides(menuVars)
     end
     local currentSVType = VIBRATO_SVS[menuVars.svTypeIndex]
-    local settingVars = getSettingVars(currentSVType .. (menuVars.vibratoMode == 1 and "SV" or "SSF"), "Vibrato")
+    local settingVars = getSettingVars(currentSVType .. (menuVars.vibratoMode == 1 and "SV" or "SSF"),
+        "Vibrato" .. tostring(separateWindow))
     if globalVars.showPresetMenu then
         renderPresetMenu("Vibrato", menuVars, settingVars)
         return
@@ -6188,13 +6189,14 @@ function placeVibratoSVMenu(separateWindow)
     if currentSVType == "Sinusoidal##Vibrato" then sinusoidalVibratoMenu(menuVars, settingVars, separateWindow) end
     if currentSVType == "Sigmoidal##Vibrato" then sigmoidalVibratoMenu(menuVars, settingVars, separateWindow) end
     if currentSVType == "Custom##Vibrato" then customVibratoMenu(menuVars, settingVars, separateWindow) end
-    local labelText = currentSVType .. (menuVars.vibratoMode == 1 and "SV" or "SSF") .. "Vibrato"
+    local labelText = currentSVType ..
+    (menuVars.vibratoMode == 1 and "SV" or "SSF") .. "Vibrato" .. tostring(separateWindow)
     cache.saveTable(labelText .. "Settings", settingVars)
-    cache.saveTable("placeVibratoMenu", menuVars)
+    cache.saveTable(table.concat({"placeVibrato", tostring(separateWindow), "Menu"}), menuVars)
 end
 function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
-        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Min/Max Msx##Vibrato", " msx", 0, 0.875)
+        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Bounds##Vibrato", " msx", 0, 0.875)
         _, settingVars.controlPointCount = imgui.InputInt("Control Points", settingVars.controlPointCount)
         settingVars.controlPointCount = math.clamp(settingVars.controlPointCount, 1, 10)
         AddSeparator()
@@ -6213,8 +6215,8 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
                 { pos = table.vectorize2(point), col = rgbaToUint(255, 255, 255, 255), size = 5 })
         end
         imgui.SetCursorPosX(26)
-        imgui.BeginChild("Polynomial Vibrato Interactive Window", vctr2(size), 67, 31)
-        local ctx = renderGraph("Polynomial Vibrato Menu", vctr2(size), pointList, false, 11,
+        imgui.BeginChild("Polynomial Vibrato Interactive Window" .. tostring(separateWindow), vctr2(size), 67, 31)
+        local ctx = renderGraph("Polynomial Vibrato Menu" .. tostring(separateWindow), vctr2(size), pointList, false, 11,
             vector.New(settingVars.startMsx, settingVars.endMsx))
         for i = 1, settingVars.controlPointCount do
             settingVars.controlPoints[i] = vector.Clamp(pointList[i].pos, vctr2(0), vctr2(size))
