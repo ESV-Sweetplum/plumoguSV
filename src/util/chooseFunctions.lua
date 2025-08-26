@@ -28,6 +28,8 @@ function chooseBezier(settingVars)
     local selectedBezier1 = cache.boolean.selectedBezier1 or false
     local selectedBezier2 = cache.boolean.selectedBezier2 or false
 
+    local freeMode = cache.boolean.bezierFreeMode or false
+
     imgui.SetCursorPos(pos1 - vctr2(10))
     imgui.PushStyleVar(imgui_style_var.ChildRounding, 169)
     imgui.InvisibleButton("##Bezier1", vctr2(20))
@@ -37,8 +39,12 @@ function chooseBezier(settingVars)
     end
 
     if (imgui.IsMouseDragging("Left") and selectedBezier1) then
-        pos1 = vector.Clamp(pos1 + imgui.GetMouseDragDelta(0, -1), vctr2(0), vctr2(150))
+        pos1 = pos1 + imgui.GetMouseDragDelta(0)
         imgui.ResetMouseDragDelta(0)
+    end
+
+    if (not freeMode) then
+        pos1 = vector.Clamp(pos1, vctr2(0), vctr2(150))
     end
 
     imgui.SetCursorPos(pos2 - vctr2(10))
@@ -49,8 +55,12 @@ function chooseBezier(settingVars)
     end
 
     if (imgui.IsMouseDragging("Left") and selectedBezier2) then
-        pos2 = vector.Clamp(pos2 + imgui.GetMouseDragDelta(0, -1), vctr2(0), vctr2(150))
+        pos2 = pos2 + imgui.GetMouseDragDelta(0)
         imgui.ResetMouseDragDelta(0)
+    end
+
+    if (not freeMode) then
+        pos2 = vector.Clamp(pos2, vctr2(0), vctr2(150))
     end
 
     if (not imgui.IsMouseDown("Left")) then
@@ -67,6 +77,9 @@ function chooseBezier(settingVars)
     cache.boolean.selectedBezier2 = selectedBezier2
 
     local ctx = imgui.GetWindowDrawList()
+    if (freeMode) then
+        ctx = imgui.GetForegroundDrawList()
+    end
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
 
@@ -92,6 +105,7 @@ function chooseBezier(settingVars)
     imgui.EndChild()
 
     KeepSameLine()
+    imgui.BeginChild("Bezier Data", vector.New(100, 150))
     imgui.SetCursorPosX(imgui.GetCursorPosX() + 5)
 
     pos1 = vector.New(pos1.x, 150 - pos1.y)
@@ -100,10 +114,18 @@ function chooseBezier(settingVars)
     local normalizedPos1 = pos1 / vctr2(150)
     local normalizedPos2 = pos2 / vctr2(150)
 
-    imgui.Text("\n\n\n         Point 1:\n      (" ..
+    imgui.Text("\n\n         Point 1:\n      (" ..
         string.format("%.2f", normalizedPos1.x) ..
-        ", " .. string.format("%.2f", normalizedPos1.y) .. ")\n\n         Point 2:\n      (" ..
-        string.format("%.2f", normalizedPos2.x) .. ", " .. string.format("%.2f", normalizedPos2.y) .. ")")
+        ", " .. string.format("%.2f", normalizedPos1.y) .. ")\n         Point 2:\n      (" ..
+        string.format("%.2f", normalizedPos2.x) .. ", " .. string.format("%.2f", normalizedPos2.y) .. ")\n\n")
+
+    _, freeMode = imgui.Checkbox("Free Mode##Bezier", freeMode)
+    cache.boolean.bezierFreeMode = freeMode
+
+    ToolTip(
+        "Enable this to allow the bezier control points to move outside the boundary. WARNING: ONCE MOVED OUTSIDE, THEY CANNOT BE MOVED BACK IN. DISABLE AND RE-ENABLE FREE MODE TO ALLOW THEM TO BE INTERACTED WITH.")
+
+    imgui.EndChild()
 
     local oldP1 = settingVars.p1
     local oldP2 = settingVars.p2
