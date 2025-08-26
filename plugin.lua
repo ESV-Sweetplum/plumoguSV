@@ -353,6 +353,23 @@ function math.clamp(number, lowerBound, upperBound)
     if number > upperBound then return upperBound end
     return number
 end
+---Clamps a number between `lowerBound` and `upperBound` by repeatedly multiplying or dividing by the `multiplicativeFactor`.
+---@param n number
+---@param lowerBound number
+---@param upperBound number
+---@param multiplicativeFactor? number
+---@return number
+function math.expoClamp(n, lowerBound, upperBound, multiplicativeFactor)
+    if (n <= upperBound and n >= lowerBound) then return n end
+    local factor = multiplicativeFactor < 1 and 1 / multiplicativeFactor or multiplicativeFactor
+    while (n < lowerBound) do
+        n = n * factor
+    end
+    while (n > upperBound) do
+        n = n / factor
+    end
+    return n
+end
 ---Returns the factorial of an integer.
 ---@param n integer
 ---@return integer
@@ -9684,8 +9701,8 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
         local ctx = imgui.GetWindowDrawList()
         local topLeft = imgui.GetWindowPos()
         local dim = imgui.GetWindowSize()
-        local simTime = 120000 / game.getTimingPointAt(state.SongTime).Bpm
-        local curTime = (state.UnixTime) % simTime
+        local simTime = math.expoClamp(120000 / game.getTimingPointAt(state.SongTime).Bpm, 600, 1200, 2)
+        local curTime = state.UnixTime % simTime
         local progress = curTime / simTime
         local maxDist = math.max(table.unpack(svDistances))
         local minDist = math.min(table.unpack(svDistances))
@@ -10048,7 +10065,7 @@ function draw()
     imgui.EndTabBar()
     if (not performanceMode) then
         if (globalVars.showVibratoWidget) then
-            imgui.Begin("plumoguSV-Vibrato", imgui_window_flags.AlwaysAutoResize)
+            imgui.Begin("plumoguSV-vibrato", imgui_window_flags.AlwaysAutoResize)
             imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
             placeVibratoSVMenu(true)
             imgui.End()
