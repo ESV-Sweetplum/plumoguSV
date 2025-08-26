@@ -3,6 +3,12 @@ DEFAULT_STARTING_SETTING_VARS = {
         startMsx = 100,
         endMsx = 0
     },
+    polynomialVibratoSV = {
+        startMsx = 100,
+        endMsx = 0,
+        controlPointCount = 3,
+        controlPoints = { vector.New(0, 250), vector.New(125, 0), vector.New(250, 250) }
+    },
     exponentialVibratoSV = {
         startMsx = 100,
         endMsx = 0,

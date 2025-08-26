@@ -4,10 +4,9 @@ function matrix.findZeroRow(mtrx)
         for _, num in ipairs(row) do
             if (num ~= 0) then
                 zeroRow = false
-                goto continue
+                break
             end
         end
-        ::continue::
         if (zeroRow) then return idx end
     end
     return -1

@@ -1,5 +1,6 @@
 VIBRATO_SVS = { -- types of vibrato SVs
     "Linear##Vibrato",
+    "Polynomial##Vibrato",
     "Exponential##Vibrato",
     "Sinusoidal##Vibrato",
     "Sigmoidal##Vibrato",
@@ -29,6 +30,7 @@ function placeVibratoSVMenu(separateWindow)
     AddSeparator()
 
     if currentSVType == "Linear##Vibrato" then linearVibratoMenu(menuVars, settingVars, separateWindow) end
+    if currentSVType == "Polynomial##Vibrato" then polynomialVibratoMenu(menuVars, settingVars, separateWindow) end
     if currentSVType == "Exponential##Vibrato" then exponentialVibratoMenu(menuVars, settingVars, separateWindow) end
     if currentSVType == "Sinusoidal##Vibrato" then sinusoidalVibratoMenu(menuVars, settingVars, separateWindow) end
     if currentSVType == "Sigmoidal##Vibrato" then sigmoidalVibratoMenu(menuVars, settingVars, separateWindow) end
