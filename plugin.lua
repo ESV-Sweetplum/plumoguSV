@@ -9128,9 +9128,11 @@ function generateBezierSet(p1, p2, avgValue, numValues, verticalShift)
     local timeGuesses = {}
     local targetXPositions = {}
     local iterations = 20
+    local xPosCount = numValues
+    if (globalVars.equalizeLinear) then xPosCount = xPosCount - 1 end
     for i = 1, numValues do
         timeGuesses[#timeGuesses + 1] = startingTimeGuess
-        targetXPositions[#targetXPositions + 1] = i / numValues
+        targetXPositions[#targetXPositions + 1] = i / xPosCount
     end
     for i = 1, iterations do
         local timeIncrement = 0.5 ^ (i + 1)
