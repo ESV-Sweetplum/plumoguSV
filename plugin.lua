@@ -8159,8 +8159,8 @@ function chooseAverageSV(menuVars)
 end
 function chooseBezier(settingVars)
     imgui.BeginChild("Bezier Interactive Window", vctr2(150), 67, 31)
-    local pos1 = state.GetValue("lists.buttonPos1") or vector.New(20, 110)
-    local pos2 = state.GetValue("lists.buttonPos2") or vector.New(90, 20)
+    local pos1 = state.GetValue("lists.buttonPos1") or vector.New(30, 75)
+    local pos2 = state.GetValue("lists.buttonPos2") or vector.New(120, 75)
     local selectedBezier1 = state.GetValue("boolean.selectedBezier1") or false
     local selectedBezier2 = state.GetValue("boolean.selectedBezier2") or false
     imgui.SetCursorPos(pos1 - vctr2(10))
@@ -10027,6 +10027,12 @@ function awake()
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
     if (not truthy(#map.TimingPoints)) then
         print("e!", "Please place a timing point before attempting to use plumoguSV.")
+    end
+    if (state.Scale ~= 1) then
+        local printedScale = math.round(state.Scale * 100)
+        print("w!",
+            "Your ImGui scale is set to " ..
+            printedScale .. "% instead of 100%. For visual purposes, please set it back to 100%.")
     end
 end
 function listenForHitObjectChanges()

@@ -22,8 +22,8 @@ end
 function chooseBezier(settingVars)
     imgui.BeginChild("Bezier Interactive Window", vctr2(150), 67, 31)
 
-    local pos1 = cache.lists.buttonPos1 or vector.New(20, 110)
-    local pos2 = cache.lists.buttonPos2 or vector.New(90, 20)
+    local pos1 = cache.lists.buttonPos1 or vector.New(30, 75)
+    local pos2 = cache.lists.buttonPos2 or vector.New(120, 75)
 
     local selectedBezier1 = cache.boolean.selectedBezier1 or false
     local selectedBezier2 = cache.boolean.selectedBezier2 or false
