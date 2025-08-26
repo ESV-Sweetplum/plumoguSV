@@ -29,5 +29,5 @@ function matrix.solve(mtrx, vctr)
         end
     end
 
-    return table.unpack(table.property(augMtrx, #mtrx + 1)) -- Last Column
+    return table.property(augMtrx, #mtrx + 1) -- Last Column
 end

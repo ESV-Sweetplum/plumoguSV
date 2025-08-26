@@ -1,13 +1,16 @@
 function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
-        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End##Vibrato", " msx", 0, 0.875)
-
+        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "L/H Msx##Vibrato", " msx", 0, 0.875)
         _, settingVars.controlPointCount = imgui.InputInt("Control Points", settingVars.controlPointCount)
         settingVars.controlPointCount = math.clamp(settingVars.controlPointCount, 1, 10)
 
+        AddSeparator()
+
+        local size = 220
+
         while (settingVars.controlPointCount > #settingVars.controlPoints) do
             local points = table.duplicate(settingVars.controlPoints)
-            table.insert(points, vector.New(math.random(255), math.random(255)))
+            table.insert(points, vector.New(math.random(size), math.random(size)))
             settingVars.controlPoints = table.duplicate(points)
         end
 
@@ -21,14 +24,15 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
                 { pos = table.vectorize2(point), col = rgbaToUint(255, 255, 255, 255), size = 5 })
         end
 
-        imgui.BeginChild("Polynomial Vibrato Interactive Window", vctr2(250), 67, 31)
-        local ctx = renderGraph("Polynomial Vibrato Menu", vctr2(250), pointList, false)
+        imgui.SetCursorPosX(26)
+        imgui.BeginChild("Polynomial Vibrato Interactive Window", vctr2(size), 67, 31)
+        local ctx = renderGraph("Polynomial Vibrato Menu", vctr2(size), pointList, false, 11)
         for i = 1, settingVars.controlPointCount do
-            settingVars.controlPoints[i] = vector.Clamp(pointList[i].pos, vctr2(0), vctr2(250))
+            settingVars.controlPoints[i] = vector.Clamp(pointList[i].pos, vctr2(0), vctr2(size))
         end
         local normalizedPoints = {}
         for _, point in pairs(settingVars.controlPoints) do
-            table.insert(normalizedPoints, vector.New(point.x, 250 - point.y))
+            table.insert(normalizedPoints, vector.New(point.x, size - point.y))
         end
 
         local mtrx = {}
@@ -39,7 +43,24 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
             for j = 1, pointCount do
                 table.insert(mtrx[1], point.x ^ (pointCount - j))
             end
-            table.insert(vctr, 1, 250 - point.y)
+            table.insert(vctr, 1, size - point.y)
+        end
+
+        local sorted = false
+
+        while (not sorted) do
+            sorted = true
+            for i = 1, #mtrx - 1 do
+                if (mtrx[i][2] < mtrx[i + 1][2]) then
+                    local tempRow = table.duplicate(mtrx[i])
+                    mtrx[i] = table.duplicate(mtrx[i + 1])
+                    mtrx[i + 1] = tempRow
+                    local tempValue = vctr[i]
+                    vctr[i] = vctr[i + 1]
+                    vctr[i + 1] = tempValue
+                    sorted = false
+                end
+            end
         end
 
         local coefficients = matrix.solve(mtrx, vctr) ---@cast coefficients number[]
@@ -53,15 +74,15 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
             for i, c in ipairs(ceff) do
                 sum = sum + c * x ^ (degree - i + 1)
             end
-            return math.clamp(sum, 0, 250)
+            return math.clamp(sum, 0, size)
         end
 
         for i = 0, RESOLUTION - 1 do
-            local currentX = i / RESOLUTION * 250
-            local nextX = (i + 1) / RESOLUTION * 250
+            local currentX = i / RESOLUTION * size
+            local nextX = (i + 1) / RESOLUTION * size
 
-            local currentY = 250 - evaluatePolynomial(coefficients, currentX)
-            local nextY = 250 - evaluatePolynomial(coefficients, nextX)
+            local currentY = size - evaluatePolynomial(coefficients, currentX)
+            local nextY = size - evaluatePolynomial(coefficients, nextX)
 
             ctx.AddLine(topLeft + vector.New(currentX, currentY), topLeft + vector.New(nextX, nextY),
                 imgui.GetColorU32("PlotLines", 0.5), 3)
@@ -69,7 +90,8 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
 
         imgui.EndChild()
         local func = function(t)
-            return settingVars.endMsx * t + settingVars.startMsx * (1 - t)
+            return (settingVars.endMsx - settingVars.startMsx) * (1 - evaluatePolynomial(coefficients, t * size) / size) +
+                settingVars.startMsx
         end
         AddSeparator()
 

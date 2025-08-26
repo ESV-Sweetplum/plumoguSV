@@ -468,7 +468,7 @@ function matrix.solve(mtrx, vctr)
             matrix.rowLinComb(augMtrx, j, i, -augMtrx[j][i]) -- Triangular Upward Sweep
         end
     end
-    return table.unpack(table.property(augMtrx, #mtrx + 1))
+    return table.property(augMtrx, #mtrx + 1)
 end
 ---Rounds a number to a given amount of decimal places.
 ---@param number number
@@ -1668,7 +1668,7 @@ DEFAULT_STARTING_SETTING_VARS = {
         startMsx = 100,
         endMsx = 0,
         controlPointCount = 3,
-        controlPoints = { vector.New(0, 250), vector.New(125, 0), vector.New(250, 250) }
+        controlPoints = { vector.New(0, 230), vector.New(115, 0), vector.New(230, 230) }
     },
     exponentialVibratoSV = {
         startMsx = 100,
@@ -5378,8 +5378,10 @@ end
 ---@param size Vector2 The size of the graph.
 ---@param points GraphPoint[] A list of points that can be dragged around.
 ---@param preferForeground? boolean Set this to true if you want to use `GetForegroundDrawList` instead of `GetWindowDrawList`.
+---@param gridSize? integer To what degree you'd like the points to snap to.
 ---@return ImDrawListPtr
-function renderGraph(label, size, points, preferForeground)
+function renderGraph(label, size, points, preferForeground, gridSize)
+    local gray = rgbaToUint(100, 100, 100, 100)
     local tableLabel = table.concat({ "graph_points_", label })
     local initDragList = {}
     for i = 1, #points do
@@ -5404,9 +5406,29 @@ function renderGraph(label, size, points, preferForeground)
         if (not dragList[i]) then col = col - alphaDifference end
         ctx.AddCircleFilled(topLeft + point.pos, point.size, col)
     end
+    gridSize = gridSize or 1
     if (not imgui.IsMouseDown("Left")) then
         for i = 1, #points do
             dragList[i] = false
+            local roundedX = math.round(points[i].pos.x / gridSize) * gridSize
+            local roundedY = math.round(points[i].pos.y / gridSize) * gridSize
+            points[i].pos = vector.New(roundedX, roundedY)
+        end
+    end
+    if (gridSize ~= 1) then
+        for i = 0, size.x, gridSize do
+            local col = gray
+            if (not truthy(i % 4)) then
+                col = rgbaToUint(100, 100, 100, 255)
+            end
+            ctx.AddLine(vector.New(topLeft.x + i, topLeft.y), vector.New(topLeft.x + i, topLeft.y + dim.y), col, 1)
+        end
+        for i = 0, size.y, gridSize do
+            local col = gray
+            if (not truthy(i % 4)) then
+                col = rgbaToUint(100, 100, 100, 255)
+            end
+            ctx.AddLine(vector.New(topLeft.x, topLeft.y + i), vector.New(topLeft.x + dim.x, topLeft.y + i), col, 1)
         end
     end
     state.SetValue(tableLabel, dragList)
@@ -6158,12 +6180,14 @@ function placeVibratoSVMenu(separateWindow)
 end
 function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
-        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End##Vibrato", " msx", 0, 0.875)
+        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "L/H Msx##Vibrato", " msx", 0, 0.875)
         _, settingVars.controlPointCount = imgui.InputInt("Control Points", settingVars.controlPointCount)
         settingVars.controlPointCount = math.clamp(settingVars.controlPointCount, 1, 10)
+        AddSeparator()
+        local size = 220
         while (settingVars.controlPointCount > #settingVars.controlPoints) do
             local points = table.duplicate(settingVars.controlPoints)
-            table.insert(points, vector.New(math.random(255), math.random(255)))
+            table.insert(points, vector.New(math.random(size), math.random(size)))
             settingVars.controlPoints = table.duplicate(points)
         end
         while (settingVars.controlPointCount < #settingVars.controlPoints) do
@@ -6174,14 +6198,15 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
             table.insert(pointList,
                 { pos = table.vectorize2(point), col = rgbaToUint(255, 255, 255, 255), size = 5 })
         end
-        imgui.BeginChild("Polynomial Vibrato Interactive Window", vctr2(250), 67, 31)
-        local ctx = renderGraph("Polynomial Vibrato Menu", vctr2(250), pointList, false)
+        imgui.SetCursorPosX(26)
+        imgui.BeginChild("Polynomial Vibrato Interactive Window", vctr2(size), 67, 31)
+        local ctx = renderGraph("Polynomial Vibrato Menu", vctr2(size), pointList, false, 11)
         for i = 1, settingVars.controlPointCount do
-            settingVars.controlPoints[i] = vector.Clamp(pointList[i].pos, vctr2(0), vctr2(250))
+            settingVars.controlPoints[i] = vector.Clamp(pointList[i].pos, vctr2(0), vctr2(size))
         end
         local normalizedPoints = {}
         for _, point in pairs(settingVars.controlPoints) do
-            table.insert(normalizedPoints, vector.New(point.x, 250 - point.y))
+            table.insert(normalizedPoints, vector.New(point.x, size - point.y))
         end
         local mtrx = {}
         local vctr = {}
@@ -6191,7 +6216,22 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
             for j = 1, pointCount do
                 table.insert(mtrx[1], point.x ^ (pointCount - j))
             end
-            table.insert(vctr, 1, 250 - point.y)
+            table.insert(vctr, 1, size - point.y)
+        end
+        local sorted = false
+        while (not sorted) do
+            sorted = true
+            for i = 1, #mtrx - 1 do
+                if (mtrx[i][2] < mtrx[i + 1][2]) then
+                    local tempRow = table.duplicate(mtrx[i])
+                    mtrx[i] = table.duplicate(mtrx[i + 1])
+                    mtrx[i + 1] = tempRow
+                    local tempValue = vctr[i]
+                    vctr[i] = vctr[i + 1]
+                    vctr[i + 1] = tempValue
+                    sorted = false
+                end
+            end
         end
         local coefficients = matrix.solve(mtrx, vctr) ---@cast coefficients number[]
         local RESOLUTION = 50
@@ -6202,19 +6242,20 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
             for i, c in ipairs(ceff) do
                 sum = sum + c * x ^ (degree - i + 1)
             end
-            return math.clamp(sum, 0, 250)
+            return math.clamp(sum, 0, size)
         end
         for i = 0, RESOLUTION - 1 do
-            local currentX = i / RESOLUTION * 250
-            local nextX = (i + 1) / RESOLUTION * 250
-            local currentY = 250 - evaluatePolynomial(coefficients, currentX)
-            local nextY = 250 - evaluatePolynomial(coefficients, nextX)
+            local currentX = i / RESOLUTION * size
+            local nextX = (i + 1) / RESOLUTION * size
+            local currentY = size - evaluatePolynomial(coefficients, currentX)
+            local nextY = size - evaluatePolynomial(coefficients, nextX)
             ctx.AddLine(topLeft + vector.New(currentX, currentY), topLeft + vector.New(nextX, nextY),
                 imgui.GetColorU32("PlotLines", 0.5), 3)
         end
         imgui.EndChild()
         local func = function(t)
-            return settingVars.endMsx * t + settingVars.startMsx * (1 - t)
+            return (settingVars.endMsx - settingVars.startMsx) * (1 - evaluatePolynomial(coefficients, t * size) / size) +
+                settingVars.startMsx
         end
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)

@@ -8,8 +8,10 @@
 ---@param size Vector2 The size of the graph.
 ---@param points GraphPoint[] A list of points that can be dragged around.
 ---@param preferForeground? boolean Set this to true if you want to use `GetForegroundDrawList` instead of `GetWindowDrawList`.
+---@param gridSize? integer To what degree you'd like the points to snap to.
 ---@return ImDrawListPtr
-function renderGraph(label, size, points, preferForeground)
+function renderGraph(label, size, points, preferForeground, gridSize)
+    local gray = rgbaToUint(100, 100, 100, 100)
     local tableLabel = table.concat({ "graph_points_", label })
     local initDragList = {}
     for i = 1, #points do
@@ -41,9 +43,32 @@ function renderGraph(label, size, points, preferForeground)
         ctx.AddCircleFilled(topLeft + point.pos, point.size, col)
     end
 
+    gridSize = gridSize or 1
+
     if (not imgui.IsMouseDown("Left")) then
         for i = 1, #points do
             dragList[i] = false
+            local roundedX = math.round(points[i].pos.x / gridSize) * gridSize
+            local roundedY = math.round(points[i].pos.y / gridSize) * gridSize
+
+            points[i].pos = vector.New(roundedX, roundedY)
+        end
+    end
+
+    if (gridSize ~= 1) then
+        for i = 0, size.x, gridSize do
+            local col = gray
+            if (not truthy(i % 4)) then
+                col = rgbaToUint(100, 100, 100, 255)
+            end
+            ctx.AddLine(vector.New(topLeft.x + i, topLeft.y), vector.New(topLeft.x + i, topLeft.y + dim.y), col, 1)
+        end
+        for i = 0, size.y, gridSize do
+            local col = gray
+            if (not truthy(i % 4)) then
+                col = rgbaToUint(100, 100, 100, 255)
+            end
+            ctx.AddLine(vector.New(topLeft.x, topLeft.y + i), vector.New(topLeft.x + dim.x, topLeft.y + i), col, 1)
         end
     end
 
