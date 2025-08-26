@@ -19,17 +19,99 @@ function chooseAverageSV(menuVars)
     return settingsChanged
 end
 
-function chooseBezierPoints(settingVars)
-    local oldFirstPoint = settingVars.p1
-    local oldSecondPoint = settingVars.p2
-    local _, newFirstPoint = imgui.SliderFloat2("(x1, y1)", oldFirstPoint, 0, 1, "%.2f")
-    HelpMarker("Coordinates of the first point of the cubic bezier")
-    local _, newSecondPoint = imgui.SliderFloat2("(x2, y2)", oldSecondPoint, 0, 1, "%.2f")
-    HelpMarker("Coordinates of the second point of the cubic bezier")
-    settingVars.p1 = newFirstPoint
-    settingVars.p2 = newSecondPoint
+function chooseBezier(settingVars)
+    imgui.BeginChild("Bezier Interactive Window", vctr2(150), 67, 31)
 
-    return settingVars.p1 ~= oldFirstPoint or settingVars.p2 ~= oldSecondPoint
+    local pos1 = cache.lists.buttonPos1 or vector.New(20, 110)
+    local pos2 = cache.lists.buttonPos2 or vector.New(90, 20)
+
+    local selectedBezier1 = cache.boolean.selectedBezier1 or false
+    local selectedBezier2 = cache.boolean.selectedBezier2 or false
+
+    imgui.SetCursorPos(pos1 - vctr2(10))
+    imgui.PushStyleVar(imgui_style_var.ChildRounding, 169)
+    imgui.InvisibleButton("##Bezier1", vctr2(20))
+
+    if (imgui.IsMouseDown("Left") and imgui.IsItemActive()) then
+        selectedBezier1 = true
+    end
+
+    if (imgui.IsMouseDragging("Left") and selectedBezier1) then
+        pos1 = vector.Clamp(pos1 + imgui.GetMouseDragDelta(0, -1), vctr2(0), vctr2(150))
+        imgui.ResetMouseDragDelta(0)
+    end
+
+    imgui.SetCursorPos(pos2 - vctr2(10))
+    imgui.InvisibleButton("##Bezier2", vctr2(20))
+
+    if (imgui.IsMouseDown("Left") and imgui.IsItemActive()) then
+        selectedBezier2 = true
+    end
+
+    if (imgui.IsMouseDragging("Left") and selectedBezier2) then
+        pos2 = vector.Clamp(pos2 + imgui.GetMouseDragDelta(0, -1), vctr2(0), vctr2(150))
+        imgui.ResetMouseDragDelta(0)
+    end
+
+    if (not imgui.IsMouseDown("Left")) then
+        selectedBezier1 = false
+        selectedBezier2 = false
+    end
+
+    imgui.PopStyleVar()
+
+    cache.lists.buttonPos1 = pos1
+    cache.lists.buttonPos2 = pos2
+
+    cache.boolean.selectedBezier1 = selectedBezier1
+    cache.boolean.selectedBezier2 = selectedBezier2
+
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+
+    local dottedCol = imgui.GetColorU32(imgui_col.ButtonHovered)
+    local mainCol = imgui.GetColorU32(imgui_col.ButtonActive)
+    local point1Col = rgbaToUint(255, 0, 0, 255)
+    local point2Col = rgbaToUint(0, 0, 255, 255)
+
+    local alphaDifference = 150 * 16 ^ 6
+
+    if (not selectedBezier1) then point1Col = point1Col - alphaDifference end
+    if (not selectedBezier2) then point2Col = point2Col - alphaDifference end
+
+    local bottomLeft = vector.New(topLeft.x + 1, topLeft.y + dim.y - 1)
+    local topRight = vector.New(topLeft.x + dim.x - 1, topLeft.y + 1)
+
+    ctx.AddBezierCubic(bottomLeft, topLeft + pos1, topLeft + pos2, topRight, mainCol, 3)
+    ctx.AddLine(bottomLeft, topLeft + pos1, dottedCol, 2)
+    ctx.AddLine(topRight, topLeft + pos2, dottedCol, 2)
+    ctx.AddCircleFilled(topLeft + pos1, 10, point1Col)
+    ctx.AddCircleFilled(topLeft + pos2, 10, point2Col)
+
+    imgui.EndChild()
+
+    KeepSameLine()
+    imgui.SetCursorPosX(imgui.GetCursorPosX() + 5)
+
+    pos1 = vector.New(pos1.x, 150 - pos1.y)
+    pos2 = vector.New(pos2.x, 150 - pos2.y)
+
+    local normalizedPos1 = pos1 / vctr2(150)
+    local normalizedPos2 = pos2 / vctr2(150)
+
+    imgui.Text("\n\n\n         Point 1:\n      (" ..
+        string.format("%.2f", normalizedPos1.x) ..
+        ", " .. string.format("%.2f", normalizedPos1.y) .. ")\n\n         Point 2:\n      (" ..
+        string.format("%.2f", normalizedPos2.x) .. ", " .. string.format("%.2f", normalizedPos2.y) .. ")")
+
+    local oldP1 = settingVars.p1
+    local oldP2 = settingVars.p2
+
+    settingVars.p1 = normalizedPos1
+    settingVars.p2 = normalizedPos2
+
+    return oldP1 ~= settingVars.p1 or oldP2 ~= settingVars.p2
 end
 
 function chooseChinchillaIntensity(settingVars)

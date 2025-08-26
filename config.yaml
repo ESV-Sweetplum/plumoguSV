@@ -530,6 +530,20 @@ defaultProperties:
       linearlyChange: false
     displaceView:
       distance: 200
+    duplicateHolistic:
+      instanceStartTime: 0
+      HOs:
+      - 
+      TLs:
+      - 
+      SVs:
+      - 
+      SSFs:
+      - 
+      BMs:
+      - 
+      instanceTGIds:
+      - 
     dynamicScale:
       noteTimes:
       - 

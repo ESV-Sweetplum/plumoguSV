@@ -18,7 +18,7 @@ function generateBezierSet(p1, p2, avgValue, numValues, verticalShift)
     for i = 1, iterations do
         local timeIncrement = 0.5 ^ (i + 1)
         for j = 1, numValues do
-            local xPositionGuess = math.cubicBezier(p1.x, p1.y, timeGuesses[j])
+            local xPositionGuess = math.cubicBezier(p1.x, p2.x, timeGuesses[j])
             if xPositionGuess < targetXPositions[j] then
                 timeGuesses[j] = timeGuesses[j] + timeIncrement
             elseif xPositionGuess > targetXPositions[j] then
@@ -28,7 +28,7 @@ function generateBezierSet(p1, p2, avgValue, numValues, verticalShift)
     end
     local yPositions = { 0 }
     for i = 1, #timeGuesses do
-        local yPosition = math.cubicBezier(p2.x, p2.y, timeGuesses[i])
+        local yPosition = math.cubicBezier(p1.y, p2.y, timeGuesses[i])
         table.insert(yPositions, yPosition)
     end
     local bezierSet = {}

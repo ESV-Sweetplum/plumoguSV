@@ -5722,7 +5722,7 @@ function displayFrameTimes(settingVars)
     HelpMarker("Make sure to select ALL lanes from a chord with multiple notes, not just one lane")
     AddPadding()
     local frameTimeSelectionArea = vector.New(ACTION_BUTTON_SIZE.x, 120)
-    imgui.BeginChild("FrameTimes", frameTimeSelectionArea, 1)
+    imgui.BeginChild("Frame Times", frameTimeSelectionArea, 1)
     for i = 1, #settingVars.frameTimes do
         local frameTimeData = {}
         local frameTime = settingVars.frameTimes[i]
@@ -7299,8 +7299,6 @@ function showDefaultPropertiesSettings()
     end
     if (imgui.CollapsingHeader("Bezier Settings")) then
         local settingVars = getSettingVars("Bezier", "Property")
-        provideBezierWebsiteLink(settingVars)
-        chooseBezierPoints(settingVars)
         chooseConstantShift(settingVars, 0)
         chooseAverageSV(settingVars)
         chooseSVPoints(settingVars)
@@ -8142,16 +8140,73 @@ function chooseAverageSV(menuVars)
     menuVars.avgSV = outputValue
     return settingsChanged
 end
-function chooseBezierPoints(settingVars)
-    local oldFirstPoint = settingVars.p1
-    local oldSecondPoint = settingVars.p2
-    local _, newFirstPoint = imgui.SliderFloat2("(x1, y1)", oldFirstPoint, 0, 1, "%.2f")
-    HelpMarker("Coordinates of the first point of the cubic bezier")
-    local _, newSecondPoint = imgui.SliderFloat2("(x2, y2)", oldSecondPoint, 0, 1, "%.2f")
-    HelpMarker("Coordinates of the second point of the cubic bezier")
-    settingVars.p1 = newFirstPoint
-    settingVars.p2 = newSecondPoint
-    return settingVars.p1 ~= oldFirstPoint or settingVars.p2 ~= oldSecondPoint
+function chooseBezier(settingVars)
+    imgui.BeginChild("Bezier Interactive Window", vctr2(150), 67, 31)
+    local pos1 = state.GetValue("lists.buttonPos1") or vector.New(20, 110)
+    local pos2 = state.GetValue("lists.buttonPos2") or vector.New(90, 20)
+    local selectedBezier1 = state.GetValue("boolean.selectedBezier1") or false
+    local selectedBezier2 = state.GetValue("boolean.selectedBezier2") or false
+    imgui.SetCursorPos(pos1 - vctr2(10))
+    imgui.PushStyleVar(imgui_style_var.ChildRounding, 169)
+    imgui.InvisibleButton("##Bezier1", vctr2(20))
+    if (imgui.IsMouseDown("Left") and imgui.IsItemActive()) then
+        selectedBezier1 = true
+    end
+    if (imgui.IsMouseDragging("Left") and selectedBezier1) then
+        pos1 = vector.Clamp(pos1 + imgui.GetMouseDragDelta(0, -1), vctr2(0), vctr2(150))
+        imgui.ResetMouseDragDelta(0)
+    end
+    imgui.SetCursorPos(pos2 - vctr2(10))
+    imgui.InvisibleButton("##Bezier2", vctr2(20))
+    if (imgui.IsMouseDown("Left") and imgui.IsItemActive()) then
+        selectedBezier2 = true
+    end
+    if (imgui.IsMouseDragging("Left") and selectedBezier2) then
+        pos2 = vector.Clamp(pos2 + imgui.GetMouseDragDelta(0, -1), vctr2(0), vctr2(150))
+        imgui.ResetMouseDragDelta(0)
+    end
+    if (not imgui.IsMouseDown("Left")) then
+        selectedBezier1 = false
+        selectedBezier2 = false
+    end
+    imgui.PopStyleVar()
+    state.SetValue("lists.buttonPos1", pos1)
+    state.SetValue("lists.buttonPos2", pos2)
+    state.SetValue("boolean.selectedBezier1", selectedBezier1)
+    state.SetValue("boolean.selectedBezier2", selectedBezier2)
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    local dottedCol = imgui.GetColorU32(imgui_col.ButtonHovered)
+    local mainCol = imgui.GetColorU32(imgui_col.ButtonActive)
+    local point1Col = rgbaToUint(255, 0, 0, 255)
+    local point2Col = rgbaToUint(0, 0, 255, 255)
+    local alphaDifference = 150 * 16 ^ 6
+    if (not selectedBezier1) then point1Col = point1Col - alphaDifference end
+    if (not selectedBezier2) then point2Col = point2Col - alphaDifference end
+    local bottomLeft = vector.New(topLeft.x + 1, topLeft.y + dim.y - 1)
+    local topRight = vector.New(topLeft.x + dim.x - 1, topLeft.y + 1)
+    ctx.AddBezierCubic(bottomLeft, topLeft + pos1, topLeft + pos2, topRight, mainCol, 3)
+    ctx.AddLine(bottomLeft, topLeft + pos1, dottedCol, 2)
+    ctx.AddLine(topRight, topLeft + pos2, dottedCol, 2)
+    ctx.AddCircleFilled(topLeft + pos1, 10, point1Col)
+    ctx.AddCircleFilled(topLeft + pos2, 10, point2Col)
+    imgui.EndChild()
+    KeepSameLine()
+    imgui.SetCursorPosX(imgui.GetCursorPosX() + 5)
+    pos1 = vector.New(pos1.x, 150 - pos1.y)
+    pos2 = vector.New(pos2.x, 150 - pos2.y)
+    local normalizedPos1 = pos1 / vctr2(150)
+    local normalizedPos2 = pos2 / vctr2(150)
+    imgui.Text("\n\n\n         Point 1:\n      (" ..
+        string.format("%.2f", normalizedPos1.x) ..
+        table.concat({", ", string.format("%.2f", normalizedPos1.y), ")\n\n         Point 2:\n      ("}) ..
+        string.format("%.2f", normalizedPos2.x) .. table.concat({", ", string.format("%.2f", normalizedPos2.y), ")"}))
+    local oldP1 = settingVars.p1
+    local oldP2 = settingVars.p2
+    settingVars.p1 = normalizedPos1
+    settingVars.p2 = normalizedPos2
+    return oldP1 ~= settingVars.p1 or oldP2 ~= settingVars.p2
 end
 function chooseChinchillaIntensity(settingVars)
     local oldIntensity = settingVars.chinchillaIntensity
@@ -8892,7 +8947,7 @@ function generateBezierSet(p1, p2, avgValue, numValues, verticalShift)
     for i = 1, iterations do
         local timeIncrement = 0.5 ^ (i + 1)
         for j = 1, numValues do
-            local xPositionGuess = math.cubicBezier(p1.x, p1.y, timeGuesses[j])
+            local xPositionGuess = math.cubicBezier(p1.x, p2.x, timeGuesses[j])
             if xPositionGuess < targetXPositions[j] then
                 timeGuesses[j] = timeGuesses[j] + timeIncrement
             elseif xPositionGuess > targetXPositions[j] then
@@ -8902,7 +8957,7 @@ function generateBezierSet(p1, p2, avgValue, numValues, verticalShift)
     end
     local yPositions = { 0 }
     for i = 1, #timeGuesses do
-        local yPosition = math.cubicBezier(p2.x, p2.y, timeGuesses[i])
+        local yPosition = math.cubicBezier(p1.y, p2.y, timeGuesses[i])
         yPositions[#yPositions + 1] = yPosition
     end
     local bezierSet = {}
@@ -9741,36 +9796,12 @@ function displayStutterSVWindows(settingVars)
 end
 function bezierSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     local settingsChanged = false
-    settingsChanged = provideBezierWebsiteLink(settingVars) or settingsChanged
-    settingsChanged = chooseBezierPoints(settingVars) or settingsChanged
+    settingsChanged = chooseBezier(settingVars) or settingsChanged
     settingsChanged = chooseConstantShift(settingVars, 0) or settingsChanged
     settingsChanged = chooseAverageSV(settingVars) or settingsChanged
     settingsChanged = chooseSVPoints(settingVars, svPointsForce) or settingsChanged
     settingsChanged = chooseFinalSV(settingVars, skipFinalSV) or settingsChanged
     return settingsChanged
-end
-function provideBezierWebsiteLink(settingVars)
-    local coordinateParsed = false
-    local bezierText = state.GetValue("bezier_text") or "https://cubic-bezier.com/"
-    _, bezierText = imgui.InputText("##bezierWebsite", bezierText, 100, imgui_input_text_flags.AutoSelectAll)
-    KeepSameLine()
-    if imgui.Button("Parse##bezierValues", SECONDARY_BUTTON_SIZE) then
-        local regex = "(-?%d*%.?%d+)"
-        local values = {}
-        for value, _ in string.gmatch(bezierText, regex) do
-            values[#values + 1] = math.toNumber(value)
-        end
-        if #values >= 4 then
-            settingVars.p1 = vector.New(values[1], values[2])
-            settingVars.p2 = vector.New(values[3], values[4])
-            coordinateParsed = true
-        end
-        bezierText = "https://cubic-bezier.com/"
-    end
-    state.SetValue("bezier_text", bezierText)
-    HelpMarker(
-        "This site lets you play around with a cubic bezier whose graph represents the motion/path of notes. After finding a good shape for note motion, paste the resulting url into the input box and hit the parse button to import the coordinate values. Alternatively, enter 4 numbers to use as the coordinates using the given inputs.")
-    return coordinateParsed
 end
 function chinchillaSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     local settingsChanged = false
