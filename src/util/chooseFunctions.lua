@@ -57,7 +57,7 @@ function chooseBezier(settingVars)
     local factor2 = 1 - 10 / dist2
 
     ctx.AddLine(bottomLeft, bottomLeft + factor1 * vector.New(pos1.x, pos1.y - dim.y), dottedCol, 2)
-    ctx.AddLine(topRight, topRight + factor2 * vector.New(-dim.x + pos2.x, pos2.y), dottedCol, 2)
+    ctx.AddLine(topRight, topRight + factor2 * vector.New(pos2.x - dim.x, pos2.y), dottedCol, 2)
 
     imgui.EndChild()
 
