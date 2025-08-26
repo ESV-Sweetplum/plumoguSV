@@ -63,7 +63,7 @@ function chooseBezier(settingVars)
 
     KeepSameLine()
     imgui.BeginChild("Bezier Data", vector.New(100, 150))
-    imgui.SetCursorPosX(imgui.GetCursorPosX() + 5)
+    imgui.SetCursorPosX(7)
 
     pos1 = vector.New(pos1.x, 150 - pos1.y)
     pos2 = vector.New(pos2.x, 150 - pos2.y)
@@ -75,6 +75,8 @@ function chooseBezier(settingVars)
         string.format("%.2f", normalizedPos1.x) ..
         ", " .. string.format("%.2f", normalizedPos1.y) .. ")\n         Point 2:\n      (" ..
         string.format("%.2f", normalizedPos2.x) .. ", " .. string.format("%.2f", normalizedPos2.y) .. ")\n\n")
+
+    imgui.SetCursorPosX(5)
 
     _, freeMode = imgui.Checkbox("Free Mode##Bezier", freeMode)
     cache.boolean.bezierFreeMode = freeMode
