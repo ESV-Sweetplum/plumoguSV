@@ -125,7 +125,7 @@ function drawCurrentFrame(settingVars)
     local noteWidth = 200 / mapKeyCount
     local noteSpacing = 5
     local barNoteHeight = math.round(2 * noteWidth / 5, 0)
-    local noteColor = rgbaToUint(117, 117, 117, 255)
+    local noteColor = color.rgbaToUint(117, 117, 117, 255)
     local noteSkinType = NOTE_SKIN_TYPES[settingVars.noteSkinTypeIndex]
     local drawlist = imgui.GetWindowDrawList()
     local childHeight = 250

@@ -89,7 +89,7 @@ function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrail
         if not cursorTrailGhost then
             alpha = math.floor(255 * (trailPoints - i) / (trailPoints - 1))
         end
-        local color = rgbaToUint(255, 255, 255, alpha)
+        local color = color.rgbaToUint(255, 255, 255, alpha)
         if trailShape == "Circles" then
             o.AddCircleFilled(point, cursorTrailSize, color)
         elseif trailShape == "Triangles" then
@@ -195,7 +195,7 @@ function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustS
             local dustY = dustParticle.y + dy
             local dustCoords = vector.New(dustX, dustY)
             local alpha = math.round(255 * (1 - time), 0)
-            local dustColor = rgbaToUint(currentRGBColors.red, currentRGBColors.green, currentRGBColors.blue, alpha)
+            local dustColor = color.rgbaToUint(currentRGBColors.red, currentRGBColors.green, currentRGBColors.blue, alpha)
             o.AddCircleFilled(dustCoords, dustSize, dustColor)
         end
     end
@@ -280,9 +280,9 @@ function renderSparkleParticles(o, t, sparkleParticles, sparkleDuration, sparkle
             local sparkleY = sparkleParticle.y + dy
             local sparkleCoords = vector.New(sparkleX, sparkleY)
             -- local alpha = math.round(255 * (1 - time), 0)
-            local white = rgbaToUint(255, 255, 255, 255)
+            local white = color.rgbaToUint(255, 255, 255, 255)
             local actualSize = sparkleSize * (1 - math.quadraticBezier(0, time))
-            local sparkleColor = rgbaToUint(255, 255, 100, 30)
+            local sparkleColor = color.rgbaToUint(255, 255, 100, 30)
             drawGlare(o, sparkleCoords, actualSize, white, sparkleColor)
         end
     end

@@ -13,7 +13,7 @@
 ---@return ImDrawListPtr
 ---@return boolean changed
 function renderGraph(label, size, points, preferForeground, gridSize, yScale)
-    local gray = rgbaToUint(100, 100, 100, 100)
+    local gray = color.rgbaToUint(100, 100, 100, 100)
     local tableLabel = table.concat({ "graph_points_", label })
     local initDragList = {}
     local initPointList = {}
@@ -63,21 +63,21 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
         for i = 0, size.x, gridSize do
             local col = gray
             if (not truthy(i % 4)) then
-                col = rgbaToUint(100, 100, 100, 255)
+                col = color.rgbaToUint(100, 100, 100, 255)
             end
             ctx.AddLine(vector.New(topLeft.x + i, topLeft.y), vector.New(topLeft.x + i, topLeft.y + dim.y), col, 1)
         end
         for i = 0, size.y, gridSize do
             local col = gray
             if (not truthy(i % 4)) then
-                col = rgbaToUint(100, 100, 100, 255)
+                col = color.rgbaToUint(100, 100, 100, 255)
             end
             if (yScale and not truthy(i % 4)) then
                 local number = (yScale.y - yScale.x) * (size.y - i) / size.y + yScale.x
                 local textSize = imgui.CalcTextSize(tostring(number))
                 ctx.AddText(
                     vector.New(topLeft.x + 6, math.clamp(topLeft.y + i - 7, topLeft.y + 5, topLeft.y + dim.y - 16)),
-                    rgbaToUint(255, 255, 255, 255),
+                    color.rgbaToUint(255, 255, 255, 255),
                     tostring(number))
                 ctx.AddLine(vector.New(topLeft.x + textSize.x + 10, topLeft.y + i),
                     vector.New(topLeft.x + dim.x, topLeft.y + i), col,

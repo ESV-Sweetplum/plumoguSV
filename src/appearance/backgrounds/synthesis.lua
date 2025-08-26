@@ -58,7 +58,7 @@ function renderSynthesis()
         local colTbl = RGB_SNAP_MAP[snap]
 
         ctx.AddCircle(dim / 2 + topLeft, circleSize * (idx - 1) + bgVars.snapOffset,
-            rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
+            color.rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
     end
 
     cache.saveTable("synthesis", bgVars)

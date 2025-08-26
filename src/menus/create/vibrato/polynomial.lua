@@ -22,7 +22,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
 
         for _, point in pairs(settingVars.controlPoints) do
             table.insert(pointList,
-                { pos = table.vectorize2(point), col = rgbaToUint(255, 255, 255, 255), size = 5 })
+                { pos = table.vectorize2(point), col = color.rgbaToUint(255, 255, 255, 255), size = 5 })
         end
 
 
@@ -103,6 +103,6 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
             svVibrato(v, func)
         end, menuVars, false, false, separateWindow and globalVars.hotkeyList[8] or nil)
     else
-        imgui.TextColored(vector.New(1, 0, 0, 1), "This mode is not supported.")
+        imgui.TextColored(color.vctr.red, "This mode is not supported.")
     end
 end

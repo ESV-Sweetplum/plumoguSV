@@ -2,7 +2,7 @@ function showWindowSettings()
     GlobalCheckbox("hideSVInfo", "Hide SV Info Window",
         "Disables the window that shows note distances when placing Standard, Special, or Still SVs.")
     if (globalVars.performanceMode) then
-        imgui.TextColored(vector.New(1, 0, 0, 1),
+        imgui.TextColored(color.vctr.red,
             "Performance mode is currently enabled.\nPlease disable it to access widgets and windows.")
         imgui.BeginDisabled()
     end

@@ -3,6 +3,10 @@ cache = {
     windows = {},
     lists = {}
 }
+color = {
+    vctr = {},
+    int = {}
+}
 game = {}
 kbm = {}
 matrix = {}
@@ -43,6 +47,76 @@ function clock.listen(id, interval)
         return true
     end
     return false
+end
+color.vctr.red = vector.New(1, 0, 0, 1)
+color.vctr.green = vector.New(0, 1, 0, 1)
+color.vctr.blue = vector.New(0, 0, 1, 1)
+color.vctr.white = vector.New(1, 1, 1, 1)
+color.vctr.black = vector.New(0, 0, 0, 1)
+color.vctr.transparent = vector.New(0, 0, 0, 0)
+HEXADECIMAL = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" }
+NONDUA = { "!", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7",
+    "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
+    "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f",
+    "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}",
+    "~" }
+---Converts rgba to an unsigned integer (0-4294967295).
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return integer
+function color.rgbaToUint(r, g, b, a)
+    local flr = math.floor
+    return flr(a) * 16 ^ 6 + flr(b) * 16 ^ 4 + flr(g) * 16 ^ 2 + flr(r)
+end
+---Converts an unsigned integer to a Vector4 of color values (0-1 for each element).
+---@param n integer
+---@return Vector4
+function color.uintToRgba(n)
+    local tbl = {}
+    for i = 0, 3 do
+        tbl[#tbl + 1] = math.floor(n / 256 ^ i) % 256
+    end
+    return table.vectorize4(tbl)
+end
+---Converts a hexa string to an rgba Vector4 (0-1 for each element).
+---@param hexa string
+---@return Vector4
+function color.hexaToRgba(hexa)
+    local rgbaTable = {}
+    for i = 1, 8, 2 do
+        table.insert(rgbaTable,
+            table.indexOf(HEXADECIMAL, hexa:charAt(i)) * 16 + table.indexOf(HEXADECIMAL, hexa:charAt(i + 1)) - 17)
+    end
+    return table.vectorize4(rgbaTable)
+end
+---Converts rgba to an ndua string (base 92).
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return string
+function color.rgbaToNdua(r, g, b, a)
+    local uint = color.rgbaToUint(r, g, b, a)
+    local str = ""
+    for i = 0, 4 do
+        str = str .. NONDUA[math.floor(uint / (92 ^ i)) % 92 + 1]
+    end
+    return str:reverse()
+end
+---Converts an ndua string (base 92) to an rgba Vector4 (0-1 for each element).
+---@param ndua string
+---@return Vector4
+function color.nduaToRgba(ndua)
+    local num = 0
+    for i = 1, 5 do
+        local idx = table.indexOf(NONDUA, ndua:charAt(i))
+        if (idx == -1) then goto skip end
+        num = num + (idx - 1) * 92 ^ (5 - i)
+        ::skip::
+    end
+    return color.uintToRgba(num)
 end
 ---Gets the most recent timing point, or a dummy timing point if none exists.
 ---@param offset number
@@ -1262,7 +1336,7 @@ VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2,
 DEFAULT_STYLE = {
     windowBg = vector.New(0.00, 0.00, 0.00, 1.00),
     popupBg = vector.New(0.08, 0.08, 0.08, 0.94),
-    border = vector.New(0, 0, 0, 1),
+    border = color.vctr.transparent,
     frameBg = vector.New(0.14, 0.24, 0.28, 1.00),
     frameBgHovered =
         vector.New(0.24, 0.34, 0.38, 1.00),
@@ -3781,7 +3855,7 @@ function renderReactiveSingularities()
         local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
         ctx.AddCircleFilled(pos, 2,
-            rgbaToUint(r, g, b, 100 + pulseStatus * 155))
+            color.rgbaToUint(r, g, b, 100 + pulseStatus * 155))
     end
     ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
     ctx.AddCircle(dim / 2 + topLeft, 16, 4294967295 - math.floor(pulseStatus * 120) * 16777216)
@@ -3860,7 +3934,7 @@ function renderReactiveStars()
         local progress = x / dimX
         local brightness = clamp(-8 * progress * (progress - 1), 0, 1)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
-        ctx.AddCircleFilled(pos, sz, rgbaToUint(255, 255, 255, brightness * 255))
+        ctx.AddCircleFilled(pos, sz, color.rgbaToUint(255, 255, 255, brightness * 255))
     end
 end
 function createStar(dimX, dimY, n)
@@ -3943,7 +4017,7 @@ function renderSynthesis()
     for idx, snap in pairs(snapTable) do
         local colTbl = RGB_SNAP_MAP[snap]
         ctx.AddCircle(dim / 2 + topLeft, circleSize * (idx - 1) + bgVars.snapOffset,
-            rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
+            color.rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
     end
     cache.saveTable("synthesis", bgVars)
 end
@@ -3967,10 +4041,10 @@ function drawCapybara()
     local eyeCoords2 = relativePoint(eyeCoords1, -eyeWidth, 0)
     local earCoords = relativePoint(headCoords1, 12, -headRadius + 5)
     local stemCoords = relativePoint(headCoords1, 50, -headRadius + 5)
-    local bodyColor = rgbaToUint(122, 70, 212, 255)
-    local eyeColor = rgbaToUint(30, 20, 35, 255)
-    local earColor = rgbaToUint(62, 10, 145, 255)
-    local stemColor = rgbaToUint(0, 255, 0, 255)
+    local bodyColor = color.rgbaToUint(122, 70, 212, 255)
+    local eyeColor = color.rgbaToUint(30, 20, 35, 255)
+    local earColor = color.rgbaToUint(62, 10, 145, 255)
+    local stemColor = color.rgbaToUint(0, 255, 0, 255)
     o.AddCircleFilled(earCoords, earRadius, earColor)
     drawHorizontalPillShape(o, headCoords1, headCoords2, headRadius, bodyColor, 12)
     drawHorizontalPillShape(o, eyeCoords1, eyeCoords2, eyeRadius, eyeColor, 12)
@@ -4090,16 +4164,16 @@ function drawCapybara2()
     local p97 = relativePoint(topLeftCapyPoint, 126, 63)
     local p98 = relativePoint(topLeftCapyPoint, 156, 73)
     local p99 = relativePoint(topLeftCapyPoint, 127, 53)
-    local color1 = rgbaToUint(250, 250, 225, 255)
-    local color2 = rgbaToUint(240, 180, 140, 255)
-    local color3 = rgbaToUint(195, 90, 120, 255)
-    local color4 = rgbaToUint(115, 5, 65, 255)
-    local color5 = rgbaToUint(100, 5, 45, 255)
-    local color6 = rgbaToUint(200, 115, 135, 255)
-    local color7 = rgbaToUint(175, 10, 70, 255)
-    local color8 = rgbaToUint(200, 90, 110, 255)
-    local color9 = rgbaToUint(125, 10, 75, 255)
-    local color10 = rgbaToUint(220, 130, 125, 255)
+    local color1 = color.rgbaToUint(250, 250, 225, 255)
+    local color2 = color.rgbaToUint(240, 180, 140, 255)
+    local color3 = color.rgbaToUint(195, 90, 120, 255)
+    local color4 = color.rgbaToUint(115, 5, 65, 255)
+    local color5 = color.rgbaToUint(100, 5, 45, 255)
+    local color6 = color.rgbaToUint(200, 115, 135, 255)
+    local color7 = color.rgbaToUint(175, 10, 70, 255)
+    local color8 = color.rgbaToUint(200, 90, 110, 255)
+    local color9 = color.rgbaToUint(125, 10, 75, 255)
+    local color10 = color.rgbaToUint(220, 130, 125, 255)
     o.AddQuadFilled(p18, p19, p24, p25, color4)
     o.AddQuadFilled(p19, p20, p21, p22, color1)
     o.AddQuadFilled(p19, p22, p23, p24, color4)
@@ -4142,7 +4216,7 @@ function drawCapybara312()
     if not globalVars.drawCapybara312 then return end
     local o = imgui.GetForegroundDrawList()
     local rgbColors = getCurrentRGBColors(globalVars.rgbPeriod)
-    local outlineColor = rgbaToUint(rgbColors.red, rgbColors.green, rgbColors.blue, 255)
+    local outlineColor = color.rgbaToUint(rgbColors.red, rgbColors.green, rgbColors.blue, 255)
     local p1 = vector.New(42, 32)
     local p2 = vector.New(100, 78)
     local p3 = vector.New(141, 32)
@@ -4260,7 +4334,7 @@ function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrail
         if not cursorTrailGhost then
             alpha = math.floor(255 * (trailPoints - i) / (trailPoints - 1))
         end
-        local color = rgbaToUint(255, 255, 255, alpha)
+        local color = color.rgbaToUint(255, 255, 255, alpha)
         if trailShape == "Circles" then
             o.AddCircleFilled(point, cursorTrailSize, color)
         elseif trailShape == "Triangles" then
@@ -4328,7 +4402,7 @@ function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustS
             local dustY = dustParticle.y + dy
             local dustCoords = vector.New(dustX, dustY)
             local alpha = math.round(255 * (1 - time), 0)
-            local dustColor = rgbaToUint(currentRGBColors.red, currentRGBColors.green, currentRGBColors.blue, alpha)
+            local dustColor = color.rgbaToUint(currentRGBColors.red, currentRGBColors.green, currentRGBColors.blue, alpha)
             o.AddCircleFilled(dustCoords, dustSize, dustColor)
         end
     end
@@ -4383,9 +4457,9 @@ function renderSparkleParticles(o, t, sparkleParticles, sparkleDuration, sparkle
             local dy = -sparkleParticle.yRange * math.quadraticBezier(0, time)
             local sparkleY = sparkleParticle.y + dy
             local sparkleCoords = vector.New(sparkleX, sparkleY)
-            local white = rgbaToUint(255, 255, 255, 255)
+            local white = color.rgbaToUint(255, 255, 255, 255)
             local actualSize = sparkleSize * (1 - math.quadraticBezier(0, time))
-            local sparkleColor = rgbaToUint(255, 255, 100, 30)
+            local sparkleColor = color.rgbaToUint(255, 255, 100, 30)
             drawGlare(o, sparkleCoords, actualSize, white, sparkleColor)
         end
     end
@@ -5393,7 +5467,7 @@ end
 ---@return ImDrawListPtr
 ---@return boolean changed
 function renderGraph(label, size, points, preferForeground, gridSize, yScale)
-    local gray = rgbaToUint(100, 100, 100, 100)
+    local gray = color.rgbaToUint(100, 100, 100, 100)
     local tableLabel = table.concat({ "graph_points_", label })
     local initDragList = {}
     local initPointList = {}
@@ -5433,21 +5507,21 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
         for i = 0, size.x, gridSize do
             local col = gray
             if (not truthy(i % 4)) then
-                col = rgbaToUint(100, 100, 100, 255)
+                col = color.rgbaToUint(100, 100, 100, 255)
             end
             ctx.AddLine(vector.New(topLeft.x + i, topLeft.y), vector.New(topLeft.x + i, topLeft.y + dim.y), col, 1)
         end
         for i = 0, size.y, gridSize do
             local col = gray
             if (not truthy(i % 4)) then
-                col = rgbaToUint(100, 100, 100, 255)
+                col = color.rgbaToUint(100, 100, 100, 255)
             end
             if (yScale and not truthy(i % 4)) then
                 local number = (yScale.y - yScale.x) * (size.y - i) / size.y + yScale.x
                 local textSize = imgui.CalcTextSize(tostring(number))
                 ctx.AddText(
                     vector.New(topLeft.x + 6, math.clamp(topLeft.y + i - 7, topLeft.y + 5, topLeft.y + dim.y - 16)),
-                    rgbaToUint(255, 255, 255, 255),
+                    color.rgbaToUint(255, 255, 255, 255),
                     tostring(number))
                 ctx.AddLine(vector.New(topLeft.x + textSize.x + 10, topLeft.y + i),
                     vector.New(topLeft.x + dim.x, topLeft.y + i), col,
@@ -5575,9 +5649,9 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
-    local red = rgbaToUint(225, 0, 0, 255)
-    local blue = rgbaToUint(75, 75, 255, 255)
-    local yellow = rgbaToUint(200, 200, 0, 255)
+    local red = color.rgbaToUint(225, 0, 0, 255)
+    local blue = color.rgbaToUint(75, 75, 255, 255)
+    local yellow = color.rgbaToUint(200, 200, 0, 255)
     local colorTable = {
         [4] = { red, yellow, blue, yellow }
     }
@@ -5589,7 +5663,7 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
             end
             local notePos = vector.New((col - 1) * 60 + 20, height) * szFactor
             local noteSize = vector.New(50, 20) * szFactor
-            local uintColor = rgbaToUint(255, 0, 0, 255)
+            local uintColor = color.rgbaToUint(255, 0, 0, 255)
             ctx.AddRectFilledMultiColor(topLeft + notePos, topLeft + notePos + noteSize, colorTable[#colTbl][i],
                 colorTable[#colTbl][i],
                 colorTable[#colTbl][i], colorTable[#colTbl][i])
@@ -5872,7 +5946,7 @@ function drawCurrentFrame(settingVars)
     local noteWidth = 200 / mapKeyCount
     local noteSpacing = 5
     local barNoteHeight = math.round(2 * noteWidth / 5, 0)
-    local noteColor = rgbaToUint(117, 117, 117, 255)
+    local noteColor = color.rgbaToUint(117, 117, 117, 255)
     local noteSkinType = NOTE_SKIN_TYPES[settingVars.noteSkinTypeIndex]
     local drawlist = imgui.GetWindowDrawList()
     local childHeight = 250
@@ -6233,7 +6307,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         end
         for _, point in pairs(settingVars.controlPoints) do
             table.insert(pointList,
-                { pos = table.vectorize2(point), col = rgbaToUint(255, 255, 255, 255), size = 5 })
+                { pos = table.vectorize2(point), col = color.rgbaToUint(255, 255, 255, 255), size = 5 })
         end
         imgui.SetCursorPosX(26)
         imgui.BeginChild("Polynomial Vibrato Interactive Window" .. tostring(separateWindow), vctr2(size), 67, 31)
@@ -6299,7 +6373,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
             svVibrato(v, func)
         end, menuVars, false, false, separateWindow and globalVars.hotkeyList[8] or nil)
     else
-        imgui.TextColored(vector.New(1, 0, 0, 1), "This mode is not supported.")
+        imgui.TextColored(color.vctr.red, "This mode is not supported.")
     end
 end
 function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
@@ -7064,7 +7138,7 @@ end
 function showAppearanceSettings()
     imgui.PushItemWidth(150)
     if (globalVars.performanceMode) then
-        imgui.TextColored(vector.New(1, 0, 0, 1),
+        imgui.TextColored(color.vctr.red,
             "Performance mode is currently enabled.\nPlease disable it to access appearance features.")
         imgui.BeginDisabled()
     end
@@ -7247,7 +7321,7 @@ function stringifyCustomStyle(customStyle)
         local g = math.floor(value.y * 255)
         local b = math.floor(value.z * 255)
         local a = math.floor(value.w * 255)
-        resultStr = resultStr .. keyId .. "" .. rgbaToNdua(r, g, b, a) .. " "
+        resultStr = resultStr .. keyId .. "" .. color.rgbaToNdua(r, g, b, a) .. " "
     end
     return resultStr:sub(1, -2)
 end
@@ -7276,7 +7350,7 @@ function parseCustomStyleV2(str, keyIdDict)
         end
         local key = table.indexOf(keyIdDict, keyId)
         if (not keyId or key == -1) then goto skip end
-        customStyle[key] = nduaToRgba(keyValue) / 255
+        customStyle[key] = color.nduaToRgba(keyValue) / 255
         ::skip::
     end
     globalVars.customStyle = table.duplicate(customStyle)
@@ -7287,7 +7361,7 @@ function parseCustomStyleV1(str, keyIdDict)
         local keyId = kvPair:match("[a-zA-Z]+:"):sub(1, -2)
         local hexa = kvPair:match(":[a-f0-9]+"):sub(2)
         local key = table.indexOf(keyIdDict, keyId)
-        if (key ~= -1) then customStyle[key] = hexaToRgba(hexa) / 255 end
+        if (key ~= -1) then customStyle[key] = color.hexaToRgba(hexa) / 255 end
     end
     globalVars.customStyle = table.duplicate(customStyle)
 end
@@ -7866,12 +7940,12 @@ function showPluginSettingsWindow()
     imgui.End()
 end
 function renderMemeButtons()
-    if (GradientButton("show me the quzz\n(quaver huzz)", vector.New(1, 0, 0, 1), vector.New(1, 1, 1, 1), 1500)) then
+    if (GradientButton("show me the quzz\n(quaver huzz)", color.vctr.red, color.vctr.white, 1500)) then
         ---@diagnostic disable-next-line: param-type-mismatch
         imgui.Text(nil)
     end
     ToolTip("Press this button once (if you don't have any work saved) and never again.")
-    if (GradientButton("fuck you and\nyour stupid editor", vector.New(1, 0, 0, 1), vector.New(1, 1, 1, 1), 1500)) then
+    if (GradientButton("fuck you and\nyour stupid editor", color.vctr.red, color.vctr.white, 1500)) then
         state.SetValue("boolean.destroyEditor", true)
         ---@diagnostic disable-next-line: param-type-mismatch
     end
@@ -7906,7 +7980,7 @@ function showWindowSettings()
     GlobalCheckbox("hideSVInfo", "Hide SV Info Window",
         "Disables the window that shows note distances when placing Standard, Special, or Still SVs.")
     if (globalVars.performanceMode) then
-        imgui.TextColored(vector.New(1, 0, 0, 1),
+        imgui.TextColored(color.vctr.red,
             "Performance mode is currently enabled.\nPlease disable it to access widgets and windows.")
         imgui.BeginDisabled()
     end
@@ -8983,70 +9057,6 @@ end
 function chooseConvertSVSSFDirection(menuVars)
     menuVars.conversionDirection = RadioButtons("Direction:", menuVars.conversionDirection, { "SSF -> SV", "SV -> SSF" },
         { false, true })
-end
-HEXADECIMAL = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" }
-NONDUA = { "!", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7",
-    "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
-    "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f",
-    "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}",
-    "~" }
----Converts rgba to an unsigned integer (0-4294967295)
----@param r integer
----@param g integer
----@param b integer
----@param a integer
----@return integer
-function rgbaToUint(r, g, b, a)
-    local flr = math.floor
-    return flr(a) * 16 ^ 6 + flr(b) * 16 ^ 4 + flr(g) * 16 ^ 2 + flr(r)
-end
----Converts an unsigned integer to a Vector4 of color values (0-1 for each element)
----@param n integer
----@return Vector4
-function uintToRgba(n)
-    local tbl = {}
-    for i = 0, 3 do
-        tbl[#tbl + 1] = math.floor(n / 256 ^ i) % 256
-    end
-    return table.vectorize4(tbl)
-end
----Converts a hexa string to an rgba Vector4 (0-1 for each element).
----@param hexa string
----@return Vector4
-function hexaToRgba(hexa)
-    local rgbaTable = {}
-    for i = 1, 8, 2 do
-        table.insert(rgbaTable,
-            table.indexOf(HEXADECIMAL, hexa:charAt(i)) * 16 + table.indexOf(HEXADECIMAL, hexa:charAt(i + 1)) - 17)
-    end
-    return table.vectorize4(rgbaTable)
-end
----Converts rgba to an ndua string (base 92).
----@param r integer
----@param g integer
----@param b integer
----@param a integer
----@return string
-function rgbaToNdua(r, g, b, a)
-    local uint = rgbaToUint(r, g, b, a)
-    local str = ""
-    for i = 0, 4 do
-        str = str .. NONDUA[math.floor(uint / (92 ^ i)) % 92 + 1]
-    end
-    return str:reverse()
-end
----Converts an ndua string (base 92) to an rgba Vector4 (0-1 for each element).
----@param ndua string
----@return Vector4
-function nduaToRgba(ndua)
-    local num = 0
-    for i = 1, 5 do
-        local idx = table.indexOf(NONDUA, ndua:charAt(i))
-        if (idx == -1) then goto skip end
-        num = num + (idx - 1) * 92 ^ (5 - i)
-        ::skip::
-    end
-    return uintToRgba(num)
 end
 function calculateDisplacementsFromNotes(noteOffsets, noteSpacing)
     local totalDisplacement = 0

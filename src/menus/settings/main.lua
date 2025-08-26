@@ -88,12 +88,12 @@ function showPluginSettingsWindow()
 end
 
 function renderMemeButtons()
-    if (GradientButton("show me the quzz\n(quaver huzz)", vector.New(1, 0, 0, 1), vector.New(1, 1, 1, 1), 1500)) then
+    if (GradientButton("show me the quzz\n(quaver huzz)", color.vctr.red, color.vctr.white, 1500)) then
         ---@diagnostic disable-next-line: param-type-mismatch
         imgui.Text(nil)
     end
     ToolTip("Press this button once (if you don't have any work saved) and never again.")
-    if (GradientButton("fuck you and\nyour stupid editor", vector.New(1, 0, 0, 1), vector.New(1, 1, 1, 1), 1500)) then
+    if (GradientButton("fuck you and\nyour stupid editor", color.vctr.red, color.vctr.white, 1500)) then
         cache.boolean.destroyEditor = true
         ---@diagnostic disable-next-line: param-type-mismatch
     end

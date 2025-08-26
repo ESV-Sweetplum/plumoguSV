@@ -146,7 +146,7 @@ function stringifyCustomStyle(customStyle)
         local g = math.floor(value.y * 255)
         local b = math.floor(value.z * 255)
         local a = math.floor(value.w * 255)
-        resultStr = resultStr .. keyId .. "" .. rgbaToNdua(r, g, b, a) .. " "
+        resultStr = resultStr .. keyId .. "" .. color.rgbaToNdua(r, g, b, a) .. " "
     end
 
     return resultStr:sub(1, -2)
@@ -180,7 +180,7 @@ function parseCustomStyleV2(str, keyIdDict)
         end
         local key = table.indexOf(keyIdDict, keyId)
         if (not keyId or key == -1) then goto skip end
-        customStyle[key] = nduaToRgba(keyValue) / 255
+        customStyle[key] = color.nduaToRgba(keyValue) / 255
         ::skip::
     end
 
@@ -194,7 +194,7 @@ function parseCustomStyleV1(str, keyIdDict)
         local keyId = kvPair:match("[a-zA-Z]+:"):sub(1, -2)
         local hexa = kvPair:match(":[a-f0-9]+"):sub(2)
         local key = table.indexOf(keyIdDict, keyId)
-        if (key ~= -1) then customStyle[key] = hexaToRgba(hexa) / 255 end
+        if (key ~= -1) then customStyle[key] = color.hexaToRgba(hexa) / 255 end
     end
 
     globalVars.customStyle = table.duplicate(customStyle)

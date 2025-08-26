@@ -6,21 +6,21 @@ NONDUA = { "!", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/",
     "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}",
     "~" }
 
----Converts rgba to an unsigned integer (0-4294967295)
+---Converts rgba to an unsigned integer (0-4294967295).
 ---@param r integer
 ---@param g integer
 ---@param b integer
 ---@param a integer
 ---@return integer
-function rgbaToUint(r, g, b, a)
+function color.rgbaToUint(r, g, b, a)
     local flr = math.floor
     return flr(a) * 16 ^ 6 + flr(b) * 16 ^ 4 + flr(g) * 16 ^ 2 + flr(r)
 end
 
----Converts an unsigned integer to a Vector4 of color values (0-1 for each element)
+---Converts an unsigned integer to a Vector4 of color values (0-1 for each element).
 ---@param n integer
 ---@return Vector4
-function uintToRgba(n)
+function color.uintToRgba(n)
     local tbl = {}
     for i = 0, 3 do
         table.insert(tbl, math.floor(n / 256 ^ i) % 256)
@@ -35,7 +35,7 @@ end
 ---@param b integer
 ---@param a integer
 ---@return string
-function rgbaToHexa(r, g, b, a)
+function color.rgbaToHexa(r, g, b, a)
     local flr = math.floor
     local hexaStr = ""
     for _, col in ipairs({ r, g, b, a }) do
@@ -47,7 +47,7 @@ end
 ---Converts a hexa string to an rgba Vector4 (0-1 for each element).
 ---@param hexa string
 ---@return Vector4
-function hexaToRgba(hexa)
+function color.hexaToRgba(hexa)
     local rgbaTable = {}
     for i = 1, 8, 2 do
         table.insert(rgbaTable,
@@ -62,8 +62,8 @@ end
 ---@param b integer
 ---@param a integer
 ---@return string
-function rgbaToNdua(r, g, b, a)
-    local uint = rgbaToUint(r, g, b, a)
+function color.rgbaToNdua(r, g, b, a)
+    local uint = color.rgbaToUint(r, g, b, a)
     local str = ""
 
     for i = 0, 4 do
@@ -76,7 +76,7 @@ end
 ---Converts an ndua string (base 92) to an rgba Vector4 (0-1 for each element).
 ---@param ndua string
 ---@return Vector4
-function nduaToRgba(ndua)
+function color.nduaToRgba(ndua)
     local num = 0
     for i = 1, 5 do
         local idx = table.indexOf(NONDUA, ndua:charAt(i))
@@ -85,5 +85,5 @@ function nduaToRgba(ndua)
         ::skip::
     end
 
-    return uintToRgba(num)
+    return color.uintToRgba(num)
 end
