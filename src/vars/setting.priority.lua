@@ -4,8 +4,8 @@ DEFAULT_STARTING_SETTING_VARS = {
         endMsx = 0
     },
     polynomialVibratoSV = {
-        startMsx = 100,
-        endMsx = 0,
+        startMsx = 0,
+        endMsx = 100,
         controlPointCount = 3,
         controlPoints = { vector.New(0, 230), vector.New(115, 0), vector.New(230, 230) }
     },

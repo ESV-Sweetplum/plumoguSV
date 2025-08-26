@@ -1,6 +1,6 @@
 function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
-        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "L/H Msx##Vibrato", " msx", 0, 0.875)
+        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Min/Max Msx##Vibrato", " msx", 0, 0.875)
         _, settingVars.controlPointCount = imgui.InputInt("Control Points", settingVars.controlPointCount)
         settingVars.controlPointCount = math.clamp(settingVars.controlPointCount, 1, 10)
 
@@ -26,7 +26,8 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
 
         imgui.SetCursorPosX(26)
         imgui.BeginChild("Polynomial Vibrato Interactive Window", vctr2(size), 67, 31)
-        local ctx = renderGraph("Polynomial Vibrato Menu", vctr2(size), pointList, false, 11)
+        local ctx = renderGraph("Polynomial Vibrato Menu", vctr2(size), pointList, false, 11,
+            vector.New(settingVars.startMsx, settingVars.endMsx))
         for i = 1, settingVars.controlPointCount do
             settingVars.controlPoints[i] = vector.Clamp(pointList[i].pos, vctr2(0), vctr2(size))
         end
@@ -90,8 +91,8 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
 
         imgui.EndChild()
         local func = function(t)
-            return (settingVars.endMsx - settingVars.startMsx) * (1 - evaluatePolynomial(coefficients, t * size) / size) +
-                settingVars.startMsx
+            return (settingVars.startMsx - settingVars.endMsx) * (1 - evaluatePolynomial(coefficients, t * size) / size) +
+                settingVars.endMsx -- Reversed due to the way imgui draws
         end
         AddSeparator()
 

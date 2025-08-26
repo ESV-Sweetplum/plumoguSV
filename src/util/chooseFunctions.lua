@@ -35,7 +35,7 @@ function chooseBezier(settingVars)
 
     local pointList = { { pos = pos1, col = red, size = 10 }, { pos = pos2, col = blue, size = 10 } }
 
-    local ctx = renderGraph("Bezier Interactive Window", vctr2(150), pointList, freeMode)
+    local ctx = renderGraph("Bezier Interactive Window", vctr2(150), pointList, freeMode, 5)
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
 

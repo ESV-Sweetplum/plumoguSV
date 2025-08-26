@@ -9,8 +9,9 @@
 ---@param points GraphPoint[] A list of points that can be dragged around.
 ---@param preferForeground? boolean Set this to true if you want to use `GetForegroundDrawList` instead of `GetWindowDrawList`.
 ---@param gridSize? integer To what degree you'd like the points to snap to.
+---@param yScale? Vector2 If included, will create labels corresponding to this scale.
 ---@return ImDrawListPtr
-function renderGraph(label, size, points, preferForeground, gridSize)
+function renderGraph(label, size, points, preferForeground, gridSize, yScale)
     local gray = rgbaToUint(100, 100, 100, 100)
     local tableLabel = table.concat({ "graph_points_", label })
     local initDragList = {}
@@ -68,7 +69,20 @@ function renderGraph(label, size, points, preferForeground, gridSize)
             if (not truthy(i % 4)) then
                 col = rgbaToUint(100, 100, 100, 255)
             end
-            ctx.AddLine(vector.New(topLeft.x, topLeft.y + i), vector.New(topLeft.x + dim.x, topLeft.y + i), col, 1)
+            if (yScale and not truthy(i % 4)) then
+                local number = (yScale.y - yScale.x) * (size.y - i) / size.y + yScale.x
+                local textSize = imgui.CalcTextSize(tostring(number))
+                ctx.AddText(
+                    vector.New(topLeft.x + 6, math.clamp(topLeft.y + i - 7, topLeft.y + 5, topLeft.y + dim.y - 16)),
+                    rgbaToUint(255, 255, 255, 255),
+                    tostring(number))
+                ctx.AddLine(vector.New(topLeft.x + textSize.x + 10, topLeft.y + i),
+                    vector.New(topLeft.x + dim.x, topLeft.y + i), col,
+                    1)
+            else
+                ctx.AddLine(vector.New(topLeft.x, topLeft.y + i), vector.New(topLeft.x + dim.x, topLeft.y + i), col,
+                    1)
+            end
         end
     end
 
