@@ -11,7 +11,11 @@
 ---@return ImDrawListPtr
 function renderGraph(label, size, points, preferForeground)
     local tableLabel = table.concat({ "graph_points_", label })
-    local dragList = state.GetValue(tableLabel, table.constructRepeating(false, #points))
+    local initDragList = {}
+    for i = 1, #points do
+        table.insert(initDragList, false)
+    end
+    local dragList = state.GetValue(tableLabel, initDragList)
 
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()

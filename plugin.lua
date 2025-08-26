@@ -5375,7 +5375,11 @@ end
 ---@return ImDrawListPtr
 function renderGraph(label, size, points, preferForeground)
     local tableLabel = table.concat({ "graph_points_", label })
-    local dragList = state.GetValue(tableLabel, table.constructRepeating(false, #points))
+    local initDragList = {}
+    for i = 1, #points do
+        initDragList[#initDragList + 1] = false
+    end
+    local dragList = state.GetValue(tableLabel, initDragList)
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
@@ -8209,7 +8213,7 @@ function chooseBezier(settingVars)
     local freeMode = state.GetValue("boolean.bezierFreeMode") or false
     local red = 4278190335
     local blue = 4294901760
-    local pointList = state.GetValue("pointList",
+    local pointList = state.GetValue("bezier_pointList",
         { { pos = vector.New(30, 75), col = red, size = 10 }, { pos = vector.New(120, 75), col = blue, size = 10 } })
     local ctx = renderGraph("Bezier Interactive Window", vctr2(150), pointList, freeMode)
     local topLeft = imgui.GetWindowPos()
@@ -8220,7 +8224,7 @@ function chooseBezier(settingVars)
     end
     pos1 = pointList[1].pos
     pos2 = pointList[2].pos
-    state.SetValue("pointList", pointList)
+    state.SetValue("bezier_pointList", pointList)
     local dottedCol = imgui.GetColorU32(imgui_col.ButtonHovered)
     local mainCol = imgui.GetColorU32(imgui_col.ButtonActive)
     local bottomLeft = vector.New(topLeft.x + 1, topLeft.y + dim.y - 1)

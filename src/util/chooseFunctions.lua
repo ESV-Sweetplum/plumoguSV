@@ -27,7 +27,7 @@ function chooseBezier(settingVars)
     local red = 4278190335
     local blue = 4294901760
 
-    local pointList = state.GetValue("pointList",
+    local pointList = state.GetValue("bezier_pointList",
         { { pos = vector.New(30, 75), col = red, size = 10 }, { pos = vector.New(120, 75), col = blue, size = 10 } })
 
     local ctx = renderGraph("Bezier Interactive Window", vctr2(150), pointList, freeMode)
@@ -42,7 +42,7 @@ function chooseBezier(settingVars)
     pos1 = pointList[1].pos
     pos2 = pointList[2].pos
 
-    state.SetValue("pointList", pointList)
+    state.SetValue("bezier_pointList", pointList)
 
     local dottedCol = imgui.GetColorU32(imgui_col.ButtonHovered)
     local mainCol = imgui.GetColorU32(imgui_col.ButtonActive)
