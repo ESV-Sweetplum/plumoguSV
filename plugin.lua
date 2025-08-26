@@ -5363,6 +5363,45 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
         kbm.pressedKeyCombo(globalVars.hotkeyList[4]) or
         oldValues ~= newValues
 end
+---@class GraphPoint
+---@field pos Vector2 A Vector2 of two elements between 0-1.
+---@field col integer Unsigned integer of the color.
+---@field size number Radius of the point.
+---Creates a graph and returns the context to run functions on.
+---@param label string The hidden label of the graph.
+---@param size Vector2 The size of the graph.
+---@param points GraphPoint[] A list of points that can be dragged around.
+---@param preferForeground? boolean Set this to true if you want to use `GetForegroundDrawList` instead of `GetWindowDrawList`.
+---@return ImDrawListPtr
+function renderGraph(label, size, points, preferForeground)
+    local tableLabel = table.concat({ "graph_points_", label })
+    local dragList = state.GetValue(tableLabel, table.constructRepeating(false, #points))
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    if (preferForeground) then ctx = imgui.GetForegroundDrawList() end
+    for i, point in ipairs(points) do
+        imgui.SetCursorPos(point.pos - vctr2(point.size))
+        imgui.InvisibleButton(tableLabel .. i, vctr2(point.size * 2))
+        if (imgui.IsMouseDown("Left") and imgui.IsItemActive()) then
+            dragList[i] = true
+        end
+        if (imgui.IsMouseDragging("Left") and dragList[i]) then
+            point.pos = point.pos + kbm.mouseDelta()
+        end
+        local col = point.col
+        local alphaDifference = 150 * 16 ^ 6
+        if (not dragList[i]) then col = col - alphaDifference end
+        ctx.AddCircleFilled(topLeft + point.pos, point.size, col)
+    end
+    if (not imgui.IsMouseDown("Left")) then
+        for i = 1, #points do
+            dragList[i] = false
+        end
+    end
+    state.SetValue(tableLabel, dragList)
+    return ctx
+end
 ---Creates an `imgui.inputInt` element.
 ---@param varsTable { [string]: any } The table that is meant to be modified.
 ---@param parameterName string The key of globalVars that will be used for data storage.
@@ -8167,63 +8206,28 @@ function chooseAverageSV(menuVars)
 end
 function chooseBezier(settingVars)
     imgui.BeginChild("Bezier Interactive Window", vctr2(150), 67, 31)
-    local pos1 = state.GetValue("lists.buttonPos1") or vector.New(30, 75)
-    local pos2 = state.GetValue("lists.buttonPos2") or vector.New(120, 75)
-    local selectedBezier1 = state.GetValue("boolean.selectedBezier1") or false
-    local selectedBezier2 = state.GetValue("boolean.selectedBezier2") or false
     local freeMode = state.GetValue("boolean.bezierFreeMode") or false
-    imgui.SetCursorPos(pos1 - vctr2(10))
-    imgui.PushStyleVar(imgui_style_var.ChildRounding, 169)
-    imgui.InvisibleButton("##Bezier1", vctr2(20))
-    if (imgui.IsMouseDown("Left") and imgui.IsItemActive()) then
-        selectedBezier1 = true
-    end
-    if (imgui.IsMouseDragging("Left") and selectedBezier1) then
-        pos1 = pos1 + kbm.mouseDelta()
-    end
-    if (not freeMode) then
-        pos1 = vector.Clamp(pos1, vctr2(0), vctr2(150))
-    end
-    imgui.SetCursorPos(pos2 - vctr2(10))
-    imgui.InvisibleButton("##Bezier2", vctr2(20))
-    if (imgui.IsMouseDown("Left") and imgui.IsItemActive()) then
-        selectedBezier2 = true
-    end
-    if (imgui.IsMouseDragging("Left") and selectedBezier2) then
-        pos2 = pos2 + kbm.mouseDelta()
-    end
-    if (not freeMode) then
-        pos2 = vector.Clamp(pos2, vctr2(0), vctr2(150))
-    end
-    if (not imgui.IsMouseDown("Left")) then
-        selectedBezier1 = false
-        selectedBezier2 = false
-    end
-    imgui.PopStyleVar()
-    state.SetValue("lists.buttonPos1", pos1)
-    state.SetValue("lists.buttonPos2", pos2)
-    state.SetValue("boolean.selectedBezier1", selectedBezier1)
-    state.SetValue("boolean.selectedBezier2", selectedBezier2)
-    local ctx = imgui.GetWindowDrawList()
-    if (freeMode) then
-        ctx = imgui.GetForegroundDrawList()
-    end
+    local red = 4278190335
+    local blue = 4294901760
+    local pointList = state.GetValue("pointList",
+        { { pos = vector.New(30, 75), col = red, size = 10 }, { pos = vector.New(120, 75), col = blue, size = 10 } })
+    local ctx = renderGraph("Bezier Interactive Window", vctr2(150), pointList, freeMode)
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
+    if (not freeMode) then
+        pointList[1].pos = vector.Clamp(pointList[1].pos, vctr2(0), vctr2(150))
+        pointList[2].pos = vector.Clamp(pointList[2].pos, vctr2(0), vctr2(150))
+    end
+    pos1 = pointList[1].pos
+    pos2 = pointList[2].pos
+    state.SetValue("pointList", pointList)
     local dottedCol = imgui.GetColorU32(imgui_col.ButtonHovered)
     local mainCol = imgui.GetColorU32(imgui_col.ButtonActive)
-    local point1Col = rgbaToUint(255, 0, 0, 255)
-    local point2Col = rgbaToUint(0, 0, 255, 255)
-    local alphaDifference = 150 * 16 ^ 6
-    if (not selectedBezier1) then point1Col = point1Col - alphaDifference end
-    if (not selectedBezier2) then point2Col = point2Col - alphaDifference end
     local bottomLeft = vector.New(topLeft.x + 1, topLeft.y + dim.y - 1)
     local topRight = vector.New(topLeft.x + dim.x - 1, topLeft.y + 1)
     ctx.AddBezierCubic(bottomLeft, topLeft + pos1, topLeft + pos2, topRight, mainCol, 3)
     ctx.AddLine(bottomLeft, topLeft + pos1, dottedCol, 2)
     ctx.AddLine(topRight, topLeft + pos2, dottedCol, 2)
-    ctx.AddCircleFilled(topLeft + pos1, 10, point1Col)
-    ctx.AddCircleFilled(topLeft + pos2, 10, point2Col)
     imgui.EndChild()
     KeepSameLine()
     imgui.BeginChild("Bezier Data", vector.New(100, 150))
