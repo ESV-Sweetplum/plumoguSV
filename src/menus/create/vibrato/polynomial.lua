@@ -103,6 +103,6 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
             svVibrato(v, func)
         end, menuVars, false, false, separateWindow and globalVars.hotkeyList[8] or nil)
     else
-
+        imgui.TextColored(vector.New(1, 0, 0, 1), "This mode is not supported.")
     end
 end
