@@ -8449,7 +8449,7 @@ function chooseAverageSV(menuVars)
     menuVars.avgSV = outputValue
     return settingsChanged
 end
-function chooseBezier(settingVars, optionalLabel)
+function chooseInteractiveBezier(settingVars, optionalLabel)
     imgui.BeginChild("Bezier Interactive Window" .. optionalLabel, vctr2(150), 67, 31)
     local freeMode = state.GetValue("boolean.bezierFreeMode") or false
     local red = 4278190335
@@ -10030,7 +10030,7 @@ function displayStutterSVWindows(settingVars)
 end
 function bezierSettingsMenu(settingVars, skipFinalSV, svPointsForce, optionalLabel)
     local settingsChanged = false
-    settingsChanged = chooseBezier(settingVars, optionalLabel or "") or settingsChanged
+    settingsChanged = chooseInteractiveBezier(settingVars, optionalLabel or "") or settingsChanged
     settingsChanged = chooseConstantShift(settingVars, 0) or settingsChanged
     settingsChanged = chooseAverageSV(settingVars) or settingsChanged
     settingsChanged = chooseSVPoints(settingVars, svPointsForce) or settingsChanged

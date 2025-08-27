@@ -19,7 +19,7 @@ function chooseAverageSV(menuVars)
     return settingsChanged
 end
 
-function chooseBezier(settingVars, optionalLabel)
+function chooseInteractiveBezier(settingVars, optionalLabel)
     imgui.BeginChild("Bezier Interactive Window" .. optionalLabel, vctr2(150), 67, 31)
 
     local freeMode = cache.boolean.bezierFreeMode or false
