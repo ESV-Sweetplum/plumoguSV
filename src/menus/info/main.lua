@@ -22,7 +22,7 @@ function infoTab()
         imgui.SetWindowPos("plumoguSV Settings", coordinatesToCenter)
     end
     KeepSameLine()
-    if (imgui.Button("Patch Notes", HALF_ACTION_BUTTON_SIZE)) then
+    if (imgui.Button("See Patch Notes", HALF_ACTION_BUTTON_SIZE)) then
 
     end
     if (imgui.Button("Get Map Stats", HALF_ACTION_BUTTON_SIZE)) then
