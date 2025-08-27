@@ -1,1 +1,3 @@
-game = {}
+game = {
+    window = {}
+}

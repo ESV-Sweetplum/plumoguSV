@@ -7,7 +7,9 @@ color = {
     vctr = {},
     int = {}
 }
-game = {}
+game = {
+    window = {}
+}
 kbm = {}
 matrix = {}
 ---#### (NOTE: This function is impure and has no return value. This should be changed eventually.)
@@ -363,6 +365,10 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     return noteOffsetsBetween
 end
 game.getUniqueNoteOffsetsBetween = game.uniqueNoteOffsetsBetween
+function game.window.getCenter()
+    local windowDim = state.WindowSize
+    return vector.New(state.WindowSize[1] / 2, state.WindowSize[2] / 2)
+end
 ---Listens to the keyboard and returns specific values based on if keys are pressed.
 ---@return string[] prefixes An array of prefixes like "Ctrl" or "Shift".
 ---@return integer key The key enum of the pressed key.
@@ -6979,14 +6985,13 @@ function infoTab()
     imgui.BulletText("ESV members for constant support.")
     AddPadding()
     AddPadding()
-    if (imgui.Button("Click Here to Edit Settings", ACTION_BUTTON_SIZE)) then
+    if (imgui.Button("Edit Settings", HALF_ACTION_BUTTON_SIZE)) then
         state.SetValue("windows.showSettingsWindow", not state.GetValue("windows.showSettingsWindow"))
-        local windowDim = state.WindowSize
-        local pluginDim = imgui.GetWindowSize()
-        local centeringX = (windowDim[1] - 433) * 0.5
-        local centeringY = (windowDim[2] - 400) * 0.5
-        local coordinatesToCenter = vector.New(centeringX, centeringY)
+        local coordinatesToCenter = game.window.getCenter() - vector.New(216.5, 200)
         imgui.SetWindowPos("plumoguSV Settings", coordinatesToCenter)
+    end
+    KeepSameLine()
+    if (imgui.Button("Patch Notes", HALF_ACTION_BUTTON_SIZE)) then
     end
     if (imgui.Button("Get Map Stats", HALF_ACTION_BUTTON_SIZE)) then
         getMapStats()
@@ -6994,11 +6999,7 @@ function infoTab()
     KeepSameLine()
     if (imgui.Button("View Tutorials", HALF_ACTION_BUTTON_SIZE)) then
         state.SetValue("windows.showTutorialWindow", not state.GetValue("windows.showTutorialWindow"))
-        local windowDim = state.WindowSize
-        local pluginDim = imgui.GetWindowSize()
-        local centeringX = (windowDim[1] - 600) * 0.5
-        local centeringY = (windowDim[2] - 500) * 0.5
-        local coordinatesToCenter = vector.New(centeringX, centeringY)
+        local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos("plumoguSV Settings", coordinatesToCenter)
     end
 end

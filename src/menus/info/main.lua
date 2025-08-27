@@ -16,14 +16,14 @@ function infoTab()
     imgui.BulletText("ESV members for constant support.")
     AddPadding()
     AddPadding()
-    if (imgui.Button("Click Here to Edit Settings", ACTION_BUTTON_SIZE)) then
+    if (imgui.Button("Edit Settings", HALF_ACTION_BUTTON_SIZE)) then
         cache.windows.showSettingsWindow = not cache.windows.showSettingsWindow
-        local windowDim = state.WindowSize
-        local pluginDim = imgui.GetWindowSize()
-        local centeringX = (windowDim[1] - 433) * 0.5
-        local centeringY = (windowDim[2] - 400) * 0.5
-        local coordinatesToCenter = vector.New(centeringX, centeringY)
+        local coordinatesToCenter = game.window.getCenter() - vector.New(216.5, 200)
         imgui.SetWindowPos("plumoguSV Settings", coordinatesToCenter)
+    end
+    KeepSameLine()
+    if (imgui.Button("Patch Notes", HALF_ACTION_BUTTON_SIZE)) then
+
     end
     if (imgui.Button("Get Map Stats", HALF_ACTION_BUTTON_SIZE)) then
         getMapStats()
@@ -31,11 +31,7 @@ function infoTab()
     KeepSameLine()
     if (imgui.Button("View Tutorials", HALF_ACTION_BUTTON_SIZE)) then
         cache.windows.showTutorialWindow = not cache.windows.showTutorialWindow
-        local windowDim = state.WindowSize
-        local pluginDim = imgui.GetWindowSize()
-        local centeringX = (windowDim[1] - 600) * 0.5
-        local centeringY = (windowDim[2] - 500) * 0.5
-        local coordinatesToCenter = vector.New(centeringX, centeringY)
+        local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos("plumoguSV Settings", coordinatesToCenter)
     end
 end
