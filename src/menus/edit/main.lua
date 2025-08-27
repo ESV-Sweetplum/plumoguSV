@@ -1,6 +1,5 @@
 EDIT_SV_TOOLS = { -- tools for editing SVs
     "Add Teleport",
-    "Align Timing Lines",
     "Change Groups",
     "Convert SV <-> SSF",
     "Copy & Paste",
@@ -9,11 +8,10 @@ EDIT_SV_TOOLS = { -- tools for editing SVs
     "Displace View",
     "Duplicate Holistic",
     "Dynamic Scale",
-    "Fix LN Ends",
     "Flicker",
     "Layer Snaps",
+    "Lint Map",
     "Measure",
-    "Merge",
     "Reverse Scroll",
     "Scale (Displace)",
     "Scale (Multiply)",
@@ -27,7 +25,6 @@ function editSVTab()
     AddSeparator()
     local toolName = EDIT_SV_TOOLS[globalVars.editToolIndex]
     if toolName == "Add Teleport" then addTeleportMenu() end
-    if toolName == "Align Timing Lines" then alignTimingLinesMenu() end
     if toolName == "Change Groups" then changeGroupsMenu() end
     if toolName == "Convert SV <-> SSF" then convertSVSSFMenu() end
     if toolName == "Copy & Paste" then copyNPasteMenu() end
@@ -36,11 +33,10 @@ function editSVTab()
     if toolName == "Displace View" then displaceViewMenu() end
     if toolName == "Duplicate Holistic" then duplicateHolisticMenu() end
     if toolName == "Dynamic Scale" then dynamicScaleMenu() end
-    if toolName == "Fix LN Ends" then fixLNEndsMenu() end
     if toolName == "Flicker" then flickerMenu() end
     if toolName == "Layer Snaps" then layerSnapMenu() end
+    if toolName == "Lint Map" then lintMapMenu() end
     if toolName == "Measure" then measureMenu() end
-    if toolName == "Merge" then mergeMenu() end
     if toolName == "Reverse Scroll" then reverseScrollMenu() end
     if toolName == "Scale (Displace)" then scaleDisplaceMenu() end
     if toolName == "Scale (Multiply)" then scaleMultiplyMenu() end
@@ -51,7 +47,6 @@ end
 function chooseEditTool()
     local tooltipList = {
         "Add a large teleport SV to move far away.",
-        "Create timing lines at notes to avoid desync.",
         "Moves SVs and SSFs to a designated timing group.",
         "Convert multipliers between SV/SSF.",
         "Copy SVs and SSFs and paste them somewhere else.",
@@ -60,11 +55,10 @@ function chooseEditTool()
         "Temporarily displace the playfield view.",
         "Copy everything in a section and paste it somewhere else.",
         "Dynamically scale SVs across notes.",
-        "Fix flipped LN ends.",
         "Flash notes on and off the screen.",
         "Transfer snap colors into layers, to be loaded later.",
+        "Polish your map with these set of tools.",
         "Get stats about SVs in a section.",
-        "Combine SVs that overlap.",
         "Reverse the scroll direction using SVs.",
         "Scale SV values by multiplying.",
         "Scale SV values by adding teleport SVs.",

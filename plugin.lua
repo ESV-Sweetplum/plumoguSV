@@ -2654,46 +2654,6 @@ function addTeleportSVs(menuVars)
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
-function alignTimingLines()
-    local tpsToRemove = {}
-    local currentTP = state.CurrentTimingPoint
-    local starttime = currentTP.StartTime
-    local length = map.GetTimingPointLength(currentTP)
-    local endtime = starttime + length
-    local signature = math.toNumber(currentTP.Signature)
-    local bpm = currentTP.Bpm
-    local mspb = 60000 / bpm
-    local msptl = mspb * signature
-    local noteTimes = table.property(map.HitObjects, "StartTime")
-    local times = {}
-    local timingpoints = {}
-    for time = starttime, endtime, msptl do
-        local originalTime = math.floor(time)
-        while (truthy(noteTimes) and (noteTimes[1] < originalTime - 5)) do
-            table.remove(noteTimes, 1)
-        end
-        if (#noteTimes == 0) then
-            times[#times + 1] = originalTime
-        elseif (math.abs(noteTimes[1] - originalTime) <= 5) then
-            times[#times + 1] = noteTimes[1]
-        else
-            times[#times + 1] = originalTime
-        end
-    end
-    for k15 = 1, #times do
-        local time = times[k15]
-        if (game.getTimingPointAt(time).StartTime == time) then
-            tpsToRemove[#tpsToRemove + 1] = game.getTimingPointAt(time)
-        end
-        table.insert(timingpoints, utils.CreateTimingPoint(time, bpm, signature))
-    end
-    actions.PerformBatch({
-        createEA(action_type.AddTimingPointBatch, timingpoints),
-        createEA(action_type.RemoveTimingPointBatch, tpsToRemove)
-    })
-    toggleablePrint("s!", table.concat({"Created ", #timingpoints, pluralize(" timing point.", #timingpoints, -2)}))
-    toggleablePrint("e!", table.concat({"Deleted ", #tpsToRemove, pluralize(" timing point.", #tpsToRemove, -2)}))
-end
 function changeGroups(menuVars)
     if (state.SelectedScrollGroupId == menuVars.designatedTimingGroup) then
         print("w!", "Moving from one timing group to the same timing group will do nothing.")
@@ -2707,12 +2667,12 @@ function changeGroups(menuVars)
     local svsToAdd = {}
     local ssfsToAdd = {}
     local oldGroup = state.SelectedScrollGroupId
-    for k16 = 1, #svsToRemove do
-        local sv = svsToRemove[k16]
+    for k15 = 1, #svsToRemove do
+        local sv = svsToRemove[k15]
         table.insert(svsToAdd, createSV(sv.StartTime, sv.Multiplier))
     end
-    for k17 = 1, #ssfsToRemove do
-        local ssf = ssfsToRemove[k17]
+    for k16 = 1, #ssfsToRemove do
+        local ssf = ssfsToRemove[k16]
         table.insert(ssfsToAdd, createSSF(ssf.StartTime, ssf.Multiplier))
     end
     local actionList = {}
@@ -2753,22 +2713,22 @@ function convertSVSSF(menuVars)
     local editorActions = {}
     if (menuVars.conversionDirection) then
         local svs = game.getSVsBetweenOffsets(startOffset, endOffset, false)
-        for k18 = 1, #svs do
-            local sv = svs[k18]
+        for k17 = 1, #svs do
+            local sv = svs[k17]
             table.insert(objects, { StartTime = sv.StartTime, Multiplier = sv.Multiplier })
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svs))
     else
         local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset, false)
-        for k19 = 1, #ssfs do
-            local ssf = ssfs[k19]
+        for k18 = 1, #ssfs do
+            local ssf = ssfs[k18]
             table.insert(objects, { StartTime = ssf.StartTime, Multiplier = ssf.Multiplier })
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfs))
     end
     local createTable = {}
-    for k20 = 1, #objects do
-        local obj = objects[k20]
+    for k19 = 1, #objects do
+        local obj = objects[k19]
         if (menuVars.conversionDirection) then
             table.insert(createTable, createSSF(obj.StartTime,
                 obj.Multiplier))
@@ -2795,8 +2755,8 @@ function copyItems(menuVars)
     local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset)
     local bms = game.getBookmarksBetweenOffsets(startOffset, endOffset)
     if (not menuVars.copyTable[1]) then goto continue1 end
-    for k21 = 1, #lines do
-        local line = lines[k21]
+    for k20 = 1, #lines do
+        local line = lines[k20]
         local copiedLine = {
             relativeOffset = line.StartTime - startOffset,
             bpm = line.Bpm,
@@ -2807,8 +2767,8 @@ function copyItems(menuVars)
     end
     ::continue1::
     if (not menuVars.copyTable[2]) then goto continue2 end
-    for k22 = 1, #svs do
-        local sv = svs[k22]
+    for k21 = 1, #svs do
+        local sv = svs[k21]
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
             multiplier = sv.Multiplier
@@ -2817,8 +2777,8 @@ function copyItems(menuVars)
     end
     ::continue2::
     if (not menuVars.copyTable[3]) then goto continue3 end
-    for k23 = 1, #ssfs do
-        local ssf = ssfs[k23]
+    for k22 = 1, #ssfs do
+        local ssf = ssfs[k22]
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
             multiplier = ssf.Multiplier
@@ -2827,8 +2787,8 @@ function copyItems(menuVars)
     end
     ::continue3::
     if (not menuVars.copyTable[4]) then goto continue4 end
-    for k24 = 1, #bms do
-        local bm = bms[k24]
+    for k23 = 1, #bms do
+        local bm = bms[k23]
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
             note = bm.Note
@@ -2996,8 +2956,8 @@ function displaceNoteSVsParent(menuVars)
     if (not truthy(offsets)) then return end
     local svsToRemove = {}
     local svsToAdd = {}
-    for k25 = 1, #offsets do
-        local offset = offsets[k25]
+    for k24 = 1, #offsets do
+        local offset = offsets[k24]
         local tbl = displaceNoteSVs(
             {
                 distance = (offset - offsets[1]) / (offsets[#offsets] - offsets[1]) *
@@ -3111,8 +3071,8 @@ function pasteInstance(menuVars)
     for tgId, tgSVs in pairs(menuVars.SVs) do
         state.SelectedScrollGroupId = tgId
         local svs = {}
-        for k26 = 1, #tgSVs do
-            local sv = tgSVs[k26]
+        for k25 = 1, #tgSVs do
+            local sv = tgSVs[k25]
             table.insert(svs, createSV(offset + sv.StartTime, sv.Multiplier))
         end
         actionList[tgId] = {}
@@ -3121,8 +3081,8 @@ function pasteInstance(menuVars)
     for tgId, tgSSFs in pairs(menuVars.SSFs) do
         state.SelectedScrollGroupId = tgId
         local ssfs = {}
-        for k27 = 1, #tgSSFs do
-            local ssf = tgSSFs[k27]
+        for k26 = 1, #tgSSFs do
+            local ssf = tgSSFs[k26]
             table.insert(ssfs, createSSF(offset + ssf.StartTime, ssf.Multiplier))
         end
         if (not truthy(actionList[tgId])) then actionList[tgId] = {} end
@@ -3153,54 +3113,13 @@ function dynamicScaleSVs(menuVars)
             endOffset)
         local targetDistance = targetAvgSV * (endOffset - startOffset)
         local scalingFactor = targetDistance / currentDistance
-        for k28 = 1, #svsBetweenOffsets do
-            local sv = svsBetweenOffsets[k28]
+        for k27 = 1, #svsBetweenOffsets do
+            local sv = svsBetweenOffsets[k27]
             local newSVMultiplier = scalingFactor * sv.Multiplier
             addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
         end
     end
     removeAndAddSVs(svsToRemove, svsToAdd)
-end
-function fixFlippedLNEnds()
-    local svsToRemove = {}
-    local svsToAdd = {}
-    local svTimeIsAdded = {}
-    local lnEndTimeFixed = {}
-    local fixedLNEndsCount = 0
-    for _, ho in ipairs(map.HitObjects) do
-        local lnEndTime = ho.EndTime
-        local isLN = lnEndTime ~= 0
-        local endHasNegativeSV = (game.getSVMultiplierAt(lnEndTime) <= 0)
-        local hasntAlreadyBeenFixed = lnEndTimeFixed[lnEndTime] == nil
-        if isLN and endHasNegativeSV and hasntAlreadyBeenFixed then
-            lnEndTimeFixed[lnEndTime] = true
-            local multiplier = getUsableDisplacementMultiplier(lnEndTime)
-            local duration = 1 / multiplier
-            local timeAt = lnEndTime
-            local timeAfter = lnEndTime + duration
-            local timeAfterAfter = lnEndTime + duration + duration
-            svTimeIsAdded[timeAt] = true
-            svTimeIsAdded[timeAfter] = true
-            svTimeIsAdded[timeAfterAfter] = true
-            local svMultiplierAt = game.getSVMultiplierAt(timeAt)
-            local svMultiplierAfter = game.getSVMultiplierAt(timeAfter)
-            local svMultiplierAfterAfter = game.getSVMultiplierAt(timeAfterAfter)
-            local newMultiplierAt = 0.001
-            local newMultiplierAfter = svMultiplierAt + svMultiplierAfter
-            local newMultiplierAfterAfter = svMultiplierAfterAfter
-            addSVToList(svsToAdd, timeAt, newMultiplierAt, true)
-            addSVToList(svsToAdd, timeAfter, newMultiplierAfter, true)
-            addSVToList(svsToAdd, timeAfterAfter, newMultiplierAfterAfter, true)
-            fixedLNEndsCount = fixedLNEndsCount + 1
-        end
-    end
-    local startOffset = map.HitObjects[1].StartTime
-    local endOffset = map.HitObjects[#map.HitObjects].EndTime
-    if endOffset == 0 then endOffset = map.HitObjects[#map.HitObjects].StartTime end
-    getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
-    removeAndAddSVs(svsToRemove, svsToAdd)
-    local type = truthy(fixedLNEndsCount) and "s!" or "w!"
-    print(type, "Fixed " .. fixedLNEndsCount .. pluralize(" flipped LN end.", fixedLNEndsCount, -2))
 end
 function flickerSVs(menuVars)
     local svsToAdd = {}
@@ -3275,8 +3194,8 @@ function layerSnaps()
     local originalLayerNames = table.property(map.EditorLayers, "Name")
     local layerNames = table.duplicate(originalLayerNames)
     local notes = game.uniqueNotesBetweenSelected()
-    for k29 = 1, #notes do
-        local ho = notes[k29]
+    for k28 = 1, #notes do
+        local ho = notes[k28]
         local color = COLOR_MAP[game.getSnapAt(ho.StartTime)]
         if (ho.EditorLayer == 0) then
             layer = { Name = "Default", ColorRgb = "255,255,255", Hidden = false }
@@ -3374,6 +3293,115 @@ function clearSnappedLayers()
     end
     actions.PerformBatch(removeLayerActions)
 end
+function alignTimingLines()
+    local tpsToRemove = {}
+    local currentTP = state.CurrentTimingPoint
+    local starttime = currentTP.StartTime
+    local length = map.GetTimingPointLength(currentTP)
+    local endtime = starttime + length
+    local signature = math.toNumber(currentTP.Signature)
+    local bpm = currentTP.Bpm
+    local mspb = 60000 / bpm
+    local msptl = mspb * signature
+    local noteTimes = table.property(map.HitObjects, "StartTime")
+    local times = {}
+    local timingpoints = {}
+    for time = starttime, endtime, msptl do
+        local originalTime = math.floor(time)
+        while (truthy(noteTimes) and (noteTimes[1] < originalTime - 5)) do
+            table.remove(noteTimes, 1)
+        end
+        if (#noteTimes == 0) then
+            times[#times + 1] = originalTime
+        elseif (math.abs(noteTimes[1] - originalTime) <= 5) then
+            times[#times + 1] = noteTimes[1]
+        else
+            times[#times + 1] = originalTime
+        end
+    end
+    for k29 = 1, #times do
+        local time = times[k29]
+        if (game.getTimingPointAt(time).StartTime == time) then
+            tpsToRemove[#tpsToRemove + 1] = game.getTimingPointAt(time)
+        end
+        table.insert(timingpoints, utils.CreateTimingPoint(time, bpm, signature))
+    end
+    actions.PerformBatch({
+        createEA(action_type.AddTimingPointBatch, timingpoints),
+        createEA(action_type.RemoveTimingPointBatch, tpsToRemove)
+    })
+    toggleablePrint("s!", table.concat({"Created ", #timingpoints, pluralize(" timing point.", #timingpoints, -2)}))
+    toggleablePrint("e!", table.concat({"Deleted ", #tpsToRemove, pluralize(" timing point.", #tpsToRemove, -2)}))
+end
+function fixFlippedLNEnds()
+    local svsToRemove = {}
+    local svsToAdd = {}
+    local svTimeIsAdded = {}
+    local lnEndTimeFixed = {}
+    local fixedLNEndsCount = 0
+    for _, ho in ipairs(map.HitObjects) do
+        local lnEndTime = ho.EndTime
+        local isLN = lnEndTime ~= 0
+        local endHasNegativeSV = (game.getSVMultiplierAt(lnEndTime) <= 0)
+        local hasntAlreadyBeenFixed = lnEndTimeFixed[lnEndTime] == nil
+        if isLN and endHasNegativeSV and hasntAlreadyBeenFixed then
+            lnEndTimeFixed[lnEndTime] = true
+            local multiplier = getUsableDisplacementMultiplier(lnEndTime)
+            local duration = 1 / multiplier
+            local timeAt = lnEndTime
+            local timeAfter = lnEndTime + duration
+            local timeAfterAfter = lnEndTime + duration + duration
+            svTimeIsAdded[timeAt] = true
+            svTimeIsAdded[timeAfter] = true
+            svTimeIsAdded[timeAfterAfter] = true
+            local svMultiplierAt = game.getSVMultiplierAt(timeAt)
+            local svMultiplierAfter = game.getSVMultiplierAt(timeAfter)
+            local svMultiplierAfterAfter = game.getSVMultiplierAt(timeAfterAfter)
+            local newMultiplierAt = 0.001
+            local newMultiplierAfter = svMultiplierAt + svMultiplierAfter
+            local newMultiplierAfterAfter = svMultiplierAfterAfter
+            addSVToList(svsToAdd, timeAt, newMultiplierAt, true)
+            addSVToList(svsToAdd, timeAfter, newMultiplierAfter, true)
+            addSVToList(svsToAdd, timeAfterAfter, newMultiplierAfterAfter, true)
+            fixedLNEndsCount = fixedLNEndsCount + 1
+        end
+    end
+    local startOffset = map.HitObjects[1].StartTime
+    local endOffset = map.HitObjects[#map.HitObjects].EndTime
+    if endOffset == 0 then endOffset = map.HitObjects[#map.HitObjects].StartTime end
+    getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
+    removeAndAddSVs(svsToRemove, svsToAdd)
+    local type = truthy(fixedLNEndsCount) and "s!" or "w!"
+    print(type, "Fixed " .. fixedLNEndsCount .. pluralize(" flipped LN end.", fixedLNEndsCount, -2))
+end
+function mergeSVs()
+    local svTimeDict = {}
+    local svsToRemove = {}
+    for _, sv in ipairs(table.reverse(map.ScrollVelocities)) do
+        if (svTimeDict[sv.StartTime]) then
+            svsToRemove[#svsToRemove + 1] = sv
+        else
+            svTimeDict[sv.StartTime] = true
+        end
+    end
+    if (truthy(svsToRemove)) then actions.Perform(createEA(action_type.RemoveScrollVelocityBatch, svsToRemove)) end
+    local type = truthy(svsToRemove) and "s!" or "w!"
+    print(type, "Removed " .. #svsToRemove .. pluralize(" SV.", #svsToRemove, -2))
+end
+function mergeSSFs()
+    local ssfTimeDict = {}
+    local ssfsToRemove = {}
+    for _, ssf in ipairs(table.reverse(map.ScrollSpeedFactors)) do
+        if (ssfTimeDict[ssf.StartTime]) then
+            ssfsToRemove[#ssfsToRemove + 1] = ssf
+        else
+            ssfTimeDict[ssf.StartTime] = true
+        end
+    end
+    if (truthy(ssfsToRemove)) then actions.Perform(createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove)) end
+    local type = truthy(ssfsToRemove) and "s!" or "w!"
+    print(type, "Removed " .. #ssfsToRemove .. pluralize(" SSF.", #ssfsToRemove, -2))
+end
 function measureSVs(menuVars)
     local roundingDecimalPlaces = 5
     local offsets = game.uniqueSelectedNoteOffsets()
@@ -3410,38 +3438,6 @@ function measureSVs(menuVars)
     local trueAvgSV = trueDistance / menuVars.roundedNSVDistance
     menuVars.roundedAvgSVDisplaceless = math.round(trueAvgSV, roundingDecimalPlaces)
     menuVars.avgSVDisplaceless = tostring(trueAvgSV)
-end
-function mergeSVs()
-    local offsets = game.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
-    local startOffset = offsets[1]
-    local endOffset = offsets[#offsets]
-    local svTimeDict = {}
-    local svsToRemove = {}
-    for _, sv in ipairs(table.reverse(game.getSVsBetweenOffsets(startOffset, endOffset, true, true))) do
-        if (svTimeDict[sv.StartTime]) then
-            svsToRemove[#svsToRemove + 1] = sv
-        else
-            svTimeDict[sv.StartTime] = true
-        end
-    end
-    actions.Perform(createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
-end
-function mergeSSFs()
-    local offsets = game.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
-    local startOffset = offsets[1]
-    local endOffset = offsets[#offsets]
-    local ssfTimeDict = {}
-    local ssfsToRemove = {}
-    for _, ssf in ipairs(table.reverse(game.getSSFsBetweenOffsets(startOffset, endOffset, true, true))) do
-        if (ssfTimeDict[ssf.StartTime]) then
-            ssfsToRemove[#ssfsToRemove + 1] = ssf
-        else
-            ssfTimeDict[ssf.StartTime] = true
-        end
-    end
-    actions.Perform(createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
 end
 function reverseScrollSVs(menuVars)
     local offsets = game.uniqueNoteOffsetsBetweenSelected()
@@ -6525,9 +6521,6 @@ function addTeleportMenu()
     AddSeparator()
     simpleActionMenu("Add teleport SVs at selected notes", 1, addTeleportSVs, menuVars)
 end
-function alignTimingLinesMenu()
-    simpleActionMenu("Align Timing Lines In This Region", 0, alignTimingLines, nil)
-end
 function changeGroupsMenu()
     local menuVars = getMenuVars("changeGroups")
     imgui.AlignTextToFramePadding()
@@ -6780,12 +6773,6 @@ function addNoteTimesToDynamicScaleButton(menuVars)
     local buttonText = "Assign selected note times"
     FunctionButton(buttonText, ACTION_BUTTON_SIZE, addSelectedNoteTimesToList, menuVars)
 end
-function fixLNEndsMenu()
-    imgui.TextWrapped(
-        "If there is a negative SV at an LN end, the LN end will be flipped. This is noticable especially for arrow skins and is jarring. This tool will fix that.")
-    AddSeparator()
-    simpleActionMenu("Fix flipped LN ends", 0, fixFlippedLNEnds, nil)
-end
 function flickerMenu()
     local menuVars = getMenuVars("flicker")
     menuVars.flickerTypeIndex = Combo("Flicker Type", FLICKER_TYPES, menuVars.flickerTypeIndex)
@@ -6803,9 +6790,18 @@ function layerSnapMenu()
     simpleActionMenu("Collapse snap layers", 0, collapseSnaps, nil)
     simpleActionMenu("Clear unused snap layers", 0, clearSnappedLayers, nil)
 end
+function lintMapMenu()
+    simpleActionMenu("Align timing lines in this region", 0, alignTimingLines, nil, false, true)
+    AddSeparator()
+    simpleActionMenu("Fix flipped LN ends", 0, fixFlippedLNEnds, nil, false, true)
+    ToolTip(
+        "If there is a negative SV at an LN end, the LN end will be flipped. This is noticable especially for arrow skins and is jarring. This tool will fix that.")
+    AddSeparator()
+    simpleActionMenu("Merge duplicate SVs", 0, mergeSVs, nil, false, true)
+    simpleActionMenu("Merge duplicate SSFs", 0, mergeSSFs, nil, false, true)
+end
 EDIT_SV_TOOLS = {
     "Add Teleport",
-    "Align Timing Lines",
     "Change Groups",
     "Convert SV <-> SSF",
     "Copy & Paste",
@@ -6814,11 +6810,10 @@ EDIT_SV_TOOLS = {
     "Displace View",
     "Duplicate Holistic",
     "Dynamic Scale",
-    "Fix LN Ends",
     "Flicker",
     "Layer Snaps",
+    "Lint Map",
     "Measure",
-    "Merge",
     "Reverse Scroll",
     "Scale (Displace)",
     "Scale (Multiply)",
@@ -6831,7 +6826,6 @@ function editSVTab()
     AddSeparator()
     local toolName = EDIT_SV_TOOLS[globalVars.editToolIndex]
     if toolName == "Add Teleport" then addTeleportMenu() end
-    if toolName == "Align Timing Lines" then alignTimingLinesMenu() end
     if toolName == "Change Groups" then changeGroupsMenu() end
     if toolName == "Convert SV <-> SSF" then convertSVSSFMenu() end
     if toolName == "Copy & Paste" then copyNPasteMenu() end
@@ -6840,11 +6834,10 @@ function editSVTab()
     if toolName == "Displace View" then displaceViewMenu() end
     if toolName == "Duplicate Holistic" then duplicateHolisticMenu() end
     if toolName == "Dynamic Scale" then dynamicScaleMenu() end
-    if toolName == "Fix LN Ends" then fixLNEndsMenu() end
     if toolName == "Flicker" then flickerMenu() end
     if toolName == "Layer Snaps" then layerSnapMenu() end
+    if toolName == "Lint Map" then lintMapMenu() end
     if toolName == "Measure" then measureMenu() end
-    if toolName == "Merge" then mergeMenu() end
     if toolName == "Reverse Scroll" then reverseScrollMenu() end
     if toolName == "Scale (Displace)" then scaleDisplaceMenu() end
     if toolName == "Scale (Multiply)" then scaleMultiplyMenu() end
@@ -6854,7 +6847,6 @@ end
 function chooseEditTool()
     local tooltipList = {
         "Add a large teleport SV to move far away.",
-        "Create timing lines at notes to avoid desync.",
         "Moves SVs and SSFs to a designated timing group.",
         "Convert multipliers between SV/SSF.",
         "Copy SVs and SSFs and paste them somewhere else.",
@@ -6863,11 +6855,10 @@ function chooseEditTool()
         "Temporarily displace the playfield view.",
         "Copy everything in a section and paste it somewhere else.",
         "Dynamically scale SVs across notes.",
-        "Fix flipped LN ends.",
         "Flash notes on and off the screen.",
         "Transfer snap colors into layers, to be loaded later.",
+        "Polish your map with these set of tools.",
         "Get stats about SVs in a section.",
-        "Combine SVs that overlap.",
         "Reverse the scroll direction using SVs.",
         "Scale SV values by multiplying.",
         "Scale SV values by adding teleport SVs.",
@@ -6932,10 +6923,6 @@ function CopiableBox(text, label, content)
     imgui.InputText(label, content, #content, imgui_input_text_flags.AutoSelectAll)
     imgui.PopItemWidth()
     AddPadding()
-end
-function mergeMenu()
-    simpleActionMenu("Merge duplicate SVs between selected notes", 2, mergeSVs, nil)
-    simpleActionMenu("Merge duplicate SSFs between selected notes", 2, mergeSSFs, nil)
 end
 function reverseScrollMenu()
     local menuVars = getMenuVars("reverseScroll")
