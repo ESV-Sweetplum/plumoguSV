@@ -1,5 +1,5 @@
----@diagnostic disable: missing-fields, duplicate-doc-field, unused-local
----@meta intellisense
+---@diagnostic disable: missing-fields, duplicate-doc-field, duplicate-doc-alias, unused-local
+---@meta quinsight-intellisense
 
 --[[
 
@@ -37,11 +37,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <https://unlicense.org>
 ]]
 
----@alias NoteLane 1|2|3|4|5|6|7|8|9|10
+---@alias NoteLane 1|2|3|4|5|6|7|8|9|10 The lane of a particular note.
 ---@alias SnapNumber 1|2|3|4|5|6|8|12|16 The denominator of the corresponding snap.
----@alias fmt string | number | boolean | table
 
--- STARTING LINE
 ---@class (exact) ScrollGroup
 ---##### (READ-ONLY)
 ---#### The initial [sv](lua://ScrollVelocity) multiplier of this [scroll group](lua://ScrollGroup).
@@ -778,7 +776,7 @@ state.Scale                    = 1 ---@type number
 
 ---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The size of the Quaver window.
-state.WindowSize               = { 69, 69 } ---@type Vector2
+state.WindowSize               = { 69, 69 } ---@type [number, number]
 
 ---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### Stores a value that can be retrieved by [`state.GetValue`](lua://state.GetValue). Mainly used to persist data between hot-reloads.
@@ -1462,10 +1460,10 @@ history_type = {
     Undo = 2,
 }
 
--- END QUAVER, START IMGUI
-
+---@alias fmt string | number | boolean | table
 ---@class Type
-imgui        = {}
+
+imgui = {}
 
 ---##### (READ-ONLY)
 ---@param type string
