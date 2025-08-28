@@ -76,7 +76,7 @@ export default async function transpiler(devMode = false, lint = true) {
         fileCount++;
     });
 
-    output = output.replaceAll(/---@meta [a-z\-]+\n/g, '');
+    output = output.replaceAll(/---@meta [a-zA-Z0-9\-]+\n/g, ''); // Remove meta tags from packages
 
     output = output.replaceAll(
         /"([^"]+?)" \.\. (.+) \.\. "([^"]+?)"/g,
