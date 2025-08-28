@@ -28,5 +28,5 @@ function chooseCreateTool()
     KeepSameLine()
     globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex, {}, {}, tooltipList)
 
-    ToolTip(tooltipList[globalVars.placeTypeIndex])
+    HoverToolTip(tooltipList[globalVars.placeTypeIndex])
 end

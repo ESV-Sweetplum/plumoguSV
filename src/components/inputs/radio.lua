@@ -9,7 +9,7 @@
 function RadioButtons(label, value, options, optionValues, tooltipText)
     imgui.AlignTextToFramePadding()
     imgui.Text(label)
-    if (tooltipText) then ToolTip(tooltipText) end
+    if (tooltipText) then HoverToolTip(tooltipText) end
     for idx, option in pairs(options) do
         imgui.SameLine(0, RADIO_BUTTON_SPACING)
         if imgui.RadioButton(option, value == optionValues[idx]) then

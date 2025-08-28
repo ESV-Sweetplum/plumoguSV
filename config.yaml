@@ -15,7 +15,7 @@ drawCapybara: true
 drawCapybara2: false
 drawCapybara312: false
 selectTypeIndex: 1
-placeTypeIndex: 1
+placeTypeIndex: 4
 editToolIndex: 1
 showPresetMenu: false
 scrollGroupIndex: 1
@@ -210,6 +210,21 @@ defaultProperties:
     linearVibratoSV:
       startMsx: 100
       endMsx: 0
+    polynomialVibratoSV:
+      startMsx: 0
+      endMsx: 100
+      controlPointCount: 3
+      controlPoints:
+      - - 0
+        - 230
+      - - 115
+        - 0
+      - - 230
+        - 230
+      plotPoints:
+      - 
+      plotCoefficients:
+      - 
     exponentialVibratoSV:
       startMsx: 100
       endMsx: 0
@@ -282,11 +297,11 @@ defaultProperties:
       distanceMode: 1
     bezier:
       p1:
-      - 0
-      - 0
+      - 0.10000000149011612
+      - 0.89999997615814209
       p2:
-      - 1
-      - 1
+      - 0.89999997615814209
+      - 0.10000000149011612
       verticalShift: 0
       avgSV: 1
       svPoints: 16

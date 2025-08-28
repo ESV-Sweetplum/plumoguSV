@@ -92,12 +92,12 @@ function renderMemeButtons()
         ---@diagnostic disable-next-line: param-type-mismatch
         imgui.Text(nil)
     end
-    ToolTip("Press this button once (if you don't have any work saved) and never again.")
+    HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
     if (GradientButton("fuck you and\nyour stupid editor", color.vctr.red, color.vctr.white, 1500)) then
         cache.boolean.destroyEditor = true
         ---@diagnostic disable-next-line: param-type-mismatch
     end
-    ToolTip("Press this button once (if you don't have any work saved) and never again.")
+    HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
     if (cache.boolean.destroyEditor) then
         -- state.SelectedScrollGroupId = nil
         actions.GoToObjects(math.floor(math.random() * map.TrackLength))

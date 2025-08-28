@@ -74,7 +74,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             imgui.SetClipboardText(table.stringify(preset))
             print("i!", "Exported preset to your clipboard.")
         end
-        ToolTip("Left-click to select this preset. Right-click to copy this preset to your clipboard.")
+        HoverToolTip("Left-click to select this preset. Right-click to copy this preset to your clipboard.")
         KeepSameLine()
         if (imgui.Button("X##Preset" .. idx)) then
             table.remove(globalVars.presets, idx)

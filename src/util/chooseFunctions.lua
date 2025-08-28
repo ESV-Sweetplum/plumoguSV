@@ -86,7 +86,7 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
     _, freeMode = imgui.Checkbox("Free Mode##Bezier", freeMode)
     cache.boolean.bezierFreeMode = freeMode
 
-    ToolTip(
+    HoverToolTip(
         "Enable this to allow the bezier control points to move outside the boundary. WARNING: ONCE MOVED OUTSIDE, THEY CANNOT BE MOVED BACK IN. DISABLE AND RE-ENABLE FREE MODE TO ALLOW THEM TO BE INTERACTED WITH.")
 
     imgui.EndChild()
@@ -152,7 +152,7 @@ function chooseConstantShift(settingVars, defaultShift)
     if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[5])) then
         settingVars.verticalShift = defaultShift
     end
-    ToolTip("Reset vertical shift to initial values")
+    HoverToolTip("Reset vertical shift to initial values")
     KeepSameLine()
 
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
@@ -161,7 +161,7 @@ function chooseConstantShift(settingVars, defaultShift)
     if negateButtonPressed and settingVars.verticalShift ~= 0 then
         settingVars.verticalShift = -settingVars.verticalShift
     end
-    ToolTip("Negate vertical shift")
+    HoverToolTip("Negate vertical shift")
 
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
@@ -183,7 +183,7 @@ function chooseMsxVerticalShift(settingVars, defaultShift)
     if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[5])) then
         settingVars.verticalShift = defaultShift or 0
     end
-    ToolTip("Reset vertical shift to initial values")
+    HoverToolTip("Reset vertical shift to initial values")
     KeepSameLine()
 
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
@@ -192,7 +192,7 @@ function chooseMsxVerticalShift(settingVars, defaultShift)
     if negateButtonPressed and settingVars.verticalShift ~= 0 then
         settingVars.verticalShift = -settingVars.verticalShift
     end
-    ToolTip("Negate vertical shift")
+    HoverToolTip("Negate vertical shift")
 
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
@@ -578,7 +578,7 @@ end
 
 function chooseVibratoQuality(menuVars)
     menuVars.vibratoQuality = Combo("Vibrato Quality", VIBRATO_DETAILED_QUALITIES, menuVars.vibratoQuality)
-    ToolTip("Note that higher FPS will look worse on lower refresh rate monitors.")
+    HoverToolTip("Note that higher FPS will look worse on lower refresh rate monitors.")
 end
 
 function chooseCurvatureCoefficient(settingVars, plotFn)
@@ -653,7 +653,7 @@ function chooseStillType(menuVars)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.4)
     menuVars.stillTypeIndex = Combo("Displacement", STILL_TYPES, menuVars.stillTypeIndex, {}, {}, tooltipList)
 
-    ToolTip(tooltipList[menuVars.stillTypeIndex])
+    HoverToolTip(tooltipList[menuVars.stillTypeIndex])
 
     if dontChooseDistance then
         imgui.Unindent(indentWidth)
@@ -682,7 +682,7 @@ end
 
 function chooseSVBehavior(settingVars)
     local swapButtonPressed = imgui.Button("Swap", SECONDARY_BUTTON_SIZE)
-    ToolTip("Switch between slow down/speed up")
+    HoverToolTip("Switch between slow down/speed up")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)

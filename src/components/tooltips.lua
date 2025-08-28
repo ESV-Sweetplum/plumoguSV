@@ -1,7 +1,7 @@
 -- Creates a tooltip box when the last (most recently created) GUI item is hovered over
 -- Parameters
 --    text : text to appear in the tooltip box [String]
-function ToolTip(text)
+function HoverToolTip(text)
     if not imgui.IsItemHovered() then return end
     imgui.BeginTooltip()
     imgui.PushTextWrapPos(imgui.GetFontSize() * 20)
@@ -16,5 +16,5 @@ end
 function HelpMarker(text)
     KeepSameLine()
     imgui.TextDisabled("(?)")
-    ToolTip(text)
+    HoverToolTip(text)
 end

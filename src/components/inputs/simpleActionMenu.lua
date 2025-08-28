@@ -17,7 +17,7 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     FunctionButton(buttonText, ACTION_BUTTON_SIZE, actionfunc, menuVars)
     if (disableKeyInput) then return end
     local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + tn(hideNoteReq)]
-    local tooltip = ToolTip("Press \'" .. keyCombo ..
+    local tooltip = HoverToolTip("Press \'" .. keyCombo ..
         "\' on your keyboard to do the same thing as this button")
     executeFunctionIfTrue(kbm.pressedKeyCombo(keyCombo), actionfunc, menuVars)
 end

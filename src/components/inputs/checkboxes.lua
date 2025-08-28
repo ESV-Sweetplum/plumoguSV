@@ -18,7 +18,7 @@ end
 function GlobalCheckbox(parameterName, label, tooltipText)
     local oldValue = globalVars[parameterName] ---@cast oldValue boolean
     _, globalVars[parameterName] = imgui.Checkbox(label, oldValue)
-    if (tooltipText) then ToolTip(tooltipText) end
+    if (tooltipText) then HoverToolTip(tooltipText) end
     if (oldValue ~= globalVars[parameterName]) then
         write(globalVars)
     end

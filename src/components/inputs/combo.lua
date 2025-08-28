@@ -42,7 +42,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
             newListIndex = i
         end
         if (tooltipList and truthy(tooltipList)) then
-            ToolTip(tooltipList[i])
+            HoverToolTip(tooltipList[i])
         end
         ::skipRender::
         if (colorList and truthy(colorList)) then imgui.PopStyleColor() end

@@ -8,16 +8,20 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         AddSeparator()
 
         local size = 220
-        local RESOLUTION = 50
+        local RESOLUTION = 44
+
+        local changedControlCount = false
 
         while (settingVars.controlPointCount > #settingVars.controlPoints) do
             local points = table.duplicate(settingVars.controlPoints)
             table.insert(points, vector.New(math.random(size), math.random(size)))
             settingVars.controlPoints = table.duplicate(points)
+            changedControlCount = true
         end
 
         while (settingVars.controlPointCount < #settingVars.controlPoints) do
             table.remove(settingVars.controlPoints, #settingVars.controlPoints)
+            changedControlCount = true
         end
 
         for _, point in pairs(settingVars.controlPoints) do
@@ -40,7 +44,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
             table.insert(normalizedPoints, vector.New(point.x, size - point.y))
         end
 
-        if (changedPoints) then
+        if (changedPoints or changedControlCount) then
             plotPoints = {}
 
             local mtrx = {}
@@ -73,7 +77,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
 
             local coefficients = matrix.solve(mtrx, vctr) ---@cast coefficients number[]
 
-            for i = 0, RESOLUTION - 1 do
+            for i = 0, RESOLUTION do
                 local x = i / RESOLUTION * size
                 local y = size - math.clamp(math.evaluatePolynomial(coefficients, x), 0, size)
 
@@ -85,10 +89,13 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         end
 
         local topLeft = imgui.GetWindowPos()
+        local dim = imgui.GetWindowSize()
 
         for i = 1, #settingVars.plotPoints - 1 do
-            ctx.AddLine(topLeft + settingVars.plotPoints[i], topLeft + settingVars.plotPoints[i + 1],
-                imgui.GetColorU32("PlotLines", 0.5), 3)
+            local opacityFactor = 0.7 - math.sin(20 * i / #settingVars.plotPoints - imgui.GetTime() * 5) / 2
+            ctx.AddLine(topLeft + settingVars.plotPoints[i],
+                vector.Clamp(topLeft + settingVars.plotPoints[i + 1], topLeft, topLeft + dim - vctr2(1)),
+                imgui.GetColorU32("PlotLines", opacityFactor), 3)
         end
 
         imgui.EndChild()

@@ -5294,7 +5294,7 @@ function PresetButton()
     local buttonText = ": )"
     if globalVars.showPresetMenu then buttonText = "X" end
     local buttonPressed = imgui.Button(buttonText, EXPORT_BUTTON_SIZE)
-    ToolTip("View presets and export/import them.")
+    HoverToolTip("View presets and export/import them.")
     KeepSameLine()
     if not buttonPressed then return end
     globalVars.showPresetMenu = not globalVars.showPresetMenu
@@ -5324,7 +5324,7 @@ end
 function GlobalCheckbox(parameterName, label, tooltipText)
     local oldValue = globalVars[parameterName] ---@cast oldValue boolean
     _, globalVars[parameterName] = imgui.Checkbox(label, oldValue)
-    if (tooltipText) then ToolTip(tooltipText) end
+    if (tooltipText) then HoverToolTip(tooltipText) end
     if (oldValue ~= globalVars[parameterName]) then
         write(globalVars)
     end
@@ -5339,7 +5339,7 @@ function CodeInput(varsTable, parameterName, label, tooltipText)
     local oldCode = varsTable[parameterName]
     _, varsTable[parameterName] = imgui.InputTextMultiline(label, oldCode, 16384,
         vector.New(240, 120))
-    if (tooltipText) then ToolTip(tooltipText) end
+    if (tooltipText) then HoverToolTip(tooltipText) end
     return imgui.IsItemActive()
 end
 ---Creates a color input.
@@ -5352,7 +5352,7 @@ function ColorInput(customStyle, parameterName, label, tooltipText)
     AddSeparator()
     local oldCode = customStyle[parameterName]
     _, customStyle[parameterName] = imgui.ColorPicker4(label, customStyle[parameterName] or DEFAULT_STYLE[parameterName])
-    if (tooltipText) then ToolTip(tooltipText) end
+    if (tooltipText) then HoverToolTip(tooltipText) end
     return oldCode ~= customStyle[parameterName]
 end
 ---Creates a combo element.
@@ -5396,7 +5396,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
             newListIndex = i
         end
         if (tooltipList and truthy(tooltipList)) then
-            ToolTip(tooltipList[i])
+            HoverToolTip(tooltipList[i])
         end
         ::skipRender::
         if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
@@ -5424,7 +5424,7 @@ function NegatableComputableInputFloat(label, var, decimalPlaces, suffix)
     local oldValue = var
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
     local negateButtonPressed = imgui.Button("Neg.", SECONDARY_BUTTON_SIZE)
-    ToolTip("Negate SV value")
+    HoverToolTip("Negate SV value")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
@@ -5442,12 +5442,12 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     widthFactor = widthFactor or 0.7
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local swapButtonPressed = imgui.Button("S##" .. lowerName, TERTIARY_BUTTON_SIZE)
-    ToolTip("Swap start/end values")
+    HoverToolTip("Swap start/end values")
     local oldValues = vector.New(varsTable[lowerName], varsTable[higherName])
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
     local negateButtonPressed = imgui.Button("N##" .. higherName, TERTIARY_BUTTON_SIZE)
-    ToolTip("Negate start/end values")
+    HoverToolTip("Negate start/end values")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * widthFactor - SAMELINE_SPACING)
@@ -5584,7 +5584,7 @@ end
 function RadioButtons(label, value, options, optionValues, tooltipText)
     imgui.AlignTextToFramePadding()
     imgui.Text(label)
-    if (tooltipText) then ToolTip(tooltipText) end
+    if (tooltipText) then HoverToolTip(tooltipText) end
     for idx, option in pairs(options) do
         imgui.SameLine(0, RADIO_BUTTON_SPACING)
         if imgui.RadioButton(option, value == optionValues[idx]) then
@@ -5612,7 +5612,7 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     FunctionButton(buttonText, ACTION_BUTTON_SIZE, actionfunc, menuVars)
     if (disableKeyInput) then return end
     local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + tn(hideNoteReq)]
-    local tooltip = ToolTip("Press \'" .. keyCombo ..
+    local tooltip = HoverToolTip("Press \'" .. keyCombo ..
         "\' on your keyboard to do the same thing as this button")
     executeFunctionIfTrue(kbm.pressedKeyCombo(keyCombo), actionfunc, menuVars)
 end
@@ -5639,7 +5639,7 @@ function AddSeparator()
     imgui.Separator()
     AddPadding()
 end
-function ToolTip(text)
+function HoverToolTip(text)
     if not imgui.IsItemHovered() then return end
     imgui.BeginTooltip()
     imgui.PushTextWrapPos(imgui.GetFontSize() * 20)
@@ -5650,7 +5650,7 @@ end
 function HelpMarker(text)
     KeepSameLine()
     imgui.TextDisabled("(?)")
-    ToolTip(text)
+    HoverToolTip(text)
 end
 function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOverride, windowScale)
     if (not forcedOverride) then
@@ -5755,7 +5755,7 @@ function chooseCreateTool()
     imgui.Text("  Type:  ")
     KeepSameLine()
     globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex, {}, {}, tooltipList)
-    ToolTip(tooltipList[globalVars.placeTypeIndex])
+    HoverToolTip(tooltipList[globalVars.placeTypeIndex])
 end
 function renderPresetMenu(menuLabel, menuVars, settingVars)
     local newPresetName = state.GetValue("newPresetName", "")
@@ -5827,7 +5827,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             imgui.SetClipboardText(table.stringify(preset))
             print("i!", "Exported preset to your clipboard.")
         end
-        ToolTip("Left-click to select this preset. Right-click to copy this preset to your clipboard.")
+        HoverToolTip("Left-click to select this preset. Right-click to copy this preset to your clipboard.")
         KeepSameLine()
         if (imgui.Button("X##Preset" .. idx)) then
             table.remove(globalVars.presets, idx)
@@ -6311,14 +6311,17 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         local pointList = {}
         AddSeparator()
         local size = 220
-        local RESOLUTION = 50
+        local RESOLUTION = 44
+        local changedControlCount = false
         while (settingVars.controlPointCount > #settingVars.controlPoints) do
             local points = table.duplicate(settingVars.controlPoints)
             table.insert(points, vector.New(math.random(size), math.random(size)))
             settingVars.controlPoints = table.duplicate(points)
+            changedControlCount = true
         end
         while (settingVars.controlPointCount < #settingVars.controlPoints) do
             table.remove(settingVars.controlPoints, #settingVars.controlPoints)
+            changedControlCount = true
         end
         for _, point in pairs(settingVars.controlPoints) do
             table.insert(pointList,
@@ -6336,7 +6339,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         for _, point in pairs(settingVars.controlPoints) do
             table.insert(normalizedPoints, vector.New(point.x, size - point.y))
         end
-        if (changedPoints) then
+        if (changedPoints or changedControlCount) then
             plotPoints = {}
             local mtrx = {}
             local vctr = {}
@@ -6364,7 +6367,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
                 end
             end
             local coefficients = matrix.solve(mtrx, vctr) ---@cast coefficients number[]
-            for i = 0, RESOLUTION - 1 do
+            for i = 0, RESOLUTION do
                 local x = i / RESOLUTION * size
                 local y = size - math.clamp(math.evaluatePolynomial(coefficients, x), 0, size)
                 table.insert(plotPoints, vector.New(x, y))
@@ -6373,9 +6376,12 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
             settingVars.plotCoefficients = table.duplicate(coefficients)
         end
         local topLeft = imgui.GetWindowPos()
+        local dim = imgui.GetWindowSize()
         for i = 1, #settingVars.plotPoints - 1 do
-            ctx.AddLine(topLeft + settingVars.plotPoints[i], topLeft + settingVars.plotPoints[i + 1],
-                imgui.GetColorU32("PlotLines", 0.5), 3)
+            local opacityFactor = 0.7 - math.sin(20 * i / #settingVars.plotPoints - imgui.GetTime() * 5) / 2
+            ctx.AddLine(topLeft + settingVars.plotPoints[i],
+                vector.Clamp(topLeft + settingVars.plotPoints[i + 1], topLeft, topLeft + dim - vctr2(1)),
+                imgui.GetColorU32("PlotLines", opacityFactor), 3)
         end
         imgui.EndChild()
         local func = function(t)
@@ -6800,7 +6806,7 @@ function lintMapMenu()
     simpleActionMenu("Align timing lines in this region", 0, alignTimingLines, nil, false, true)
     AddSeparator()
     simpleActionMenu("Fix flipped LN ends", 0, fixFlippedLNEnds, nil, false, true)
-    ToolTip(
+    HoverToolTip(
         "If there is a negative SV at an LN end, the LN end will be flipped. This is noticable especially for arrow skins and is jarring. This tool will fix that.")
     AddSeparator()
     simpleActionMenu("Merge duplicate SVs", 0, mergeSVs, nil, false, true)
@@ -6875,7 +6881,7 @@ function chooseEditTool()
     imgui.Text("  Current Tool:")
     KeepSameLine()
     globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, globalVars.editToolIndex, {}, {}, tooltipList)
-    ToolTip(tooltipList[globalVars.editToolIndex])
+    HoverToolTip(tooltipList[globalVars.editToolIndex])
 end
 function measureMenu()
     local menuVars = getMenuVars("measure")
@@ -6888,7 +6894,7 @@ function measureMenu()
     end
     AddPadding()
     imgui.TextDisabled("*** Measuring disclaimer ***")
-    ToolTip("Measured values might not be 100%% accurate & may not work on older maps")
+    HoverToolTip("Measured values might not be 100%% accurate & may not work on older maps")
     AddSeparator()
     simpleActionMenu("Measure SVs between selected notes", 2, measureSVs, menuVars)
     cache.saveTable("measureMenu", menuVars)
@@ -7115,7 +7121,7 @@ function chooseSelectTool()
     imgui.Text("Current Type:")
     KeepSameLine()
     globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, globalVars.selectTypeIndex, {}, {}, tooltipList)
-    ToolTip(tooltipList[globalVars.selectTypeIndex])
+    HoverToolTip(tooltipList[globalVars.selectTypeIndex])
     local selectTool = SELECT_TOOLS[globalVars.selectTypeIndex]
 end
 function selectNoteTypeMenu()
@@ -7945,12 +7951,12 @@ function renderMemeButtons()
         ---@diagnostic disable-next-line: param-type-mismatch
         imgui.Text(nil)
     end
-    ToolTip("Press this button once (if you don't have any work saved) and never again.")
+    HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
     if (GradientButton("fuck you and\nyour stupid editor", color.vctr.red, color.vctr.white, 1500)) then
         state.SetValue("boolean.destroyEditor", true)
         ---@diagnostic disable-next-line: param-type-mismatch
     end
-    ToolTip("Press this button once (if you don't have any work saved) and never again.")
+    HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
     if (state.GetValue("boolean.destroyEditor")) then
         actions.GoToObjects(math.floor(math.random() * map.TrackLength))
         local ho1 = map.HitObjects[1]
@@ -8483,7 +8489,7 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
     imgui.SetCursorPosX(5)
     _, freeMode = imgui.Checkbox("Free Mode##Bezier", freeMode)
     state.SetValue("boolean.bezierFreeMode", freeMode)
-    ToolTip(
+    HoverToolTip(
         "Enable this to allow the bezier control points to move outside the boundary. WARNING: ONCE MOVED OUTSIDE, THEY CANNOT BE MOVED BACK IN. DISABLE AND RE-ENABLE FREE MODE TO ALLOW THEM TO BE INTERACTED WITH.")
     imgui.EndChild()
     local oldP1 = settingVars.p1
@@ -8535,14 +8541,14 @@ function chooseConstantShift(settingVars, defaultShift)
     if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[5])) then
         settingVars.verticalShift = defaultShift
     end
-    ToolTip("Reset vertical shift to initial values")
+    HoverToolTip("Reset vertical shift to initial values")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
     local negateButtonPressed = imgui.Button("N", TERTIARY_BUTTON_SIZE)
     if negateButtonPressed and settingVars.verticalShift ~= 0 then
         settingVars.verticalShift = -settingVars.verticalShift
     end
-    ToolTip("Negate vertical shift")
+    HoverToolTip("Negate vertical shift")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
@@ -8559,14 +8565,14 @@ function chooseMsxVerticalShift(settingVars, defaultShift)
     if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[5])) then
         settingVars.verticalShift = defaultShift or 0
     end
-    ToolTip("Reset vertical shift to initial values")
+    HoverToolTip("Reset vertical shift to initial values")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
     local negateButtonPressed = imgui.Button("N", TERTIARY_BUTTON_SIZE)
     if negateButtonPressed and settingVars.verticalShift ~= 0 then
         settingVars.verticalShift = -settingVars.verticalShift
     end
-    ToolTip("Negate vertical shift")
+    HoverToolTip("Negate vertical shift")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
@@ -8903,7 +8909,7 @@ function chooseVibratoSVType(menuVars)
 end
 function chooseVibratoQuality(menuVars)
     menuVars.vibratoQuality = Combo("Vibrato Quality", VIBRATO_DETAILED_QUALITIES, menuVars.vibratoQuality)
-    ToolTip("Note that higher FPS will look worse on lower refresh rate monitors.")
+    HoverToolTip("Note that higher FPS will look worse on lower refresh rate monitors.")
 end
 function chooseCurvatureCoefficient(settingVars, plotFn)
     plotFn(settingVars)
@@ -8969,7 +8975,7 @@ function chooseStillType(menuVars)
     end
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.4)
     menuVars.stillTypeIndex = Combo("Displacement", STILL_TYPES, menuVars.stillTypeIndex, {}, {}, tooltipList)
-    ToolTip(tooltipList[menuVars.stillTypeIndex])
+    HoverToolTip(tooltipList[menuVars.stillTypeIndex])
     if dontChooseDistance then
         imgui.Unindent(indentWidth)
     end
@@ -8994,7 +9000,7 @@ function chooseStyleTheme()
 end
 function chooseSVBehavior(settingVars)
     local swapButtonPressed = imgui.Button("Swap", SECONDARY_BUTTON_SIZE)
-    ToolTip("Switch between slow down/speed up")
+    HoverToolTip("Switch between slow down/speed up")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)

@@ -48,7 +48,6 @@ function draw()
     end
 
     imgui.End()
-
     cache.boolean.changeOccurred = false
 end
 

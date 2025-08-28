@@ -30,7 +30,7 @@ function chooseSelectTool()
     KeepSameLine()
     globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, globalVars.selectTypeIndex, {}, {}, tooltipList)
 
-    ToolTip(tooltipList[globalVars.selectTypeIndex])
+    HoverToolTip(tooltipList[globalVars.selectTypeIndex])
 
     local selectTool = SELECT_TOOLS[globalVars.selectTypeIndex]
 end
