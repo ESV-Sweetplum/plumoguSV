@@ -13,7 +13,7 @@
 ---@return ImDrawListPtr
 ---@return boolean changed
 function renderGraph(label, size, points, preferForeground, gridSize, yScale)
-    local gray = color.rgbaToUint(100, 100, 100, 100)
+    local gray = color.int.white * 100 / 255
     local tableLabel = table.concat({ "graph_points_", label })
     local initDragList = {}
     local initPointList = {}

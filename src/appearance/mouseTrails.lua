@@ -89,7 +89,7 @@ function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrail
         if not cursorTrailGhost then
             alpha = math.floor(255 * (trailPoints - i) / (trailPoints - 1))
         end
-        local color = color.rgbaToUint(255, 255, 255, alpha)
+        local color = color.int.whiteMask + math.floor(alpha) / 255 * color.int.alphaMask
         if trailShape == "Circles" then
             o.AddCircleFilled(point, cursorTrailSize, color)
         elseif trailShape == "Triangles" then
@@ -280,10 +280,9 @@ function renderSparkleParticles(o, t, sparkleParticles, sparkleDuration, sparkle
             local sparkleY = sparkleParticle.y + dy
             local sparkleCoords = vector.New(sparkleX, sparkleY)
             -- local alpha = math.round(255 * (1 - time), 0)
-            local white = color.rgbaToUint(255, 255, 255, 255)
             local actualSize = sparkleSize * (1 - math.quadraticBezier(0, time))
             local sparkleColor = color.rgbaToUint(255, 255, 100, 30)
-            drawGlare(o, sparkleCoords, actualSize, white, sparkleColor)
+            drawGlare(o, sparkleCoords, actualSize, color.int.white, sparkleColor)
         end
     end
 end
