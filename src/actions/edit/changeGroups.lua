@@ -1,6 +1,8 @@
 function changeGroups(menuVars)
     if (state.SelectedScrollGroupId == menuVars.designatedTimingGroup) then
-        print("w!", "Moving from one timing group to the same timing group will do nothing.")
+        print("w!",
+            table.concat({ menuVars.clone and "Cloning" or "Moving",
+                " from one timing group to the same timing group will do nothing." }))
         return
     end
     local offsets = game.uniqueSelectedNoteOffsets()
@@ -26,13 +28,17 @@ function changeGroups(menuVars)
     local willChangeSVs = menuVars.changeSVs and #svsToRemove ~= 0
     local willChangeSSFs = menuVars.changeSSFs and #ssfsToRemove ~= 0
     if (willChangeSVs) then
-        table.insert(actionList, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
+        if (not menuVars.clone) then
+            table.insert(actionList, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
+        end
         state.SelectedScrollGroupId = menuVars
             .designatedTimingGroup -- must change in the middle because previous line applies to previous tg, next line applies to next tg
         table.insert(actionList, createEA(action_type.AddScrollVelocityBatch, svsToAdd))
     end
     if (willChangeSSFs) then
-        table.insert(actionList, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
+        if (not menuVars.clone) then
+            table.insert(actionList, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
+        end
         state.SelectedScrollGroupId = menuVars.designatedTimingGroup
         table.insert(actionList, createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd))
     end
