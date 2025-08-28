@@ -4098,7 +4098,7 @@ function drawCapybara()
     o.AddCircleFilled(earCoords, earRadius, earColor)
     drawHorizontalPillShape(o, headCoords1, headCoords2, headRadius, bodyColor, 12)
     drawHorizontalPillShape(o, eyeCoords1, eyeCoords2, eyeRadius, eyeColor, 12)
-    o.AddRectFilled(sz, headCoords1, bodyColor)
+    o.AddRectFilled(table.vectorize2(sz), headCoords1, bodyColor)
     o.AddRectFilled(vector.New(stemCoords.x, stemCoords.y), vector.New(stemCoords.x + 10, stemCoords.y + 20),
         stemColor)
     o.AddRectFilled(vector.New(stemCoords.x - 10, stemCoords.y), vector.New(stemCoords.x + 20, stemCoords.y - 5),

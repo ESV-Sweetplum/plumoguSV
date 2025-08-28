@@ -76,6 +76,8 @@ export default async function transpiler(devMode = false, lint = true) {
         fileCount++;
     });
 
+    output = output.replaceAll(/---@meta [a-z\-]+\n/g, '');
+
     output = output.replaceAll(
         /"([^"]+?)" \.\. (.+) \.\. "([^"]+?)"/g,
         'table.concat({"$1", $2, "$3"})'

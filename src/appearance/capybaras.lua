@@ -30,7 +30,7 @@ function drawCapybara()
     -- draw capybara eyes
     drawHorizontalPillShape(o, eyeCoords1, eyeCoords2, eyeRadius, eyeColor, 12)
     -- draws capybara body
-    o.AddRectFilled(sz, headCoords1, bodyColor)
+    o.AddRectFilled(table.vectorize2(sz), headCoords1, bodyColor)
 
     -- draws capybara stem
     o.AddRectFilled(vector.New(stemCoords.x, stemCoords.y), vector.New(stemCoords.x + 10, stemCoords.y + 20),
