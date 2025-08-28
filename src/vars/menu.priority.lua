@@ -42,6 +42,7 @@ DEFAULT_STARTING_MENU_VARS = {
         designatedTimingGroup = "$Default",
         changeSVs = true,
         changeSSFs = true,
+        clone = false,
     },
     convertSVSSF = {
         conversionDirection = true

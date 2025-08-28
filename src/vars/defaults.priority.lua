@@ -6,7 +6,7 @@ function loadDefaultProperties(defaultProperties)
             local defaultTable = DEFAULT_STARTING_MENU_VARS[label]
             if (not defaultTable) then break end
             local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
-            if (not defaultSetting) then
+            if (defaultSetting == nil) then
                 goto skipSetting
             end
             DEFAULT_STARTING_MENU_VARS[label][settingName] = defaultSetting
@@ -30,7 +30,7 @@ function loadDefaultProperties(defaultProperties)
 end
 
 function parseDefaultProperty(v, default)
-    if (not default or type(default) == "table" or type(default) == "userdata") then
+    if (default == nil or type(default) == "table" or type(default) == "userdata") then
         return nil
     end
     if (type(default) == "number") then

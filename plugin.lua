@@ -1462,7 +1462,7 @@ function loadDefaultProperties(defaultProperties)
             local defaultTable = DEFAULT_STARTING_MENU_VARS[label]
             if (not defaultTable) then break end
             local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
-            if (not defaultSetting) then
+            if (defaultSetting == nil) then
                 goto skipSetting
             end
             DEFAULT_STARTING_MENU_VARS[label][settingName] = defaultSetting
@@ -1485,7 +1485,7 @@ function loadDefaultProperties(defaultProperties)
     globalVars.defaultProperties = { settings = DEFAULT_STARTING_SETTING_VARS, menu = DEFAULT_STARTING_MENU_VARS }
 end
 function parseDefaultProperty(v, default)
-    if (not default or type(default) == "table" or type(default) == "userdata") then
+    if (default == nil or type(default) == "table" or type(default) == "userdata") then
         return nil
     end
     if (type(default) == "number") then
@@ -1627,6 +1627,7 @@ DEFAULT_STARTING_MENU_VARS = {
         designatedTimingGroup = "$Default",
         changeSVs = true,
         changeSSFs = true,
+        clone = false,
     },
     convertSVSSF = {
         conversionDirection = true
@@ -6563,7 +6564,8 @@ end
 function changeGroupsMenu()
     local menuVars = getMenuVars("changeGroups")
     imgui.AlignTextToFramePadding()
-    imgui.Text("  Move to: ")
+    local action = menuVars.clone and "Clone" or "Move"
+    imgui.Text(table.concat({ "  ", action, " to: " }))
     KeepSameLine()
     local groups = { "$Default", "$Global" }
     local cols = { map.TimingGroups["$Default"].ColorRgb or "86,253,110", map.TimingGroups["$Global"].ColorRgb or
@@ -6588,9 +6590,10 @@ function changeGroupsMenu()
     _, menuVars.changeSVs = imgui.Checkbox("Change SVs?", menuVars.changeSVs)
     KeepSameLine()
     _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
+    menuVars.clone = RadioButtons("Mode: ", menuVars.clone, { "Clone", "Move" }, { true, false })
     AddSeparator()
     cache.saveTable("changeGroupsMenu", menuVars)
-    simpleActionMenu("Move items to " .. menuVars.designatedTimingGroup, 2, changeGroups, menuVars)
+    simpleActionMenu(table.concat({ action, " items to ", menuVars.designatedTimingGroup }), 2, changeGroups, menuVars)
 end
 function convertSVSSFMenu()
     local menuVars = getMenuVars("convertSVSSF")
@@ -7478,6 +7481,7 @@ function showDefaultPropertiesSettings()
         _, menuVars.changeSVs = imgui.Checkbox("Change SVs?", menuVars.changeSVs)
         KeepSameLine()
         _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
+        menuVars.clone = RadioButtons("Mode: ", menuVars.clone, { "Clone", "Move" }, { true, false })
         saveMenuPropertiesButton(menuVars, "changeGroups")
         cache.saveTable("changeGroupsPropertyMenu", menuVars)
     end

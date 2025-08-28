@@ -96,6 +96,8 @@ function showDefaultPropertiesSettings()
         KeepSameLine()
         _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
 
+        menuVars.clone = RadioButtons("Mode: ", menuVars.clone, { "Clone", "Move" }, { true, false })
+
         saveMenuPropertiesButton(menuVars, "changeGroups")
         cache.saveTable("changeGroupsPropertyMenu", menuVars)
     end

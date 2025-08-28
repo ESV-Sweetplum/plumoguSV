@@ -15,7 +15,7 @@ drawCapybara: true
 drawCapybara2: false
 drawCapybara312: false
 selectTypeIndex: 1
-placeTypeIndex: 4
+placeTypeIndex: 1
 editToolIndex: 1
 showPresetMenu: false
 scrollGroupIndex: 1
@@ -513,6 +513,7 @@ defaultProperties:
       designatedTimingGroup: $Default
       changeSVs: true
       changeSSFs: true
+      clone: true
     convertSVSSF:
       conversionDirection: true
     copy:

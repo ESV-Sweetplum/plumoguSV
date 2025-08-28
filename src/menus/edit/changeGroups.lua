@@ -1,7 +1,8 @@
 function changeGroupsMenu()
     local menuVars = getMenuVars("changeGroups")
     imgui.AlignTextToFramePadding()
-    imgui.Text("  Move to: ")
+    local action = menuVars.clone and "Clone" or "Move"
+    imgui.Text(table.concat({ "  ", action, " to: " }))
     KeepSameLine()
 
     local groups = { "$Default", "$Global" }
@@ -30,9 +31,11 @@ function changeGroupsMenu()
     KeepSameLine()
     _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
 
+    menuVars.clone = RadioButtons("Mode: ", menuVars.clone, { "Clone", "Move" }, { true, false })
+
     AddSeparator()
 
     cache.saveTable("changeGroupsMenu", menuVars)
 
-    simpleActionMenu("Move items to " .. menuVars.designatedTimingGroup, 2, changeGroups, menuVars)
+    simpleActionMenu(table.concat({ action, " items to ", menuVars.designatedTimingGroup }), 2, changeGroups, menuVars)
 end
