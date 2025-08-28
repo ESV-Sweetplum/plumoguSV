@@ -50,25 +50,47 @@ function clock.listen(id, interval)
     end
     return false
 end
-color.vctr.red = vector.New(1, 0, 0, 1)
-color.vctr.light_red = vector.New(1, 0, 0, 1)
-color.vctr.orange = vector.New(1, 0.5, 0, 1)
-color.vctr.light_orange = vector.New(1, 0.75, 0.5, 1)
-color.vctr.yellow = vector.New(1, 1, 0, 1)
-color.vctr.light_yellow = vector.New(1, 1, 0.5, 1)
-color.vctr.green = vector.New(0, 1, 0, 1)
-color.vctr.light_green = vector.New(0.5, 1, 0.5, 1)
-color.vctr.aqua = vector.New(0, 1, 1, 1)
-color.vctr.light_aqua = vector.New(0.5, 1, 1, 1)
-color.vctr.blue = vector.New(0, 0, 1, 1)
-color.vctr.light_blue = vector.New(0.5, 0.5, 1, 1)
-color.vctr.purple = vector.New(1, 0, 1, 1)
-color.vctr.light_purple = vector.New(1, 0.5, 1, 1)
-color.vctr.magenta = vector.New(1, 0, 0.5, 1)
-color.vctr.light_magenta = vector.New(1, 0.5, 0.75, 1)
+---Alters opacity of a given color.
+---@param col number
+---@param additiveOpacity integer
+---@return number
+---@overload fun(col: Vector4, additiveOpacity: number): Vector4
+function color.alterOpacity(col, additiveOpacity)
+    if (type(col) ~= "number") then
+        return col + vector.New(0, 0, 0, additiveOpacity)
+    end
+    return col + math.floor(additiveOpacity) * 16777216
+end
 color.vctr.white = vector.New(1, 1, 1, 1)
 color.vctr.black = vector.New(0, 0, 0, 1)
 color.vctr.transparent = vector.New(0, 0, 0, 0)
+color.int.white = 4294967295
+color.int.black = 4278190080
+color.int.transparent = 0
+color.vctr.red = vector.New(1, 0, 0, 1)
+color.vctr.light_red = vector.New(1, 0.5, 0.5, 1)
+color.int.red = 4278190335
+color.vctr.orange = vector.New(1, 0.5, 0, 1)
+color.vctr.light_orange = vector.New(1, 0.75, 0.5, 1)
+color.int.orange = 4278222975
+color.vctr.yellow = vector.New(1, 1, 0, 1)
+color.vctr.light_yellow = vector.New(1, 1, 0.5, 1)
+color.int.yellow = 4278255615
+color.vctr.green = vector.New(0, 1, 0, 1)
+color.vctr.light_green = vector.New(0.5, 1, 0.5, 1)
+color.int.green = 4278255360
+color.vctr.aqua = vector.New(0, 1, 1, 1)
+color.vctr.light_aqua = vector.New(0.5, 1, 1, 1)
+color.int.aqua = 4294967040
+color.vctr.blue = vector.New(0, 0, 1, 1)
+color.vctr.light_blue = vector.New(0.5, 0.5, 1, 1)
+color.int.blue = 4294901760
+color.vctr.purple = vector.New(1, 0, 1, 1)
+color.vctr.light_purple = vector.New(1, 0.5, 1, 1)
+color.int.purple = 4294902015
+color.vctr.magenta = vector.New(1, 0, 0.5, 1)
+color.vctr.light_magenta = vector.New(1, 0.5, 0.75, 1)
+color.int.magenta = 4286546175
 HEXADECIMAL = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" }
 NONDUA = { "!", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7",
     "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
@@ -3949,7 +3971,7 @@ function renderReactiveStars()
         local progress = x / dimX
         local brightness = clamp(-8 * progress * (progress - 1), 0, 1)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
-        ctx.AddCircleFilled(pos, sz, color.rgbaToUint(255, 255, 255, brightness * 255))
+        ctx.AddCircleFilled(pos, sz, color.alterOpacity(color.int.white, math.floor(brightness * 255) - 255))
     end
 end
 function createStar(dimX, dimY, n)
@@ -5536,7 +5558,7 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
                 local textSize = imgui.CalcTextSize(tostring(number))
                 ctx.AddText(
                     vector.New(topLeft.x + 6, math.clamp(topLeft.y + i - 7, topLeft.y + 5, topLeft.y + dim.y - 16)),
-                    color.rgbaToUint(255, 255, 255, 255),
+                    color.int.white,
                     tostring(number))
                 ctx.AddLine(vector.New(topLeft.x + textSize.x + 10, topLeft.y + i),
                     vector.New(topLeft.x + dim.x, topLeft.y + i), col,
@@ -6325,7 +6347,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         end
         for _, point in pairs(settingVars.controlPoints) do
             table.insert(pointList,
-                { pos = table.vectorize2(point), col = color.rgbaToUint(255, 255, 255, 255), size = 5 })
+                { pos = table.vectorize2(point), col = color.int.white, size = 5 })
         end
         imgui.SetCursorPosX(26)
         imgui.BeginChild("Polynomial Vibrato Interactive Window" .. tostring(separateWindow), vctr2(size), 67, 31)

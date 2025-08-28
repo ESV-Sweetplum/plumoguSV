@@ -26,7 +26,7 @@ function renderReactiveStars()
         local brightness = clamp(-8 * progress * (progress - 1), 0, 1)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
 
-        ctx.AddCircleFilled(pos, sz, color.rgbaToUint(255, 255, 255, brightness * 255))
+        ctx.AddCircleFilled(pos, sz, color.alterOpacity(color.int.white, math.floor(brightness * 255) - 255))
     end
 end
 

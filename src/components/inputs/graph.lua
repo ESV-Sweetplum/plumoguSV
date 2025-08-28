@@ -77,7 +77,7 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
                 local textSize = imgui.CalcTextSize(tostring(number))
                 ctx.AddText(
                     vector.New(topLeft.x + 6, math.clamp(topLeft.y + i - 7, topLeft.y + 5, topLeft.y + dim.y - 16)),
-                    color.rgbaToUint(255, 255, 255, 255),
+                    color.int.white,
                     tostring(number))
                 ctx.AddLine(vector.New(topLeft.x + textSize.x + 10, topLeft.y + i),
                     vector.New(topLeft.x + dim.x, topLeft.y + i), col,

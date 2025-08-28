@@ -26,7 +26,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
 
         for _, point in pairs(settingVars.controlPoints) do
             table.insert(pointList,
-                { pos = table.vectorize2(point), col = color.rgbaToUint(255, 255, 255, 255), size = 5 })
+                { pos = table.vectorize2(point), col = color.int.white, size = 5 })
         end
 
 
