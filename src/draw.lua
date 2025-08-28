@@ -50,7 +50,7 @@ function draw()
 
     imgui.End()
 
-    logoWrapper()
+    logoThread()
 
     cache.boolean.changeOccurred = false
 end

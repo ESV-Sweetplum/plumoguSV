@@ -4323,7 +4323,7 @@ function drawHorizontalPillShape(o, point1, point2, radius, color, circleSegment
     local rectangleEndCoords = relativePoint(point2, 0, -radius)
     o.AddRectFilled(rectangleStartCoords, rectangleEndCoords, color)
 end
-function logoWrapper()
+function logoThread()
     curTime = state.UnixTime or 0
     if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 100) then
         startTime = imgui.GetTime()
@@ -11377,7 +11377,7 @@ function draw()
         showPluginSettingsWindow()
     end
     imgui.End()
-    logoWrapper()
+    logoThread()
     state.SetValue("boolean.changeOccurred", false)
 end
 function renderNoteDataWidget()

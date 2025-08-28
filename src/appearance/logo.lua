@@ -1,4 +1,4 @@
-function logoWrapper()
+function logoThread()
     curTime = state.UnixTime or 0
     -- If state.DeltaTime is over 100ms off of the computed delta time, that means that the computed delta time was delayed in some way. This is used to detect when the plugin is turned off and on.
     if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 100) then
