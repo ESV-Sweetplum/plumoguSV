@@ -3,12 +3,6 @@ function draw()
     local performanceMode = globalVars.performanceMode
     tempClockCount = 0
 
-    curTime = state.UnixTime or 0
-    if (curTime - (prevTime or 0) > 1000) then
-        startTime = imgui.GetTime()
-    end
-    prevTime = state.UnixTime
-
     state.IsWindowHovered = imgui.IsWindowHovered()
 
     startNextWindowNotCollapsed("plumoguSV-autoOpen")
@@ -56,15 +50,9 @@ function draw()
 
     imgui.End()
 
-    if (startTime < 0.1 or (loaded)) then
-        drawLogo(imgui.GetTime() - startTime, 2, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
-            color.int.white, 4)
-    else
-        startTime = imgui.GetTime() + 2
-    end
+    logoWrapper()
 
     cache.boolean.changeOccurred = false
-    loaded = true
 end
 
 function renderNoteDataWidget()

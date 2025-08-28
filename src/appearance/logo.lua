@@ -1,3 +1,21 @@
+function logoWrapper()
+    curTime = state.UnixTime or 0
+    -- If state.DeltaTime is over 100ms off of the computed delta time, that means that the computed delta time was delayed in some way. This is used to detect when the plugin is turned off and on.
+    if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 100) then
+        startTime = imgui.GetTime()
+    end
+    prevTime = state.UnixTime
+
+    if (startTime < 0.1 or (loaded)) then
+        drawLogo(imgui.GetTime() - startTime, 2, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
+            color.int.white, 4)
+    else
+        startTime = imgui.GetTime() - 5
+    end
+
+    loaded = true
+end
+
 ---Draws logo (267,48)
 ---@param currentTime number
 ---@param logoLength number
