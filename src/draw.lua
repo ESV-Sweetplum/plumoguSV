@@ -6,7 +6,6 @@ function draw()
     curTime = state.UnixTime or 0
     if (curTime - (prevTime or 0) > 1000) then
         startTime = imgui.GetTime()
-        print(startTime)
     end
     prevTime = state.UnixTime
 
@@ -57,12 +56,15 @@ function draw()
 
     imgui.End()
 
-    if (startTime < 0.1 or startTime > 5) then
+    if (startTime < 0.1 or (loaded)) then
         drawLogo(imgui.GetTime() - startTime, 2, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
             color.int.white, 4)
+    else
+        startTime = imgui.GetTime() + 2
     end
 
     cache.boolean.changeOccurred = false
+    loaded = true
 end
 
 function renderNoteDataWidget()

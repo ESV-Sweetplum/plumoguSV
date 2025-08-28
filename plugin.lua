@@ -5687,7 +5687,7 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
     end
     progress = progress * 0.5
     local bgStrength = 4 * (progress - progress * progress)
-    ctx.AddRectFilled(vctr2(0), windowSize, color.rgbaToUint(0, 0, 0, 200 * bgStrength))
+    ctx.AddRectFilled(vctr2(0), windowSize, color.rgbaToUint(20, 0, 20, 240 * bgStrength))
     local t0 = math.max(progress * 2, 1) - 1
     local t1 = math.min(progress * 2, 1)
     local center = vector.New(267, 48) * scale / 2
@@ -11326,7 +11326,6 @@ function draw()
     curTime = state.UnixTime or 0
     if (curTime - (prevTime or 0) > 1000) then
         startTime = imgui.GetTime()
-        print(startTime)
     end
     prevTime = state.UnixTime
     state.IsWindowHovered = imgui.IsWindowHovered()
@@ -11369,11 +11368,14 @@ function draw()
         showPluginSettingsWindow()
     end
     imgui.End()
-    if (startTime < 0.1 or startTime > 5) then
+    if (startTime < 0.1 or (loaded)) then
         drawLogo(imgui.GetTime() - startTime, 2, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
             color.int.white, 4)
+    else
+        startTime = imgui.GetTime() + 2
     end
     state.SetValue("boolean.changeOccurred", false)
+    loaded = true
 end
 function renderNoteDataWidget()
     if (#state.SelectedHitObjects ~= 1) then return end
