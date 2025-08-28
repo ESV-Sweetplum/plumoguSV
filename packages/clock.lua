@@ -1,3 +1,4 @@
+---@meta clock-class
 require("packages.cache.initialize.priority")
 clock = {}; cache.clock = {}
 
@@ -19,4 +20,12 @@ function clock.listen(id, interval)
     end
 
     return false
+end
+
+---A temporary clock that can be called multiple times. Should only be used for testing/debugging.
+---@param interval integer The interval at which the clock should run.
+---@return boolean ev True if the clock has reached its interval time.
+function clock.temp(interval)
+    tempClockCount = tempClockCount + 1
+    return clock.listen("temporary" .. tempClockCount, interval)
 end

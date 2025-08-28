@@ -10298,6 +10298,7 @@ end
 function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
+    tempClockCount = 0
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed("plumoguSV-autoOpen")
     imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
