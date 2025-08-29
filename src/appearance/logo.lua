@@ -48,7 +48,11 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
     progress = progress * 0.5
 
     local bgStrength = 4 * (progress - progress * progress)
-    ctx.AddRectFilled(vctr2(0), windowSize, color.rgbaToUint(20, 0, 20, 240 * bgStrength))
+    local colTl = color.rgbaToUint(20, 0, 20, 100 * bgStrength)
+    local colTrBl = color.rgbaToUint(40, 0, 40, 200 * bgStrength)
+    local colBr = color.rgbaToUint(60, 0, 60, 255 * bgStrength)
+
+    ctx.AddRectFilledMultiColor(vctr2(0), windowSize, colTl, colTrBl, colBr, colTrBl)
 
     local t0 = math.max(progress * 2, 1) - 1
     local t1 = math.min(progress * 2, 1)
