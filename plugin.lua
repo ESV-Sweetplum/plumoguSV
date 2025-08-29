@@ -7707,7 +7707,7 @@ function copyNPasteMenu()
 end
 function updateDirectEdit()
     local offsets = game.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not truthy(offsets) and not truthy(state.GetValue("lists.directSVList"))) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     if (#offsets < 2) then
@@ -7718,8 +7718,7 @@ function updateDirectEdit()
 end
 function directSVMenu()
     local menuVars = getMenuVars("directSV")
-    local clockTime = 0.2
-    if (clock.listen("directSV", 500)) then
+    if (clock.listen("directSV", 300)) then
         updateDirectEdit()
     end
     local svs = state.GetValue("lists.directSVList") or {}
@@ -7729,36 +7728,16 @@ function directSVMenu()
         return
     end
     if (menuVars.selectableIndex > #svs) then menuVars.selectableIndex = #svs end
-    local oldStartTime = svs[menuVars.selectableIndex].StartTime
-    local oldMultiplier = svs[menuVars.selectableIndex].Multiplier
-    local primeStartTime = state.GetValue("primeStartTime") or false
-    local primeMultiplier = state.GetValue("primeMultiplier") or false
-    _, menuVars.startTime = imgui.InputFloat("Start Time", oldStartTime)
-    _, menuVars.multiplier = imgui.InputFloat("Multiplier", oldMultiplier)
-    if (oldStartTime ~= menuVars.startTime) then
-        primeStartTime = true
-    else
-        if (not primeStartTime) then goto continue1 end
-        primeStartTime = false
-        local newSV = createSV(state.GetValue("savedStartTime") or 0, menuVars.multiplier)
+    _, menuVars.startTime = imgui.InputFloat("Start Time", svs[menuVars.selectableIndex].StartTime)
+    if (imgui.IsItemDeactivatedAfterEdit()) then
         actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
-            createEA(action_type.AddScrollVelocity, newSV) })
+            createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime or 0, menuVars.multiplier)) })
     end
-    ::continue1::
-    if (oldMultiplier ~= menuVars.multiplier) then
-        primeMultiplier = true
-    else
-        if (not primeMultiplier) then goto continue2 end
-        primeMultiplier = false
-        local newSV = createSV(menuVars.startTime, state.GetValue("savedMultiplier") or 1)
+    _, menuVars.multiplier = imgui.InputFloat("Multiplier", svs[menuVars.selectableIndex].Multiplier)
+    if (imgui.IsItemDeactivatedAfterEdit()) then
         actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
-            createEA(action_type.AddScrollVelocity, newSV) })
+            createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime, menuVars.multiplier or 1)) })
     end
-    ::continue2::
-    state.SetValue("primeStartTime", primeStartTime)
-    state.SetValue("primeMultiplier", primeMultiplier)
-    state.SetValue("savedStartTime", menuVars.startTime)
-    state.SetValue("savedMultiplier", menuVars.multiplier)
     imgui.Separator()
     if (imgui.ArrowButton("##DirectSVLeft", imgui_dir.Left)) then
         menuVars.pageNumber = math.clamp(menuVars.pageNumber - 1, 1, math.ceil(#svs * 0.1))
