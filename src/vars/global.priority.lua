@@ -40,6 +40,7 @@ globalVars = {
     defaultProperties = { settings = {}, menu = {} },
     presets = {},
     dynamicBackgroundIndex = 1,
+    disableLoadup = false
 }
 
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
@@ -82,5 +83,6 @@ function setGlobalVars(tempGlobalVars)
     end
     globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
     globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
+    globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)
     globalVars.dynamicBackgroundIndex = math.toNumber(tempGlobalVars.dynamicBackgroundIndex)
 end

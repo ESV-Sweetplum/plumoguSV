@@ -1,5 +1,4 @@
 function showAppearanceSettings()
-    imgui.PushItemWidth(150)
     if (globalVars.performanceMode) then
         imgui.TextColored(color.vctr.red,
             "Performance mode is currently enabled.\nPlease disable it to access appearance features.")
@@ -16,7 +15,13 @@ function showAppearanceSettings()
     chooseSnakeSpringConstant()
     chooseCursorTrailGhost()
     AddSeparator()
-    imgui.PopItemWidth()
+    GlobalCheckbox("disableLoadup", "Disable Loadup Animation",
+        "Disables the loadup animation when launching the editor.")
+    KeepSameLine()
+    if (imgui.Button("Play", vector.New(42, 24))) then
+        cache_logoStartTime = imgui.GetTime()
+    end
+    AddSeparator()
     GlobalCheckbox("drawCapybara", "Capybara", "Draws a capybara at the bottom right of the screen")
     imgui.SameLine(0, RADIO_BUTTON_SPACING)
     GlobalCheckbox("drawCapybara2", "Capybara 2", "Draws a capybara at the bottom left of the screen")

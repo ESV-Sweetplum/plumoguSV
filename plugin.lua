@@ -1541,6 +1541,7 @@ globalVars = {
     defaultProperties = { settings = {}, menu = {} },
     presets = {},
     dynamicBackgroundIndex = 1,
+    disableLoadup = false
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 function setGlobalVars(tempGlobalVars)
@@ -1581,6 +1582,7 @@ function setGlobalVars(tempGlobalVars)
     end
     globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
     globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
+    globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)
     globalVars.dynamicBackgroundIndex = math.toNumber(tempGlobalVars.dynamicBackgroundIndex)
 end
 DEFAULT_STARTING_MENU_VARS = {
@@ -4346,21 +4348,21 @@ end
 function logoThread()
     curTime = state.UnixTime or 0
     if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 750) then
-        startTime = imgui.GetTime()
-        if (startTime < 2.5) then
-            startTime = startTime + 0.75
+        cache_logoStartTime = imgui.GetTime()
+        if (cache_logoStartTime < 2.5) then
+            cache_logoStartTime = cache_logoStartTime + 0.75
         end
     end
     prevTime = state.UnixTime
-    local currentTime = imgui.GetTime() - startTime
+    local currentTime = imgui.GetTime() - cache_logoStartTime
     local logoLength = 2
-    if (startTime < 3 or loaded) then
+    if ((cache_logoStartTime < 3 and not globalVars.disableLoadup) or loaded) then
         if (currentTime >= 0 and currentTime <= logoLength) then
             drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
                 color.int.white, 4)
         end
     else
-        startTime = imgui.GetTime() - 5
+        cache_logoStartTime = imgui.GetTime() - 5
     end
     loaded = true
 end
@@ -8229,7 +8231,6 @@ function selectBySnapMenu()
         selectBySnap, menuVars)
 end
 function showAppearanceSettings()
-    imgui.PushItemWidth(150)
     if (globalVars.performanceMode) then
         imgui.TextColored(color.vctr.red,
             "Performance mode is currently enabled.\nPlease disable it to access appearance features.")
@@ -8246,7 +8247,13 @@ function showAppearanceSettings()
     chooseSnakeSpringConstant()
     chooseCursorTrailGhost()
     AddSeparator()
-    imgui.PopItemWidth()
+    GlobalCheckbox("disableLoadup", "Disable Loadup Animation",
+        "Disables the loadup animation when launching the editor.")
+    KeepSameLine()
+    if (imgui.Button("Play", vector.New(42, 24))) then
+        cache_logoStartTime = imgui.GetTime()
+    end
+    AddSeparator()
     GlobalCheckbox("drawCapybara", "Capybara", "Draws a capybara at the bottom right of the screen")
     imgui.SameLine(0, RADIO_BUTTON_SPACING)
     GlobalCheckbox("drawCapybara2", "Capybara 2", "Draws a capybara at the bottom left of the screen")

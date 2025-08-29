@@ -645,4 +645,5 @@ defaultProperties:
 presets:
 - 
 dynamicBackgroundIndex: 2
+disableLoadup: false
 ignoreNotes: false
