@@ -9060,7 +9060,6 @@ function renderMemeButtons()
     HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
     if (GradientButton("fuck you and\nyour stupid editor", color.vctr.red, color.vctr.white, 1500)) then
         state.SetValue("boolean.destroyEditor", true)
-        ---@diagnostic disable-next-line: param-type-mismatch
     end
     HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
     if (state.GetValue("boolean.destroyEditor")) then
@@ -9071,16 +9070,21 @@ function renderMemeButtons()
     end
     local text = state.GetValue("crazy", "Crazy?")
     local full =
-    " I was crazy once. They put me in a map. A ranked map. A ranked map with no SV. And no SV makes me crazy. Crazy?"
-    if (imgui.Button(text)) then
+    " I was crazy\nonce. They put me in\na map. A ranked map.\nA ranked map\nwith no SV. And no\nSV makes me crazy.\nCrazy?"
+    if (imgui.Button("Crazy?")) then
         state.SetValue("activateCrazy", true)
     end
     if (state.GetValue("activateCrazy")) then
-        imgui.TextWrapped(text)
-        if (clock.listen("crazy", 10 * math.exp(- #text / 100))) then
+        imgui.TextUnformatted(text)
+        if (clock.listen("crazy", 5 * math.exp(- #text / 1500))) then
             local curIdx = state.GetValue("crazyIdx", 1)
             if (curIdx > #full) then curIdx = curIdx - #full end
+            local char = full:charAt(curIdx)
             text = text .. full:charAt(curIdx)
+            if (full:charAt(curIdx) == "\n") then
+                curIdx = curIdx + 1
+                text = text .. full:charAt(curIdx)
+            end
             state.SetValue("crazyIdx", curIdx + 1)
             state.SetValue("crazy", text)
         end
