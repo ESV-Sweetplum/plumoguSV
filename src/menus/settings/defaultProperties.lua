@@ -464,6 +464,14 @@ function showDefaultPropertiesSettings()
         saveSettingPropertiesButton(settingVars, "LinearVibratoSV")
         cache.saveTable("LinearVibratoSVPropertySettings", settingVars)
     end
+    if (imgui.CollapsingHeader("Polynomial Vibrato SV Settings")) then
+        local settingVars = getSettingVars("PolynomialVibratoSV", "Property")
+
+        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Bounds##Vibrato", " msx", 0, 0.875)
+
+        saveSettingPropertiesButton(settingVars, "PolynomialVibratoSV")
+        cache.saveTable("PolynomialVibratoSVPropertySettings", settingVars)
+    end
     if (imgui.CollapsingHeader("Exponential Vibrato SV Settings")) then
         local settingVars = getSettingVars("ExponentialVibratoSV", "Property")
 
