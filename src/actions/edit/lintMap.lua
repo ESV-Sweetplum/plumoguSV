@@ -117,3 +117,22 @@ function mergeSSFs()
     local type = truthy(ssfsToRemove) and "s!" or "w!"
     print(type, "Removed " .. #ssfsToRemove .. pluralize(" SSF.", #ssfsToRemove, -2))
 end
+
+function mergeNotes()
+    local noteDict = {}
+    local notesToRemove = {}
+    for _, ho in ipairs(map.HitObjects) do
+        if (not noteDict[ho.StartTime]) then
+            noteDict[ho.StartTime] = { [ho.Lane] = true }
+        else
+            if (not noteDict[ho.StartTime][ho.Lane]) then
+                noteDict[ho.StartTime][ho.Lane] = true
+            else
+                table.insert(notesToRemove, ho)
+            end
+        end
+    end
+    if (truthy(notesToRemove)) then actions.Perform(createEA(action_type.RemoveHitObjectBatch, notesToRemove)) end
+    local type = truthy(notesToRemove) and "s!" or "w!"
+    print(type, "Removed " .. #notesToRemove .. pluralize(" note.", #notesToRemove, -2))
+end

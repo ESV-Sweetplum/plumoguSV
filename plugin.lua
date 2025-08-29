@@ -3443,6 +3443,24 @@ function mergeSSFs()
     local type = truthy(ssfsToRemove) and "s!" or "w!"
     print(type, "Removed " .. #ssfsToRemove .. pluralize(" SSF.", #ssfsToRemove, -2))
 end
+function mergeNotes()
+    local noteDict = {}
+    local notesToRemove = {}
+    for _, ho in ipairs(map.HitObjects) do
+        if (not noteDict[ho.StartTime]) then
+            noteDict[ho.StartTime] = { [ho.Lane] = true }
+        else
+            if (not noteDict[ho.StartTime][ho.Lane]) then
+                noteDict[ho.StartTime][ho.Lane] = true
+            else
+                notesToRemove[#notesToRemove + 1] = ho
+            end
+        end
+    end
+    if (truthy(notesToRemove)) then actions.Perform(createEA(action_type.RemoveHitObjectBatch, notesToRemove)) end
+    local type = truthy(notesToRemove) and "s!" or "w!"
+    print(type, "Removed " .. #notesToRemove .. pluralize(" note.", #notesToRemove, -2))
+end
 function measureSVs(menuVars)
     local roundingDecimalPlaces = 5
     local offsets = game.uniqueSelectedNoteOffsets()
@@ -4329,15 +4347,19 @@ function logoThread()
         startTime = imgui.GetTime()
     end
     prevTime = state.UnixTime
-    if (startTime < 0.1 or (loaded)) then
-        drawLogo(imgui.GetTime() - startTime, 2, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
-            color.int.white, 4)
+    local currentTime = imgui.GetTime() - startTime
+    local logoLength = 2
+    if (startTime < 0.01 or loaded) then
+        if (currentTime >= 0 and currentTime <= logoLength) then
+            drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
+                color.int.white, 4)
+        end
     else
         startTime = imgui.GetTime() - 5
     end
     loaded = true
 end
----Draws logo (267,48)
+---Draws logo, where dim = scale * (267, 48).
 ---@param currentTime number
 ---@param logoLength number
 ---@param ctx ImDrawListPtr
@@ -7878,6 +7900,8 @@ function layerSnapMenu()
 end
 function lintMapMenu()
     simpleActionMenu("Align timing lines in this region", 0, alignTimingLines, nil, false, true)
+    HoverToolTip(
+        "Sometimes, due to rounding errors with BPMs, timing lines don't show up where 1/1 snapped notes should be. This will fix that within the entire timing line region you are currently in.")
     AddSeparator()
     simpleActionMenu("Fix flipped LN ends", 0, fixFlippedLNEnds, nil, false, true)
     HoverToolTip(
@@ -7885,6 +7909,7 @@ function lintMapMenu()
     AddSeparator()
     simpleActionMenu("Merge duplicate SVs", 0, mergeSVs, nil, false, true)
     simpleActionMenu("Merge duplicate SSFs", 0, mergeSSFs, nil, false, true)
+    simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, false, true)
 end
 EDIT_SV_TOOLS = {
     "Add Teleport",

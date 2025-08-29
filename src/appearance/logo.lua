@@ -6,9 +6,14 @@ function logoThread()
     end
     prevTime = state.UnixTime
 
-    if (startTime < 0.1 or (loaded)) then
-        drawLogo(imgui.GetTime() - startTime, 2, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
-            color.int.white, 4)
+    local currentTime = imgui.GetTime() - startTime
+    local logoLength = 2
+
+    if (startTime < 0.01 or loaded) then
+        if (currentTime >= 0 and currentTime <= logoLength) then
+            drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
+                color.int.white, 4)
+        end
     else
         startTime = imgui.GetTime() - 5
     end
@@ -16,7 +21,7 @@ function logoThread()
     loaded = true
 end
 
----Draws logo (267,48)
+---Draws logo, where dim = scale * (267, 48).
 ---@param currentTime number
 ---@param logoLength number
 ---@param ctx ImDrawListPtr
