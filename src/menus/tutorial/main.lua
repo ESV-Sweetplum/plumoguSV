@@ -15,7 +15,7 @@ function renderTutorialMenu()
     local navigatorWidth = 200
 
     local nullFn = function()
-        imgui.Text("Select a tutorial menu on the left to view it.")
+        imgui.Text("Select a tutorial on the left to view it.")
     end
     local incompleteFn = function()
         imgui.TextWrapped("Sorry, this tutorial is not ready yet. Please come back when a new version comes out.")

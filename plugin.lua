@@ -8085,6 +8085,9 @@ function infoTab()
     end
     KeepSameLine()
     if (imgui.Button("See Patch Notes", HALF_ACTION_BUTTON_SIZE)) then
+        state.SetValue("windows.showPatchNotesWindow", not state.GetValue("windows.showPatchNotesWindow"))
+        local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
+        imgui.SetWindowPos("plumoguSV Patch Notes", coordinatesToCenter)
     end
     if (imgui.Button("Get Map Stats", HALF_ACTION_BUTTON_SIZE)) then
         getMapStats()
@@ -8093,7 +8096,7 @@ function infoTab()
     if (imgui.Button("View Tutorials", HALF_ACTION_BUTTON_SIZE)) then
         state.SetValue("windows.showTutorialWindow", not state.GetValue("windows.showTutorialWindow"))
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
-        imgui.SetWindowPos("plumoguSV Settings", coordinatesToCenter)
+        imgui.SetWindowPos("plumoguSV Tutorial Menu", coordinatesToCenter)
     end
 end
 function selectAlternatingMenu()
@@ -9439,7 +9442,7 @@ function renderTutorialMenu()
     end
     local navigatorWidth = 200
     local nullFn = function()
-        imgui.Text("Select a tutorial menu on the left to view it.")
+        imgui.Text("Select a tutorial on the left to view it.")
     end
     local incompleteFn = function()
         imgui.TextWrapped("Sorry, this tutorial is not ready yet. Please come back when a new version comes out.")

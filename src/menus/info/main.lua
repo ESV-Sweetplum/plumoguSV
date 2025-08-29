@@ -23,7 +23,9 @@ function infoTab()
     end
     KeepSameLine()
     if (imgui.Button("See Patch Notes", HALF_ACTION_BUTTON_SIZE)) then
-
+        cache.windows.showPatchNotesWindow = not cache.windows.showPatchNotesWindow
+        local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
+        imgui.SetWindowPos("plumoguSV Patch Notes", coordinatesToCenter)
     end
     if (imgui.Button("Get Map Stats", HALF_ACTION_BUTTON_SIZE)) then
         getMapStats()
@@ -32,6 +34,6 @@ function infoTab()
     if (imgui.Button("View Tutorials", HALF_ACTION_BUTTON_SIZE)) then
         cache.windows.showTutorialWindow = not cache.windows.showTutorialWindow
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
-        imgui.SetWindowPos("plumoguSV Settings", coordinatesToCenter)
+        imgui.SetWindowPos("plumoguSV Tutorial Menu", coordinatesToCenter)
     end
 end
