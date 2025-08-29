@@ -1886,6 +1886,8 @@ end]]
         p1 = vector.New(0.1, 0.9),
         p2 = vector.New(0.9, 0.1),
         verticalShift = 0,
+        freeMode = false,
+        manualMode = false,
         avgSV = 1,
         svPoints = 16,
         finalSVIndex = 2,
@@ -8684,6 +8686,7 @@ function showDefaultPropertiesSettings()
     end
     if (imgui.CollapsingHeader("Bezier Settings")) then
         local settingVars = getSettingVars("Bezier", "Property")
+        chooseInteractiveBezier(settingVars, "Property")
         chooseConstantShift(settingVars, 0)
         chooseAverageSV(settingVars)
         chooseSVPoints(settingVars)
@@ -9526,23 +9529,22 @@ function chooseAverageSV(menuVars)
     return settingsChanged
 end
 function chooseInteractiveBezier(settingVars, optionalLabel)
-    local freeMode = state.GetValue("boolean.bezierFreeMode") or false
-    local directMode = state.GetValue("boolean.bezierDirectMode") or false
     local pos1 = (settingVars.p1 * vctr2(150)) or vector.New(30, 75)
     local pos2 = (settingVars.p2 * vctr2(150)) or vector.New(120, 75)
     local normalizedPos1 = pos1 / 150
     local normalizedPos2 = pos2 / 150
-    if (not directMode) then
+    if (not settingVars.manualMode) then
         imgui.BeginChild("Bezier Interactive Window" .. optionalLabel, vctr2(150), 67, 31)
         local red = 4278190335
         local blue = 4294901760
         pos1.y = 150 - pos1.y
         pos2.y = 150 - pos2.y
         local pointList = { { pos = pos1, col = red, size = 10 }, { pos = pos2, col = blue, size = 10 } }
-        local ctx = renderGraph("Bezier Interactive Window" .. optionalLabel, vctr2(150), pointList, freeMode)
+        local ctx = renderGraph("Bezier Interactive Window" .. optionalLabel, vctr2(150), pointList, settingVars
+        .freeMode)
         local topLeft = imgui.GetWindowPos()
         local dim = imgui.GetWindowSize()
-        if (not freeMode) then
+        if (not settingVars.freeMode) then
             pointList[1].pos = vector.Clamp(pointList[1].pos, vctr2(0), vctr2(150))
             pointList[2].pos = vector.Clamp(pointList[2].pos, vctr2(0), vctr2(150))
         end
@@ -9573,11 +9575,11 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
             string.format("%.2f", normalizedPos2.x) .. table.concat({", ", string.format("%.2f", normalizedPos2.y), ")\n"}))
         imgui.SetCursorPosY(80)
         imgui.SetCursorPosX(5)
-        _, freeMode = imgui.Checkbox("Free Mode##Bezier", freeMode)
+        _, settingVars.freeMode = imgui.Checkbox("Free Mode##Bezier", settingVars.freeMode)
         HoverToolTip(
             "Enable this to allow the bezier control points to move outside the boundary. WARNING: ONCE MOVED OUTSIDE, THEY CANNOT BE MOVED BACK IN. DISABLE AND RE-ENABLE FREE MODE TO ALLOW THEM TO BE INTERACTED WITH.")
         imgui.SetCursorPosX(5)
-        _, directMode = imgui.Checkbox("Manual Edit##Bezier", directMode)
+        _, settingVars.manualMode = imgui.Checkbox("Manual Edit##Bezier", settingVars.manualMode)
         HoverToolTip(
             "Enable this to directly edit the bezier points.")
         imgui.EndChild()
@@ -9586,7 +9588,7 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         _, normalizedPos1 = imgui.SliderFloat2("Point 1", pos1 / 150, 0, 1)
         imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
         _, normalizedPos2 = imgui.SliderFloat2("Point 2", pos2 / 150, 0, 1)
-        _, directMode = imgui.Checkbox("Manual Edit##Bezier", directMode)
+        _, settingVars.manualMode = imgui.Checkbox("Manual Edit##Bezier", settingVars.manualMode)
         HoverToolTip(
             "Disable this to edit the bezier points with an interactive graph.")
     end
@@ -9594,8 +9596,8 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
     local oldP2 = settingVars.p2
     settingVars.p1 = normalizedPos1
     settingVars.p2 = normalizedPos2
-    state.SetValue("boolean.bezierFreeMode", freeMode)
-    state.SetValue("boolean.bezierDirectMode", directMode)
+    state.SetValue("boolean.bezierFreeMode", settingVars.freeMode)
+    state.SetValue("boolean.bezierManualMode", settingVars.manualMode)
     return oldP1 ~= settingVars.p1 or oldP2 ~= settingVars.p2
 end
 function chooseChinchillaIntensity(settingVars)

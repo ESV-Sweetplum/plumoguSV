@@ -96,6 +96,8 @@ end]]
         p1 = vector.New(0.1, 0.9),
         p2 = vector.New(0.9, 0.1),
         verticalShift = 0,
+        freeMode = false,
+        manualMode = false,
         avgSV = 1,
         svPoints = 16,
         finalSVIndex = 2,

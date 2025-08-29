@@ -289,6 +289,7 @@ function showDefaultPropertiesSettings()
     if (imgui.CollapsingHeader("Bezier Settings")) then
         local settingVars = getSettingVars("Bezier", "Property")
 
+        chooseInteractiveBezier(settingVars, "Property")
         chooseConstantShift(settingVars, 0)
         chooseAverageSV(settingVars)
         chooseSVPoints(settingVars)
