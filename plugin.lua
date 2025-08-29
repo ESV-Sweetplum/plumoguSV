@@ -4343,7 +4343,7 @@ function drawHorizontalPillShape(o, point1, point2, radius, color, circleSegment
 end
 function logoThread()
     curTime = state.UnixTime or 0
-    if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 100) then
+    if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 750) then
         startTime = imgui.GetTime()
     end
     prevTime = state.UnixTime
