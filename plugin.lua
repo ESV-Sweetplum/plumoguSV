@@ -7417,7 +7417,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         PolynomialEditor(size, settingVars, separateWindow)
         local func = function(t)
             return (settingVars.startMsx - settingVars.endMsx) *
-                (1 - math.clamp(math.evaluatePolynomial(settingVars.plotCoefficients, t * size) / size, 0, size)) +
+                (1 - math.clamp(math.evaluatePolynomial(settingVars.plotCoefficients, t * size) / size, 0, 1)) +
                 settingVars.endMsx
         end
         AddSeparator()
