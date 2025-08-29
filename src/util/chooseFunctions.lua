@@ -20,82 +20,97 @@ function chooseAverageSV(menuVars)
 end
 
 function chooseInteractiveBezier(settingVars, optionalLabel)
-    imgui.BeginChild("Bezier Interactive Window" .. optionalLabel, vctr2(150), 67, 31)
-
     local freeMode = cache.boolean.bezierFreeMode or false
-
-    local red = 4278190335
-    local blue = 4294901760
+    local directMode = cache.boolean.bezierDirectMode or false
 
     local pos1 = (settingVars.p1 * vctr2(150)) or vector.New(30, 75)
     local pos2 = (settingVars.p2 * vctr2(150)) or vector.New(120, 75)
 
-    pos1.y = 150 - pos1.y
-    pos2.y = 150 - pos2.y
+    local normalizedPos1 = pos1 / 150
+    local normalizedPos2 = pos2 / 150
 
-    local pointList = { { pos = pos1, col = red, size = 10 }, { pos = pos2, col = blue, size = 10 } }
+    if (not directMode) then
+        imgui.BeginChild("Bezier Interactive Window" .. optionalLabel, vctr2(150), 67, 31)
+        local red = 4278190335
+        local blue = 4294901760
 
-    local ctx = renderGraph("Bezier Interactive Window" .. optionalLabel, vctr2(150), pointList, freeMode)
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
+        pos1.y = 150 - pos1.y
+        pos2.y = 150 - pos2.y
 
-    if (not freeMode) then
-        pointList[1].pos = vector.Clamp(pointList[1].pos, vctr2(0), vctr2(150))
-        pointList[2].pos = vector.Clamp(pointList[2].pos, vctr2(0), vctr2(150))
+        local pointList = { { pos = pos1, col = red, size = 10 }, { pos = pos2, col = blue, size = 10 } }
+
+        local ctx = renderGraph("Bezier Interactive Window" .. optionalLabel, vctr2(150), pointList, freeMode)
+        local topLeft = imgui.GetWindowPos()
+        local dim = imgui.GetWindowSize()
+
+        if (not freeMode) then
+            pointList[1].pos = vector.Clamp(pointList[1].pos, vctr2(0), vctr2(150))
+            pointList[2].pos = vector.Clamp(pointList[2].pos, vctr2(0), vctr2(150))
+        end
+
+        pos1 = pointList[1].pos
+        pos2 = pointList[2].pos
+
+        local dottedCol = imgui.GetColorU32(imgui_col.ButtonHovered)
+        local mainCol = imgui.GetColorU32(imgui_col.ButtonActive)
+
+        local bottomLeft = vector.New(topLeft.x, topLeft.y + dim.y)
+        local topRight = vector.New(topLeft.x + dim.x, topLeft.y)
+
+        ctx.AddBezierCubic(bottomLeft, topLeft + pos1, topLeft + pos2, topRight, mainCol, 3)
+        local dist1 = vector.Distance(bottomLeft, topLeft + pos1)
+        local dist2 = vector.Distance(topRight, topLeft + pos2)
+        local factor1 = 1 - 10 / dist1
+        local factor2 = 1 - 10 / dist2
+
+        ctx.AddLine(bottomLeft, bottomLeft + factor1 * vector.New(pos1.x, pos1.y - dim.y), dottedCol, 2)
+        ctx.AddLine(topRight, topRight + factor2 * vector.New(pos2.x - dim.x, pos2.y), dottedCol, 2)
+        imgui.EndChild()
+
+        KeepSameLine()
+        imgui.BeginChild("Bezier Data", vector.New(100, 150))
+        imgui.SetCursorPosX(7)
+
+        pos1.y = 150 - pos1.y
+        pos2.y = 150 - pos2.y
+
+        normalizedPos1 = pos1 / vctr2(150)
+        normalizedPos2 = pos2 / vctr2(150)
+
+        imgui.Text("\n         Point 1:\n      (" ..
+            string.format("%.2f", normalizedPos1.x) ..
+            ", " .. string.format("%.2f", normalizedPos1.y) .. ")\n         Point 2:\n      (" ..
+            string.format("%.2f", normalizedPos2.x) .. ", " .. string.format("%.2f", normalizedPos2.y) .. ")\n")
+
+        imgui.SetCursorPosY(80)
+        imgui.SetCursorPosX(5)
+        _, freeMode = imgui.Checkbox("Free Mode##Bezier", freeMode)
+        HoverToolTip(
+            "Enable this to allow the bezier control points to move outside the boundary. WARNING: ONCE MOVED OUTSIDE, THEY CANNOT BE MOVED BACK IN. DISABLE AND RE-ENABLE FREE MODE TO ALLOW THEM TO BE INTERACTED WITH.")
+        imgui.SetCursorPosX(5)
+        _, directMode = imgui.Checkbox("Manual Edit##Bezier", directMode)
+        HoverToolTip(
+            "Enable this to directly edit the bezier points.")
+
+        imgui.EndChild()
+    else
+        imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
+        _, normalizedPos1 = imgui.SliderFloat2("Point 1", pos1 / 150, 0, 1)
+        imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
+        _, normalizedPos2 = imgui.SliderFloat2("Point 2", pos2 / 150, 0, 1)
+        _, directMode = imgui.Checkbox("Manual Edit##Bezier", directMode)
+        HoverToolTip(
+            "Disable this to edit the bezier points with an interactive graph.")
     end
-
-    pos1 = pointList[1].pos
-    pos2 = pointList[2].pos
-
-    state.SetValue("bezier_pointList", pointList)
-
-    local dottedCol = imgui.GetColorU32(imgui_col.ButtonHovered)
-    local mainCol = imgui.GetColorU32(imgui_col.ButtonActive)
-
-    local bottomLeft = vector.New(topLeft.x, topLeft.y + dim.y)
-    local topRight = vector.New(topLeft.x + dim.x, topLeft.y)
-
-    ctx.AddBezierCubic(bottomLeft, topLeft + pos1, topLeft + pos2, topRight, mainCol, 3)
-    local dist1 = vector.Distance(bottomLeft, topLeft + pos1)
-    local dist2 = vector.Distance(topRight, topLeft + pos2)
-    local factor1 = 1 - 10 / dist1
-    local factor2 = 1 - 10 / dist2
-
-    ctx.AddLine(bottomLeft, bottomLeft + factor1 * vector.New(pos1.x, pos1.y - dim.y), dottedCol, 2)
-    ctx.AddLine(topRight, topRight + factor2 * vector.New(pos2.x - dim.x, pos2.y), dottedCol, 2)
-
-    imgui.EndChild()
-
-    KeepSameLine()
-    imgui.BeginChild("Bezier Data", vector.New(100, 150))
-    imgui.SetCursorPosX(7)
-
-    pos1.y = 150 - pos1.y
-    pos2.y = 150 - pos2.y
-
-    local normalizedPos1 = pos1 / vctr2(150)
-    local normalizedPos2 = pos2 / vctr2(150)
-
-    imgui.Text("\n\n         Point 1:\n      (" ..
-        string.format("%.2f", normalizedPos1.x) ..
-        ", " .. string.format("%.2f", normalizedPos1.y) .. ")\n         Point 2:\n      (" ..
-        string.format("%.2f", normalizedPos2.x) .. ", " .. string.format("%.2f", normalizedPos2.y) .. ")\n\n")
-
-    imgui.SetCursorPosX(5)
-
-    _, freeMode = imgui.Checkbox("Free Mode##Bezier", freeMode)
-    cache.boolean.bezierFreeMode = freeMode
-
-    HoverToolTip(
-        "Enable this to allow the bezier control points to move outside the boundary. WARNING: ONCE MOVED OUTSIDE, THEY CANNOT BE MOVED BACK IN. DISABLE AND RE-ENABLE FREE MODE TO ALLOW THEM TO BE INTERACTED WITH.")
-
-    imgui.EndChild()
 
     local oldP1 = settingVars.p1
     local oldP2 = settingVars.p2
 
     settingVars.p1 = normalizedPos1
     settingVars.p2 = normalizedPos2
+
+    cache.boolean.bezierFreeMode = freeMode
+    cache.boolean.bezierDirectMode = directMode
 
     return oldP1 ~= settingVars.p1 or oldP2 ~= settingVars.p2
 end
