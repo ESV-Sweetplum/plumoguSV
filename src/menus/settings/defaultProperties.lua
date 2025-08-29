@@ -10,7 +10,8 @@ function saveSettingPropertiesButton(settingVars, label)
     write(globalVars)
 
     print("i!",
-        "Default setting properties for " .. label .. " have been set. Changes will be shown on the next plugin refresh.")
+        'Default setting properties for submenu "' ..
+        label .. '" have been set. Changes will be shown on the next plugin refresh.')
 end
 
 function saveMenuPropertiesButton(menuVars, label)
@@ -25,7 +26,8 @@ function saveMenuPropertiesButton(menuVars, label)
     write(globalVars)
 
     print("i!",
-        "Default menu properties for " .. label .. " have been set. Changes will be shown on the next plugin refresh.")
+        'Default menu properties for menu "' ..
+        label .. '" have been set. Changes will be shown on the next plugin refresh.')
 end
 
 function showDefaultPropertiesSettings()

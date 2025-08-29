@@ -8466,7 +8466,8 @@ function saveSettingPropertiesButton(settingVars, label)
     loadDefaultProperties(globalVars.defaultProperties)
     write(globalVars)
     print("i!",
-        table.concat({"Default setting properties for ", label, " have been set. Changes will be shown on the next plugin refresh."}))
+        'Default setting properties for submenu "' ..
+        label .. '" have been set. Changes will be shown on the next plugin refresh.')
 end
 function saveMenuPropertiesButton(menuVars, label)
     local saveButtonClicked = imgui.Button("Save##menu" .. label)
@@ -8479,7 +8480,8 @@ function saveMenuPropertiesButton(menuVars, label)
     loadDefaultProperties(globalVars.defaultProperties)
     write(globalVars)
     print("i!",
-        table.concat({"Default menu properties for ", label, " have been set. Changes will be shown on the next plugin refresh."}))
+        'Default menu properties for menu "' ..
+        label .. '" have been set. Changes will be shown on the next plugin refresh.')
 end
 function showDefaultPropertiesSettings()
     imgui.SeparatorText("Create Tab Settings")

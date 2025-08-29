@@ -303,6 +303,8 @@ defaultProperties:
       - 0.89999997615814209
       - 0.10000000149011612
       verticalShift: 0
+      freeMode: false
+      manualMode: false
       avgSV: 1
       svPoints: 16
       finalSVIndex: 2
