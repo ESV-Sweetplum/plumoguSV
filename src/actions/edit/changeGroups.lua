@@ -43,7 +43,7 @@ function changeGroups(menuVars)
         table.insert(actionList, createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd))
     end
 
-    if (#actionList == 0) then
+    if (not truthy(actionList)) then
         state.SelectedScrollGroupId = oldGroup
         return
     end

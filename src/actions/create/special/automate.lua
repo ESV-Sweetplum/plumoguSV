@@ -5,7 +5,7 @@ function automateCopySVs(settingVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
-    if (not #svs or #svs == 0) then
+    if (not truthy(svs)) then
         toggleablePrint("w!", "No SVs found within the copiable region.")
         return
     end

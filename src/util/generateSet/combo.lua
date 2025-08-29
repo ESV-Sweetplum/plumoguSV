@@ -70,7 +70,7 @@ function generateComboSet(values1, values2, comboPhase, comboType, comboMultipli
             table.insert(comboValues, values1[i])
         end
 
-        if #comboValues == 0 then table.insert(comboValues, 1) end
+        if not truthy(comboValues) then table.insert(comboValues, 1) end
         if (comboPhase - #values2 >= 0) then
             table.insert(comboValues, lastValue1)
         else

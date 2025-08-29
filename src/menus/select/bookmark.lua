@@ -4,7 +4,7 @@ function selectBookmarkMenu()
     local menuVars = getMenuVars("selectBookmark")
     local times = {}
 
-    if (#bookmarks == 0) then
+    if (not truthy(bookmarks)) then
         imgui.TextWrapped("There are no bookmarks! Add one to navigate.")
     else
         imgui.PushItemWidth(70)

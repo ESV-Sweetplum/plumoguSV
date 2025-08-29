@@ -19,7 +19,7 @@ function directSVMenu()
         updateDirectEdit()
     end
     local svs = cache.lists.directSVList or {}
-    if (#svs == 0) then
+    if (not truthy(svs)) then
         menuVars.selectableIndex = 1
         imgui.TextWrapped("Select two notes to view SVs.")
         return

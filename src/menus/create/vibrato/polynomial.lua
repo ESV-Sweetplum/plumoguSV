@@ -55,6 +55,8 @@ function PolynomialEditor(size, settingVars, separateWindow)
         pointList, false, 11,
         vector.New(settingVars.startMsx, settingVars.endMsx))
 
+    changedPoints = not truthy(settingVars.plotPoints) or changedPoints
+
     for i = 1, settingVars.controlPointCount do
         settingVars.controlPoints[i] = vector.Clamp(pointList[i].pos, vctr2(0), vctr2(size)) / vctr2(size)
     end

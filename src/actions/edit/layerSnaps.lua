@@ -109,7 +109,7 @@ function collapseSnaps()
         ::continue::
     end
     actions.PerformBatch(moveNoteActions)
-    if (#normalTpsToAdd + #snapTpsToAdd + #tpsToRemove == 0) then
+    if (#normalTpsToAdd + #snapTpsToAdd + not truthy(tpsToRemove)) then
         print("w!", "There were no generated layers you nonce")
         return
     end
@@ -127,7 +127,7 @@ function clearSnappedLayers()
             table.insert(removeLayerActions, createEA(action_type.RemoveLayer, layer))
         end
     end
-    if (#removeLayerActions == 0) then
+    if (not truthy(removeLayerActions)) then
         print("w!", "There were no generated layers you nonce")
         return
     end

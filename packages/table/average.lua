@@ -3,7 +3,7 @@
 ---@param includeLastValue? boolean Whether or not to include the last value in the table.
 ---@return number avg The arithmetic mean of the table.
 function table.average(values, includeLastValue)
-    if #values == 0 then return 0 end
+    if not truthy(values) then return 0 end
     local sum = 0
     for _, value in ipairs(values) do
         sum = sum + value

@@ -345,7 +345,7 @@ function game.uniqueSelectedNoteOffsets()
     end
     offsets = table.dedupe(offsets)
     offsets = sort(offsets, sortAscending)
-    if (#offsets == 0) then return {} end
+    if (not truthy(offsets)) then return {} end
     return offsets
 end
 ---Returns an array of hit objects within the selection time.
@@ -751,7 +751,7 @@ end
 ---@param includeLastValue? boolean Whether or not to include the last value in the table.
 ---@return number avg The arithmetic mean of the table.
 function table.average(values, includeLastValue)
-    if #values == 0 then return 0 end
+    if not truthy(values) then return 0 end
     local sum = 0
     for k2 = 1, #values do
         local value = values[k2]
@@ -2094,7 +2094,7 @@ function automateCopySVs(settingVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
-    if (not #svs or #svs == 0) then
+    if (not truthy(svs)) then
         toggleablePrint("w!", "No SVs found within the copiable region.")
         return
     end
@@ -2734,7 +2734,7 @@ function changeGroups(menuVars)
         state.SelectedScrollGroupId = menuVars.designatedTimingGroup
         table.insert(actionList, createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd))
     end
-    if (#actionList == 0) then
+    if (not truthy(actionList)) then
         state.SelectedScrollGroupId = oldGroup
         return
     end
@@ -3315,7 +3315,7 @@ function collapseSnaps()
         ::continue::
     end
     actions.PerformBatch(moveNoteActions)
-    if (#normalTpsToAdd + #snapTpsToAdd + #tpsToRemove == 0) then
+    if (#normalTpsToAdd + #snapTpsToAdd + not truthy(tpsToRemove)) then
         print("w!", "There were no generated layers you nonce")
         return
     end
@@ -3332,7 +3332,7 @@ function clearSnappedLayers()
             table.insert(removeLayerActions, createEA(action_type.RemoveLayer, layer))
         end
     end
-    if (#removeLayerActions == 0) then
+    if (not truthy(removeLayerActions)) then
         print("w!", "There were no generated layers you nonce")
         return
     end
@@ -3356,7 +3356,7 @@ function alignTimingLines()
         while (truthy(noteTimes) and (noteTimes[1] < originalTime - 5)) do
             table.remove(noteTimes, 1)
         end
-        if (#noteTimes == 0) then
+        if (not truthy(noteTimes)) then
             times[#times + 1] = originalTime
         elseif (math.abs(noteTimes[1] - originalTime) <= 5) then
             times[#times + 1] = noteTimes[1]
@@ -7451,6 +7451,7 @@ function PolynomialEditor(size, settingVars, separateWindow)
     local ctx, changedPoints = renderGraph("Polynomial Vibrato Menu" .. tostring(separateWindow), vctr2(size),
         pointList, false, 11,
         vector.New(settingVars.startMsx, settingVars.endMsx))
+    changedPoints = not truthy(settingVars.plotPoints) or changedPoints
     for i = 1, settingVars.controlPointCount do
         settingVars.controlPoints[i] = vector.Clamp(pointList[i].pos, vctr2(0), vctr2(size)) / vctr2(size)
     end
@@ -7731,7 +7732,7 @@ function directSVMenu()
         updateDirectEdit()
     end
     local svs = state.GetValue("lists.directSVList") or {}
-    if (#svs == 0) then
+    if (not truthy(svs)) then
         menuVars.selectableIndex = 1
         imgui.TextWrapped("Select two notes to view SVs.")
         return
@@ -8115,7 +8116,7 @@ function selectBookmarkMenu()
     local bookmarks = map.Bookmarks
     local menuVars = getMenuVars("selectBookmark")
     local times = {}
-    if (#bookmarks == 0) then
+    if (not truthy(bookmarks)) then
         imgui.TextWrapped("There are no bookmarks! Add one to navigate.")
     else
         imgui.PushItemWidth(70)
@@ -10464,7 +10465,7 @@ function generateComboSet(values1, values2, comboPhase, comboType, comboMultipli
         for i = startIndex2, #values1 do
             comboValues[#comboValues + 1] = values1[i]
         end
-        if #comboValues == 0 then comboValues[#comboValues + 1] = 1 end
+        if not truthy(comboValues) then comboValues[#comboValues + 1] = 1 end
         if (comboPhase - #values2 >= 0) then
             comboValues[#comboValues + 1] = lastValue1
         else
@@ -10737,7 +10738,7 @@ end
 ---@param svsToAdd ScrollVelocity[]
 function removeAndAddSVs(svsToRemove, svsToAdd)
     local tolerance = 0.035
-    if #svsToAdd == 0 then return end
+    if not truthy(svsToAdd) then return end
     for idx, sv in pairs(svsToRemove) do
         local baseSV = game.getSVStartTimeAt(sv.StartTime)
         if (math.abs(baseSV - sv.StartTime) > tolerance) then
@@ -10752,7 +10753,7 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
     toggleablePrint("s!", table.concat({"Created ", #svsToAdd, pluralize(" SV.", #svsToAdd, -2)}))
 end
 function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
-    if #ssfsToAdd == 0 then return end
+    if not truthy(ssfsToAdd) then return end
     local editorActions = {
         createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
         createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)

@@ -30,7 +30,7 @@ function game.uniqueSelectedNoteOffsets()
     end
     offsets = table.dedupe(offsets)
     offsets = sort(offsets, sortAscending)
-    if (#offsets == 0) then return {} end
+    if (not truthy(offsets)) then return {} end
     return offsets
 end
 

@@ -20,7 +20,7 @@ function alignTimingLines()
         while (truthy(noteTimes) and (noteTimes[1] < originalTime - 5)) do
             table.remove(noteTimes, 1)
         end
-        if (#noteTimes == 0) then
+        if (not truthy(noteTimes)) then
             table.insert(times, originalTime)
         elseif (math.abs(noteTimes[1] - originalTime) <= 5) then
             table.insert(times, noteTimes[1])
