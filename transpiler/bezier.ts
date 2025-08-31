@@ -3,8 +3,8 @@ import * as path from 'path';
 
 const files = fs.readdirSync('bezier').filter((p) => p.endsWith('bezier'));
 
-function vectorize(str) {
-    const params = str.split(', ');
+function vectorize(str: string) {
+    const params = str.split(/, ?/);
     const x = parseFloat(params[0]);
     const y = parseFloat(params[1]);
     return [x, y];
