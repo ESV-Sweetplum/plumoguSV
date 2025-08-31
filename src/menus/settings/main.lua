@@ -49,7 +49,9 @@ function showPluginSettingsWindow()
 
     imgui.EndChild()
     imgui.NextColumn()
+
     imgui.BeginChild("Settings Data")
+    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
 
     if (SETTING_TYPES[typeIndex] == "General") then
         showGeneralSettings()
@@ -69,7 +71,10 @@ function showPluginSettingsWindow()
     if (SETTING_TYPES[typeIndex] == "Keybinds") then
         showKeybindSettings()
     end
+
+    imgui.PopItemWidth()
     imgui.EndChild()
+
     imgui.Columns(1)
     state.SetValue("settings_typeIndex", typeIndex)
     if (not settingsOpened) then
