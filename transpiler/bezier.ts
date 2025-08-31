@@ -25,14 +25,13 @@ files.forEach((p) => {
     const startingFile = `
 ---Draws ${name} on screen, with dimensions = scale * ${JSON.stringify(dim)}.
 ---@param ctx ImDrawListPtr
----@param windowSize Vector2
----@param location number
+---@param location Vector2
 ---@param scale number
 ---@param col integer
 ---@param thickness integer
-function draw${name.charAt(0).toUpperCase()}${name.slice(
-        1
-    )}(ctx, windowSize, location, scale, col, thickness)
+function draw${name.charAt(0).toUpperCase()}${name
+        .slice(1)
+        .replaceAll('.', '')}(ctx, location, scale, col, thickness)
 location = location - vector.New(${dim[0] / 2}, ${dim[1] / 2}) * scale
 `.trim();
 
