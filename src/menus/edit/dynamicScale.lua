@@ -41,7 +41,7 @@ function dynamicScaleMenu()
         menuVars.svMultipliers, nil, true)
 
     local labelText = currentSVType .. "DynamicScale"
-    cache.saveTable(labelText .. "Settings", settingVars)
+    cache.saveTable(currentSVType .. "DynamicScaleSettings", settingVars)
     cache.saveTable("dynamicScaleMenu", menuVars)
 
     AddSeparator()

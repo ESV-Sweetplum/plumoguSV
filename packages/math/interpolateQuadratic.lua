@@ -2,7 +2,7 @@
 ---@param p1 Vector2
 ---@param p2 Vector2
 ---@param p3 Vector2
----@return number, number, number
+---@return number, number?, number?
 function math.interpolateQuadratic(p1, p2, p3)
     local mtrx = { -- from subtracting two quadratics formed from input points
         (p2.x) ^ 2 - (p1.x) ^ 2, (p2 - p1).x,
@@ -14,9 +14,10 @@ function math.interpolateQuadratic(p1, p2, p3)
         (p3 - p1).y
     }
 
-    a, b = matrix.solve(mtrx, vctr)
-    c = p1.y - p1.x * b - (p1.x) ^ 2 * a
+    local coeffs = matrix.solve(mtrx, vctr)
+    if (type(coeffs) == "number") then return 1 / 0 end
+    c = p1.y - p1.x * coeffs[2] - (p1.x) ^ 2 * coeffs[1]
 
     ---@type number, number, number
-    return a, b, c
+    return coeffs[1], coeffs[2], c
 end

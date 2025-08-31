@@ -6,7 +6,7 @@ require("packages.math.matrix.scaleRow")
 ---@param mtrx number[][]
 ---@param vctr number[]
 function matrix.solve(mtrx, vctr)
-    if (#vctr ~= #mtrx) then return end
+    if (#vctr ~= #mtrx) then return -1 / 0 end
     local augMtrx = table.duplicate(mtrx)
     for i, n in pairs(vctr) do
         table.insert(augMtrx[i], n)

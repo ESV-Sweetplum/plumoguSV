@@ -14,7 +14,7 @@
 ---@return boolean changed
 function renderGraph(label, size, points, preferForeground, gridSize, yScale)
     local gray = color.int.white * 100 / 255
-    local tableLabel = table.concat({ "graph_points_", label })
+    local tableLabel = "graph_points_" .. label
     local initDragList = {}
     local initPointList = {}
     for i = 1, #points do

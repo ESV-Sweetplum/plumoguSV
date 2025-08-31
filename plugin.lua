@@ -578,7 +578,7 @@ end
 ---@param mtrx number[][]
 ---@param vctr number[]
 function matrix.solve(mtrx, vctr)
-    if (#vctr ~= #mtrx) then return end
+    if (#vctr ~= #mtrx) then return -1 / 0 end
     local augMtrx = table.duplicate(mtrx)
     for i, n in pairs(vctr) do
         augMtrx[i][#augMtrx[i] + 1] = n
@@ -6603,7 +6603,7 @@ end
 ---@return boolean changed
 function renderGraph(label, size, points, preferForeground, gridSize, yScale)
     local gray = color.int.white * 100 / 255
-    local tableLabel = table.concat({ "graph_points_", label })
+    local tableLabel = "graph_points_" .. label
     local initDragList = {}
     local initPointList = {}
     for i = 1, #points do
@@ -7175,8 +7175,7 @@ function placeSpecialSVMenu()
     end
     if currentSVType == "Automate" then automateSVMenu(settingVars) end
     if currentSVType == "Penis" then penisMenu(settingVars) end
-    local labelText = currentSVType .. "Special"
-    cache.saveTable(labelText .. "Settings", settingVars)
+    cache.saveTable(currentSVType .. "SpecialSettings", settingVars)
     cache.saveTable("placeSpecialMenu", menuVars)
 end
 function penisMenu(settingVars)
@@ -7418,8 +7417,9 @@ function placeVibratoSVMenu(separateWindow)
     if (menuVars.vibratoMode ~= 2) then
         chooseVibratoSides(menuVars)
     end
+    local modeText = menuVars.vibratoMode == 1 and "SV" or "SSF"
     local currentSVType = VIBRATO_SVS[menuVars.svTypeIndex]
-    local settingVars = getSettingVars(currentSVType .. (menuVars.vibratoMode == 1 and "SV" or "SSF"),
+    local settingVars = getSettingVars(currentSVType .. modeText,
         "Vibrato" .. tostring(separateWindow))
     if globalVars.showPresetMenu then
         renderPresetMenu("Vibrato", menuVars, settingVars)
@@ -7432,9 +7432,8 @@ function placeVibratoSVMenu(separateWindow)
     if currentSVType == "Sinusoidal##Vibrato" then sinusoidalVibratoMenu(menuVars, settingVars, separateWindow) end
     if currentSVType == "Sigmoidal##Vibrato" then sigmoidalVibratoMenu(menuVars, settingVars, separateWindow) end
     if currentSVType == "Custom##Vibrato" then customVibratoMenu(menuVars, settingVars, separateWindow) end
-    local labelText = currentSVType ..
-        (menuVars.vibratoMode == 1 and "SV" or "SSF") .. "Vibrato" .. tostring(separateWindow)
-    cache.saveTable(labelText .. "Settings", settingVars)
+    cache.saveTable(table.concat({ currentSVType, modeText, "Vibrato", tostring(separateWindow), "Settings" }),
+        settingVars)
     cache.saveTable(table.concat({"placeVibrato", tostring(separateWindow), "Menu"}), menuVars)
 end
 function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
@@ -7887,7 +7886,7 @@ function dynamicScaleMenu()
     makeSVInfoWindow("SV Info", menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
         menuVars.svMultipliers, nil, true)
     local labelText = currentSVType .. "DynamicScale"
-    cache.saveTable(labelText .. "Settings", settingVars)
+    cache.saveTable(currentSVType .. "DynamicScaleSettings", settingVars)
     cache.saveTable("dynamicScaleMenu", menuVars)
     AddSeparator()
     simpleActionMenu("Scale spacing between assigned notes", 0, dynamicScaleSVs, menuVars)

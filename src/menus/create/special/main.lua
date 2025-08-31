@@ -27,7 +27,6 @@ function placeSpecialSVMenu()
     if currentSVType == "Automate" then automateSVMenu(settingVars) end
     if currentSVType == "Penis" then penisMenu(settingVars) end
 
-    local labelText = currentSVType .. "Special"
-    cache.saveTable(labelText .. "Settings", settingVars)
+    cache.saveTable(currentSVType .. "SpecialSettings", settingVars)
     cache.saveTable("placeSpecialMenu", menuVars)
 end
