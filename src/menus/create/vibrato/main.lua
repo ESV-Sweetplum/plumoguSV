@@ -15,6 +15,7 @@ function placeVibratoSVMenu(separateWindow)
     AddSeparator()
     imgui.Text("Vibrato Settings:")
     menuVars.vibratoMode = Combo("Vibrato Mode", VIBRATO_TYPES, menuVars.vibratoMode)
+
     chooseVibratoQuality(menuVars)
     if (menuVars.vibratoMode ~= 2) then
         chooseVibratoSides(menuVars)
@@ -38,7 +39,7 @@ function placeVibratoSVMenu(separateWindow)
     if currentSVType == "Custom##Vibrato" then customVibratoMenu(menuVars, settingVars, separateWindow) end
 
     local labelText = currentSVType ..
-    (menuVars.vibratoMode == 1 and "SV" or "SSF") .. "Vibrato" .. tostring(separateWindow)
+        (menuVars.vibratoMode == 1 and "SV" or "SSF") .. "Vibrato" .. tostring(separateWindow)
     cache.saveTable(labelText .. "Settings", settingVars)
     cache.saveTable("placeVibrato" .. tostring(separateWindow) .. "Menu", menuVars)
 end
