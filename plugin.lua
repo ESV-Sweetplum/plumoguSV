@@ -7117,6 +7117,11 @@ function automateSVMenu(settingVars)
     end
     FunctionButton("Clear copied items", ACTION_BUTTON_SIZE, clearAutomateSVs, settingVars)
     AddSeparator()
+    automateSVSettingsMenu(settingVars)
+    AddSeparator()
+    simpleActionMenu("Automate SVs for selected notes", 2, automateSVs, settingVars)
+end
+function automateSVSettingsMenu(settingVars)
     settingVars.initialSV = NegatableComputableInputFloat("Initial SV", settingVars.initialSV, 2, "x")
     _, settingVars.scaleSVs = imgui.Checkbox("Scale SVs?", settingVars.scaleSVs)
     KeepSameLine()
@@ -7128,8 +7133,6 @@ function automateSVMenu(settingVars)
         settingVars.ms = ComputableInputFloat("Time", settingVars.ms, 2, "ms")
         imgui.PopItemWidth()
     end
-    AddSeparator()
-    simpleActionMenu("Automate SVs for selected notes", 2, automateSVs, settingVars)
 end
 SPECIAL_SVS = {
     "Stutter",
@@ -7161,16 +7164,28 @@ function placeSpecialSVMenu()
     cache.saveTable("placeSpecialMenu", menuVars)
 end
 function penisMenu(settingVars)
+    penisSettingsMenu(settingVars)
+    simpleActionMenu("Place SVs", 1, placePenisSV, settingVars)
+end
+function penisSettingsMenu(settingVars)
     _, settingVars.bWidth = imgui.InputInt("Ball Width", math.floor(settingVars.bWidth))
     _, settingVars.sWidth = imgui.InputInt("Shaft Width", math.floor(settingVars.sWidth))
     _, settingVars.sCurvature = imgui.SliderInt("S Curvature", settingVars.sCurvature, 1, 100,
         settingVars.sCurvature .. "%%")
     _, settingVars.bCurvature = imgui.SliderInt("B Curvature", settingVars.bCurvature, 1, 100,
         settingVars.bCurvature .. "%%")
-    simpleActionMenu("Place SVs", 1, placePenisSV, settingVars)
 end
 function stutterMenu(settingVars)
     local settingsChanged = #settingVars.svMultipliers == 0
+    settingsChanged = stutterSettingsMenu(settingVars) or settingsChanged
+    if settingsChanged then updateStutterMenuSVs(settingVars) end
+    displayStutterSVWindows(settingVars)
+    AddSeparator()
+    simpleActionMenu("Place SVs between selected notes", 2, placeStutterSVs, settingVars)
+    simpleActionMenu("Place SSFs between selected notes", 2, placeStutterSSFs, settingVars, true)
+end
+function stutterSettingsMenu(settingVars)
+    local settingsChanged = false
     settingsChanged = chooseControlSecondSV(settingVars) or settingsChanged
     settingsChanged = chooseStartEndSVs(settingVars) or settingsChanged
     settingsChanged = chooseStutterDuration(settingVars) or settingsChanged
@@ -7179,13 +7194,15 @@ function stutterMenu(settingVars)
     settingsChanged = BasicInputInt(settingVars, "stuttersPerSection", "Stutters", { 1, 1000 }) or settingsChanged
     settingsChanged = chooseAverageSV(settingVars) or settingsChanged
     settingsChanged = chooseFinalSV(settingVars, false) or settingsChanged
-    if settingsChanged then updateStutterMenuSVs(settingVars) end
-    displayStutterSVWindows(settingVars)
-    AddSeparator()
-    simpleActionMenu("Place SVs between selected notes", 2, placeStutterSVs, settingVars)
-    simpleActionMenu("Place SSFs between selected notes", 2, placeStutterSSFs, settingVars, true)
+    return settingsChanged
 end
 function teleportStutterMenu(settingVars)
+    teleportStutterSettingsMenu(settingVars)
+    AddSeparator()
+    simpleActionMenu("Place SVs between selected notes", 2, placeTeleportStutterSVs, settingVars)
+    simpleActionMenu("Place SSFs between selected notes", 2, placeTeleportStutterSSFs, settingVars, true)
+end
+function teleportStutterSettingsMenu(settingVars)
     if settingVars.useDistance then
         chooseDistance(settingVars)
         HelpMarker("Start SV teleport distance")
@@ -7197,9 +7214,6 @@ function teleportStutterMenu(settingVars)
     chooseFinalSV(settingVars, false)
     BasicCheckbox(settingVars, "useDistance", "Use distance for start SV")
     BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time")
-    AddSeparator()
-    simpleActionMenu("Place SVs between selected notes", 2, placeTeleportStutterSVs, settingVars)
-    simpleActionMenu("Place SSFs between selected notes", 2, placeTeleportStutterSSFs, settingVars, true)
 end
 STANDARD_SVS = {
     "Linear",
@@ -8671,170 +8685,80 @@ function showDefaultPropertiesSettings()
     imgui.SeparatorText("Standard/Still Settings")
     if (imgui.CollapsingHeader("Linear Settings")) then
         local settingVars = getSettingVars("Linear", "Property")
-        chooseStartEndSVs(settingVars)
-        chooseSVPoints(settingVars)
-        chooseFinalSV(settingVars)
+        linearSettingsMenu(settingVars)
         saveSettingPropertiesButton(settingVars, "Linear")
         cache.saveTable("LinearPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Exponential Settings")) then
         local settingVars = getSettingVars("Exponential", "Property")
-        chooseSVBehavior(settingVars)
-        chooseIntensity(settingVars)
-        if (globalVars.advancedMode) then
-            chooseDistanceMode(settingVars)
-        end
-        if (settingVars.distanceMode ~= 3) then
-            chooseConstantShift(settingVars, 0)
-        end
-        if (settingVars.distanceMode == 1) then
-            chooseAverageSV(settingVars)
-        elseif (settingVars.distanceMode == 2) then
-            chooseDistance(settingVars)
-        else
-            chooseStartEndSVs(settingVars)
-        end
-        chooseSVPoints(settingVars)
-        chooseFinalSV(settingVars)
+        exponentialSettingsMenu(settingVars)
         saveSettingPropertiesButton(settingVars, "Exponential")
         cache.saveTable("ExponentialPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Bezier Settings")) then
         local settingVars = getSettingVars("Bezier", "Property")
-        chooseInteractiveBezier(settingVars, "Property")
-        chooseConstantShift(settingVars, 0)
-        chooseAverageSV(settingVars)
-        chooseSVPoints(settingVars)
-        chooseFinalSV(settingVars)
+        bezierSettingsMenu(settingVars, false, false, "Property")
         saveSettingPropertiesButton(settingVars, "Bezier")
         cache.saveTable("BezierPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Hermite Settings")) then
         local settingVars = getSettingVars("Hermite", "Property")
-        chooseStartEndSVs(settingVars)
-        chooseConstantShift(settingVars, 0)
-        chooseAverageSV(settingVars)
-        chooseSVPoints(settingVars)
-        chooseFinalSV(settingVars)
+        hermiteSettingsMenu(settingVars)
         saveSettingPropertiesButton(settingVars, "Hermite")
         cache.saveTable("HermitePropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Sinusoidal Settings")) then
         local settingVars = getSettingVars("Sinusoidal", "Property")
-        imgui.Text("Amplitude:")
-        chooseStartEndSVs(settingVars)
-        chooseCurveSharpness(settingVars)
-        chooseConstantShift(settingVars, 1)
-        chooseNumPeriods(settingVars)
-        choosePeriodShift(settingVars)
-        chooseSVPerQuarterPeriod(settingVars)
-        chooseFinalSV(settingVars)
+        sinusoidalSettingsMenu(settingVars)
         saveSettingPropertiesButton(settingVars, "Sinusoidal")
         cache.saveTable("SinusoidalPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Circular Settings")) then
         local settingVars = getSettingVars("Circular", "Property")
-        chooseSVBehavior(settingVars)
-        chooseArcPercent(settingVars)
-        chooseAverageSV(settingVars)
-        chooseConstantShift(settingVars, 0)
-        chooseSVPoints(settingVars)
-        chooseFinalSV(settingVars)
-        chooseNoNormalize(settingVars)
+        circularSettingsMenu(settingVars)
         saveSettingPropertiesButton(settingVars, "Circular")
         cache.saveTable("CircularPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Random Settings")) then
         local settingVars = getSettingVars("Random", "Property")
-        chooseRandomType(settingVars)
-        chooseRandomScale(settingVars)
-        chooseSVPoints(settingVars)
-        AddSeparator()
-        chooseConstantShift(settingVars, 0)
-        if not settingVars.dontNormalize then
-            chooseAverageSV(settingVars)
-        end
-        chooseFinalSV(settingVars)
-        chooseNoNormalize(settingVars)
+        randomSettingsMenu(settingVars, false, false, true)
         saveSettingPropertiesButton(settingVars, "Random")
         cache.saveTable("RandomPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Chinchilla Settings")) then
         local settingVars = getSettingVars("Chinchilla", "Property")
-        chooseSVBehavior(settingVars)
-        chooseChinchillaType(settingVars)
-        chooseChinchillaIntensity(settingVars)
-        chooseAverageSV(settingVars)
-        chooseConstantShift(settingVars, 0)
-        chooseSVPoints(settingVars)
-        chooseFinalSV(settingVars)
+        chinchillaSettingsMenu(settingVars)
         saveSettingPropertiesButton(settingVars, "Chinchilla")
         cache.saveTable("ChinchillaPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Code Settings")) then
         local settingVars = getSettingVars("Code", "Property")
-        CodeInput(settingVars, "code", "##code",
-            "This input should return a function that takes in a number t=[0-1], and returns a value corresponding to the msx value of the vibrato at (100t)% of the way through the first and last selected note times.")
-        imgui.Separator()
-        chooseSVPoints(settingVars)
-        chooseFinalSV(settingVars)
+        codeSettingsMenu(settingVars)
         saveSettingPropertiesButton(settingVars, "Code")
         cache.saveTable("CodePropertySettings", settingVars)
     end
     imgui.SeparatorText("Special Settings")
     if (imgui.CollapsingHeader("Stutter Settings")) then
         local settingVars = getSettingVars("Stutter", "Property")
-        settingsChanged = chooseControlSecondSV(settingVars) or settingsChanged
-        settingsChanged = chooseStartEndSVs(settingVars) or settingsChanged
-        settingsChanged = chooseStutterDuration(settingVars) or settingsChanged
-        settingsChanged = BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time") or settingsChanged
-        AddSeparator()
-        settingsChanged = BasicInputInt(settingVars, "stuttersPerSection", "Stutters", { 1, 1000 }) or settingsChanged
-        settingsChanged = chooseAverageSV(settingVars) or settingsChanged
-        settingsChanged = chooseFinalSV(settingVars, false) or settingsChanged
+        stutterSettingsMenu(settingVars)
         saveSettingPropertiesButton(settingVars, "Stutter")
         cache.saveTable("StutterPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Teleport Stutter Settings")) then
         local settingVars = getSettingVars("TeleportStutter", "Property")
-        if settingVars.useDistance then
-            chooseDistance(settingVars)
-            HelpMarker("Start SV teleport distance")
-        else
-            chooseStartSVPercent(settingVars)
-        end
-        chooseMainSV(settingVars)
-        chooseAverageSV(settingVars)
-        chooseFinalSV(settingVars, false)
-        BasicCheckbox(settingVars, "useDistance", "Use distance for start SV")
-        BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time")
+        teleportStutterSettingsMenu(settingVars)
         saveSettingPropertiesButton(settingVars, "TeleportStutter")
         cache.saveTable("TeleportStutterPropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Automate Settings")) then
         local settingVars = getSettingVars("Automate", "Property")
-        settingVars.initialSV = NegatableComputableInputFloat("Initial SV", settingVars.initialSV, 2, "x")
-        _, settingVars.scaleSVs = imgui.Checkbox("Scale SVs?", settingVars.scaleSVs)
-        KeepSameLine()
-        _, settingVars.optimizeTGs = imgui.Checkbox("Optimize TGs?", settingVars.optimizeTGs)
-        _, settingVars.maintainMs = imgui.Checkbox("Static Time?", settingVars.maintainMs)
-        if (settingVars.maintainMs) then
-            KeepSameLine()
-            imgui.PushItemWidth(71)
-            settingVars.ms = ComputableInputFloat("Time", settingVars.ms, 2, "ms")
-            imgui.PopItemWidth()
-        end
+        automateSVSettingsMenu(settingVars)
         saveSettingPropertiesButton(settingVars, "Automate")
         cache.saveTable("AutomatePropertySettings", settingVars)
     end
     if (imgui.CollapsingHeader("Penis Settings")) then
         local settingVars = getSettingVars("Penis", "Property")
-        _, settingVars.bWidth = imgui.InputInt("Ball Width", math.floor(settingVars.bWidth))
-        _, settingVars.sWidth = imgui.InputInt("Shaft Width", math.floor(settingVars.sWidth))
-        _, settingVars.sCurvature = imgui.SliderInt("S Curvature", settingVars.sCurvature, 1, 100,
-            settingVars.sCurvature .. "%%")
-        _, settingVars.bCurvature = imgui.SliderInt("B Curvature", settingVars.bCurvature, 1, 100,
-            settingVars.bCurvature .. "%%")
+        penisSettingsMenu(settingVars)
         saveSettingPropertiesButton(settingVars, "Penis")
         cache.saveTable("PenisPropertySettings", settingVars)
     end
@@ -11311,12 +11235,12 @@ function linearSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     settingsChanged = chooseFinalSV(settingVars, skipFinalSV) or settingsChanged
     return settingsChanged
 end
-function randomSettingsMenu(settingVars, skipFinalSV, svPointsForce)
+function randomSettingsMenu(settingVars, skipFinalSV, svPointsForce, disableRegeneration)
     local settingsChanged = false
     settingsChanged = chooseRandomType(settingVars) or settingsChanged
     settingsChanged = chooseRandomScale(settingVars) or settingsChanged
     settingsChanged = chooseSVPoints(settingVars, svPointsForce) or settingsChanged
-    if imgui.Button("Generate New Random Set", BEEG_BUTTON_SIZE) then
+    if not disableRegeneration and imgui.Button("Generate New Random Set", BEEG_BUTTON_SIZE) then
         generateRandomSetMenuSVs(settingVars)
         settingsChanged = true
     end

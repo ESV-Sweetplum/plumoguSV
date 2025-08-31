@@ -1,4 +1,10 @@
 function penisMenu(settingVars)
+    penisSettingsMenu(settingVars)
+
+    simpleActionMenu("Place SVs", 1, placePenisSV, settingVars)
+end
+
+function penisSettingsMenu(settingVars)
     _, settingVars.bWidth = imgui.InputInt("Ball Width", math.floor(settingVars.bWidth))
     _, settingVars.sWidth = imgui.InputInt("Shaft Width", math.floor(settingVars.sWidth))
 
@@ -6,6 +12,4 @@ function penisMenu(settingVars)
         settingVars.sCurvature .. "%%")
     _, settingVars.bCurvature = imgui.SliderInt("B Curvature", settingVars.bCurvature, 1, 100,
         settingVars.bCurvature .. "%%")
-
-    simpleActionMenu("Place SVs", 1, placePenisSV, settingVars)
 end

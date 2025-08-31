@@ -1,4 +1,12 @@
 function teleportStutterMenu(settingVars)
+    teleportStutterSettingsMenu(settingVars)
+
+    AddSeparator()
+    simpleActionMenu("Place SVs between selected notes", 2, placeTeleportStutterSVs, settingVars)
+    simpleActionMenu("Place SSFs between selected notes", 2, placeTeleportStutterSSFs, settingVars, true)
+end
+
+function teleportStutterSettingsMenu(settingVars)
     if settingVars.useDistance then
         chooseDistance(settingVars)
         HelpMarker("Start SV teleport distance")
@@ -10,8 +18,4 @@ function teleportStutterMenu(settingVars)
     chooseFinalSV(settingVars, false)
     BasicCheckbox(settingVars, "useDistance", "Use distance for start SV")
     BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time")
-
-    AddSeparator()
-    simpleActionMenu("Place SVs between selected notes", 2, placeTeleportStutterSVs, settingVars)
-    simpleActionMenu("Place SSFs between selected notes", 2, placeTeleportStutterSSFs, settingVars, true)
 end
