@@ -31,6 +31,28 @@ function saveMenuPropertiesButton(menuVars, label)
 end
 
 function showDefaultPropertiesSettings()
+    local standardFnList = {
+        linearSettingsMenu,
+        exponentialSettingsMenu,
+        bezierSettingsMenu,
+        hermiteSettingsMenu,
+        sinusoidalSettingsMenu,
+        circularSettingsMenu,
+        randomSettingsMenu,
+        customSettingsMenu,
+        chinchillaSettingsMenu,
+        comboSettingsMenu,
+        codeSettingsMenu
+    }
+
+    local specialFnList = {
+        stutterSettingsMenu,
+        teleportStutterSettingsMenu,
+        nil,
+        automateSVSettingsMenu,
+        penisSettingsMenu
+    }
+
     imgui.SeparatorText("Create Tab Settings")
 
     if (imgui.CollapsingHeader("General Standard Settings")) then
@@ -254,112 +276,37 @@ function showDefaultPropertiesSettings()
 
     imgui.SeparatorText("Standard/Still Settings")
 
-    if (imgui.CollapsingHeader("Linear Settings")) then
-        local settingVars = getSettingVars("Linear", "Property")
+    local standardMenuDict = table.map(STANDARD_SVS, function(element, idx)
+        return { label = element, fn = standardFnList[idx] }
+    end)
 
-        linearSettingsMenu(settingVars)
-
-        saveSettingPropertiesButton(settingVars, "Linear")
-        cache.saveTable("LinearPropertySettings", settingVars)
-    end
-    if (imgui.CollapsingHeader("Exponential Settings")) then
-        local settingVars = getSettingVars("Exponential", "Property")
-
-        exponentialSettingsMenu(settingVars)
-
-        saveSettingPropertiesButton(settingVars, "Exponential")
-        cache.saveTable("ExponentialPropertySettings", settingVars)
-    end
-    if (imgui.CollapsingHeader("Bezier Settings")) then
-        local settingVars = getSettingVars("Bezier", "Property")
-
-        bezierSettingsMenu(settingVars, false, false, "Property")
-
-        saveSettingPropertiesButton(settingVars, "Bezier")
-        cache.saveTable("BezierPropertySettings", settingVars)
-    end
-    if (imgui.CollapsingHeader("Hermite Settings")) then
-        local settingVars = getSettingVars("Hermite", "Property")
-
-        hermiteSettingsMenu(settingVars)
-
-        saveSettingPropertiesButton(settingVars, "Hermite")
-        cache.saveTable("HermitePropertySettings", settingVars)
-    end
-    if (imgui.CollapsingHeader("Sinusoidal Settings")) then
-        local settingVars = getSettingVars("Sinusoidal", "Property")
-
-        sinusoidalSettingsMenu(settingVars)
-
-        saveSettingPropertiesButton(settingVars, "Sinusoidal")
-        cache.saveTable("SinusoidalPropertySettings", settingVars)
-    end
-    if (imgui.CollapsingHeader("Circular Settings")) then
-        local settingVars = getSettingVars("Circular", "Property")
-
-        circularSettingsMenu(settingVars)
-
-        saveSettingPropertiesButton(settingVars, "Circular")
-        cache.saveTable("CircularPropertySettings", settingVars)
-    end
-    if (imgui.CollapsingHeader("Random Settings")) then
-        local settingVars = getSettingVars("Random", "Property")
-
-        randomSettingsMenu(settingVars, false, false, true)
-
-        saveSettingPropertiesButton(settingVars, "Random")
-        cache.saveTable("RandomPropertySettings", settingVars)
-    end
-    if (imgui.CollapsingHeader("Chinchilla Settings")) then
-        local settingVars = getSettingVars("Chinchilla", "Property")
-
-        chinchillaSettingsMenu(settingVars)
-
-        saveSettingPropertiesButton(settingVars, "Chinchilla")
-        cache.saveTable("ChinchillaPropertySettings", settingVars)
-    end
-    if (imgui.CollapsingHeader("Code Settings")) then
-        local settingVars = getSettingVars("Code", "Property")
-
-        codeSettingsMenu(settingVars)
-
-        saveSettingPropertiesButton(settingVars, "Code")
-        cache.saveTable("CodePropertySettings", settingVars)
+    for _, tbl in pairs(standardMenuDict) do
+        local label = tbl.label
+        local fn = tbl.fn
+        if (imgui.CollapsingHeader(label .. " Settings")) then
+            local settingVars = getSettingVars(label, "Property")
+            fn(settingVars, false, false, "Property")
+            saveSettingPropertiesButton(settingVars, label)
+            cache.saveTable(label .. "PropertySettings", settingVars)
+        end
     end
 
     imgui.SeparatorText("Special Settings")
 
-    if (imgui.CollapsingHeader("Stutter Settings")) then
-        local settingVars = getSettingVars("Stutter", "Property")
+    local specialMenuDict = table.map(SPECIAL_SVS, function(element, idx)
+        return { label = element, fn = specialFnList[idx] }
+    end)
 
-        stutterSettingsMenu(settingVars)
-
-        saveSettingPropertiesButton(settingVars, "Stutter")
-        cache.saveTable("StutterPropertySettings", settingVars)
-    end
-    if (imgui.CollapsingHeader("Teleport Stutter Settings")) then
-        local settingVars = getSettingVars("TeleportStutter", "Property")
-
-        teleportStutterSettingsMenu(settingVars)
-
-        saveSettingPropertiesButton(settingVars, "TeleportStutter")
-        cache.saveTable("TeleportStutterPropertySettings", settingVars)
-    end
-    if (imgui.CollapsingHeader("Automate Settings")) then
-        local settingVars = getSettingVars("Automate", "Property")
-
-        automateSVSettingsMenu(settingVars)
-
-        saveSettingPropertiesButton(settingVars, "Automate")
-        cache.saveTable("AutomatePropertySettings", settingVars)
-    end
-    if (imgui.CollapsingHeader("Penis Settings")) then
-        local settingVars = getSettingVars("Penis", "Property")
-
-        penisSettingsMenu(settingVars)
-
-        saveSettingPropertiesButton(settingVars, "Penis")
-        cache.saveTable("PenisPropertySettings", settingVars)
+    for _, tbl in pairs(specialMenuDict) do
+        local label = tbl.label
+        if (not tbl.fn) then goto continue end
+        if (imgui.CollapsingHeader(label .. " Settings")) then
+            local settingVars = getSettingVars(label, "Property")
+            tbl.fn(settingVars)
+            saveSettingPropertiesButton(settingVars, label)
+            cache.saveTable(label .. "PropertySettings", settingVars)
+        end
+        ::continue::
     end
 
     imgui.SeparatorText("SV Vibrato Settings")
