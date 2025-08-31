@@ -8130,6 +8130,10 @@ function infoTab()
     end
 end
 function showPatchNotesWindow()
+    startNextWindowNotCollapsed("plumoguSV Patch Notes")
+    _, patchNotesOpened = imgui.Begin("plumoguSV Patch Notes", true, 42)
+    imgui.SetWindowSize("plumoguSV Patch Notes", vector.New(433, 400))
+    imgui.End()
 end
 function selectAlternatingMenu()
     local menuVars = getMenuVars("selectAlternating")
@@ -9351,9 +9355,9 @@ function showTutorialWindow()
     imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
     imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
     startNextWindowNotCollapsed("plumoguSV Tutorial Menu")
-    _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
+    _, tutorialOpened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
     local tutorialWindowName = state.GetValue("tutorialWindowName") or ""
-    if (not opened) then
+    if (not tutorialOpened) then
         state.SetValue("windows.showTutorialWindow", false)
     end
     local navigatorWidth = 200

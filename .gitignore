@@ -2,3 +2,4 @@ node_modules
 dist
 builds
 .DS_store
+bezier/out

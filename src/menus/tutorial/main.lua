@@ -5,10 +5,10 @@ function showTutorialWindow()
 
     startNextWindowNotCollapsed("plumoguSV Tutorial Menu")
 
-    _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
+    _, tutorialOpened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
     local tutorialWindowName = cache.tutorialWindowName or ""
 
-    if (not opened) then
+    if (not tutorialOpened) then
         cache.windows.showTutorialWindow = false
     end
 
