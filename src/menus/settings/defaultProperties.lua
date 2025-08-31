@@ -104,6 +104,22 @@ function showDefaultPropertiesSettings()
 
     imgui.SeparatorText("Edit Tab Settings")
 
+    -- local editTabDict = table.map(EDIT_SV_TOOLS, function(element, idx)
+    --     return { label = element, fn = editFnList[idx] }
+    -- end)
+
+    -- for _, tbl in pairs(editTabDict) do
+    --     local label = tbl.label
+    --     if (not tbl.fn) then goto continue end
+    --     if (imgui.CollapsingHeader(label .. " Settings")) then
+    --         local menuVars = getMenuVars(label, "Property")
+    --         tbl.fn(menuVars)
+    --         saveMenuPropertiesButton(menuVars, label)
+    --         cache.saveTable(label .. "PropertyMenu", menuVars)
+    --     end
+    --     ::continue::
+    -- end
+
     if (imgui.CollapsingHeader("Add Teleport Settings")) then
         local menuVars = getMenuVars("addTeleport", "Property")
 
@@ -233,6 +249,22 @@ function showDefaultPropertiesSettings()
 
     imgui.SeparatorText("Select Tab Settings")
 
+    -- local selectTabDict = table.map(SELECT_TOOLS, function(element, idx)
+    --     return { label = element, fn = selectFnList[idx] }
+    -- end)
+
+    -- for _, tbl in pairs(selectFnList) do
+    --     local label = tbl.label
+    --     if (not tbl.fn) then goto continue end
+    --     if (imgui.CollapsingHeader(label .. " Settings")) then
+    --         local menuVars = getMenuVars(label, "Property")
+    --         tbl.fn(menuVars)
+    --         saveMenuPropertiesButton(menuVars, label)
+    --         cache.saveTable(label .. "PropertyMenu", menuVars)
+    --     end
+    --     ::continue::
+    -- end
+
     if (imgui.CollapsingHeader("Select Alternating Settings")) then
         local menuVars = getMenuVars("selectAlternating", "Property")
 
@@ -282,10 +314,9 @@ function showDefaultPropertiesSettings()
 
     for _, tbl in pairs(standardMenuDict) do
         local label = tbl.label
-        local fn = tbl.fn
         if (imgui.CollapsingHeader(label .. " Settings")) then
             local settingVars = getSettingVars(label, "Property")
-            fn(settingVars, false, false, "Property")
+            tbl.fn(settingVars, false, false, "Property")
             saveSettingPropertiesButton(settingVars, label)
             cache.saveTable(label .. "PropertySettings", settingVars)
         end

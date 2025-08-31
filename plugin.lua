@@ -751,7 +751,7 @@ end
 ---@generic U
 ---@param keyArr T[]
 ---@param valArr U[]
----@return {[T]: U} tbl
+---@return { [T]: U } tbl
 function table.assign(keyArr, valArr)
     if (#valArr > #keyArr) then
         valArr = table.slice(valArr, 1, #keyArr)
@@ -814,7 +814,7 @@ function table.constructRepeating(item, num)
     return tbl
 end
 ---Returns a boolean value corresponding to whether or not an element exists within a table.
----@param tbl table The table to search in.
+---@param tbl any[] The table to search in.
 ---@param item any The item to search for.
 ---@return boolean contains Whether or not the item given is within the table.
 function table.contains(tbl, item)
@@ -894,7 +894,7 @@ function table.map(tbl, fn)
     return newTbl
 end
 ---Navigates a tree with dot notation and returns the corresponding value. For example, if you had a table { foo = { bar = 1}}, then this returns 1 if the given value is "foo.bar".
----@param tree { [string] : any}
+---@param tree { [string]: any }
 ---@param value string[]
 ---@return any
 function table.nestedValue(tree, value)
@@ -6716,7 +6716,7 @@ end
 ---Creates a big button that runs a function when clicked. If the number of notes selected is less than `minimumNotes`, returns a textual placeholder instead.
 ---@param buttonText string The text that should be rendered on the button.
 ---@param minimumNotes integer The minimum number of notes that are required to select berfore the button appears.
----@param actionfunc fun(...): any The function to run on button press.
+---@param actionfunc fun(...): nil The function to run on button press.
 ---@param menuVars? { [string]: any } Optional menu variable parameter.
 ---@param hideNoteReq? boolean Whether or not to hide the textual placeholder if the selected note requirement isn't met.
 ---@param disableKeyInput? boolean Whether or not to disallow keyboard inputs as a substitution to pressing the button.
@@ -8724,10 +8724,9 @@ function showDefaultPropertiesSettings()
     end)
     for _, tbl in pairs(standardMenuDict) do
         local label = tbl.label
-        local fn = tbl.fn
         if (imgui.CollapsingHeader(label .. " Settings")) then
             local settingVars = getSettingVars(label, "Property")
-            fn(settingVars, false, false, "Property")
+            tbl.fn(settingVars, false, false, "Property")
             saveSettingPropertiesButton(settingVars, label)
             cache.saveTable(label .. "PropertySettings", settingVars)
         end

@@ -1,7 +1,7 @@
 ---Creates a big button that runs a function when clicked. If the number of notes selected is less than `minimumNotes`, returns a textual placeholder instead.
 ---@param buttonText string The text that should be rendered on the button.
 ---@param minimumNotes integer The minimum number of notes that are required to select berfore the button appears.
----@param actionfunc fun(...): any The function to run on button press.
+---@param actionfunc fun(...): nil The function to run on button press.
 ---@param menuVars? { [string]: any } Optional menu variable parameter.
 ---@param hideNoteReq? boolean Whether or not to hide the textual placeholder if the selected note requirement isn't met.
 ---@param disableKeyInput? boolean Whether or not to disallow keyboard inputs as a substitution to pressing the button.

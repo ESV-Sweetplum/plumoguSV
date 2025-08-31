@@ -3,7 +3,7 @@
 ---@generic U
 ---@param keyArr T[]
 ---@param valArr U[]
----@return {[T]: U} tbl
+---@return { [T]: U } tbl
 function table.assign(keyArr, valArr)
     if (#valArr > #keyArr) then
         valArr = table.slice(valArr, 1, #keyArr)
