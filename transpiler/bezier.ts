@@ -44,7 +44,7 @@ location = location - vector.New(${dim[0] / 2}, ${dim[1] / 2}) * scale
         } else if (line.startsWith('C, ')) {
             const pointList = line.split('C, ')[1];
             const matches = pointList
-                .match(/[0-9]+, [0-9\.]+/g)
+                .match(/[0-9\.]+, [0-9\.]+/g)
                 .map((match) => vectorize(match));
             curveList.push([
                 currentLocation,
