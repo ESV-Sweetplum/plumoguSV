@@ -5,7 +5,7 @@ function draw()
 
     state.IsWindowHovered = imgui.IsWindowHovered()
 
-    startNextWindowNotCollapsed("plumoguSV-autoOpen")
+    startNextWindowNotCollapsed("plumoguSV-dev")
     imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
 
     if (not performanceMode) then
@@ -42,10 +42,13 @@ function draw()
         end
     end
     if (cache.windows.showTutorialWindow) then
-        renderTutorialMenu()
+        showTutorialWindow()
     end
     if (cache.windows.showSettingsWindow) then
         showPluginSettingsWindow()
+    end
+    if (cache.windows.showPatchNotesWindow) then
+        showPatchNotesWindow()
     end
 
     imgui.End()

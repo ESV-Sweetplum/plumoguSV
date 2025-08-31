@@ -1,9 +1,9 @@
-function renderTutorialMenu()
+function showTutorialWindow()
     imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
     imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
     imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
 
-    startNextWindowNotCollapsed("Tutorial")
+    startNextWindowNotCollapsed("plumoguSV Tutorial Menu")
 
     _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
     local tutorialWindowName = cache.tutorialWindowName or ""

@@ -290,16 +290,16 @@ end
 
 function displayStutterSVWindows(settingVars)
     if settingVars.linearlyChange then
-        startNextWindowNotCollapsed("svInfo2AutoOpen")
+        startNextWindowNotCollapsed("SV Info (Starting first SV)")
         makeSVInfoWindow("SV Info (Starting first SV)", settingVars.svGraphStats, nil,
             settingVars.svDistances, settingVars.svMultipliers,
             settingVars.stutterDuration, false)
-        startNextWindowNotCollapsed("svInfo3AutoOpen")
+        startNextWindowNotCollapsed("SV Info (Ending first SV)")
         makeSVInfoWindow("SV Info (Ending first SV)", settingVars.svGraph2Stats, nil,
             settingVars.svDistances2, settingVars.svMultipliers2,
             settingVars.stutterDuration, false)
     else
-        startNextWindowNotCollapsed("svInfo1AutoOpen")
+        startNextWindowNotCollapsed("SV Info")
         makeSVInfoWindow("SV Info", settingVars.svGraphStats, nil, settingVars.svDistances,
             settingVars.svMultipliers, settingVars.stutterDuration, false)
     end

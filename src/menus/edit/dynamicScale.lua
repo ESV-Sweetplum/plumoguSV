@@ -36,7 +36,7 @@ function dynamicScaleMenu()
     needSVUpdate = showSettingsMenu(currentSVType, settingVars, true, numSVPoints, "DynamicScale") or needSVUpdate
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, true) end
 
-    startNextWindowNotCollapsed("svInfoAutoOpen")
+    startNextWindowNotCollapsed("SV Info")
     makeSVInfoWindow("SV Info", menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
         menuVars.svMultipliers, nil, true)
 

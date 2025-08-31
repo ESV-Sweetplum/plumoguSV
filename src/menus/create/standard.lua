@@ -32,7 +32,7 @@ function placeStandardSVMenu()
     needSVUpdate = chooseInterlace(menuVars) or needSVUpdate
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, false) end
 
-    startNextWindowNotCollapsed("svInfoAutoOpen")
+    startNextWindowNotCollapsed("SV Info")
     makeSVInfoWindow("SV Info", menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
         menuVars.svMultipliers, nil, false)
 

@@ -1,0 +1,3 @@
+function showPatchNotesWindow()
+
+end

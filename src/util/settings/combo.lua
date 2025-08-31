@@ -1,6 +1,6 @@
 function comboSettingsMenu(settingVars)
     local settingsChanged = false
-    startNextWindowNotCollapsed("svType1AutoOpen")
+    startNextWindowNotCollapsed("SV Type 1 Settings")
     imgui.Begin("SV Type 1 Settings", imgui_window_flags.AlwaysAutoResize)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     local svType1 = STANDARD_SVS[settingVars.svType1Index]
@@ -10,7 +10,7 @@ function comboSettingsMenu(settingVars)
     cache.saveTable(labelText1 .. "Settings", settingVars1)
     imgui.End()
 
-    startNextWindowNotCollapsed("svType2AutoOpen")
+    startNextWindowNotCollapsed("SV Type 2 Settings")
     imgui.Begin("SV Type 2 Settings", imgui_window_flags.AlwaysAutoResize)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     local svType2 = STANDARD_SVS[settingVars.svType2Index]

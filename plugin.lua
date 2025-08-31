@@ -7259,7 +7259,7 @@ function placeStandardSVMenu()
     AddSeparator()
     needSVUpdate = chooseInterlace(menuVars) or needSVUpdate
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, false) end
-    startNextWindowNotCollapsed("svInfoAutoOpen")
+    startNextWindowNotCollapsed("SV Info")
     makeSVInfoWindow("SV Info", menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
         menuVars.svMultipliers, nil, false)
     menuVars.settingVars = settingVars
@@ -7294,7 +7294,7 @@ function placeStillSVMenu()
     AddSeparator()
     needSVUpdate = chooseInterlace(menuVars) or needSVUpdate
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, false) end
-    startNextWindowNotCollapsed("svInfoAutoOpen")
+    startNextWindowNotCollapsed("SV Info")
     makeSVInfoWindow("SV Info", menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
         menuVars.svMultipliers, nil, false)
     AddSeparator()
@@ -7882,7 +7882,7 @@ function dynamicScaleMenu()
     local settingVars = getSettingVars(currentSVType, "DynamicScale")
     needSVUpdate = showSettingsMenu(currentSVType, settingVars, true, numSVPoints, "DynamicScale") or needSVUpdate
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, true) end
-    startNextWindowNotCollapsed("svInfoAutoOpen")
+    startNextWindowNotCollapsed("SV Info")
     makeSVInfoWindow("SV Info", menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
         menuVars.svMultipliers, nil, true)
     local labelText = currentSVType .. "DynamicScale"
@@ -8128,6 +8128,8 @@ function infoTab()
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos("plumoguSV Tutorial Menu", coordinatesToCenter)
     end
+end
+function showPatchNotesWindow()
 end
 function selectAlternatingMenu()
     local menuVars = getMenuVars("selectAlternating")
@@ -8897,7 +8899,7 @@ function showPluginSettingsWindow()
         imgui.PushStyleColor(imgui_col.TitleBgActive, bgColor)
         imgui.PushStyleColor(imgui_col.Border, vctr4(1))
     end
-    startNextWindowNotCollapsed("Settings")
+    startNextWindowNotCollapsed("plumoguSV Settings")
     _, settingsOpened = imgui.Begin("plumoguSV Settings", true, 42)
     imgui.SetWindowSize("plumoguSV Settings", vector.New(433, 400))
     local typeIndex = state.GetValue("settings_typeIndex", 1)
@@ -9344,11 +9346,11 @@ function showWhatIsMsxTutorial()
     imgui.TextWrapped(
     "Hopefully the nomenclature for msx makes sense; it is quite literally ms * x. If you know a little bit of dimensional analysis, you can use this fact to easily compute average SVs and displacements.")
 end
-function renderTutorialMenu()
+function showTutorialWindow()
     imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
     imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
     imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
-    startNextWindowNotCollapsed("Tutorial")
+    startNextWindowNotCollapsed("plumoguSV Tutorial Menu")
     _, opened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
     local tutorialWindowName = state.GetValue("tutorialWindowName") or ""
     if (not opened) then
@@ -11044,16 +11046,16 @@ function startNextWindowNotCollapsed(windowName)
 end
 function displayStutterSVWindows(settingVars)
     if settingVars.linearlyChange then
-        startNextWindowNotCollapsed("svInfo2AutoOpen")
+        startNextWindowNotCollapsed("SV Info (Starting first SV)")
         makeSVInfoWindow("SV Info (Starting first SV)", settingVars.svGraphStats, nil,
             settingVars.svDistances, settingVars.svMultipliers,
             settingVars.stutterDuration, false)
-        startNextWindowNotCollapsed("svInfo3AutoOpen")
+        startNextWindowNotCollapsed("SV Info (Ending first SV)")
         makeSVInfoWindow("SV Info (Ending first SV)", settingVars.svGraph2Stats, nil,
             settingVars.svDistances2, settingVars.svMultipliers2,
             settingVars.stutterDuration, false)
     else
-        startNextWindowNotCollapsed("svInfo1AutoOpen")
+        startNextWindowNotCollapsed("SV Info")
         makeSVInfoWindow("SV Info", settingVars.svGraphStats, nil, settingVars.svDistances,
             settingVars.svMultipliers, settingVars.stutterDuration, false)
     end
@@ -11103,7 +11105,7 @@ function codeSettingsMenu(settingVars, skipFinalSV, svPointsForce)
 end
 function comboSettingsMenu(settingVars)
     local settingsChanged = false
-    startNextWindowNotCollapsed("svType1AutoOpen")
+    startNextWindowNotCollapsed("SV Type 1 Settings")
     imgui.Begin("SV Type 1 Settings", imgui_window_flags.AlwaysAutoResize)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     local svType1 = STANDARD_SVS[settingVars.svType1Index]
@@ -11112,7 +11114,7 @@ function comboSettingsMenu(settingVars)
     local labelText1 = svType1 .. "Combo1"
     cache.saveTable(labelText1 .. "Settings", settingVars1)
     imgui.End()
-    startNextWindowNotCollapsed("svType2AutoOpen")
+    startNextWindowNotCollapsed("SV Type 2 Settings")
     imgui.Begin("SV Type 2 Settings", imgui_window_flags.AlwaysAutoResize)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     local svType2 = STANDARD_SVS[settingVars.svType2Index]
@@ -11299,7 +11301,7 @@ function draw()
     local performanceMode = globalVars.performanceMode
     tempClockCount = 0
     state.IsWindowHovered = imgui.IsWindowHovered()
-    startNextWindowNotCollapsed("plumoguSV-autoOpen")
+    startNextWindowNotCollapsed("plumoguSV-dev")
     imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
     if (not performanceMode) then
         renderBackground()
@@ -11332,10 +11334,13 @@ function draw()
         end
     end
     if (state.GetValue("windows.showTutorialWindow")) then
-        renderTutorialMenu()
+        showTutorialWindow()
     end
     if (state.GetValue("windows.showSettingsWindow")) then
         showPluginSettingsWindow()
+    end
+    if (state.GetValue("windows.showPatchNotesWindow")) then
+        showPatchNotesWindow()
     end
     imgui.End()
     logoThread()
