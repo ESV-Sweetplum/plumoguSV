@@ -6,7 +6,6 @@ EDIT_SV_TOOLS = { -- tools for editing SVs
     "Direct SV",
     "Displace Note",
     "Displace View",
-    "Duplicate Holistic",
     "Dynamic Scale",
     "Flicker",
     "Layer Snaps",
@@ -31,7 +30,6 @@ function editSVTab()
     if toolName == "Direct SV" then directSVMenu() end
     if toolName == "Displace Note" then displaceNoteMenu() end
     if toolName == "Displace View" then displaceViewMenu() end
-    if toolName == "Duplicate Holistic" then duplicateHolisticMenu() end
     if toolName == "Dynamic Scale" then dynamicScaleMenu() end
     if toolName == "Flicker" then flickerMenu() end
     if toolName == "Layer Snaps" then layerSnapMenu() end
@@ -53,7 +51,6 @@ function chooseEditTool()
         "Directly update SVs within your selection.",
         "Move where notes are hit on the screen.",
         "Temporarily displace the playfield view.",
-        "Copy everything in a section and paste it somewhere else.",
         "Dynamically scale SVs across notes.",
         "Flash notes on and off the screen.",
         "Transfer snap colors into layers, to be loaded later.",

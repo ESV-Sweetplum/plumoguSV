@@ -74,15 +74,6 @@ DEFAULT_STARTING_MENU_VARS = {
     displaceView = {
         distance = 200
     },
-    duplicateHolistic = {
-        instanceStartTime = 0,
-        HOs = {},
-        TLs = {},
-        SVs = {},
-        SSFs = {},
-        BMs = {},
-        instanceTGIds = {}
-    },
     dynamicScale = {
         noteTimes = {},
         svTypeIndex = 1,

@@ -1677,15 +1677,6 @@ DEFAULT_STARTING_MENU_VARS = {
     displaceView = {
         distance = 200
     },
-    duplicateHolistic = {
-        instanceStartTime = 0,
-        HOs = {},
-        TLs = {},
-        SVs = {},
-        SSFs = {},
-        BMs = {},
-        instanceTGIds = {}
-    },
     dynamicScale = {
         noteTimes = {},
         svTypeIndex = 1,
@@ -3079,86 +3070,6 @@ function displaceViewSVs(menuVars)
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
-function instanceItems(menuVars)
-    clearInstance(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
-    local startOffset = offsets[1]
-    local endOffset = offsets[#offsets]
-    menuVars.HOs = game.getNotesBetweenOffsets(startOffset, endOffset)
-    menuVars.TLs = game.getLinesBetweenOffsets(startOffset, endOffset)
-    menuVars.BMs = game.getBookmarksBetweenOffsets(startOffset, endOffset)
-    local ogTgId = state.SelectedScrollGroupId
-    for tgId, _ in pairs(map.TimingGroups) do
-        state.SelectedScrollGroupId = tgId
-        menuVars.SVs[tgId] = {}
-        menuVars.SSFs[tgId] = {}
-        menuVars.SVs[tgId] = table.combine(menuVars.SVs[tgId], game.getSVsBetweenOffsets(startOffset, endOffset))
-        menuVars.SSFs[tgId] = table.combine(menuVars.SSFs[tgId], game.getSSFsBetweenOffsets(startOffset, endOffset))
-        table.insert(menuVars.instanceTGIds, tgId)
-    end
-    state.SelectedScrollGroupId = ogTgId
-    menuVars.instanceStartTime = startOffset
-end
-function clearInstance(menuVars)
-    menuVars.HOs = {}
-    menuVars.TLs = {}
-    menuVars.SVs = {}
-    menuVars.SSFs = {}
-    menuVars.BMs = {}
-    menuVars.instanceTGIds = {}
-    menuVars.instanceStartTime = 0
-end
-function pasteInstance(menuVars)
-    local offset = state.SongTime - menuVars.instanceStartTime
-    local hos = {}
-    local tls = {}
-    local bms = {}
-    local ogTgId = state.SelectedScrollGroupId
-    for _, ho in ipairs(menuVars.HOs) do
-        table.insert(hos, utils.CreateHitObject(offset + ho.StartTime, ho.Lane, ho.EndTime, ho.HitSound, ho.EditorLayer))
-    end
-    for _, tl in ipairs(menuVars.TLs) do
-        table.insert(tls, utils.CreateTimingPoint(offset + tl.StartTime, tl.Bpm, tl.Signature, tl.Hidden))
-    end
-    for _, bm in ipairs(menuVars.BMs) do
-        table.insert(bms, utils.CreateBookmark(offset + bm.StartTime, bm.Note))
-    end
-    actions.PerformBatch({
-        createEA(action_type.PlaceHitObjectBatch, hos),
-        createEA(action_type.AddTimingPointBatch, tls),
-        createEA(action_type.AddBookmarkBatch, bms)
-    })
-    local actionList = {}
-    for tgId, tgSVs in pairs(menuVars.SVs) do
-        state.SelectedScrollGroupId = tgId
-        local svs = {}
-        for k24 = 1, #tgSVs do
-            local sv = tgSVs[k24]
-            table.insert(svs, createSV(offset + sv.StartTime, sv.Multiplier))
-        end
-        actionList[tgId] = {}
-        table.insert(actionList[tgId], createEA(action_type.AddScrollVelocityBatch, svs))
-    end
-    for tgId, tgSSFs in pairs(menuVars.SSFs) do
-        state.SelectedScrollGroupId = tgId
-        local ssfs = {}
-        for k25 = 1, #tgSSFs do
-            local ssf = tgSSFs[k25]
-            table.insert(ssfs, createSSF(offset + ssf.StartTime, ssf.Multiplier))
-        end
-        if (not truthy(actionList[tgId])) then actionList[tgId] = {} end
-        table.insert(actionList[tgId], createEA(action_type.AddScrollSpeedFactorBatch, ssfs))
-    end
-    local svSSFActionCount = 0
-    for tgId, subActionList in pairs(actionList) do
-        state.SelectedScrollGroupId = tgId
-        actions.PerformBatch(subActionList)
-        svSSFActionCount = svSSFActionCount + 1
-    end
-    state.SelectedScrollGroupId = ogTgId
-    local actionCount = svSSFActionCount + 1
-    print("w!", table.concat({"Pasted. This action requires ", actionCount, pluralize(" undo.", actionCount, -2)}))
-end
 function dynamicScaleSVs(menuVars)
     local offsets = menuVars.noteTimes
     local targetAvgSVs = menuVars.svMultipliers
@@ -3174,8 +3085,8 @@ function dynamicScaleSVs(menuVars)
             endOffset)
         local targetDistance = targetAvgSV * (endOffset - startOffset)
         local scalingFactor = targetDistance / currentDistance
-        for k26 = 1, #svsBetweenOffsets do
-            local sv = svsBetweenOffsets[k26]
+        for k24 = 1, #svsBetweenOffsets do
+            local sv = svsBetweenOffsets[k24]
             local newSVMultiplier = scalingFactor * sv.Multiplier
             addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
         end
@@ -3255,8 +3166,8 @@ function layerSnaps()
     local originalLayerNames = table.property(map.EditorLayers, "Name")
     local layerNames = table.duplicate(originalLayerNames)
     local notes = game.uniqueNotesBetweenSelected()
-    for k27 = 1, #notes do
-        local ho = notes[k27]
+    for k25 = 1, #notes do
+        local ho = notes[k25]
         local color = COLOR_MAP[game.getSnapAt(ho.StartTime)]
         if (ho.EditorLayer == 0) then
             layer = { Name = "Default", ColorRgb = "255,255,255", Hidden = false }
@@ -3380,8 +3291,8 @@ function alignTimingLines()
             times[#times + 1] = originalTime
         end
     end
-    for k28 = 1, #times do
-        local time = times[k28]
+    for k26 = 1, #times do
+        local time = times[k26]
         if (game.getTimingPointAt(time).StartTime == time) then
             tpsToRemove[#tpsToRemove + 1] = game.getTimingPointAt(time)
         end
@@ -3548,14 +3459,14 @@ function reverseScrollSVs(menuVars)
         prepareDisplacingSVs(noteOffset, almostSVsToAdd, svTimeIsAdded, beforeDisplacement,
             atDisplacement, afterDisplacement)
     end
-    for k29 = 1, #svsBetweenOffsets do
-        local sv = svsBetweenOffsets[k29]
+    for k27 = 1, #svsBetweenOffsets do
+        local sv = svsBetweenOffsets[k27]
         if (not svTimeIsAdded[sv.StartTime]) then
             almostSVsToAdd[#almostSVsToAdd + 1] = sv
         end
     end
-    for k30 = 1, #almostSVsToAdd do
-        local sv = almostSVsToAdd[k30]
+    for k28 = 1, #almostSVsToAdd do
+        local sv = almostSVsToAdd[k28]
         local newSVMultiplier = -sv.Multiplier
         if sv.StartTime > endOffset then newSVMultiplier = sv.Multiplier end
         addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
@@ -3624,8 +3535,8 @@ function scaleMultiplySVs(menuVars)
         elseif scaleType == "Absolute Distance" then
             scalingFactor = menuVars.distance / currentDistance
         end
-        for k31 = 1, #svsBetweenOffsets do
-            local sv = svsBetweenOffsets[k31]
+        for k29 = 1, #svsBetweenOffsets do
+            local sv = svsBetweenOffsets[k29]
             local newSVMultiplier = scalingFactor * sv.Multiplier
             addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
         end
@@ -3666,8 +3577,8 @@ function verticalShiftSVs(menuVars)
     local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
     local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
-    for k32 = 1, #svsBetweenOffsets do
-        local sv = svsBetweenOffsets[k32]
+    for k30 = 1, #svsBetweenOffsets do
+        local sv = svsBetweenOffsets[k30]
         local newSVMultiplier = sv.Multiplier + menuVars.verticalShift
         addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
     end
@@ -3733,8 +3644,8 @@ function getMapStats()
     local tgList = map.GetTimingGroupIds()
     local svSum = 0
     local ssfSum = 0
-    for k33 = 1, #tgList do
-        local tg = tgList[k33]
+    for k31 = 1, #tgList do
+        local tg = tgList[k31]
         state.SelectedScrollGroupId = tg
         svSum = svSum + #map.ScrollVelocities
         ssfSum = ssfSum + #map.ScrollSpeedFactors
@@ -3759,8 +3670,8 @@ function selectAlternating(menuVars)
     local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     local times = {}
-    for k34 = 1, #notes do
-        local ho = notes[k34]
+    for k32 = 1, #notes do
+        local ho = notes[k32]
         times[#times + 1] = ho.StartTime
     end
     times = table.dedupe(times)
@@ -3773,8 +3684,8 @@ function selectAlternating(menuVars)
     local notesToSelect = {}
     local currentTime = allowedTimes[1]
     local index = 2
-    for k35 = 1, #notes do
-        local note = notes[k35]
+    for k33 = 1, #notes do
+        local note = notes[k33]
         if (note.StartTime > currentTime and index <= #allowedTimes) then
             currentTime = allowedTimes[index]
             index = index + 1
@@ -3795,8 +3706,8 @@ function selectByChordSizes(menuVars)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     notes = sort(notes, sortAscendingNoteLaneTime)
     local noteTimeTable = {}
-    for k36 = 1, #notes do
-        local note = notes[k36]
+    for k34 = 1, #notes do
+        local note = notes[k34]
         noteTimeTable[#noteTimeTable + 1] = note.StartTime
     end
     noteTimeTable = table.dedupe(noteTimeTable)
@@ -3804,13 +3715,13 @@ function selectByChordSizes(menuVars)
     for idx = 1, game.keyCount do
         sizeDict[#sizeDict + 1] = {}
     end
-    for k37 = 1, #noteTimeTable do
-        local time = noteTimeTable[k37]
+    for k35 = 1, #noteTimeTable do
+        local time = noteTimeTable[k35]
         local size = 0
         local curLane = 0
         local totalNotes = {}
-        for k38 = 1, #notes do
-            local note = notes[k38]
+        for k36 = 1, #notes do
+            local note = notes[k36]
             if (math.abs(note.StartTime - time) < 3) then
                 size = size + 1
                 curLane = curLane + 1
@@ -3836,8 +3747,8 @@ function selectByNoteType(menuVars)
     local totalNotes = game.getNotesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then totalNotes = state.SelectedHitObjects end
     local notesToSelect = {}
-    for k39 = 1, #totalNotes do
-        local note = totalNotes[k39]
+    for k37 = 1, #totalNotes do
+        local note = totalNotes[k37]
         if (note.EndTime == 0 and menuVars.rice) then notesToSelect[#notesToSelect + 1] = note end
         if (note.EndTime ~= 0 and menuVars.ln) then notesToSelect[#notesToSelect + 1] = note end
     end
@@ -3861,8 +3772,8 @@ function selectBySnap(menuVars)
     for i = 2, (menuVars.snap - 1) do
         if (menuVars.snap % i == 0) then factors[#factors + 1] = i end
     end
-    for k40 = 1, #factors do
-        local factor = factors[k40]
+    for k38 = 1, #factors do
+        local factor = factors[k38]
         while (pointer <= endOffset + 10) do
             if ((counter ~= 0 or factor == 1) and pointer >= startOffset) then disallowedTimes[#disallowedTimes + 1] = pointer end
             counter = (counter + 1) % factor
@@ -3876,8 +3787,8 @@ function selectBySnap(menuVars)
         counter = (counter + 1) % menuVars.snap
         pointer = pointer + (60000 / bpm) / (menuVars.snap)
     end
-    for k41 = 1, #disallowedTimes do
-        local bannedTime = disallowedTimes[k41]
+    for k39 = 1, #disallowedTimes do
+        local bannedTime = disallowedTimes[k39]
         for idx, time in pairs(times) do
             if (math.abs(time - bannedTime) < 10) then table.remove(times, idx) end
         end
@@ -3885,8 +3796,8 @@ function selectBySnap(menuVars)
     local notesToSelect = {}
     local currentTime = times[1]
     local index = 2
-    for k42 = 1, #notes do
-        local note = notes[k42]
+    for k40 = 1, #notes do
+        local note = notes[k40]
         if (note.StartTime > currentTime + 10 and index <= #times) then
             currentTime = times[index]
             index = index + 1
@@ -7832,22 +7743,6 @@ function displaceViewMenu()
     AddSeparator()
     simpleActionMenu("Displace view between selected notes", 2, displaceViewSVs, menuVars)
 end
-function duplicateHolisticMenu()
-    local menuVars = getMenuVars("duplicateHolistic")
-    local copiedItemCount = #menuVars.HOs + #menuVars.TLs + #menuVars.BMs + #menuVars.SVs + #menuVars.SSFs
-    if (copiedItemCount == 0) then
-        simpleActionMenu("Copy items between selected notes", 2, instanceItems, menuVars)
-    else
-        FunctionButton("Clear copied items", ACTION_BUTTON_SIZE, clearInstance, menuVars)
-    end
-    if copiedItemCount == 0 then
-        cache.saveTable("duplicateHolisticMenu", menuVars)
-        return
-    end
-    cache.saveTable("duplicateHolisticMenu", menuVars)
-    AddSeparator()
-    simpleActionMenu("Paste items at current time", 0, pasteInstance, menuVars)
-end
 function dynamicScaleMenu()
     local menuVars = getMenuVars("dynamicScale")
     local numNoteTimes = #menuVars.noteTimes
@@ -7937,7 +7832,6 @@ EDIT_SV_TOOLS = {
     "Direct SV",
     "Displace Note",
     "Displace View",
-    "Duplicate Holistic",
     "Dynamic Scale",
     "Flicker",
     "Layer Snaps",
@@ -7961,7 +7855,6 @@ function editSVTab()
     if toolName == "Direct SV" then directSVMenu() end
     if toolName == "Displace Note" then displaceNoteMenu() end
     if toolName == "Displace View" then displaceViewMenu() end
-    if toolName == "Duplicate Holistic" then duplicateHolisticMenu() end
     if toolName == "Dynamic Scale" then dynamicScaleMenu() end
     if toolName == "Flicker" then flickerMenu() end
     if toolName == "Layer Snaps" then layerSnapMenu() end
@@ -7982,7 +7875,6 @@ function chooseEditTool()
         "Directly update SVs within your selection.",
         "Move where notes are hit on the screen.",
         "Temporarily displace the playfield view.",
-        "Copy everything in a section and paste it somewhere else.",
         "Dynamically scale SVs across notes.",
         "Flash notes on and off the screen.",
         "Transfer snap colors into layers, to be loaded later.",
@@ -8143,7 +8035,72 @@ function showPatchNotesWindow()
     ctx.AddRect(topLeft + vector.New(243 + 144 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
     imgui.EndChild()
     imgui.SeparatorText("Bug Fixes")
+    imgui.BulletText("Fixed not being able to properly store some cursor trail parameters.")
+    imgui.BulletText("Fixed start/end expo using incorrect algorithm.")
+    imgui.BulletText("Fixed all bugs relating to automate.")
+    imgui.BulletText("Removed v1.1.2 temporary bug fix.")
+    imgui.BulletText("Fix direct SV pagination not working correctly.")
+    imgui.BulletText("Fixed flicker percentage not accurately converting to map.")
+    imgui.BulletText("Fixed align timing lines not being deterministic.")
+    imgui.BulletText("Fixed suffix of computableinputfloat.")
+    imgui.BulletText("Fixed inconsistency of negative/positive SV generation.")
+    imgui.BulletText("Fixed getRemovableSVs to use tolerance.")
+    imgui.BulletText("Fixed the builder not properly nesting files.")
+    imgui.BulletText("Fixed stills placing duplicate SVs.")
+    imgui.BulletText("Fixed internal documentation being incorrect and generally poor.")
+    imgui.BulletText("Fixed several overlapping SV issues.")
+    imgui.BulletText("Fixed hypothetical SVs using some weird BS.")
+    imgui.BulletText("Removed splitscroll in favor of using TGs.")
+    imgui.BulletText("Fixed TG selector being unable to properly select some TGs.")
+    imgui.BulletText("Fixed TG selector not always being fully in-sync with the game.")
+    imgui.BulletText("Fixed automate altering SV post-effect.")
+    imgui.BulletText("Fixed 2-side vibrato inaccuracy.")
+    imgui.BulletText("Fixed build script to use correct regex.")
+    imgui.BulletText("Fixed cursor trail being broken.")
+    imgui.BulletText("Fixed hotkey settings window having overlapping text.")
+    imgui.BulletText("Fixed global vars being unable to default to true.")
+    imgui.BulletText("Moved workspace settings to .luarc file.")
+    imgui.BulletText("Cached variables are properly reloaded during hot-reload.")
+    imgui.BulletText("Fixed bug where hot-reloading would crash the game.")
+    imgui.BulletText("Fixed starting fresh plugin with no config.yaml breaking style.")
+    imgui.BulletText("Fixed bug where string ending of pluralized content\ncarried over between function calls.")
+    imgui.BulletText("Fixed vibrato placing duplicate SVs.")
+    imgui.BulletText("Fixed still per note group finally.")
+    imgui.BulletText("Now properly instantiates pulse color.")
+    imgui.BulletText("Fixed relative ratio not saving.")
+    imgui.BulletText("Fixed Select Bookmark crashing the game.")
+    imgui.BulletText("Fixed Select Bookmark text going off the screen.")
+    imgui.BulletText("Fixed measure msx widget not rendering in real time.")
+    imgui.BulletText("Fixed bug where saving a false setting wouldn't save it at all.")
     imgui.SeparatorText("New Features")
+    imgui.BulletText("Added tooltips to various functions to explain their functionality.")
+    imgui.BulletText("New border pulse feature that pulses along with the beat.")
+    imgui.BulletText("Easily switch between TGs with new keybind.")
+    imgui.BulletText("Select TG of note quickly with note keybind.")
+    imgui.BulletText("New menu: Edit > Convert SV <-> SSF; Self-explanatory.")
+    imgui.BulletText(
+        "Added vibrato to plumoguSV, with less error than AFFINE. Includes linear,\npolynomial, exponential, sinusoidal, and sigmoidal shapes. Includes presets for FPS.")
+    imgui.BulletText("Include code-based SV/SSF fast place.")
+    imgui.BulletText("New settings menu with many more customizable features.")
+    imgui.BulletText("Allow defaults to be edited.")
+    imgui.BulletText("Include some new automate parameters for further customization.")
+    imgui.BulletText("Edit > Layer Snaps feature: Save your snap colors before using AFFINE to\nbring them back easily.")
+    imgui.BulletText("Added linear equalizer to allow you to create 0x SV on linear much easier.")
+    imgui.BulletText("Added custom theme input, along with exporting/importing.")
+    imgui.BulletText("Added 3 custom reactive backgrounds. More will be added\nwhen the kofi products are paid for.")
+    imgui.BulletText("Added copy paste slots; now you can copy paste more than one thing at once.")
+    imgui.BulletText("Allow border pulse to be custom.")
+    imgui.BulletText(
+        "Note lock feature: you don't need to worry about accidentally placing,\nmoving, or deleting notes during SV generation.")
+    imgui.BulletText("Now allows certain inputs to be computed automatically on the backend.")
+    imgui.BulletText("A new performance mode to speed up the FPS by 2-3x.")
+    imgui.BulletText("You can now merge SSFs to eliminate duped ones.")
+    imgui.BulletText("Added new option to allow combo-select.")
+    imgui.BulletText("New toggleable SV Info visualizer for the more inexperienced mappers.")
+    imgui.BulletText("Reworked bezier menu to be much more intuitive.")
+    imgui.BulletText("Added loadup animation because why not.")
+    imgui.BulletText("Added patch notes page.")
+    imgui.BulletText("Added map stats button to quickly grab SV and SSF count.")
     AddPadding()
     imgui.BeginChild("v1.1.2Bezier", vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
@@ -9941,8 +9898,8 @@ end
 function stringifyCustomStyle(customStyle)
     local keys = table.keys(customStyle)
     local resultStr = "v2 "
-    for k43 = 1, #keys do
-        local key = keys[k43]
+    for k41 = 1, #keys do
+        local key = keys[k41]
         local value = customStyle[key]
         keyId = convertStrToShort(key)
         local r = math.floor(value.x * 255)
@@ -12248,8 +12205,8 @@ end
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for k44 = 1, #svs do
-        local sv = svs[k44]
+    for k42 = 1, #svs do
+        local sv = svs[k42]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
         if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
     end
