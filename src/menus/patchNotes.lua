@@ -80,6 +80,7 @@ function showPatchNotesWindow()
     imgui.BulletText("Added loadup animation because why not.")
     imgui.BulletText("Added patch notes page.")
     imgui.BulletText("Added map stats button to quickly grab SV and SSF count.")
+    imgui.BulletText("Added pagination to bookmarks.")
 
     AddPadding()
 
