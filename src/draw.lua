@@ -6,6 +6,7 @@ function draw()
     state.IsWindowHovered = imgui.IsWindowHovered()
 
     startNextWindowNotCollapsed("plumoguSV-dev")
+    imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
     imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
 
     if (not performanceMode) then

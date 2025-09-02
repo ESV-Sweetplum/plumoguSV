@@ -8026,6 +8026,9 @@ function showPatchNotesWindow()
     _, patchNotesOpened = imgui.Begin("plumoguSV Patch Notes", true, imgui_window_flags.NoResize)
     imgui.SetWindowSize("plumoguSV Patch Notes", vector.New(500, 400))
     imgui.PushStyleColor(imgui_col.Separator, color.int.white - color.int.alphaMask * 200)
+    if (not patchNotesOpened) then
+        state.SetValue("windows.showPatchNotesWindow", false)
+    end
     imgui.BeginChild("v2.0.0Bezier", vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
@@ -9639,15 +9642,16 @@ function selectBookmarkMenu()
             bmData = {}
             imgui.Text(bm.Note:fixToSize(95))
             imgui.NextColumn()
-            if (imgui.Button("Go to #" .. idx - skippedIndices, vector.New(65, 24))) then
+            buttonText = "Go to #" .. idx - skippedIndices
+            if (imgui.Button(buttonText, vector.New(imgui.CalcTextSize(buttonText).x + 20, 24))) then
                 actions.GoToObjects(bm.StartTime)
             end
             imgui.NextColumn()
             if (idx ~= #bookmarks) then imgui.Separator() end
             ::skipBookmark::
         end
-        local maxTimeLength = math.log(math.max(table.unpack(times) or 0), 10) + 0.75
-        imgui.SetColumnWidth(0, maxTimeLength * 10.25)
+        local maxTimeLength = math.log(math.max(table.unpack(times) or 0), 10) + 0.5
+        imgui.SetColumnWidth(0, maxTimeLength * 11)
         imgui.SetColumnWidth(1, 110)
         imgui.SetColumnWidth(2, 80)
         imgui.PopItemWidth()
@@ -12754,6 +12758,7 @@ function draw()
     tempClockCount = 0
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed("plumoguSV-dev")
+    imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
     imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
     if (not performanceMode) then
         renderBackground()

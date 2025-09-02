@@ -4,6 +4,10 @@ function showPatchNotesWindow()
     imgui.SetWindowSize("plumoguSV Patch Notes", vector.New(500, 400))
     imgui.PushStyleColor(imgui_col.Separator, color.int.white - color.int.alphaMask * 200)
 
+    if (not patchNotesOpened) then
+        cache.windows.showPatchNotesWindow = false
+    end
+
     imgui.BeginChild("v2.0.0Bezier", vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()

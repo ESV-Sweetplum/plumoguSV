@@ -8,7 +8,6 @@ function selectBookmarkMenu()
         imgui.TextWrapped("There are no bookmarks! Add one to navigate.")
     else
         imgui.PushItemWidth(70)
-
         _, menuVars.searchTerm = imgui.InputText("Search", menuVars.searchTerm, 4096)
         KeepSameLine()
         _, menuVars.filterTerm = imgui.InputText("Ignore", menuVars.filterTerm, 4096)
@@ -59,7 +58,9 @@ function selectBookmarkMenu()
 
             imgui.NextColumn()
 
-            if (imgui.Button("Go to #" .. idx - skippedIndices, vector.New(65, 24))) then
+            buttonText = "Go to #" .. idx - skippedIndices
+
+            if (imgui.Button(buttonText, vector.New(imgui.CalcTextSize(buttonText).x + 20, 24))) then
                 actions.GoToObjects(bm.StartTime)
             end
             imgui.NextColumn()
@@ -68,9 +69,9 @@ function selectBookmarkMenu()
             ::skipBookmark::
         end
 
-        local maxTimeLength = math.log(math.max(table.unpack(times) or 0), 10) + 0.75
+        local maxTimeLength = math.log(math.max(table.unpack(times) or 0), 10) + 0.5
 
-        imgui.SetColumnWidth(0, maxTimeLength * 10.25)
+        imgui.SetColumnWidth(0, maxTimeLength * 11)
         imgui.SetColumnWidth(1, 110)
         imgui.SetColumnWidth(2, 80)
 
