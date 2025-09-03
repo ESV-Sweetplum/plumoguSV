@@ -4015,10 +4015,14 @@ function renderSynthesis()
         table.insert(snapTable, game.getSnapAt(mostRecentStart, true))
     end
     bgVars.lastDifference = curTime - mostRecentStart
+    local diagonalLength = vector.Distance(dim, vctr2(0))
     for idx, snap in pairs(snapTable) do
         local colTbl = RGB_SNAP_MAP[snap]
-        ctx.AddCircle(dim / 2 + topLeft, circleSize * (idx - 1) + bgVars.snapOffset,
+        local radius = circleSize * (idx - 1) + bgVars.snapOffset
+        if (radius > diagonalLength / 2) then goto continue end
+        ctx.AddCircle(dim / 2 + topLeft, radius,
             color.rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
+        ::continue::
     end
     cache.saveTable("synthesis", bgVars)
 end
