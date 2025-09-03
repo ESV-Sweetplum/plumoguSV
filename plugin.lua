@@ -3931,9 +3931,11 @@ function renderReactiveStars()
         local y = stars_yList[i]
         local sz = stars_szList[i]
         local progress = x / dimX
-        local brightness = clamp(-8 * progress * (progress - 1), 0, 1)
+        local brightness = clamp(-8 * progress * (progress - 1), -1, 1)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
+        if (brightness < 0) then goto continue end
         ctx.AddCircleFilled(pos, sz, color.alterOpacity(color.int.white, math.floor(brightness * 255) - 255))
+        ::continue::
     end
 end
 function createStar(dimX, dimY, n)
