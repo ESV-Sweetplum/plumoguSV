@@ -188,7 +188,7 @@ local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---@return SnapNumber
 function game.getSnapAt(time, dontPrintInaccuracy)
     local previousBar = math.floor(map.GetNearestSnapTimeFromTime(false, 1, time + 6) or 0)
-    local barLength = math.floor(map.GetNearestSnapTimeFromTime(true, 1, time) or 0) - previousBar
+    local barLength = 60000 / game.getTimingPointAt(state.SongTime).Bpm
     local distanceAbovePrev = time - previousBar
     if (distanceAbovePrev <= 5 or distanceAbovePrev >= barLength - 5) then return 1 end
     local snap48 = barLength / 48
