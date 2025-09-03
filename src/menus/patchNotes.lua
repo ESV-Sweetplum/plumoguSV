@@ -4,6 +4,9 @@ function showPatchNotesWindow()
     imgui.SetWindowSize("plumoguSV Patch Notes", vector.New(500, 400))
     imgui.PushStyleColor(imgui_col.Separator, color.int.white - color.int.alphaMask * 200)
 
+    local minHeight = imgui.GetWindowPos().y
+    local maxHeight = minHeight + 400
+
     if (not patchNotesOpened) then
         cache.windows.showPatchNotesWindow = false
     end
@@ -12,9 +15,12 @@ function showPatchNotesWindow()
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
+    if (topLeft.y - maxHeight > 0) then goto skip200 end
+    if (topLeft.y - minHeight < -50) then goto skip200 end
     drawV200(ctx, topLeft + vector.New(243, 17), 1, color.int.white, 1)
     ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 144 / 2 - 10, 28), color.int.white)
     ctx.AddRect(topLeft + vector.New(243 + 144 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
+    ::skip200::
     imgui.EndChild()
 
     imgui.SeparatorText("Bug Fixes")
@@ -92,9 +98,12 @@ function showPatchNotesWindow()
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
+    if (topLeft.y - maxHeight > 0) then goto skip112 end
+    if (topLeft.y - minHeight < -50) then goto skip112 end
     drawV112(ctx, topLeft + vector.New(243, 17), 1, color.int.white, 1)
     ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 127 / 2 - 10, 28), color.int.white)
     ctx.AddRect(topLeft + vector.New(243 + 127 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
+    ::skip112::
     imgui.EndChild()
 
     imgui.SeparatorText("Bug Fixes")
@@ -117,8 +126,11 @@ function showPatchNotesWindow()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
     drawV111(ctx, topLeft + vector.New(238, 17), 1, color.int.white, 1)
+    if (topLeft.y - maxHeight > 0) then goto skip111 end
+    if (topLeft.y - minHeight < -50) then goto skip111 end
     ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 111 / 2 - 15, 28), color.int.white)
     ctx.AddRect(topLeft + vector.New(243 + 111 / 2 + 15, 25), topLeft + vector.New(486, 28), color.int.white)
+    ::skip111::
     imgui.EndChild()
 
     imgui.SeparatorText("Bug Fixes")
@@ -133,9 +145,12 @@ function showPatchNotesWindow()
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
+    if (topLeft.y - maxHeight > 0) then goto skip110 end
+    if (topLeft.y - minHeight < -50) then goto skip110 end
     drawV110(ctx, topLeft + vector.New(243, 17), 1, color.int.white, 1)
     ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 129 / 2 - 10, 28), color.int.white)
     ctx.AddRect(topLeft + vector.New(243 + 129 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
+    ::skip110::
     imgui.EndChild()
 
     imgui.SeparatorText("Bug Fixes")
@@ -158,9 +173,12 @@ function showPatchNotesWindow()
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
+    if (topLeft.y - maxHeight > 0) then goto skip101 end
+    if (topLeft.y - minHeight < -50) then goto skip101 end
     drawV101(ctx, topLeft + vector.New(243, 17), 1, color.int.white, 1)
     ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 125 / 2 - 10, 28), color.int.white)
     ctx.AddRect(topLeft + vector.New(243 + 125 / 2 + 12.5, 25), topLeft + vector.New(486, 28), color.int.white)
+    ::skip101::
     imgui.EndChild()
 
     imgui.SeparatorText("Bug Fixes")
@@ -178,9 +196,12 @@ function showPatchNotesWindow()
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
+    if (topLeft.y - maxHeight > 0) then goto skip100 end
+    if (topLeft.y - minHeight < -50) then goto skip100 end
     drawV100(ctx, topLeft + vector.New(243, 17), 1, color.int.white, 1)
     ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 137 / 2 - 10, 28), color.int.white)
     ctx.AddRect(topLeft + vector.New(243 + 137 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
+    ::skip100::
     imgui.EndChild()
 
     imgui.SeparatorText("Bug Fixes")
