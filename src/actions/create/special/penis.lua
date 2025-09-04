@@ -1,5 +1,5 @@
 function placePenisSV(settingVars)
-    local startTime = game.uniqueNoteOffsetsBetweenSelected()[1]
+    local startTime = state.SelectedHitObjects[1].StartTime
 
     local svs = {}
 

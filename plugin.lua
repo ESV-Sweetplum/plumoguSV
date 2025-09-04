@@ -2186,7 +2186,7 @@ function automateSVs(settingVars)
     toggleablePrint("w!", "Automated.")
 end
 function placePenisSV(settingVars)
-    local startTime = game.uniqueNoteOffsetsBetweenSelected()[1]
+    local startTime = state.SelectedHitObjects[1].StartTime
     local svs = {}
     for j = 0, 1 do
         for i = 0, 100 do
@@ -3432,7 +3432,7 @@ function measureSVs(menuVars)
     menuVars.avgSVDisplaceless = tostring(trueAvgSV)
 end
 function reverseScrollSVs(menuVars)
-    local offsets = game.uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {}
