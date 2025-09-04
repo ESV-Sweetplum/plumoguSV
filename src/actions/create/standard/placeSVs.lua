@@ -45,7 +45,6 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance)
     end
     local tbl = getStillSVs(menuVars, firstOffset, lastOffset,
         sort(svsToAdd, sortAscendingStartTime), svsToAdd)
-    svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
     svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
     return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
 end

@@ -387,6 +387,9 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
             end
             ::skip::
         end
+        if ho.EndTime >= startOffset and ho.EndTime <= endOffset and includeLN then
+            noteOffsetsBetween[#noteOffsetsBetween + 1] = ho.EndTime
+        end
     end
     noteOffsetsBetween = table.dedupe(noteOffsetsBetween)
     noteOffsetsBetween = sort(noteOffsetsBetween, sortAscending)
@@ -2450,7 +2453,6 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance)
     end
     local tbl = getStillSVs(menuVars, firstOffset, lastOffset,
         sort(svsToAdd, sortAscendingStartTime), svsToAdd)
-    svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
     svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
     return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
 end
@@ -2564,7 +2566,7 @@ end
 ---@param menuVars any
 ---@param heightFn fun(t: number, idx?: integer): number
 function svVibrato(menuVars, heightFn)
-    local offsets = game.uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {} ---@type ScrollVelocity[]

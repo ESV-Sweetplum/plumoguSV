@@ -2,7 +2,7 @@
 ---@param menuVars any
 ---@param heightFn fun(t: number, idx?: integer): number
 function svVibrato(menuVars, heightFn)
-    local offsets = game.uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {} ---@type ScrollVelocity[]

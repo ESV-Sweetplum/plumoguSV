@@ -21,6 +21,9 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
             end
             ::skip::
         end
+        if ho.EndTime >= startOffset and ho.EndTime <= endOffset and includeLN then
+            table.insert(noteOffsetsBetween, ho.EndTime)
+        end
     end
     noteOffsetsBetween = table.dedupe(noteOffsetsBetween)
     noteOffsetsBetween = sort(noteOffsetsBetween, sortAscending)
