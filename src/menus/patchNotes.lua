@@ -61,6 +61,8 @@ function showPatchNotesWindow()
     imgui.BulletText("Fixed Select Bookmark text going off the screen.")
     imgui.BulletText("Fixed measure msx widget not rendering in real time.")
     imgui.BulletText("Fixed bug where saving a false setting wouldn't save it at all.")
+    imgui.BulletText(
+    "Fixed bug with certain functions where LN ends would not be\nconsidered if their start wasn't within the selection.")
     imgui.SeparatorText("New Features")
     imgui.BulletText("Added tooltips to various functions to explain their functionality.")
     imgui.BulletText("New border pulse feature that pulses along with the beat.")
