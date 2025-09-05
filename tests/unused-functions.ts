@@ -1,5 +1,5 @@
 import chalk = require('chalk');
-import getFunctionList from '../transpiler/getFunctionList';
+import getFunctionList from '../transpiler/lib/getFunctionList';
 
 export default function checkUnusedFunctions(file: string[]) {
     const functions = getFunctionList(file)[0];

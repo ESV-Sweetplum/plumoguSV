@@ -1,5 +1,5 @@
 import chalk = require('chalk');
-import { getFilesRecursively } from '../transpiler/getFilesRecursively';
+import { getFilesRecursively } from '../transpiler/lib/getFilesRecursively';
 
 export default function checkDoubleNestedFiles() {
     const files = getFilesRecursively('./src');

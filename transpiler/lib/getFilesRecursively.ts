@@ -1,8 +1,8 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from 'fs';
+import * as path from 'path';
 
-export function getFilesRecursively(dir) {
-    let files = [];
+export function getFilesRecursively(dir: string) {
+    let files: string[] = [];
 
     const filesInDirectory = fs.readdirSync(dir);
     for (const file of filesInDirectory) {

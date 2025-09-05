@@ -1,6 +1,4 @@
----@meta clock-class
 require("packages.cache.initialize.priority")
-clock = {}; cache.clock = {}
 
 ---Returns true every `interval` ms.
 ---@param id string The unique identifier of the clock.

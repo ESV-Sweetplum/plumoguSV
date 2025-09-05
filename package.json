@@ -8,7 +8,7 @@
         "watch": "tsc && node dist/transpiler/watch",
         "dev": "npm run watch",
         "build": "tsc && node dist/transpiler/build",
-        "bezier": "tsc && node dist/transpiler/bezier"
+        "bezier": "tsc && node dist/transpiler/lib/bezier"
     },
     "repository": {
         "type": "git",

@@ -6,10 +6,11 @@ import {
     renameSync,
     copyFileSync,
 } from 'fs';
-import { getFilesRecursively } from './getFilesRecursively.js';
-import getFunctionList from './getFunctionList.js';
-import getUnusedFunctions from './getUnusedFunctions.js';
+import { getFilesRecursively } from './lib/getFilesRecursively.js';
+import getFunctionList from './lib/getFunctionList.js';
+import getUnusedFunctions from './lib/getUnusedFunctions.js';
 import { join } from 'path';
+import readAndLintLua from './lib/readAndLintLua.js';
 
 let counter = 0;
 
@@ -23,27 +24,34 @@ export default async function transpiler(devMode = false, lint = true) {
     let fileCount = 0;
     let output = '';
 
-    const entryPoints = ['draw.lua', 'awake.lua'];
-    const ignoredFiles = [
-        'classes.lua',
-        'intellisense.lua',
-        'init.lua',
-        join('packages', 'tests'),
-    ];
+    const entryPoints = ['_draw.lua', '_awake.lua'];
+    const ignoredFiles = ['intellisense.lua', join('packages', 'tests')];
     if (!devMode) ignoredFiles.push(join('src', 'dev'));
 
     const files = getFilesRecursively('packages').sort(
-        (a, b) => +b.includes('priority') - +a.includes('priority')
+        (a, b) => +b.includes('.priority.') - +a.includes('.priority.')
     );
+
     files.push(
-        ...getFilesRecursively('src')
-            .sort((a, b) => +b.includes('priority') - +a.includes('priority'))
-            .sort(
-                (a, b) =>
-                    +entryPoints.some((e) => a.includes(e)) -
-                    +entryPoints.some((e) => b.includes(e))
-            ) // Force entry points to be towards the bottom.
+        ...getFilesRecursively('src').sort(
+            (a, b) => +b.includes('.priority.') - +a.includes('.priority.')
+        )
     ); // Force priority functions towards the top to avoid hot-reload error.
+
+    const entryFiles: string[] = [...files].reduce((arr, cur, idx) => {
+        if (entryPoints.some((e) => cur.includes(e))) {
+            files.splice(idx);
+            arr.push(cur);
+        }
+        return arr;
+    }, []);
+
+    const entryFileData = entryFiles.reduce((obj, f) => {
+        obj[f] = readAndLintLua(f);
+        return obj;
+    }, {});
+
+    console.log(entryFileData);
 
     files.forEach((file: string) => {
         if (
@@ -51,23 +59,19 @@ export default async function transpiler(devMode = false, lint = true) {
             !file.endsWith('.lua')
         )
             return;
-        let fileData = readFileSync(file, 'utf-8')
-            .replaceAll(/( *)\<const\> */g, '$1')
-            .replaceAll(/\-\-\[\[.*?\-\-\]\][ \r\n]*/gs, '')
-            .split('\n')
-            .filter((l) => !l.includes('require('))
-            .map((l) => {
-                l = l.replace(/\s+$/, '');
-                l = l.replaceAll(
-                    /^([^\-\r\n]*)[\-]{2}([\-]{2,})?[^\-\r\n].+[ \r\n]*/g,
-                    '$1'
-                ); // Removes <const> tag, removes --[[ --]] comments, removes double dash comments (not triple dash) from lines with code
-                l = l.replaceAll(
-                    /table\.insert\(([a-zA-Z0-9\[\]_]+), ([^,\r\n]+)\)( end)?$/g,
-                    '$1[#$1 + 1] = $2$3'
-                ); // Replace table insert for performance (only on tables of 1ply)
-                return l;
-            });
+        let fileData = readAndLintLua(file).map((l) => {
+            l = l.replaceAll(
+                /^([^\-\r\n]*)[\-]{2}([\-]{2,})?[^\-\r\n].+[ \r\n]*/g,
+                '$1'
+            ); // Removes <const> tag, removes --[[ --]] comments, removes double dash comments (not triple dash) from lines with code
+            l = l.replaceAll(
+                /table\.insert\(([a-zA-Z0-9\[\]_]+), ([^,\r\n]+)\)( end)?$/g,
+                '$1[#$1 + 1] = $2$3'
+            ); // Replace table insert for performance (only on tables of 1ply)
+            return l;
+        });
+
+        if (file.includes('.draw.lua')) console.log(file);
 
         output = `${output}\n${fileData
             .map((str) => str.replace(/\s+$/, ''))

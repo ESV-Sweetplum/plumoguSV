@@ -3,6 +3,7 @@ cache = {
     windows = {},
     lists = {}
 }
+clock = {}; cache.clock = {}
 color = {
     vctr = {},
     int = {}
@@ -37,7 +38,6 @@ function cache.saveTable(listName, variables)
         state.SetValue(listName .. key, value)
     end
 end
-clock = {}; cache.clock = {}
 ---Returns true every `interval` ms.
 ---@param id string The unique identifier of the clock.
 ---@param interval integer The interval at which the clock should run.
@@ -56,6 +56,7 @@ function clock.listen(id, interval)
     end
     return false
 end
+tempClockCount = 0
 ---Alters opacity of a given color.
 ---@param col number
 ---@param additiveOpacity integer
@@ -1563,47 +1564,6 @@ globalVars = {
     disableLoadup = false
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
-function setGlobalVars(tempGlobalVars)
-    globalVars.useCustomPulseColor = truthy(tempGlobalVars.useCustomPulseColor)
-    globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
-    globalVars.pulseCoefficient = math.toNumber(tempGlobalVars.pulseCoefficient)
-    globalVars.stepSize = math.toNumber(tempGlobalVars.stepSize)
-    globalVars.dontReplaceSV = truthy(tempGlobalVars.dontReplaceSV)
-    globalVars.upscroll = truthy(tempGlobalVars.upscroll)
-    globalVars.colorThemeIndex = math.toNumber(tempGlobalVars.colorThemeIndex)
-    globalVars.styleThemeIndex = math.toNumber(tempGlobalVars.styleThemeIndex)
-    globalVars.rgbPeriod = math.toNumber(tempGlobalVars.rgbPeriod)
-    globalVars.cursorTrailIndex = math.toNumber(tempGlobalVars.cursorTrailIndex)
-    globalVars.cursorTrailShapeIndex = math.toNumber(tempGlobalVars.cursorTrailShapeIndex)
-    globalVars.effectFPS = math.toNumber(tempGlobalVars.effectFPS)
-    globalVars.cursorTrailPoints = math.clamp(math.toNumber(tempGlobalVars.cursorTrailPoints), 0, 100)
-    globalVars.cursorTrailSize = math.toNumber(tempGlobalVars.cursorTrailSize)
-    globalVars.snakeSpringConstant = math.toNumber(tempGlobalVars.snakeSpringConstant)
-    globalVars.cursorTrailGhost = truthy(tempGlobalVars.cursorTrailGhost)
-    globalVars.drawCapybara = truthy(tempGlobalVars.drawCapybara)
-    globalVars.drawCapybara2 = truthy(tempGlobalVars.drawCapybara2)
-    globalVars.drawCapybara312 = truthy(tempGlobalVars.drawCapybara312)
-    globalVars.ignoreNotes = truthy(tempGlobalVars.ignoreNotesOutsideTg)
-    globalVars.hideSVInfo = truthy(tempGlobalVars.hideSVInfo)
-    globalVars.showSVInfoVisualizer = truthy(tempGlobalVars.showSVInfoVisualizer, true)
-    globalVars.showVibratoWidget = truthy(tempGlobalVars.showVibratoWidget)
-    globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
-    globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
-    globalVars.advancedMode = truthy(tempGlobalVars.advancedMode)
-    globalVars.performanceMode = truthy(tempGlobalVars.performanceMode)
-    globalVars.hideAutomatic = truthy(tempGlobalVars.hideAutomatic)
-    globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
-    globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
-    globalVars.customStyle = tempGlobalVars.customStyle or {}
-    if (globalVars.customStyle.border) then
-        globalVars.customStyle.border = table.vectorize4(globalVars.customStyle
-            .border)
-    end
-    globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
-    globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
-    globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)
-    globalVars.dynamicBackgroundIndex = math.toNumber(tempGlobalVars.dynamicBackgroundIndex)
-end
 DEFAULT_STARTING_MENU_VARS = {
     placeStandard = {
         svTypeIndex = 1,
@@ -1773,16 +1733,6 @@ function getMenuVars(menuType, optionalLabel)
     local labelText = menuType .. optionalLabel .. "Menu"
     cache.loadTable(labelText, menuVars)
     return menuVars
-end
-function setPresets(presetList)
-    globalVars.presets = {}
-    for _, preset in pairs(presetList) do
-        local presetIsValid, presetData = checkPresetValidity(preset)
-        if (not presetIsValid) then goto continue end
-        table.insert(globalVars.presets,
-            { name = preset.name, type = preset.type, menu = preset.menu, data = presetData })
-        ::continue::
-    end
 end
 function checkPresetValidity(preset)
     if (not table.contains(CREATE_TYPES, preset.type)) then return false, nil end
@@ -3612,28 +3562,6 @@ function changeNoteLockMode()
     end
     state.SetValue("noteLockMode", mode)
 end
-function initializeNoteLockMode()
-    state.SetValue("noteLockMode", 0)
-    listen(function(action, type, fromLua)
-        if (fromLua) then return end
-        local actionIndex = tonumber(action.Type) ---@cast actionIndex EditorActionType
-        local mode = state.GetValue("noteLockMode") or 0
-        if (mode == 1) then
-            if (actionIndex > 9) then return end
-            actions.Undo()
-        end
-        if (mode == 2) then
-            local allowedIndices = { 0, 1, 3, 4, 8, 9 }
-            if (not table.contains(allowedIndices, actionIndex)) then return end
-            actions.Undo()
-        end
-        if (mode == 3) then
-            local allowedIndices = { 2, 5, 6, 7 }
-            if (not table.contains(allowedIndices, actionIndex)) then return end
-            actions.Undo()
-        end
-    end)
-end
 function jumpToTg()
     if (not truthy(state.SelectedHitObjects)) then return end
     local tgId = state.SelectedHitObjects[1].TimingGroup
@@ -3641,10 +3569,6 @@ function jumpToTg()
         if (ho.TimingGroup ~= tgId) then return end
     end
     state.SelectedScrollGroupId = tgId
-end
-function checkForGlobalHotkeys()
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[9])) then jumpToTg() end
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[10])) then changeNoteLockMode() end
 end
 function getMapStats()
     local currentTg = state.SelectedScrollGroupId
@@ -4033,11 +3957,6 @@ function renderSynthesis()
     end
     cache.saveTable("synthesis", bgVars)
 end
-function drawCapybaraParent()
-    drawCapybara()
-    drawCapybara2()
-    drawCapybara312()
-end
 function drawCapybara()
     if not globalVars.drawCapybara then return end
     local o = imgui.GetForegroundDrawList()
@@ -4284,27 +4203,6 @@ function drawHorizontalPillShape(o, point1, point2, radius, color, circleSegment
     local rectangleStartCoords = relativePoint(point1, 0, radius)
     local rectangleEndCoords = relativePoint(point2, 0, -radius)
     o.AddRectFilled(rectangleStartCoords, rectangleEndCoords, color)
-end
-function logoThread()
-    curTime = state.UnixTime or 0
-    if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 750) then
-        cache_logoStartTime = imgui.GetTime()
-        if (cache_logoStartTime < 2.5) then
-            cache_logoStartTime = cache_logoStartTime + 0.75
-        end
-    end
-    prevTime = state.UnixTime
-    local currentTime = imgui.GetTime() - cache_logoStartTime
-    local logoLength = 2
-    if ((cache_logoStartTime < 3 and not globalVars.disableLoadup) or loaded) then
-        if (currentTime >= 0 and currentTime <= logoLength) then
-            drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
-                color.int.white, 4)
-        end
-    else
-        cache_logoStartTime = imgui.GetTime() - 5
-    end
-    loaded = true
 end
 ---Draws logo, where dim = scale * (267, 48).
 ---@param currentTime number
@@ -5333,19 +5231,6 @@ function partialBezierCubic(ctx, t0, t1, p1, p2, p3, p4, col, thickness)
     local np4 = qb * u1 + qd * t1
     ctx.AddBezierCubic(np1, np2, np3, np4, col, thickness)
 end
-function drawCursorTrail()
-    local cursorTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
-    if cursorTrail == "None" then return end
-    local o = imgui.GetForegroundDrawList()
-    local m = imgui.GetMousePos()
-    local t = imgui.GetTime()
-    local sz = state.WindowSize
-    if cursorTrail ~= "Dust" then state.SetValue("boolean.dustParticlesInitialized", false) end
-    if cursorTrail ~= "Sparkle" then state.SetValue("boolean.sparkleParticlesInitialized", false) end
-    if cursorTrail == "Snake" then drawSnakeTrail(o, m, t) end
-    if cursorTrail == "Dust" then drawDustTrail(o, m, t, sz) end
-    if cursorTrail == "Sparkle" then drawSparkleTrail(o, m, t, sz) end
-end
 function drawSnakeTrail(o, m, t)
     local trailPoints = globalVars.cursorTrailPoints
     local snakeTrailPoints = {}
@@ -5575,62 +5460,6 @@ function drawGlare(o, coords, size, glareColor, auraColor)
     local circleSize2 = size / 3
     o.AddCircleFilled(coords, circleSize1, auraColor, circlePoints)
     o.AddCircleFilled(coords, circleSize2, auraColor, circlePoints)
-end
-function pulseController()
-    local pulseVars = {
-        previousBar = 0,
-        pulseStatus = 0,
-        pulsedThisFrame = false
-    }
-    cache.loadTable("pulseController", pulseVars)
-    local timeOffset = 50
-    local timeSinceLastBar = ((state.SongTime + timeOffset) - game.getTimingPointAt(state.SongTime).StartTime) %
-        ((60000 / game.getTimingPointAt(state.SongTime).Bpm))
-    pulseVars.pulsedThisFrame = false
-    if ((timeSinceLastBar < pulseVars.previousBar)) then
-        pulseVars.pulseStatus = 1
-        pulseVars.pulsedThisFrame = true
-    else
-        pulseVars.pulseStatus = (pulseVars.pulseStatus - state.DeltaTime / (60000 / game.getTimingPointAt(state.SongTime).Bpm) * 1.2)
-    end
-    pulseVars.previousBar = timeSinceLastBar
-    local futureTime = state.SongTime + state.DeltaTime * 2 + timeOffset
-    if ((futureTime - game.getTimingPointAt(futureTime).StartTime) < 0) then
-        pulseVars.pulseStatus = 0
-    end
-    outputPulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
-    local borderColor = state.GetValue("borderColor") or vctr4(1)
-    local negatedBorderColor = vctr4(1) - borderColor
-    local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
-    imgui.PushStyleColor(imgui_col.Border, pulseColor * outputPulseStatus + borderColor * (1 - outputPulseStatus))
-    cache.saveTable("pulseController", pulseVars)
-    state.SetValue("pulseValue", math.max(pulseVars.pulseStatus, 0))
-    state.SetValue("pulsedThisFrame", pulseVars.pulsedThisFrame)
-end
----@class PhysicsObject
----@field pos Vector2
----@field v Vector2
----@field a Vector2
----@class Particle: PhysicsObject
----@field col Vector4
----@field size integer
-function renderBackground()
-    local idx = globalVars.dynamicBackgroundIndex
-    if (DYNAMIC_BACKGROUND_TYPES[idx] == "Reactive Stars") then
-        renderReactiveStars()
-    end
-    if (DYNAMIC_BACKGROUND_TYPES[idx] == "Reactive Singularity") then
-        renderReactiveSingularities()
-    end
-    if (DYNAMIC_BACKGROUND_TYPES[idx] == "Synthesis") then
-        renderSynthesis()
-    end
-end
-function setPluginAppearance()
-    local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
-    local styleTheme = STYLE_THEMES[globalVars.styleThemeIndex]
-    setPluginAppearanceStyles(styleTheme)
-    setPluginAppearanceColors(colorTheme)
 end
 function setPluginAppearanceStyles(styleTheme)
     local cornerRoundnessValue = (styleTheme == "Boxed" or
@@ -8034,205 +7863,6 @@ function infoTab()
         imgui.SetWindowPos("plumoguSV Tutorial Menu", coordinatesToCenter)
     end
 end
-function showPatchNotesWindow()
-    startNextWindowNotCollapsed("plumoguSV Patch Notes")
-    _, patchNotesOpened = imgui.Begin("plumoguSV Patch Notes", true, imgui_window_flags.NoResize)
-    imgui.SetWindowSize("plumoguSV Patch Notes", vector.New(500, 400))
-    imgui.PushStyleColor(imgui_col.Separator, color.int.white - color.int.alphaMask * 200)
-    local minHeight = imgui.GetWindowPos().y
-    local maxHeight = minHeight + 400
-    if (not patchNotesOpened) then
-        state.SetValue("windows.showPatchNotesWindow", false)
-    end
-    imgui.BeginChild("v2.0.0Bezier", vector.New(486, 48), 2, 3)
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    if (topLeft.y - maxHeight > 0) then goto skip200 end
-    if (topLeft.y - minHeight < -50) then goto skip200 end
-    drawV200(ctx, topLeft + vector.New(243, 17), 1, color.int.white, 1)
-    ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 144 / 2 - 10, 28), color.int.white)
-    ctx.AddRect(topLeft + vector.New(243 + 144 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
-    ::skip200::
-    imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes")
-    imgui.BulletText("Fixed not being able to properly store some cursor trail parameters.")
-    imgui.BulletText("Fixed start/end expo using incorrect algorithm.")
-    imgui.BulletText("Fixed all bugs relating to automate.")
-    imgui.BulletText("Removed v1.1.2 temporary bug fix.")
-    imgui.BulletText("Fix direct SV pagination not working correctly.")
-    imgui.BulletText("Fixed flicker percentage not accurately converting to map.")
-    imgui.BulletText("Fixed align timing lines not being deterministic.")
-    imgui.BulletText("Fixed suffix of computableinputfloat.")
-    imgui.BulletText("Fixed inconsistency of negative/positive SV generation.")
-    imgui.BulletText("Fixed getRemovableSVs to use tolerance.")
-    imgui.BulletText("Fixed the builder not properly nesting files.")
-    imgui.BulletText("Fixed stills placing duplicate SVs.")
-    imgui.BulletText("Fixed internal documentation being incorrect and generally poor.")
-    imgui.BulletText("Fixed several overlapping SV issues.")
-    imgui.BulletText("Fixed hypothetical SVs using some weird BS.")
-    imgui.BulletText("Removed splitscroll in favor of using TGs.")
-    imgui.BulletText("Fixed TG selector being unable to properly select some TGs.")
-    imgui.BulletText("Fixed TG selector not always being fully in-sync with the game.")
-    imgui.BulletText("Fixed automate altering SV post-effect.")
-    imgui.BulletText("Fixed 2-side vibrato inaccuracy.")
-    imgui.BulletText("Fixed build script to use correct regex.")
-    imgui.BulletText("Fixed cursor trail being broken.")
-    imgui.BulletText("Fixed hotkey settings window having overlapping text.")
-    imgui.BulletText("Fixed global vars being unable to default to true.")
-    imgui.BulletText("Moved workspace settings to .luarc file.")
-    imgui.BulletText("Cached variables are properly reloaded during hot-reload.")
-    imgui.BulletText("Fixed bug where hot-reloading would crash the game.")
-    imgui.BulletText("Fixed starting fresh plugin with no config.yaml breaking style.")
-    imgui.BulletText("Fixed bug where string ending of pluralized content\ncarried over between function calls.")
-    imgui.BulletText("Fixed vibrato placing duplicate SVs.")
-    imgui.BulletText("Fixed still per note group finally.")
-    imgui.BulletText("Now properly instantiates pulse color.")
-    imgui.BulletText("Fixed relative ratio not saving.")
-    imgui.BulletText("Fixed Select Bookmark crashing the game.")
-    imgui.BulletText("Fixed Select Bookmark text going off the screen.")
-    imgui.BulletText("Fixed measure msx widget not rendering in real time.")
-    imgui.BulletText("Fixed bug where saving a false setting wouldn't save it at all.")
-    imgui.BulletText(
-    "Fixed bug with certain functions where LN ends would not be\nconsidered if their start wasn't within the selection.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Added tooltips to various functions to explain their functionality.")
-    imgui.BulletText("New border pulse feature that pulses along with the beat.")
-    imgui.BulletText("Easily switch between TGs with new keybind.")
-    imgui.BulletText("Select TG of note quickly with note keybind.")
-    imgui.BulletText("New menu: Edit > Convert SV <-> SSF; Self-explanatory.")
-    imgui.BulletText(
-        "Added vibrato to plumoguSV, with less error than AFFINE. Includes linear,\npolynomial, exponential, sinusoidal, and sigmoidal shapes. Includes presets for FPS.")
-    imgui.BulletText("Include code-based SV/SSF fast place.")
-    imgui.BulletText("New settings menu with many more customizable features.")
-    imgui.BulletText("Allow defaults to be edited.")
-    imgui.BulletText("Include some new automate parameters for further customization.")
-    imgui.BulletText("Edit > Layer Snaps feature: Save your snap colors before using AFFINE to\nbring them back easily.")
-    imgui.BulletText("Added linear equalizer to allow you to create 0x SV on linear much easier.")
-    imgui.BulletText("Added custom theme input, along with exporting/importing.")
-    imgui.BulletText("Added 3 custom reactive backgrounds. More will be added\nwhen the kofi products are paid for.")
-    imgui.BulletText("Added copy paste slots; now you can copy paste more than one thing at once.")
-    imgui.BulletText("Allow border pulse to be custom.")
-    imgui.BulletText(
-        "Note lock feature: you don't need to worry about accidentally placing,\nmoving, or deleting notes during SV generation.")
-    imgui.BulletText("Now allows certain inputs to be computed automatically on the backend.")
-    imgui.BulletText("A new performance mode to speed up the FPS by 2-3x.")
-    imgui.BulletText("You can now merge SSFs to eliminate duped ones.")
-    imgui.BulletText("Added new option to allow combo-select.")
-    imgui.BulletText("New toggleable SV Info visualizer for the more inexperienced mappers.")
-    imgui.BulletText("Reworked bezier menu to be much more intuitive.")
-    imgui.BulletText("Added loadup animation because why not.")
-    imgui.BulletText("Added patch notes page.")
-    imgui.BulletText("Added map stats button to quickly grab SV and SSF count.")
-    imgui.BulletText("Added pagination to bookmarks.")
-    AddPadding()
-    imgui.BeginChild("v1.1.2Bezier", vector.New(486, 48), 2, 3)
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    if (topLeft.y - maxHeight > 0) then goto skip112 end
-    if (topLeft.y - minHeight < -50) then goto skip112 end
-    drawV112(ctx, topLeft + vector.New(243, 17), 1, color.int.white, 1)
-    ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 127 / 2 - 10, 28), color.int.white)
-    ctx.AddRect(topLeft + vector.New(243 + 127 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
-    ::skip112::
-    imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes")
-    imgui.BulletText("Fixed stills placing duplicate SVs that changed order when called.")
-    imgui.BulletText("Fixed stills removing non-existent SVs.")
-    imgui.BulletText("Fixed copy/paste priority problems.")
-    imgui.BulletText("Fixed plugin TG selector overriding editor TG selector.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Now stores settings so you don't have to edit the plugin file to save them.")
-    imgui.BulletText("Added step size to the exponential intensity bar.")
-    imgui.BulletText("Distance fields now allow mathematical expressions that are automatically evaluated.")
-    imgui.BulletText("Created a new advanced mode, which disabling causes less clutter.")
-    imgui.BulletText("Created Edit > Direct SV, an easier way to edit SVs directly within your selection.")
-    imgui.BulletText("Added colors to the TG selector to easily distinguish groups.")
-    AddPadding()
-    imgui.BeginChild("v1.1.1Bezier", vector.New(486, 48), 2, 3)
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    drawV111(ctx, topLeft + vector.New(238, 17), 1, color.int.white, 1)
-    if (topLeft.y - maxHeight > 0) then goto skip111 end
-    if (topLeft.y - minHeight < -50) then goto skip111 end
-    ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 111 / 2 - 15, 28), color.int.white)
-    ctx.AddRect(topLeft + vector.New(243 + 111 / 2 + 15, 25), topLeft + vector.New(486, 28), color.int.white)
-    ::skip111::
-    imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes")
-    imgui.BulletText("Fixed more bugs involving stills.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Added a new keybind to quickly place SSFs.")
-    imgui.BulletText("Added a new TG selector.")
-    AddPadding()
-    imgui.BeginChild("v1.1.0Bezier", vector.New(486, 48), 2, 3)
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    if (topLeft.y - maxHeight > 0) then goto skip110 end
-    if (topLeft.y - minHeight < -50) then goto skip110 end
-    drawV110(ctx, topLeft + vector.New(243, 17), 1, color.int.white, 1)
-    ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 129 / 2 - 10, 28), color.int.white)
-    ctx.AddRect(topLeft + vector.New(243 + 129 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
-    ::skip110::
-    imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes")
-    imgui.BulletText("Fixed issues where stills would incorrectly displace notes.")
-    imgui.BulletText("Fixed swap/negate buttons not working properly.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Added Select by Chord Size.")
-    imgui.BulletText("Now allows displace note/flicker to be linearly interpolated.")
-    imgui.BulletText("Stills now only require one undo instead of two.")
-    imgui.BulletText("New Still mode: still per note group, which drastically speeds up still production.")
-    imgui.BulletText("Two new exponential modes: start/end and distance-based algorithms.")
-    imgui.BulletText("Added hotkeys to quickly swap, negate, and reset certain parameters.")
-    imgui.BulletText("Added notifications to all features.")
-    imgui.BulletText("Copy and paste now supports bookmarks and timing lines.")
-    imgui.BulletText("New setting was added to allow you to ignore notes outside the current TG.")
-    AddPadding()
-    imgui.BeginChild("v1.0.1Bezier", vector.New(486, 48), 2, 3)
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    if (topLeft.y - maxHeight > 0) then goto skip101 end
-    if (topLeft.y - minHeight < -50) then goto skip101 end
-    drawV101(ctx, topLeft + vector.New(243, 17), 1, color.int.white, 1)
-    ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 125 / 2 - 10, 28), color.int.white)
-    ctx.AddRect(topLeft + vector.New(243 + 125 / 2 + 12.5, 25), topLeft + vector.New(486, 28), color.int.white)
-    ::skip101::
-    imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes")
-    imgui.BulletText("Fixed game occasionally crashing when using the Select tab.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Added Select Bookmark feature (from BookmarkLeaper).")
-    imgui.BulletText("Added Edit > Align Timing Lines feature (from SmartAlign).")
-    imgui.BulletText("Added notifications for more features when executed.")
-    imgui.BulletText("Added tooltips for Select features and swap/negate buttons.")
-    imgui.BulletText("Changed the Delete menu to allow deleting SVs or SSFs.")
-    AddPadding()
-    imgui.BeginChild("v1.0.0Bezier", vector.New(486, 48), 2, 3)
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    if (topLeft.y - maxHeight > 0) then goto skip100 end
-    if (topLeft.y - minHeight < -50) then goto skip100 end
-    drawV100(ctx, topLeft + vector.New(243, 17), 1, color.int.white, 1)
-    ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 137 / 2 - 10, 28), color.int.white)
-    ctx.AddRect(topLeft + vector.New(243 + 137 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
-    ::skip100::
-    imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes")
-    imgui.BulletText("Fix LN Ends feature now flips LN ends, even if the corresponding ending SV is 0.")
-    imgui.BulletText("Allowed Still to treat LN ends as displacement markers.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Added the SSF equivalent to all Standard SV shapes.")
-    imgui.BulletText(
-        "Added the Select tab, which allows users to quickly select desired notes based on\na variety of conditions. Currently, there is the Alternate option and the Snap option.")
-    imgui.PopStyleColor()
-    imgui.End()
-end
 ---Draws v200 on screen, with dimensions = scale * [144,48].
 ---@param ctx ImDrawListPtr
 ---@param location Vector2
@@ -10379,81 +10009,6 @@ SETTING_TYPES = {
     "Windows + Widgets",
     "Keybinds",
 }
-function showPluginSettingsWindow()
-    if (not globalVars.performanceMode) then
-        local bgColor = vector.New(0.2, 0.2, 0.2, 1)
-        imgui.PopStyleColor(20)
-        setIncognitoColors()
-        setPluginAppearanceStyles("Rounded + Border")
-        imgui.PushStyleColor(imgui_col.WindowBg, bgColor)
-        imgui.PushStyleColor(imgui_col.TitleBg, bgColor)
-        imgui.PushStyleColor(imgui_col.TitleBgActive, bgColor)
-        imgui.PushStyleColor(imgui_col.Border, vctr4(1))
-    end
-    startNextWindowNotCollapsed("plumoguSV Settings")
-    _, settingsOpened = imgui.Begin("plumoguSV Settings", true, 42)
-    imgui.SetWindowSize("plumoguSV Settings", vector.New(433, 400))
-    local typeIndex = state.GetValue("settings_typeIndex", 1)
-    imgui.Columns(2, "settings_columnList", true)
-    imgui.SetColumnWidth(0, 150)
-    imgui.SetColumnWidth(1, 283)
-    imgui.BeginChild("Setting Categories")
-    imgui.Text("Setting Type")
-    imgui.Separator()
-    for idx, v in pairs(SETTING_TYPES) do
-        if (v == "Custom Theme" and (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)) then goto skip end
-        if (imgui.Selectable(v, typeIndex == idx)) then
-            typeIndex = idx
-        end
-        ::skip::
-    end
-    AddSeparator()
-    if (imgui.Button("Reset Settings")) then
-        write({})
-        globalVars = DEFAULT_GLOBAL_VARS
-        toggleablePrint("e!", "Settings have been reset.")
-    end
-    if (globalVars.advancedMode) then renderMemeButtons() end
-    imgui.EndChild()
-    imgui.NextColumn()
-    imgui.BeginChild("Settings Data")
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
-    if (SETTING_TYPES[typeIndex] == "General") then
-        showGeneralSettings()
-    end
-    if (SETTING_TYPES[typeIndex] == "Default Properties") then
-        showDefaultPropertiesSettings()
-    end
-    if (SETTING_TYPES[typeIndex] == "Windows + Widgets") then
-        showWindowSettings()
-    end
-    if (SETTING_TYPES[typeIndex] == "Appearance") then
-        showAppearanceSettings()
-    end
-    if (SETTING_TYPES[typeIndex] == "Custom Theme" and COLOR_THEMES[globalVars.colorThemeIndex] == "CUSTOM") then
-        showCustomThemeSettings()
-    end
-    if (SETTING_TYPES[typeIndex] == "Keybinds") then
-        showKeybindSettings()
-    end
-    imgui.PopItemWidth()
-    imgui.EndChild()
-    imgui.Columns(1)
-    state.SetValue("settings_typeIndex", typeIndex)
-    if (not settingsOpened) then
-        state.SetValue("windows.showSettingsWindow", false)
-        state.SetValue("settings_typeIndex", 1)
-        state.SetValue("crazy", "Crazy?")
-        state.SetValue("activateCrazy", false)
-        state.SetValue("crazyIdx", 1)
-    end
-    if (not globalVars.performanceMode) then
-        imgui.PopStyleColor(41)
-        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
-        setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
-    end
-    imgui.End()
-end
 function renderMemeButtons()
     if (GradientButton("show me the quzz\n(quaver huzz)", color.vctr.red, color.vctr.white, 1500)) then
         ---@diagnostic disable-next-line: param-type-mismatch
@@ -10525,18 +10080,6 @@ TAB_MENUS = {
     "Edit",
     "Delete"
 }
----Creates a menu tab.
----@param tabName string
-function createMenuTab(tabName)
-    if not imgui.BeginTabItem(tabName) then return end
-    AddPadding()
-    if tabName == "Info" then infoTab() end
-    if tabName == "Select" then selectTab() end
-    if tabName == "Create" then createSVTab() end
-    if tabName == "Edit" then editSVTab() end
-    if tabName == "Delete" then deleteTab() end
-    imgui.EndTabItem()
-end
 function showEditingRemovingSVTutorial()
     imgui.SeparatorText("Directly Editing SVs")
     imgui.TextWrapped(
@@ -10836,168 +10379,6 @@ function showWhatIsMsxTutorial()
     imgui.TextColored(INSTRUCTION_COLOR, "(300 msx) / (500 ms) = 0.6x")
     imgui.TextWrapped(
     "Hopefully the nomenclature for msx makes sense; it is quite literally ms * x. If you know a little bit of dimensional analysis, you can use this fact to easily compute average SVs and displacements.")
-end
-function showTutorialWindow()
-    imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
-    imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
-    imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
-    startNextWindowNotCollapsed("plumoguSV Tutorial Menu")
-    _, tutorialOpened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
-    local tutorialWindowName = state.GetValue("tutorialWindowName") or ""
-    if (not tutorialOpened) then
-        state.SetValue("windows.showTutorialWindow", false)
-    end
-    local navigatorWidth = 200
-    local nullFn = function()
-        imgui.Text("Select a tutorial on the left to view it.")
-    end
-    local incompleteFn = function()
-        imgui.TextWrapped("Sorry, this tutorial is not ready yet. Please come back when a new version comes out.")
-    end
-    local tree = {
-        ["For Beginners"] = {
-            ["Start Here"] = showStartingTutorial,
-            ["Placing Basic SVs"] = {
-                ["Your First Effect"] = showYourFirstEffectTutorial,
-                ["Your Second Effect"] = showYourSecondEffectTutorial,
-                ["Working With Shapes"] = showWorkingWithShapesTutorial,
-                ["Editing/Removing SVs"] = showEditingRemovingSVTutorial,
-                ["Stills and Displacement"] = showStillsAndDisplacementTutorial,
-                ["Composite Effects"] = incompleteFn,
-            },
-            ["Adding Effects"] = {
-                ["Flickers"] = incompleteFn,
-                ["Vibrato"] = incompleteFn,
-            },
-        },
-        ["Helpful Info"] = {
-            ["Plugin Efficiency Tips"] = {
-                ["Hotkeys"] = showHotkeyTutorial,
-            },
-            ["The Math Behind SV"] = {
-                ["What IS msx?"] = showWhatIsMsxTutorial,
-                ["The calculus of SV"] = incompleteFn,
-                ["Why do we call them shapes?"] = incompleteFn,
-                ["Analogies to Physics"] = incompleteFn,
-            }
-        }
-    }
-    imgui.Columns(2)
-    imgui.SetColumnWidth(0, 200)
-    imgui.SetColumnWidth(1, 400)
-    imgui.BeginChild("Tutorial Navigator")
-    function renderBranch(branch, branchName)
-        for text, data in pairs(branch) do
-            local leafName = table.concat({ branchName, ".", text })
-            if (type(data) == "table") then
-                if (imgui.TreeNode(text)) then
-                    renderBranch(data, leafName)
-                    imgui.TreePop()
-                end
-            else
-                if (imgui.GetCursorPosX() < 10) then imgui.SetCursorPosX(10) end
-                imgui.Selectable(text)
-                if (imgui.IsItemClicked()) then
-                    tutorialWindowName = leafName
-                    state.SetValue("tutorialWindowName", tutorialWindowName)
-                end
-            end
-        end
-    end
-    for text, data in pairs(tree) do
-        imgui.SeparatorText(text)
-        renderBranch(data, text)
-    end
-    imgui.EndChild()
-    imgui.NextColumn()
-    imgui.BeginChild("Tutorial Data", vector.New(380, 500), imgui_child_flags
-        .AlwaysUseWindowPadding)
-    imgui.SetCursorPosY(0)
-    function ForceHeight(h)
-        imgui.SetCursorPosY(h)
-        imgui.TextColored(vctr4(0), "penis")
-    end
-    if (game.keyCount ~= 4) then
-        imgui.SeparatorText("This tutorial does not support this key mode.")
-        imgui.Text("Please go to a 4K map to continue.")
-        goto dontRenderTutorial
-    end
-    if (state.GetValue("tutorialWindowQueue")) then
-        tutorialWindowName = state.GetValue("tutorialWindowQueue")
-        state.SetValue("tutorialWindowQueue", nil)
-    end
-    if (tutorialWindowName == "") then
-        nullFn()
-        goto dontRenderTutorial
-    end
-    table.nestedValue(tree, tutorialWindowName:split("."))()
-    ::dontRenderTutorial::
-    imgui.EndChild()
-    imgui.Columns(1)
-    imgui.End()
-    imgui.PopStyleColor(2)
-end
-function renderMeasureDataWidget()
-    if #state.SelectedHitObjects == 0 then return end
-    local widgetVars = {
-        oldStartOffset = -69,
-        oldEndOffset = -69,
-        nsvDistance = 0,
-        roundedSVDistance = 0,
-        roundedAvgSV = 0
-    }
-    cache.loadTable("measureWidget", widgetVars)
-    local uniqueDict = {}
-    for _, ho in ipairs(state.SelectedHitObjects) do
-        if (not table.contains(uniqueDict, ho.StartTime)) then
-            uniqueDict[#uniqueDict + 1] = ho.StartTime
-        end
-        if (#uniqueDict > 2) then return end
-    end
-    if (#state.SelectedHitObjects == 1 and state.SelectedHitObjects[1].EndTime ~= 0) then
-        uniqueDict = { state.SelectedHitObjects[1].StartTime, state.SelectedHitObjects[1].EndTime }
-        imgui.BeginTooltip()
-        AddSeparator()
-        imgui.EndTooltip()
-    end
-    uniqueDict = sort(uniqueDict, sortAscending) ---@type number[]
-    local startOffset = uniqueDict[1]
-    local endOffset = uniqueDict[2] or uniqueDict[1]
-    if (math.abs(endOffset - startOffset) < 1e-10) then return end
-    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or state.GetValue("boolean.changeOccurred")) then
-        svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
-        widgetVars.nsvDistance = endOffset - startOffset
-        addStartSVIfMissing(svsBetweenOffsets, startOffset)
-        totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
-        widgetVars.roundedSVDistance = math.round(totalDistance, 3)
-        avgSV = totalDistance / (endOffset - startOffset)
-        widgetVars.roundedAvgSV = math.round(avgSV, 3)
-    end
-    imgui.BeginTooltip()
-    imgui.Text("Measure Info:")
-    imgui.Text(table.concat({"NSV Distance = ", widgetVars.nsvDistance, " ms"}))
-    imgui.Text(table.concat({"SV Distance = ", widgetVars.roundedSVDistance, " msx"}))
-    imgui.Text(table.concat({"Avg SV = ", widgetVars.roundedAvgSV, "x"}))
-    imgui.EndTooltip()
-    widgetVars.oldStartOffset = startOffset
-    widgetVars.oldEndOffset = endOffset
-    cache.saveTable("measureWidget", widgetVars)
-end
-function renderNoteDataWidget()
-    if (#state.SelectedHitObjects ~= 1) then return end
-    imgui.BeginTooltip()
-    imgui.Text("Note Info:")
-    local selectedNote = state.SelectedHitObjects[1]
-    imgui.Text(table.concat({"StartTime = ", selectedNote.StartTime, " ms"}))
-    local noteIsNotLN = selectedNote.EndTime == 0
-    if noteIsNotLN then
-        imgui.EndTooltip()
-        return
-    end
-    local lnLength = selectedNote.EndTime - selectedNote.StartTime
-    imgui.Text(table.concat({"EndTime = ", selectedNote.EndTime, " ms"}))
-    imgui.Text(table.concat({"LN Length = ", lnLength, " ms"}))
-    imgui.EndTooltip()
 end
 function chooseAddComboMultipliers(settingVars)
     local oldValues = vector.New(settingVars.comboMultiplier1, settingVars.comboMultiplier2)
@@ -12809,94 +12190,4 @@ function sinusoidalSettingsMenu(settingVars, skipFinalSV)
     settingsChanged = chooseSVPerQuarterPeriod(settingVars) or settingsChanged
     settingsChanged = chooseFinalSV(settingVars, skipFinalSV) or settingsChanged
     return settingsChanged
-end
-function awake()
-    local tempGlobalVars = read()
-    if (not tempGlobalVars) then
-        write(globalVars)
-        print("w!",
-            'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.')
-        setPresets({})
-    else
-        setGlobalVars(tempGlobalVars)
-        loadDefaultProperties(tempGlobalVars.defaultProperties)
-        setPresets(tempGlobalVars.presets or {})
-    end
-    initializeNoteLockMode()
-    listenForHitObjectChanges()
-    setPluginAppearance()
-    game.keyCount = map.GetKeyCount()
-    state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
-    if (not truthy(#map.TimingPoints)) then
-        print("e!", "Please place a timing point before attempting to use plumoguSV.")
-    end
-    if (state.Scale ~= 1) then
-        local printedScale = math.round(state.Scale * 100)
-        print("w!",
-            "Your ImGui scale is set to " ..
-            printedScale .. "% instead of 100%. For visual purposes, please set it back to 100%.")
-    end
-end
-function listenForHitObjectChanges()
-    local function setHitObjectStartTimes()
-        state.SetValue("lists.hitObjectStartTimes", table.dedupe(table.property(map.HitObjects, "StartTime")))
-    end
-    setHitObjectStartTimes()
-    listen(function(action, type, fromLua)
-        state.SetValue("boolean.changeOccurred", true)
-        if (tonumber(action.Type) <= 7) then
-            setHitObjectStartTimes()
-        end
-    end)
-end
-function draw()
-    if (not state.CurrentTimingPoint) then return end
-    local performanceMode = globalVars.performanceMode
-    tempClockCount = 0
-    state.IsWindowHovered = imgui.IsWindowHovered()
-    startNextWindowNotCollapsed("plumoguSV-dev")
-    imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
-    imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
-    if (not performanceMode) then
-        renderBackground()
-        drawCapybaraParent()
-        drawCursorTrail()
-        pulseController()
-        checkForGlobalHotkeys()
-        if (clock.listen("appearanceRefresh", 1000)) then
-            setPluginAppearance()
-        end
-    end
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
-    imgui.BeginTabBar("SV tabs")
-    for i = 1, #TAB_MENUS do
-        createMenuTab(TAB_MENUS[i])
-    end
-    imgui.EndTabBar()
-    if (not performanceMode) then
-        if (globalVars.showVibratoWidget) then
-            imgui.Begin("plumoguSV-vibrato", imgui_window_flags.AlwaysAutoResize)
-            imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
-            placeVibratoSVMenu(true)
-            imgui.End()
-        end
-        if (globalVars.showNoteDataWidget) then
-            renderNoteDataWidget()
-        end
-        if (globalVars.showMeasureDataWidget) then
-            renderMeasureDataWidget()
-        end
-    end
-    if (state.GetValue("windows.showTutorialWindow")) then
-        showTutorialWindow()
-    end
-    if (state.GetValue("windows.showSettingsWindow")) then
-        showPluginSettingsWindow()
-    end
-    if (state.GetValue("windows.showPatchNotesWindow")) then
-        showPatchNotesWindow()
-    end
-    imgui.End()
-    logoThread()
-    state.SetValue("boolean.changeOccurred", false)
 end
