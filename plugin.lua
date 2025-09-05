@@ -10932,6 +10932,68 @@ function showTutorialWindow()
     imgui.End()
     imgui.PopStyleColor(2)
 end
+function renderMeasureDataWidget()
+    if #state.SelectedHitObjects == 0 then return end
+    local widgetVars = {
+        oldStartOffset = -69,
+        oldEndOffset = -69,
+        nsvDistance = 0,
+        roundedSVDistance = 0,
+        roundedAvgSV = 0
+    }
+    cache.loadTable("measureWidget", widgetVars)
+    local uniqueDict = {}
+    for _, ho in ipairs(state.SelectedHitObjects) do
+        if (not table.contains(uniqueDict, ho.StartTime)) then
+            uniqueDict[#uniqueDict + 1] = ho.StartTime
+        end
+        if (#uniqueDict > 2) then return end
+    end
+    if (#state.SelectedHitObjects == 1 and state.SelectedHitObjects[1].EndTime ~= 0) then
+        uniqueDict = { state.SelectedHitObjects[1].StartTime, state.SelectedHitObjects[1].EndTime }
+        imgui.BeginTooltip()
+        AddSeparator()
+        imgui.EndTooltip()
+    end
+    uniqueDict = sort(uniqueDict, sortAscending) ---@type number[]
+    local startOffset = uniqueDict[1]
+    local endOffset = uniqueDict[2] or uniqueDict[1]
+    if (math.abs(endOffset - startOffset) < 1e-10) then return end
+    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or state.GetValue("boolean.changeOccurred")) then
+        svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+        widgetVars.nsvDistance = endOffset - startOffset
+        addStartSVIfMissing(svsBetweenOffsets, startOffset)
+        totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
+        widgetVars.roundedSVDistance = math.round(totalDistance, 3)
+        avgSV = totalDistance / (endOffset - startOffset)
+        widgetVars.roundedAvgSV = math.round(avgSV, 3)
+    end
+    imgui.BeginTooltip()
+    imgui.Text("Measure Info:")
+    imgui.Text(table.concat({"NSV Distance = ", widgetVars.nsvDistance, " ms"}))
+    imgui.Text(table.concat({"SV Distance = ", widgetVars.roundedSVDistance, " msx"}))
+    imgui.Text(table.concat({"Avg SV = ", widgetVars.roundedAvgSV, "x"}))
+    imgui.EndTooltip()
+    widgetVars.oldStartOffset = startOffset
+    widgetVars.oldEndOffset = endOffset
+    cache.saveTable("measureWidget", widgetVars)
+end
+function renderNoteDataWidget()
+    if (#state.SelectedHitObjects ~= 1) then return end
+    imgui.BeginTooltip()
+    imgui.Text("Note Info:")
+    local selectedNote = state.SelectedHitObjects[1]
+    imgui.Text(table.concat({"StartTime = ", selectedNote.StartTime, " ms"}))
+    local noteIsNotLN = selectedNote.EndTime == 0
+    if noteIsNotLN then
+        imgui.EndTooltip()
+        return
+    end
+    local lnLength = selectedNote.EndTime - selectedNote.StartTime
+    imgui.Text(table.concat({"EndTime = ", selectedNote.EndTime, " ms"}))
+    imgui.Text(table.concat({"LN Length = ", lnLength, " ms"}))
+    imgui.EndTooltip()
+end
 function chooseAddComboMultipliers(settingVars)
     local oldValues = vector.New(settingVars.comboMultiplier1, settingVars.comboMultiplier2)
     local _, newValues = imgui.InputFloat2("ax + by", oldValues, "%.2f")
@@ -12832,66 +12894,4 @@ function draw()
     imgui.End()
     logoThread()
     state.SetValue("boolean.changeOccurred", false)
-end
-function renderNoteDataWidget()
-    if (#state.SelectedHitObjects ~= 1) then return end
-    imgui.BeginTooltip()
-    imgui.Text("Note Info:")
-    local selectedNote = state.SelectedHitObjects[1]
-    imgui.Text(table.concat({"StartTime = ", selectedNote.StartTime, " ms"}))
-    local noteIsNotLN = selectedNote.EndTime == 0
-    if noteIsNotLN then
-        imgui.EndTooltip()
-        return
-    end
-    local lnLength = selectedNote.EndTime - selectedNote.StartTime
-    imgui.Text(table.concat({"EndTime = ", selectedNote.EndTime, " ms"}))
-    imgui.Text(table.concat({"LN Length = ", lnLength, " ms"}))
-    imgui.EndTooltip()
-end
-function renderMeasureDataWidget()
-    if #state.SelectedHitObjects == 0 then return end
-    local widgetVars = {
-        oldStartOffset = -69,
-        oldEndOffset = -69,
-        nsvDistance = 0,
-        roundedSVDistance = 0,
-        roundedAvgSV = 0
-    }
-    cache.loadTable("measureWidget", widgetVars)
-    local uniqueDict = {}
-    for _, ho in ipairs(state.SelectedHitObjects) do
-        if (not table.contains(uniqueDict, ho.StartTime)) then
-            uniqueDict[#uniqueDict + 1] = ho.StartTime
-        end
-        if (#uniqueDict > 2) then return end
-    end
-    if (#state.SelectedHitObjects == 1 and state.SelectedHitObjects[1].EndTime ~= 0) then
-        uniqueDict = { state.SelectedHitObjects[1].StartTime, state.SelectedHitObjects[1].EndTime }
-        imgui.BeginTooltip()
-        AddSeparator()
-        imgui.EndTooltip()
-    end
-    uniqueDict = sort(uniqueDict, sortAscending) ---@type number[]
-    local startOffset = uniqueDict[1]
-    local endOffset = uniqueDict[2] or uniqueDict[1]
-    if (math.abs(endOffset - startOffset) < 1e-10) then return end
-    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or state.GetValue("boolean.changeOccurred")) then
-        svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
-        widgetVars.nsvDistance = endOffset - startOffset
-        addStartSVIfMissing(svsBetweenOffsets, startOffset)
-        totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
-        widgetVars.roundedSVDistance = math.round(totalDistance, 3)
-        avgSV = totalDistance / (endOffset - startOffset)
-        widgetVars.roundedAvgSV = math.round(avgSV, 3)
-    end
-    imgui.BeginTooltip()
-    imgui.Text("Measure Info:")
-    imgui.Text(table.concat({"NSV Distance = ", widgetVars.nsvDistance, " ms"}))
-    imgui.Text(table.concat({"SV Distance = ", widgetVars.roundedSVDistance, " msx"}))
-    imgui.Text(table.concat({"Avg SV = ", widgetVars.roundedAvgSV, "x"}))
-    imgui.EndTooltip()
-    widgetVars.oldStartOffset = startOffset
-    widgetVars.oldEndOffset = endOffset
-    cache.saveTable("measureWidget", widgetVars)
 end
