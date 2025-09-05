@@ -21,11 +21,16 @@ function svVibrato(menuVars, heightFn)
         local roundingFactor = math.max(menuVars.sides, 2)
         local teleportCount = math.floor((nextVibro - startVibro) / 1000 * fps / roundingFactor) * roundingFactor
 
+        if (teleportCount < 2) then
+            print("e!", "Some notes are too close together to place vibrato.")
+            return
+        end
+
         if (menuVars.sides == 1) then
             for tp = 1, teleportCount do
                 local x = (tp - 1) / teleportCount
                 local offset = nextVibro * x + startVibro * (1 - x)
-                local height = heightFn(((math.floor((tp - 1) / 2) * 2) / (teleportCount - 2)) * posDifference +
+                local height = heightFn(math.floor(tp / 2) * 2 / teleportCount * posDifference +
                     startPos, tp)
                 if (tp % 2 == 1) then
                     height = -height
