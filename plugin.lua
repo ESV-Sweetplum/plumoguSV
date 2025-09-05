@@ -12850,7 +12850,7 @@ function renderNoteDataWidget()
     imgui.EndTooltip()
 end
 function renderMeasureDataWidget()
-    if #state.SelectedHitObjects < 2 then return end
+    if #state.SelectedHitObjects == 0 then return end
     local widgetVars = {
         oldStartOffset = -69,
         oldEndOffset = -69,
@@ -12865,6 +12865,12 @@ function renderMeasureDataWidget()
             uniqueDict[#uniqueDict + 1] = ho.StartTime
         end
         if (#uniqueDict > 2) then return end
+    end
+    if (#state.SelectedHitObjects == 1 and state.SelectedHitObjects[1].EndTime ~= 0) then
+        uniqueDict = { state.SelectedHitObjects[1].StartTime, state.SelectedHitObjects[1].EndTime }
+        imgui.BeginTooltip()
+        AddSeparator()
+        imgui.EndTooltip()
     end
     uniqueDict = sort(uniqueDict, sortAscending) ---@type number[]
     local startOffset = uniqueDict[1]

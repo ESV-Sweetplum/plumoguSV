@@ -630,6 +630,6 @@ defaultProperties:
       snap: 1
 presets:
 - 
-dynamicBackgroundIndex: 4
+dynamicBackgroundIndex: 1
 disableLoadup: false
 ignoreNotes: false
