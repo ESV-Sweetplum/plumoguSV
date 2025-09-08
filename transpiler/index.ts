@@ -74,7 +74,6 @@ export default async function transpiler(devMode = false, lint = true) {
                 if (!file.includes(`.${path}`)) return;
                 const whitespace =
                     entryFileData[path][data.length - 2].match(/^([ ]*)/)[0];
-                console.log(whitespace);
                 entryFileData[path].splice(
                     data.length - 1,
                     0,
