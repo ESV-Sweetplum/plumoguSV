@@ -12191,3 +12191,81 @@ function sinusoidalSettingsMenu(settingVars, skipFinalSV)
     settingsChanged = chooseFinalSV(settingVars, skipFinalSV) or settingsChanged
     return settingsChanged
 end
+function awake()
+    local tempGlobalVars = read()
+    if (not tempGlobalVars) then
+        write(globalVars) -- First time launching plugin
+        print("w!",
+            'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.')
+        setPresets({})
+    else
+        setGlobalVars(tempGlobalVars)
+        loadDefaultProperties(tempGlobalVars.defaultProperties)
+        setPresets(tempGlobalVars.presets or {})
+    end
+    initializeNoteLockMode()
+    listenForHitObjectChanges()
+    setPluginAppearance()
+    game.keyCount = map.GetKeyCount()
+    state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
+    if (not truthy(#map.TimingPoints)) then
+        print("e!", "Please place a timing point before attempting to use plumoguSV.")
+    end
+    if (state.Scale ~= 1) then
+        local printedScale = math.round(state.Scale * 100)
+        print("w!",
+            "Your ImGui scale is set to " ..
+            printedScale .. "% instead of 100%. For visual purposes, please set it back to 100%.")
+    end
+end
+function draw()
+    if (not state.CurrentTimingPoint) then return end
+    local performanceMode = globalVars.performanceMode
+    state.IsWindowHovered = imgui.IsWindowHovered()
+    startNextWindowNotCollapsed("plumoguSV-dev")
+    imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
+    imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
+    if (not performanceMode) then
+        renderBackground()
+        drawCapybaraParent()
+        drawCursorTrail()
+        pulseController()
+        checkForGlobalHotkeys()
+        if (clock.listen("appearanceRefresh", 1000)) then
+            setPluginAppearance()
+        end
+    end
+    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
+    imgui.BeginTabBar("SV tabs")
+    for i = 1, #TAB_MENUS do
+        createMenuTab(TAB_MENUS[i])
+    end
+    imgui.EndTabBar()
+    if (not performanceMode) then
+        if (globalVars.showVibratoWidget) then
+            imgui.Begin("plumoguSV-vibrato", imgui_window_flags.AlwaysAutoResize)
+            imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
+            placeVibratoSVMenu(true)
+            imgui.End()
+        end
+        if (globalVars.showNoteDataWidget) then
+            renderNoteDataWidget()
+        end
+        if (globalVars.showMeasureDataWidget) then
+            renderMeasureDataWidget()
+        end
+    end
+    if (cache.windows.showTutorialWindow) then
+        showTutorialWindow()
+    end
+    if (cache.windows.showSettingsWindow) then
+        showPluginSettingsWindow()
+    end
+    if (cache.windows.showPatchNotesWindow) then
+        showPatchNotesWindow()
+    end
+    imgui.End()
+    logoThread()
+    cache.boolean.changeOccurred = false
+    tempClockCount = 0
+end

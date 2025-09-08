@@ -47,11 +47,9 @@ export default async function transpiler(devMode = false, lint = true) {
     }, []);
 
     const entryFileData = entryFiles.reduce((obj, f) => {
-        obj[f] = readAndLintLua(f);
+        obj[f.split('\\').slice(-1)[0].slice(1)] = readAndLintLua(f);
         return obj;
     }, {});
-
-    console.log(entryFileData);
 
     files.forEach((file: string) => {
         if (
@@ -71,7 +69,19 @@ export default async function transpiler(devMode = false, lint = true) {
             return l;
         });
 
-        if (file.includes('.draw.lua')) console.log(file);
+        Object.entries(entryFileData).forEach(
+            ([path, data]: [string, string[]]) => {
+                if (!file.includes(`.${path}`)) return;
+                const whitespace =
+                    entryFileData[path][data.length - 2].match(/^([ ]*)/)[0];
+                console.log(whitespace);
+                entryFileData[path].splice(
+                    data.length - 1,
+                    0,
+                    ...fileData.map((d) => `${whitespace}${d}`)
+                );
+            }
+        );
 
         output = `${output}\n${fileData
             .map((str) => str.replace(/\s+$/, ''))
@@ -180,6 +190,10 @@ export default async function transpiler(devMode = false, lint = true) {
 
         output = splitOutput.join('\n');
     }
+
+    Object.values(entryFileData).forEach((data: string[]) => {
+        output = `${output}\n${data.join('\n')}`;
+    });
 
     if (existsSync('plugin.lua')) rmSync('plugin.lua');
     writeFileSync('temp.lua', output);
