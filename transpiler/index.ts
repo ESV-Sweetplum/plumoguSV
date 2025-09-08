@@ -89,6 +89,10 @@ export default async function transpiler(devMode = false, lint = true) {
         fileCount++;
     });
 
+    Object.values(entryFileData).forEach((data: string[]) => {
+        output = `${output}\n${data.join('\n')}`;
+    });
+
     output = output.replaceAll(/---@meta [a-zA-Z0-9\-]+\n/g, ''); // Remove meta tags from packages
 
     output = output.replaceAll(
@@ -189,10 +193,6 @@ export default async function transpiler(devMode = false, lint = true) {
 
         output = splitOutput.join('\n');
     }
-
-    Object.values(entryFileData).forEach((data: string[]) => {
-        output = `${output}\n${data.join('\n')}`;
-    });
 
     if (existsSync('plugin.lua')) rmSync('plugin.lua');
     writeFileSync('temp.lua', output);
