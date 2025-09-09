@@ -162,13 +162,11 @@ export default async function transpiler(devMode = false, lint = true) {
     output = output.replaceAll('\n\n', '\n').trimStart();
     if (lint) {
         let linted = true;
+        const splitOutput = output.split('\n');
 
         while (linted) {
             linted = false;
-            const splitOutput = output.split('\n');
-
             let [functions, fnIndices] = getFunctionList(splitOutput);
-
             const spliceIndices = [];
 
             functions.forEach((fn, i) => {
@@ -189,8 +187,10 @@ export default async function transpiler(devMode = false, lint = true) {
                 fnIndices
             );
 
+            const listLength = unusedIndexes.length;
+            if (listLength > 1) linted = true;
+
             unusedIndexes.reverse().forEach((idx) => {
-                linted = true;
                 let startIdx = idx;
                 let endIdx = idx;
                 while (
@@ -201,9 +201,8 @@ export default async function transpiler(devMode = false, lint = true) {
                 while (!splitOutput[endIdx].startsWith('end')) endIdx++;
                 splitOutput.splice(startIdx, endIdx - startIdx + 1);
             });
-
-            output = splitOutput.join('\n');
         }
+        output = splitOutput.join('\n');
     }
 
     if (existsSync('plugin.lua')) rmSync('plugin.lua');
