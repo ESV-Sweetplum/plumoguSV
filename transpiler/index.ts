@@ -161,37 +161,49 @@ export default async function transpiler(devMode = false, lint = true) {
 
     output = output.replaceAll('\n\n', '\n').trimStart();
     if (lint) {
-        const splitOutput = output.split('\n');
+        let linted = true;
 
-        let [functions, fnIndices] = getFunctionList(splitOutput);
-        const spliceIndices = [];
-        for (let i = 0; i < functions.length; i++) {
-            const fn = functions[i];
-            const cond = fn.startsWith('string') || fn.startsWith('table');
-            if (cond) {
-                spliceIndices.unshift(i);
-            }
+        while (linted) {
+            linted = false;
+            const splitOutput = output.split('\n');
+
+            let [functions, fnIndices] = getFunctionList(splitOutput);
+
+            const spliceIndices = [];
+
+            functions.forEach((fn, i) => {
+                const cond = fn.startsWith('string') || fn.startsWith('table');
+                if (cond) {
+                    spliceIndices.unshift(i);
+                }
+            });
+
+            spliceIndices.forEach((idx) => {
+                functions.splice(idx, 1);
+                fnIndices.splice(idx, 1);
+            });
+
+            const [_, unusedIndexes] = getUnusedFunctions(
+                splitOutput,
+                functions,
+                fnIndices
+            );
+
+            unusedIndexes.reverse().forEach((idx) => {
+                linted = true;
+                let startIdx = idx;
+                let endIdx = idx;
+                while (
+                    splitOutput[startIdx - 1].startsWith('---') &&
+                    startIdx > 0
+                )
+                    startIdx--;
+                while (!splitOutput[endIdx].startsWith('end')) endIdx++;
+                splitOutput.splice(startIdx, endIdx - startIdx + 1);
+            });
+
+            output = splitOutput.join('\n');
         }
-        spliceIndices.forEach((idx) => {
-            functions.splice(idx, 1);
-            fnIndices.splice(idx, 1);
-        });
-        const [_, unusedIndexes] = getUnusedFunctions(
-            splitOutput,
-            functions,
-            fnIndices
-        );
-
-        unusedIndexes.reverse().forEach((idx) => {
-            let startIdx = idx;
-            let endIdx = idx;
-            while (/^---/.test(splitOutput[startIdx - 1]) && startIdx > 0)
-                startIdx--;
-            while (!/^end/.test(splitOutput[endIdx])) endIdx++;
-            splitOutput.splice(startIdx, endIdx - startIdx + 1);
-        });
-
-        output = splitOutput.join('\n');
     }
 
     if (existsSync('plugin.lua')) rmSync('plugin.lua');
