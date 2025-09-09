@@ -512,7 +512,6 @@ function math.expoClamp(n, lowerBound, upperBound, multiplicativeFactor)
     end
     return n
 end
----@param n integer
 ---Forces a number to have a quarterly decimal part.
 ---@param number number
 ---@return number
