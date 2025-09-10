@@ -16,8 +16,6 @@ function awake()
     listenForHitObjectChanges()
     setPluginAppearance()
 
-    game.keyCount = map.GetKeyCount()
-
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
 
     if (not truthy(#map.TimingPoints)) then

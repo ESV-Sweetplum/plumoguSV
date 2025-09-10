@@ -1,0 +1,1 @@
+game.keyCount = map.GetKeyCount()

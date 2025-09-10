@@ -397,6 +397,7 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     return noteOffsetsBetween
 end
 game.getUniqueNoteOffsetsBetween = game.uniqueNoteOffsetsBetween
+game.keyCount = map.GetKeyCount()
 function game.window.getCenter()
     local windowDim = state.WindowSize
     return vector.New(state.WindowSize[1] / 2, state.WindowSize[2] / 2)
@@ -12828,7 +12829,6 @@ function awake()
     initializeNoteLockMode()
     listenForHitObjectChanges()
     setPluginAppearance()
-    game.keyCount = map.GetKeyCount()
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
     if (not truthy(#map.TimingPoints)) then
         print("e!", "Please place a timing point before attempting to use plumoguSV.")
@@ -12839,6 +12839,7 @@ function awake()
             "Your ImGui scale is set to " ..
             printedScale .. "% instead of 100%. For visual purposes, please set it back to 100%.")
     end
+    game.keyCount = map.GetKeyCount()
 end
 function draw()
     if (not state.CurrentTimingPoint) then return end
