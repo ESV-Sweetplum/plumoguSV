@@ -21,3 +21,12 @@ end
 function createEA(actionType, ...)
     return utils.CreateEditorAction(actionType, ...)
 end
+
+---Alias for [`utils.CreateScrollGroup`](lua://utils.CreateScrollGroup).
+---@param svs ScrollVelocity[]
+---@param initialSV? number
+---@param colorRgb? string
+---@return ScrollGroup
+function createSG(svs, initialSV, colorRgb)
+    return utils.CreateScrollGroup(svs, initialSV, colorRgb)
+end
