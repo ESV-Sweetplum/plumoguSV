@@ -69,6 +69,8 @@ export default async function transpiler(devMode = false, lint = true) {
             return l;
         });
 
+        let fileIsInsert = false;
+
         Object.entries(entryFileData).forEach(
             ([path, data]: [string, string[]]) => {
                 if (!file.includes(`.${path}`)) return;
@@ -79,8 +81,11 @@ export default async function transpiler(devMode = false, lint = true) {
                     0,
                     ...fileData.map((d) => `${whitespace}${d}`)
                 );
+                fileIsInsert = true;
             }
         );
+
+        if (fileIsInsert) return;
 
         output = `${output}\n${fileData
             .map((str) => str.replace(/\s+$/, ''))
