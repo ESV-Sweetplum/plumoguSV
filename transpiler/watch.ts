@@ -37,7 +37,7 @@ async function main(event, path) {
     );
 
     const devMode = path.includes('src\\dev\\unlock');
-    const fileCount = await transpiler(devMode, true);
+    const fileCount = await transpiler(devMode, false);
     const endTime = performance.now();
     console.log(
         `Successfully transpiled ${chalk.green(

@@ -11,7 +11,7 @@
 -- Parameters
 --    offset: time in milliseconds [Int]
 function getUsableDisplacementMultiplier(offset)
-    local exponent = 23 - math.floor(math.log(math.abs(offset) + 1) / math.log(2))
+    local exponent = 23 - math.floor(math.log(math.abs(offset) + 1, 2))
     if exponent >= 6 then return 64 end
     return 2 ^ exponent
 end
