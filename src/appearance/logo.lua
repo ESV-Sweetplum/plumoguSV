@@ -1,12 +1,12 @@
 function logoThread()
     curTime = state.UnixTime or 0
     -- If state.DeltaTime is significantly off of the computed delta time, that means that the computed delta time was delayed in some way. This is used to detect when the plugin is turned off and on (not rapidly).
-    if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 5000) then
-        cache_logoStartTime = clock.getTime()
-        if (cache_logoStartTime < 2.5) then
-            cache_logoStartTime = cache_logoStartTime + 0.75
-        end
-    end
+    -- if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 5000) then
+    --     cache_logoStartTime = clock.getTime()
+    --     if (cache_logoStartTime < 2.5) then
+    --         cache_logoStartTime = cache_logoStartTime + 0.75
+    --     end
+    -- end
     prevTime = state.UnixTime
 
     local currentTime = clock.getTime() - cache_logoStartTime
