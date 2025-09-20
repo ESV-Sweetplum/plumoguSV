@@ -733,7 +733,7 @@ end
 -- Parameters
 --    rgbPeriod : length in seconds for one complete RGB cycle (i.e. period) [Int/Float]
 function getCurrentRGBColors(rgbPeriod)
-    local currentTime = imgui.GetTime()
+    local currentTime = clock.getTime()
     local percentIntoRGBCycle = (currentTime % rgbPeriod) / rgbPeriod
     local stagesElapsed = 6 * percentIntoRGBCycle
     local currentStageNumber = math.floor(stagesElapsed)

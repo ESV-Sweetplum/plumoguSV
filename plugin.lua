@@ -4,6 +4,7 @@ cache = {
     lists = {}
 }
 clock = {}; cache.clock = {}
+clock.prevTime = 0
 color = {
     vctr = {},
     int = {}
@@ -37,6 +38,9 @@ function cache.saveTable(listName, variables)
     for key, value in pairs(variables) do
         state.SetValue(listName .. key, value)
     end
+end
+function clock.getTime()
+    return (state.UnixTime - clock.prevTime) / 1000
 end
 ---Returns true every `interval` ms.
 ---@param id string The unique identifier of the clock.
@@ -3929,7 +3933,7 @@ function renderReactiveSingularities()
     local fastSpeedG = 165
     local fastSpeedB = 117
     local speed = clamp(math.abs(multiplier), 0, 4)
-    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
+    if (dimX < 100 or clock.getTime() < 0.3) then return end
     createParticle(dimX, dimY, 150)
     updateParticles(dimX, dimY,
         state.DeltaTime * speed, multiplier)
@@ -4017,7 +4021,7 @@ function renderReactiveStars()
     local dimX = dim.x
     local dimY = dim.y
     local clamp = math.clamp
-    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
+    if (dimX < 100 or clock.getTime() < 0.3) then return end
     createStar(dimX, dimY, 100)
     updateStars(dimX, dimY, state.DeltaTime)
     for i = 1, #stars_xList do
@@ -4375,13 +4379,13 @@ end
 function logoThread()
     curTime = state.UnixTime or 0
     if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 750) then
-        cache_logoStartTime = imgui.GetTime()
+        cache_logoStartTime = clock.getTime()
         if (cache_logoStartTime < 2.5) then
             cache_logoStartTime = cache_logoStartTime + 0.75
         end
     end
     prevTime = state.UnixTime
-    local currentTime = imgui.GetTime() - cache_logoStartTime
+    local currentTime = clock.getTime() - cache_logoStartTime
     local logoLength = 2
     if ((cache_logoStartTime < 3 and not globalVars.disableLoadup) or loaded) then
         if (currentTime >= 0 and currentTime <= logoLength) then
@@ -4389,7 +4393,7 @@ function logoThread()
                 color.int.white, 4)
         end
     else
-        cache_logoStartTime = imgui.GetTime() - 5
+        cache_logoStartTime = clock.getTime() - 5
     end
     loaded = true
 end
@@ -5425,7 +5429,7 @@ function drawCursorTrail()
     if cursorTrail == "None" then return end
     local o = imgui.GetForegroundDrawList()
     local m = imgui.GetMousePos()
-    local t = imgui.GetTime()
+    local t = clock.getTime()
     local sz = state.WindowSize
     if cursorTrail ~= "Dust" then state.SetValue("boolean.dustParticlesInitialized", false) end
     if cursorTrail ~= "Sparkle" then state.SetValue("boolean.sparkleParticlesInitialized", false) end
@@ -6367,7 +6371,7 @@ function setCustomColors()
     return borderColor
 end
 function getCurrentRGBColors(rgbPeriod)
-    local currentTime = imgui.GetTime()
+    local currentTime = clock.getTime()
     local percentIntoRGBCycle = (currentTime % rgbPeriod) / rgbPeriod
     local stagesElapsed = 6 * percentIntoRGBCycle
     local currentStageNumber = math.floor(stagesElapsed)
@@ -7557,7 +7561,7 @@ function PolynomialEditor(size, settingVars, separateWindow)
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
     for i = 1, #settingVars.plotPoints - 1 do
-        local opacityFactor = 0.7 - math.sin(20 * i / #settingVars.plotPoints - imgui.GetTime() * 5) / 2
+        local opacityFactor = 0.7 - math.sin(20 * i / #settingVars.plotPoints - clock.getTime() * 5) / 2
         ctx.AddLine(topLeft + settingVars.plotPoints[i],
             vector.Clamp(topLeft + settingVars.plotPoints[i + 1], topLeft, topLeft + dim - vctr2(1)),
             imgui.GetColorU32("PlotLines", opacityFactor), 3)
@@ -9886,7 +9890,7 @@ function showAppearanceSettings()
         "Disables the loadup animation when launching the editor.")
     KeepSameLine()
     if (imgui.Button("Play", vector.New(42, 24))) then
-        cache_logoStartTime = imgui.GetTime()
+        cache_logoStartTime = clock.getTime()
     end
     AddSeparator()
     GlobalCheckbox("drawCapybara", "Capybara", "Draws a capybara at the bottom right of the screen")
@@ -12988,6 +12992,7 @@ function awake()
             "Your ImGui scale is set to " ..
             printedScale .. "% instead of 100%. For visual purposes, please set it back to 100%.")
     end
+    clock.prevTime = state.UnixTime
     game.keyCount = map.GetKeyCount()
 end
 function draw()

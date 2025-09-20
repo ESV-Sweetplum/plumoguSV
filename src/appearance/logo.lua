@@ -2,14 +2,14 @@ function logoThread()
     curTime = state.UnixTime or 0
     -- If state.DeltaTime is significantly off of the computed delta time, that means that the computed delta time was delayed in some way. This is used to detect when the plugin is turned off and on.
     if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 750) then
-        cache_logoStartTime = imgui.GetTime()
+        cache_logoStartTime = clock.getTime()
         if (cache_logoStartTime < 2.5) then
             cache_logoStartTime = cache_logoStartTime + 0.75
         end
     end
     prevTime = state.UnixTime
 
-    local currentTime = imgui.GetTime() - cache_logoStartTime
+    local currentTime = clock.getTime() - cache_logoStartTime
     local logoLength = 2
 
     if ((cache_logoStartTime < 3 and not globalVars.disableLoadup) or loaded) then
@@ -18,7 +18,7 @@ function logoThread()
                 color.int.white, 4)
         end
     else
-        cache_logoStartTime = imgui.GetTime() - 5
+        cache_logoStartTime = clock.getTime() - 5
     end
 
     loaded = true

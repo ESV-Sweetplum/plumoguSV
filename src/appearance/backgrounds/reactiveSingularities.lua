@@ -35,7 +35,7 @@ function renderReactiveSingularities()
     local fastSpeedB = 117
 
     local speed = clamp(math.abs(multiplier), 0, 4)
-    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
+    if (dimX < 100 or clock.getTime() < 0.3) then return end
 
     createParticle(dimX, dimY, 150)
     updateParticles(dimX, dimY,

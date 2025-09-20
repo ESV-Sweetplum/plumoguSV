@@ -109,7 +109,7 @@ function PolynomialEditor(size, settingVars, separateWindow)
     local dim = imgui.GetWindowSize()
 
     for i = 1, #settingVars.plotPoints - 1 do
-        local opacityFactor = 0.7 - math.sin(20 * i / #settingVars.plotPoints - imgui.GetTime() * 5) / 2
+        local opacityFactor = 0.7 - math.sin(20 * i / #settingVars.plotPoints - clock.getTime() * 5) / 2
         ctx.AddLine(topLeft + settingVars.plotPoints[i],
             vector.Clamp(topLeft + settingVars.plotPoints[i + 1], topLeft, topLeft + dim - vctr2(1)),
             imgui.GetColorU32("PlotLines", opacityFactor), 3)

@@ -4,7 +4,7 @@ function drawCursorTrail()
 
     local o = imgui.GetForegroundDrawList()
     local m = imgui.GetMousePos()
-    local t = imgui.GetTime()
+    local t = clock.getTime()
     local sz = state.WindowSize
     if cursorTrail ~= "Dust" then cache.boolean.dustParticlesInitialized = false end
     if cursorTrail ~= "Sparkle" then cache.boolean.sparkleParticlesInitialized = false end

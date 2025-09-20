@@ -13,7 +13,7 @@ function renderReactiveStars()
 
     local clamp = math.clamp
 
-    if (dimX < 100 or imgui.GetTime() < 0.3) then return end
+    if (dimX < 100 or clock.getTime() < 0.3) then return end
 
     createStar(dimX, dimY, 100)
     updateStars(dimX, dimY, state.DeltaTime)
