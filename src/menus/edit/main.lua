@@ -57,8 +57,8 @@ function chooseEditTool()
         "Polish your map with these set of tools.",
         "Get stats about SVs in a section.",
         "Reverse the scroll direction using SVs.",
-        "Scale SV values by multiplying.",
         "Scale SV values by adding teleport SVs.",
+        "Scale SV values by multiplying.",
         "Swap positions of notes using SVs.",
         "Adds a constant value to SVs in a range.",
     }

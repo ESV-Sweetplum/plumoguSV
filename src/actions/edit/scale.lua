@@ -11,29 +11,26 @@ function scaleDisplaceSVs(menuVars)
         local note1Offset = offsets[i]
         local note2Offset = offsets[i + 1]
         local svsBetweenOffsets = game.getSVsBetweenOffsets(note1Offset, note2Offset)
-        addStartSVIfMissing(svsBetweenOffsets, note1Offset)
+        -- addStartSVIfMissing(svsBetweenOffsets, note1Offset)
         local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
-        local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
-            endOffset)
+        local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, note1Offset,
+            note2Offset)
         local scalingDistance
         if scaleType == "Average SV" then
             local targetDistance = menuVars.avgSV * (note2Offset - note1Offset)
             scalingDistance = targetDistance - currentDistance
+            print(scalingDistance)
         elseif scaleType == "Absolute Distance" then
             scalingDistance = menuVars.distance - currentDistance
         elseif scaleType == "Relative Ratio" then
             scalingDistance = (menuVars.ratio - 1) * currentDistance
         end
         if isStartDisplace then
-            local atDisplacement = scalingDistance
-            local afterDisplacement = 0
-            prepareDisplacingSVs(note1Offset, svsToAdd, svTimeIsAdded, nil, atDisplacement,
-                afterDisplacement)
+            prepareDisplacingSVs(note1Offset, svsToAdd, svTimeIsAdded, nil, scalingDistance,
+                0)
         else
-            local beforeDisplacement = scalingDistance
-            local atDisplacement = 0
-            prepareDisplacingSVs(note2Offset, svsToAdd, svTimeIsAdded, beforeDisplacement,
-                atDisplacement, nil)
+            prepareDisplacingSVs(note2Offset, svsToAdd, svTimeIsAdded, scalingDistance,
+                0, nil)
         end
     end
     if isStartDisplace then addFinalSV(svsToAdd, endOffset, game.getSVMultiplierAt(endOffset)) end

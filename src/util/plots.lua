@@ -201,19 +201,18 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
             local appearanceTime = 0.5
             local inverseProgress = 1 - progress
             for idx, m in ipairs(svMultipliers) do
+                local x
                 local y = (#svMultipliers - idx + 1) / (#svMultipliers + 1)
                 local apx = y - (inverseProgress * 2 - 0.6)
                 if (math.abs(apx) > appearanceTime) then goto continue end
                 apx = apx / appearanceTime / 2 + 0.5
-                do
-                    local x = math.abs(m) / normativeMax
-                    ctx.AddRectFilled(
-                        vector.New(topLeft.x,
-                            topLeft.y + dim.y * (y + (1 - 2 * math.min(apx, 0.5)) / (#svMultipliers + 1))),
-                        vector.New(topLeft.x + dim.x * x,
-                            topLeft.y + dim.y * (y + 2 * (1 - math.max(apx, 0.5)) / (#svMultipliers + 1))),
-                        imgui.GetColorU32(imgui_col.PlotHistogram, (apx - apx * apx) * 2))
-                end
+                x = math.abs(m) / normativeMax
+                ctx.AddRectFilled(
+                    vector.New(topLeft.x,
+                        topLeft.y + dim.y * (y + (1 - 2 * math.min(apx, 0.5)) / (#svMultipliers + 1))),
+                    vector.New(topLeft.x + dim.x * x,
+                        topLeft.y + dim.y * (y + 2 * (1 - math.max(apx, 0.5)) / (#svMultipliers + 1))),
+                    imgui.GetColorU32(imgui_col.PlotHistogram, (apx - apx * apx) * 2))
                 ::continue::
             end
         end

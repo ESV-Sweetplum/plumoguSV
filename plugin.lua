@@ -3583,29 +3583,25 @@ function scaleDisplaceSVs(menuVars)
         local note1Offset = offsets[i]
         local note2Offset = offsets[i + 1]
         local svsBetweenOffsets = game.getSVsBetweenOffsets(note1Offset, note2Offset)
-        addStartSVIfMissing(svsBetweenOffsets, note1Offset)
         local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
-        local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
-            endOffset)
+        local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, note1Offset,
+            note2Offset)
         local scalingDistance
         if scaleType == "Average SV" then
             local targetDistance = menuVars.avgSV * (note2Offset - note1Offset)
             scalingDistance = targetDistance - currentDistance
+            print(scalingDistance)
         elseif scaleType == "Absolute Distance" then
             scalingDistance = menuVars.distance - currentDistance
         elseif scaleType == "Relative Ratio" then
             scalingDistance = (menuVars.ratio - 1) * currentDistance
         end
         if isStartDisplace then
-            local atDisplacement = scalingDistance
-            local afterDisplacement = 0
-            prepareDisplacingSVs(note1Offset, svsToAdd, svTimeIsAdded, nil, atDisplacement,
-                afterDisplacement)
+            prepareDisplacingSVs(note1Offset, svsToAdd, svTimeIsAdded, nil, scalingDistance,
+                0)
         else
-            local beforeDisplacement = scalingDistance
-            local atDisplacement = 0
-            prepareDisplacingSVs(note2Offset, svsToAdd, svTimeIsAdded, beforeDisplacement,
-                atDisplacement, nil)
+            prepareDisplacingSVs(note2Offset, svsToAdd, svTimeIsAdded, scalingDistance,
+                0, nil)
         end
     end
     if isStartDisplace then addFinalSV(svsToAdd, endOffset, game.getSVMultiplierAt(endOffset)) end
@@ -8007,8 +8003,8 @@ function chooseEditTool()
         "Polish your map with these set of tools.",
         "Get stats about SVs in a section.",
         "Reverse the scroll direction using SVs.",
-        "Scale SV values by multiplying.",
         "Scale SV values by adding teleport SVs.",
+        "Scale SV values by multiplying.",
         "Swap positions of notes using SVs.",
         "Adds a constant value to SVs in a range.",
     }
@@ -12674,19 +12670,18 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
             local appearanceTime = 0.5
             local inverseProgress = 1 - progress
             for idx, m in ipairs(svMultipliers) do
+                local x
                 local y = (#svMultipliers - idx + 1) / (#svMultipliers + 1)
                 local apx = y - (inverseProgress * 2 - 0.6)
                 if (math.abs(apx) > appearanceTime) then goto continue end
                 apx = apx / appearanceTime / 2 + 0.5
-                do
-                    local x = math.abs(m) / normativeMax
-                    ctx.AddRectFilled(
-                        vector.New(topLeft.x,
-                            topLeft.y + dim.y * (y + (1 - 2 * math.min(apx, 0.5)) / (#svMultipliers + 1))),
-                        vector.New(topLeft.x + dim.x * x,
-                            topLeft.y + dim.y * (y + 2 * (1 - math.max(apx, 0.5)) / (#svMultipliers + 1))),
-                        imgui.GetColorU32(imgui_col.PlotHistogram, (apx - apx * apx) * 2))
-                end
+                x = math.abs(m) / normativeMax
+                ctx.AddRectFilled(
+                    vector.New(topLeft.x,
+                        topLeft.y + dim.y * (y + (1 - 2 * math.min(apx, 0.5)) / (#svMultipliers + 1))),
+                    vector.New(topLeft.x + dim.x * x,
+                        topLeft.y + dim.y * (y + 2 * (1 - math.max(apx, 0.5)) / (#svMultipliers + 1))),
+                    imgui.GetColorU32(imgui_col.PlotHistogram, (apx - apx * apx) * 2))
                 ::continue::
             end
         end
