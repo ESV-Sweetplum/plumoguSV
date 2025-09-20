@@ -11,7 +11,7 @@ function scaleDisplaceSVs(menuVars)
         local note1Offset = offsets[i]
         local note2Offset = offsets[i + 1]
         local svsBetweenOffsets = game.getSVsBetweenOffsets(note1Offset, note2Offset)
-        -- addStartSVIfMissing(svsBetweenOffsets, note1Offset)
+        addStartSVIfMissing(svsBetweenOffsets, note1Offset)
         local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, note1Offset,
             note2Offset)
