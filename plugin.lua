@@ -10673,6 +10673,14 @@ function createMenuTab(tabName)
     if tabName == "Delete" then deleteTab() end
     imgui.EndTabItem()
 end
+function showCompositeEffectsTutorial()
+    imgui.SeparatorText("Exponential Composition")
+    imgui.TextWrapped(
+        "All of the previous effects we've seen have been done with just one effect; no changing settings, no different shapes. However, mixing and matching these different effects is what will make your SV map truly unique.")
+    gpsim("DoubleExpoExample", vctr2(1), function(t, idx)
+        return 2 * (t - 0.5) ^ 3 + 0.5 + t / 2
+    end, { { 1, 2 }, {}, { 3, 4 }, {} }, 500)
+end
 function showEditingRemovingSVTutorial()
     imgui.SeparatorText("Directly Editing SVs")
     imgui.TextWrapped(
@@ -10999,7 +11007,7 @@ function showTutorialWindow()
                 ["Working With Shapes"] = showWorkingWithShapesTutorial,
                 ["Editing/Removing SVs"] = showEditingRemovingSVTutorial,
                 ["Stills and Displacement"] = showStillsAndDisplacementTutorial,
-                ["Composite Effects"] = incompleteFn,
+                ["Composite Effects"] = showCompositeEffectsTutorial,
             },
             ["Adding Effects"] = {
                 ["Flickers"] = incompleteFn,

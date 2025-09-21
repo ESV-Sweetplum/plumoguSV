@@ -30,7 +30,7 @@ function showTutorialWindow()
                 ["Working With Shapes"] = showWorkingWithShapesTutorial,
                 ["Editing/Removing SVs"] = showEditingRemovingSVTutorial,
                 ["Stills and Displacement"] = showStillsAndDisplacementTutorial,
-                ["Composite Effects"] = incompleteFn,
+                ["Composite Effects"] = showCompositeEffectsTutorial,
             },
             ["Adding Effects"] = {
                 ["Flickers"] = incompleteFn,
