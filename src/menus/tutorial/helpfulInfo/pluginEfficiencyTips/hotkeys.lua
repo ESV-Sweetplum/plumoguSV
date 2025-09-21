@@ -9,7 +9,7 @@ function showHotkeyTutorial()
         globalVars.hotkeyList[8] .. '" to quickly place vibrato.')
     imgui.BulletText('Press "' .. globalVars.hotkeyList[3] .. '" to quickly swap any swappable parameters.')
     imgui.BulletText('Press "' .. globalVars.hotkeyList[4] .. '" to quickly negatable any negatable parameters.')
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[4] .. '" to quickly reset any resettable parameters.')
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[5] .. '" to quickly reset any resettable parameters.')
     imgui.PopStyleColor()
     imgui.SeparatorText("Advanced Hotkeys")
     imgui.TextWrapped(
