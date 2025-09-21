@@ -784,6 +784,12 @@ function pluralize(str, val, pos)
     end
     return table.concat(finalStrTbl) .. (strEnding or "")
 end
+---Capitalizes the first letter of the given string.
+---@param str string
+---@return string
+function string.capitalize(str)
+    return str:charAt(1):upper() .. str:sub(2)
+end
 ---Returns the `idx`th character in a string. Simply used for shorthand. Also supports negative indexes.
 ---@param str string The string to search.
 ---@param idx integer If positive, returns the `i`th character. If negative, returns the `i`th character from the end of the string (e.g. -1 returns the last character).
@@ -9877,6 +9883,16 @@ function showAppearanceSettings()
     end
     chooseStyleTheme()
     chooseColorTheme()
+    if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
+        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
+        local customStyle = {}
+        for k41 = 1, #customStyleIds do
+            local id = customStyleIds[k41]
+            customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[id:capitalize()])) / vctr4(255)
+        end
+        globalVars.customStyle = customStyle
+        globalVars.colorThemeIndex = table.indexOf(COLOR_THEMES, "CUSTOM")
+    end
     AddSeparator()
     chooseCursorTrail()
     chooseCursorTrailShape()
@@ -9922,7 +9938,7 @@ function showAppearanceSettings()
         imgui.EndDisabled()
     end
 end
-local customStyleIds = {
+customStyleIds = {
     "windowBg",
     "popupBg",
     "border",
@@ -10052,8 +10068,8 @@ end
 function stringifyCustomStyle(customStyle)
     local keys = table.keys(customStyle)
     local resultStr = "v2 "
-    for k41 = 1, #keys do
-        local key = keys[k41]
+    for k42 = 1, #keys do
+        local key = keys[k42]
         local value = customStyle[key]
         keyId = convertStrToShort(key)
         local r = math.floor(value.x * 255)
@@ -12457,8 +12473,8 @@ end
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for k42 = 1, #svs do
-        local sv = svs[k42]
+    for k43 = 1, #svs do
+        local sv = svs[k43]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
         if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
     end
@@ -12998,10 +13014,11 @@ end
 function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
+    PLUGIN_NAME = "plumoguSV-dev"
     state.IsWindowHovered = imgui.IsWindowHovered()
-    startNextWindowNotCollapsed("plumoguSV-dev")
+    startNextWindowNotCollapsed(PLUGIN_NAME)
     imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
-    imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
+    imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
     if (not performanceMode) then
         renderBackground()
         drawCapybaraParent()

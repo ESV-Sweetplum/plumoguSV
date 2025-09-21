@@ -1,4 +1,4 @@
-local customStyleIds = {
+customStyleIds = {
     "windowBg",
     "popupBg",
     "border",

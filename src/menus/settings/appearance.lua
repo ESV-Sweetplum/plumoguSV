@@ -6,6 +6,15 @@ function showAppearanceSettings()
     end
     chooseStyleTheme()
     chooseColorTheme()
+    if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
+        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
+        local customStyle = {}
+        for _, id in ipairs(customStyleIds) do
+            customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[id:capitalize()])) / vctr4(255)
+        end
+        globalVars.customStyle = customStyle
+        globalVars.colorThemeIndex = table.indexOf(COLOR_THEMES, "CUSTOM")
+    end
     AddSeparator()
     chooseCursorTrail()
     chooseCursorTrailShape()

@@ -2,11 +2,13 @@ function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
 
+    PLUGIN_NAME = "plumoguSV-dev"
+
     state.IsWindowHovered = imgui.IsWindowHovered()
 
-    startNextWindowNotCollapsed("plumoguSV-dev")
+    startNextWindowNotCollapsed(PLUGIN_NAME)
     imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
-    imgui.Begin("plumoguSV-dev", imgui_window_flags.AlwaysAutoResize)
+    imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
 
     if (not performanceMode) then
         renderBackground()
