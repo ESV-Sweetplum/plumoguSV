@@ -8138,21 +8138,25 @@ function infoTab()
         local coordinatesToCenter = game.window.getCenter() - vector.New(216.5, 200)
         imgui.SetWindowPos("plumoguSV Settings", coordinatesToCenter)
     end
+    HoverToolTip("Edit various functions of the plugin, such as the appearance or internal calculations.")
     KeepSameLine()
     if (imgui.Button("See Patch Notes", HALF_ACTION_BUTTON_SIZE)) then
         state.SetValue("windows.showPatchNotesWindow", not state.GetValue("windows.showPatchNotesWindow"))
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos("plumoguSV Patch Notes", coordinatesToCenter)
     end
+    HoverToolTip("Keep up with the progress of plumoguSV, and see what the newest updates have in store for you.")
     if (imgui.Button("Get Map Stats", HALF_ACTION_BUTTON_SIZE)) then
         getMapStats()
     end
+    HoverToolTip("A quick and easy way to view SV/SSF counts and some other minute pieces of data.")
     KeepSameLine()
     if (imgui.Button("View Tutorials", HALF_ACTION_BUTTON_SIZE)) then
         state.SetValue("windows.showTutorialWindow", not state.GetValue("windows.showTutorialWindow"))
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos("plumoguSV Tutorial Menu", coordinatesToCenter)
     end
+    HoverToolTip("New to SV? View interactive tutorials that will help you navigate the plugin for your first time.")
 end
 function showPatchNotesWindow()
     startNextWindowNotCollapsed("plumoguSV Patch Notes")
