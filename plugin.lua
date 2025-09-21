@@ -9893,6 +9893,8 @@ function showAppearanceSettings()
         globalVars.customStyle = customStyle
         globalVars.colorThemeIndex = table.indexOf(COLOR_THEMES, "CUSTOM")
     end
+    HoverToolTip(
+    "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
     AddSeparator()
     chooseCursorTrail()
     chooseCursorTrailShape()
