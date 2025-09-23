@@ -40,7 +40,7 @@ export default async function transpiler(devMode = false, lint = true) {
 
     const entryFiles: string[] = [...files].reduce((arr, cur, idx) => {
         if (entryPoints.some((e) => cur.includes(e))) {
-            files.splice(idx);
+            files.splice(idx, 1);
             arr.push(cur);
         }
         return arr;
