@@ -60,6 +60,13 @@ function clock.listen(id, interval)
     end
     return false
 end
+---A temporary clock that can be called multiple times. Should only be used for testing/debugging.
+---@param interval integer The interval at which the clock should run.
+---@return boolean ev True if the clock has reached its interval time.
+function clock.temp(interval)
+    tempClockCount = tempClockCount + 1
+    return clock.listen("temporary" .. tempClockCount, interval)
+end
 ---Alters opacity of a given color.
 ---@param col number
 ---@param additiveOpacity integer
@@ -126,6 +133,20 @@ function color.uintToRgba(n)
         tbl[#tbl + 1] = math.floor(n / 256 ^ i) % 256
     end
     return table.vectorize4(tbl)
+end
+---Converts rgba to a hexa string.
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return string
+function color.rgbaToHexa(r, g, b, a)
+    local flr = math.floor
+    local hexaStr = ""
+    for _, col in ipairs({ r, g, b, a }) do
+        hexaStr = hexaStr .. HEXADECIMAL[flr(col / 16) + 1] .. HEXADECIMAL[flr(col) % 16 + 1]
+    end
+    return hexaStr
 end
 ---Converts a hexa string to an rgba Vector4 (0-1 for each element).
 ---@param hexa string
@@ -217,6 +238,15 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     if (math.floor(48 / v) ~= 48 / v) then return 5 end
     if (48 / v > 16) then return 5 end
     return 48 / v
+end
+---Gets the start time of the most recent SSF, or returns -1 if there is no SSF before the given offset.
+---@param offset number
+---@param tgId? string
+---@return number
+function game.getSSFStartTimeAt(offset, tgId)
+    local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
+    if ssf then return ssf.StartTime end
+    return -1
 end
 ---Gets the multiplier of the most recent SSF, or returns 1 if there is no SSF before the given offset.
 ---@param offset number
@@ -404,6 +434,12 @@ function game.window.getCenter()
     local windowDim = state.WindowSize
     return vector.New(state.WindowSize[1] / 2, state.WindowSize[2] / 2)
 end
+---Returns `true` if the input (which should be a number) is not a number.
+---@param v number
+---@return boolean
+function isNaN(v)
+    return type(v) == "number" and v ~= v
+end
 ---Listens to the keyboard and returns specific values based on if keys are pressed.
 ---@return string[] prefixes An array of prefixes like "Ctrl" or "Shift".
 ---@return integer key The key enum of the pressed key.
@@ -479,6 +515,13 @@ end
 function math.quadraticBezier(p2, t)
     return 2 * t * (1 - t) * p2 + t * t
 end
+---Returns n choose r, or nCr.
+---@param n integer
+---@param r integer
+---@return integer
+function math.binom(n, r)
+    return math.factorial(n) / (math.factorial(r) * math.factorial(n - r))
+end
 ---Restricts a number to be within a chosen bound.
 ---@param number number
 ---@param lowerBound number
@@ -515,6 +558,16 @@ function math.expoClamp(n, lowerBound, upperBound, multiplicativeFactor)
     end
     return n
 end
+---Returns the factorial of an integer.
+---@param n integer
+---@return integer
+function math.factorial(n)
+    local product = 1
+    for i = 2, n do
+        product = product * i
+    end
+    return product
+end
 ---Forces a number to have a quarterly decimal part.
 ---@param number number
 ---@return number
@@ -538,6 +591,53 @@ function math.hermite(m1, m2, y2, t)
     local b = 3 * y2 - 2 * m1 - m2
     local c = m1
     return a * t * t * t + b * t * t + c * t
+end
+---Interpolates circular parameters of the form (x-h)^2+(y-k)^2=r^2 with three, non-colinear points.
+---@param p1 Vector2
+---@param p2 Vector2
+---@param p3 Vector2
+---@return number, number?, number?
+function math.interpolateCircle(p1, p2, p3)
+    local mtrx = {
+        vector.Table(2 * (p2 - p1)),
+        vector.Table(2 * (p3 - p1))
+    }
+    local vctr = {
+        vector.Length(p2) ^ 2 - vector.Length(p1) ^ 2,
+        vector.Length(p3) ^ 2 - vector.Length(p1) ^ 2
+    }
+    vtx = matrix.solve(mtrx, vctr)
+    if (type(vtx) == "number") then return -1 / 0 end
+    r = math.sqrt((p1.x) ^ 2 + (p1.y) ^ 2 + vtx[1] ^ 2 + vtx[2] ^ 2 - 2 * vtx[1] * p1.x - 2 * vtx[2] * p1.y)
+    return vtx[1], vtx[2], r
+end
+---Interpolates quadratic parameters of the form y=ax^2+bx+c with three, non-colinear points.
+---@param p1 Vector2
+---@param p2 Vector2
+---@param p3 Vector2
+---@return number, number?, number?
+function math.interpolateQuadratic(p1, p2, p3)
+    local mtrx = {
+        (p2.x) ^ 2 - (p1.x) ^ 2, (p2 - p1).x,
+        (p3.x) ^ 2 - (p1.x) ^ 2, (p3 - p1).x,
+    }
+    local vctr = {
+        (p2 - p1).y,
+        (p3 - p1).y
+    }
+    local coeffs = matrix.solve(mtrx, vctr)
+    if (type(coeffs) == "number") then return 1 / 0 end
+    c = p1.y - p1.x * coeffs[2] - (p1.x) ^ 2 * coeffs[1]
+    ---@type number, number, number
+    return coeffs[1], coeffs[2], c
+end
+---Returns a number that is `(weight * 100)%` of the way from travelling between `lowerBound` and `upperBound`.
+---@param weight number
+---@param lowerBound number
+---@param upperBound number
+---@return number
+function math.lerp(weight, lowerBound, upperBound)
+    return upperBound * weight + lowerBound * (1 - weight)
 end
 ---Returns the weight of a number between `lowerBound` and `upperBound`.
 ---@param num number
@@ -595,6 +695,11 @@ function matrix.solve(mtrx, vctr)
         end
     end
     return table.property(augMtrx, #mtrx + 1)
+end
+function matrix.swapRows(mtrx, rowIdx1, rowIdx2)
+    local temp = table.duplicate(mtrx[rowIdx1])
+    mtrx[rowIdx1] = table.duplicate(mtrx[rowIdx2])
+    mtrx[rowIdx2] = temp
 end
 ---Rounds a number to a given amount of decimal places.
 ---@param number number
@@ -1196,6 +1301,9 @@ end
 ---@return Vector2 vctr The resultant vector of style `<n, n>`.
 function vctr2(n)
     return vector.New(n, n)
+end
+function unit2(theta)
+    return vector.New(math.cos(theta), math.sin(theta))
 end
 imgui_disable_vector_packing = true
 DEFAULT_WIDGET_HEIGHT = 26
@@ -1984,6 +2092,7 @@ end]],
         startSV = 1.5,
         endSV = 0.5,
         stutterDuration = 50,
+        stutterDuration2 = 0,
         stuttersPerSection = 1,
         avgSV = 1,
         finalSVIndex = 2,
@@ -2220,14 +2329,19 @@ function placeStutterSVs(settingVars)
         local stutterOffsets = generateLinearSet(startOffset, endOffset,
             settingVars.stuttersPerSection + 1)
         for j = 1, #stutterOffsets - 1 do
+            local duration = settingVars.stutterDuration
+            if settingVars.linearlyChange then
+                local x = (i - 1) / (#stutterOffsets - 2)
+                duration = x * settingVars.stutterDuration2 + (1 - x) * settingVars.stutterDuration
+            end
             local svMultipliers = generateStutterSet(firstStutterSVs[stutterIndex],
-                settingVars.stutterDuration,
+                duration,
                 settingVars.avgSV,
                 settingVars.controlLastSV)
             local stutterStart = stutterOffsets[j]
             local stutterEnd = stutterOffsets[j + 1]
             local timeInterval = stutterEnd - stutterStart
-            local secondSVOffset = stutterStart + timeInterval * settingVars.stutterDuration * 0.01
+            local secondSVOffset = stutterStart + timeInterval * duration * 0.01
             addSVToList(svsToAdd, stutterStart, svMultipliers[1], true)
             addSVToList(svsToAdd, secondSVOffset, svMultipliers[2], true)
             stutterIndex = stutterIndex + 1
@@ -6437,6 +6551,8 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     imgui.EndCombo()
     return newListIndex
 end
+function BasicInputFloat(label, var, decimalPlaces, suffix, step)
+end
 function ComputableInputFloat(label, var, decimalPlaces, suffix)
     local previousValue = var
     local fmt = table.concat({"%.", decimalPlaces, "f"})
@@ -6664,6 +6780,14 @@ end
 function KeepSameLine()
     imgui.SameLine(0, SAMELINE_SPACING)
 end
+function BeginPaddinglessChild(label, size, flags)
+    imgui.PushStyleVar(imgui_style_var.WindowPadding, vctr2(0))
+    imgui.BeginChild(label, size, bit32.bor(flags or 2, 2))
+end
+function EndPaddinglessChild()
+    imgui.EndChild()
+    imgui.PopStyleVar()
+end
 function AddPadding()
     imgui.Dummy(vector.New(0, 0))
 end
@@ -6671,6 +6795,16 @@ function AddSeparator()
     AddPadding()
     imgui.Separator()
     AddPadding()
+end
+---Creates text that shifts between two colors.
+---@param text string The text to render.
+---@param color1 Vector4 The first color.
+---@param color2 Vector4 The second color.
+---@param oscillationPeriod? integer The amount of time to switch from color 1 -> 2 -> 1, in milliseconds.
+function GradientText(color1, color2, text, oscillationPeriod)
+    PushGradientStyle(color1, color2, imgui_col.Text, oscillationPeriod)
+    imgui.Text(text)
+    imgui.PopStyleColor()
 end
 function HoverToolTip(text)
     if not imgui.IsItemHovered() then return end
@@ -7038,6 +7172,9 @@ function addSelectedNoteTimesToList(menuVars)
     menuVars.noteTimes = table.dedupe(menuVars.noteTimes)
     menuVars.noteTimes = sort(menuVars.noteTimes, sortAscending)
 end
+function animationPaletteMenu(settingVars)
+    CodeInput(settingVars, "instructions", "", "Write instructions here.")
+end
 function automateSVMenu(settingVars)
     local copiedSVCount = #settingVars.copiedSVs
     if (copiedSVCount == 0) then
@@ -7116,7 +7253,15 @@ function stutterSettingsMenu(settingVars)
     local settingsChanged = false
     settingsChanged = chooseControlSecondSV(settingVars) or settingsChanged
     settingsChanged = chooseStartEndSVs(settingVars) or settingsChanged
-    settingsChanged = chooseStutterDuration(settingVars) or settingsChanged
+    if (not settingVars.linearlyChange) then
+        settingsChanged = chooseStutterDuration(settingVars) or settingsChanged
+    else
+        settingsChanged = SwappableNegatableInputFloat2(settingVars, "stutterDuration", "stutterDuration2",
+            "S/E % Duration",
+            "%%", 0)
+        settingVars.stutterDuration = math.clamp(settingVars.stutterDuration, 1, 99)
+        settingVars.stutterDuration2 = math.clamp(settingVars.stutterDuration2, 1, 99)
+    end
     settingsChanged = BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time") or settingsChanged
     AddSeparator()
     settingsChanged = BasicInputInt(settingVars, "stuttersPerSection", "Stutters", { 1, 1000 }) or settingsChanged
@@ -12333,6 +12478,22 @@ function getHypotheticalSVMultiplierAt(svs, offset)
         end
     end
     return 1
+end
+---Returns the SV time in a given array of SVs.
+---@param svs ScrollVelocity[]
+---@param offset number
+---@return number
+function getHypotheticalSVTimeAt(svs, offset)
+    if (#svs == 1) then return svs[1].StartTime end
+    local index = #svs
+    while (index >= 1) do
+        if (svs[index].StartTime > offset) then
+            index = index - 1
+        else
+            return svs[index].StartTime
+        end
+    end
+    return -69
 end
 ---Given a predetermined set of SVs, returns a list of [scroll velocities](lua://ScrollVelocity) within a temporal boundary.
 ---@param startOffset number The lower bound of the search area.

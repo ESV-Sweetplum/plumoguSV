@@ -22,14 +22,19 @@ function placeStutterSVs(settingVars)
         local stutterOffsets = generateLinearSet(startOffset, endOffset,
             settingVars.stuttersPerSection + 1)
         for j = 1, #stutterOffsets - 1 do
+            local duration = settingVars.stutterDuration
+            if settingVars.linearlyChange then
+                local x = (i - 1) / (#stutterOffsets - 2)
+                duration = x * settingVars.stutterDuration2 + (1 - x) * settingVars.stutterDuration
+            end
             local svMultipliers = generateStutterSet(firstStutterSVs[stutterIndex],
-                settingVars.stutterDuration,
+                duration,
                 settingVars.avgSV,
                 settingVars.controlLastSV)
             local stutterStart = stutterOffsets[j]
             local stutterEnd = stutterOffsets[j + 1]
             local timeInterval = stutterEnd - stutterStart
-            local secondSVOffset = stutterStart + timeInterval * settingVars.stutterDuration * 0.01
+            local secondSVOffset = stutterStart + timeInterval * duration * 0.01
             addSVToList(svsToAdd, stutterStart, svMultipliers[1], true)
             addSVToList(svsToAdd, secondSVOffset, svMultipliers[2], true)
             stutterIndex = stutterIndex + 1
