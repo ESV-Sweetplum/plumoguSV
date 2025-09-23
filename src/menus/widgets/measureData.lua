@@ -27,12 +27,12 @@ function renderMeasureDataWidget()
     uniqueDict = sort(uniqueDict, sortAscending) ---@type number[]
     local startOffset = uniqueDict[1]
     local endOffset = uniqueDict[2] or uniqueDict[1]
-    if (math.abs(endOffset - startOffset) < 1e-10) then return end
+    if (math.abs(endOffset - startOffset) < 1e-10 and not cache.boolean.changeOccurred) then return end
     if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or cache.boolean.changeOccurred) then
         svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
         widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
-        totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
+        totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset) or 0
         widgetVars.roundedSVDistance = math.round(totalDistance, 3)
         avgSV = totalDistance / (endOffset - startOffset)
         widgetVars.roundedAvgSV = math.round(avgSV, 3)
