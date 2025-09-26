@@ -21,6 +21,8 @@ function showGeneralSettings()
         "Forces the standard > linear option to have an average sv of 0 if the start and end SVs are equal. For beginners, this should be enabled.")
     GlobalCheckbox("comboizeSelect", "Select Using Already Selected Notes",
         "Changes the behavior of the SELECT tab to select notes that are already selected, instead of all notes between the start/end selection.")
+    GlobalCheckbox("useEndTimeOffsets", "Use LN Ends As Offsets",
+        "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets.")
 end
 
 function chooseUpscroll()

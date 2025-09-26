@@ -391,6 +391,7 @@ defaultProperties:
       startSV: 5
       endSV: 0.5
       stutterDuration: 15
+      stutterDuration2: 0
       stuttersPerSection: 1
       avgSV: 1
       finalSVIndex: 2
@@ -426,6 +427,7 @@ defaultProperties:
       avgSV: 1
       finalSVIndex: 2
       customSV: 1
+      stuttersPerSection: 1
     framesSetup:
       menuStep: 1
       numFrames: 5
@@ -632,4 +634,5 @@ presets:
 - 
 dynamicBackgroundIndex: 1
 disableLoadup: false
+useEndTimeOffsets: true
 ignoreNotes: false

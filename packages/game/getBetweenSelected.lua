@@ -25,8 +25,9 @@ end
 ---@return number[]
 function game.uniqueSelectedNoteOffsets()
     local offsets = {}
-    for i, ho in pairs(state.SelectedHitObjects) do
-        offsets[i] = ho.StartTime
+    for _, ho in pairs(state.SelectedHitObjects) do
+        table.insert(offsets, ho.StartTime)
+        if (ho.EndTime ~= 0 and globalVars.useEndTimeOffsets) then table.insert(offsets, ho.EndTime) end
     end
     offsets = table.dedupe(offsets)
     offsets = sort(offsets, sortAscending)

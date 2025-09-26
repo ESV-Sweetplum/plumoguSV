@@ -7,6 +7,7 @@ require("packages.table.dedupe")
 ---@return number[]
 function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     local noteOffsetsBetween = {}
+    includeLN = includeLN or globalVars.useEndTimeOffsets
     for _, ho in ipairs(map.HitObjects) do
         if ho.StartTime >= startOffset and ho.StartTime <= endOffset then
             local skipNote = false

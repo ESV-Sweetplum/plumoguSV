@@ -374,8 +374,9 @@ end
 ---@return number[]
 function game.uniqueSelectedNoteOffsets()
     local offsets = {}
-    for i, ho in pairs(state.SelectedHitObjects) do
-        offsets[i] = ho.StartTime
+    for _, ho in pairs(state.SelectedHitObjects) do
+        offsets[#offsets + 1] = ho.StartTime
+        if (ho.EndTime ~= 0 and globalVars.useEndTimeOffsets) then offsets[#offsets + 1] = ho.EndTime end
     end
     offsets = table.dedupe(offsets)
     offsets = sort(offsets, sortAscending)
@@ -408,6 +409,7 @@ end
 ---@return number[]
 function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     local noteOffsetsBetween = {}
+    includeLN = includeLN or globalVars.useEndTimeOffsets
     for _, ho in ipairs(map.HitObjects) do
         if ho.StartTime >= startOffset and ho.StartTime <= endOffset then
             local skipNote = false
@@ -1660,7 +1662,8 @@ globalVars = {
     defaultProperties = { settings = {}, menu = {} },
     presets = {},
     dynamicBackgroundIndex = 1,
-    disableLoadup = false
+    disableLoadup = false,
+    useEndTimeOffsets = false
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 function setGlobalVars(tempGlobalVars)
@@ -1703,6 +1706,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
     globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)
     globalVars.dynamicBackgroundIndex = math.toNumber(tempGlobalVars.dynamicBackgroundIndex)
+    globalVars.useEndTimeOffsets = truthy(tempGlobalVars.useEndTimeOffsets)
 end
 DEFAULT_STARTING_MENU_VARS = {
     placeStandard = {
@@ -6870,6 +6874,9 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
         imgui.Dummy(vector.New(0, 10))
     end
 end
+---Returns `true` if enough notes are selected.
+---@param minimumNotes 0|1|2
+---@return boolean
 function checkEnoughSelectedNotes(minimumNotes)
     if minimumNotes == 0 then return true end
     local selectedNotes = state.SelectedHitObjects
@@ -6877,6 +6884,7 @@ function checkEnoughSelectedNotes(minimumNotes)
     if numSelectedNotes == 0 then return false end
     if minimumNotes == 1 then return true end
     if numSelectedNotes > game.keyCount then return true end
+    if (globalVars.useEndTimeOffsets and minimumNotes == 2 and selectedNotes[1].EndTime ~= 0) then return true end
     return selectedNotes[1].StartTime ~= selectedNotes[numSelectedNotes].StartTime
 end
 function showSettingsMenu(currentSVType, settingVars, skipFinalSV, svPointsForce, optionalLabel)
@@ -7297,8 +7305,8 @@ function teleportStutterSettingsMenu(settingVars)
         chooseStartSVPercent(settingVars)
     end
     chooseMainSV(settingVars)
-    chooseAverageSV(settingVars)
     BasicInputInt(settingVars, "stuttersPerSection", "Stutters", { 1, 1000 })
+    chooseAverageSV(settingVars)
     chooseFinalSV(settingVars, false)
     BasicCheckbox(settingVars, "useDistance", "Use distance for start SV")
     BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time")
@@ -10497,6 +10505,8 @@ function showGeneralSettings()
         "Forces the standard > linear option to have an average sv of 0 if the start and end SVs are equal. For beginners, this should be enabled.")
     GlobalCheckbox("comboizeSelect", "Select Using Already Selected Notes",
         "Changes the behavior of the SELECT tab to select notes that are already selected, instead of all notes between the start/end selection.")
+    GlobalCheckbox("useEndTimeOffsets", "Use LN Ends As Offsets",
+        "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets.")
 end
 function chooseUpscroll()
     local oldUpscroll = globalVars.upscroll
