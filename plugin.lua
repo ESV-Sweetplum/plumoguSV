@@ -2430,9 +2430,17 @@ function placeTeleportStutterSVs(settingVars)
         local sv1 = thisMainSV + startDistance * startMultiplier
         local sv2 = thisMainSV
         local sv3 = thisMainSV + endDistance * endMultiplier
-        addSVToList(svsToAdd, startOffset, sv1, true)
-        if sv2 ~= sv1 then addSVToList(svsToAdd, startOffset + startDuration, sv2, true) end
-        if sv3 ~= sv2 then addSVToList(svsToAdd, endOffset - endDuration, sv3, true) end
+        for j = 0, settingVars.stuttersPerSection - 1 do
+            local x = j / settingVars.stuttersPerSection
+            local currentStart = (endOffset - startOffset) * j / settingVars.stuttersPerSection + startOffset
+            local currentEnd = (endOffset - startOffset) * (j + 1) / settingVars.stuttersPerSection + startOffset
+            addSVToList(svsToAdd, currentStart, sv1 / settingVars.stuttersPerSection, true)
+            if sv2 ~= sv1 then
+                addSVToList(svsToAdd, currentStart + startDuration, sv2,
+                    true)
+            end
+            if sv3 ~= sv2 then addSVToList(svsToAdd, currentEnd - endDuration, sv3 / settingVars.stuttersPerSection, true) end
+        end
     end
     local finalMultiplier = settingVars.avgSV
     if finalSVType ~= "Normal" then
