@@ -2116,7 +2116,8 @@ end]],
         linearlyChange = false,
         avgSV = 1,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
+        stuttersPerSection = 1
     },
     framesSetup = {
         menuStep = 1,
@@ -2373,8 +2374,13 @@ function placeStutterSSFs(settingVars)
         local stutterOffsets = generateLinearSet(startOffset, endOffset,
             settingVars.stuttersPerSection + 1)
         for j = 1, #stutterOffsets - 1 do
+            local duration = settingVars.stutterDuration
+            if settingVars.linearlyChange then
+                local x = (i - 1) / (#stutterOffsets - 2)
+                duration = x * settingVars.stutterDuration2 + (1 - x) * settingVars.stutterDuration
+            end
             local ssfMultipliers = generateStutterSet(firstStutterSVs[stutterIndex],
-                settingVars.stutterDuration,
+                duration,
                 settingVars.avgSV,
                 settingVars.controlLastSV)
             local stutterStart = stutterOffsets[j]
@@ -7284,6 +7290,7 @@ function teleportStutterSettingsMenu(settingVars)
     end
     chooseMainSV(settingVars)
     chooseAverageSV(settingVars)
+    BasicInputInt(settingVars, "stuttersPerSection", "Stutters", { 1, 1000 })
     chooseFinalSV(settingVars, false)
     BasicCheckbox(settingVars, "useDistance", "Use distance for start SV")
     BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time")

@@ -67,8 +67,13 @@ function placeStutterSSFs(settingVars)
         local stutterOffsets = generateLinearSet(startOffset, endOffset,
             settingVars.stuttersPerSection + 1)
         for j = 1, #stutterOffsets - 1 do
+            local duration = settingVars.stutterDuration
+            if settingVars.linearlyChange then
+                local x = (i - 1) / (#stutterOffsets - 2)
+                duration = x * settingVars.stutterDuration2 + (1 - x) * settingVars.stutterDuration
+            end
             local ssfMultipliers = generateStutterSet(firstStutterSVs[stutterIndex],
-                settingVars.stutterDuration,
+                duration,
                 settingVars.avgSV,
                 settingVars.controlLastSV)
             local stutterStart = stutterOffsets[j]

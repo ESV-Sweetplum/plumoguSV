@@ -15,6 +15,7 @@ function teleportStutterSettingsMenu(settingVars)
     end
     chooseMainSV(settingVars)
     chooseAverageSV(settingVars)
+    BasicInputInt(settingVars, "stuttersPerSection", "Stutters", { 1, 1000 })
     chooseFinalSV(settingVars, false)
     BasicCheckbox(settingVars, "useDistance", "Use distance for start SV")
     BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time")

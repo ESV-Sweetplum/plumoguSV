@@ -215,7 +215,8 @@ end]],
         linearlyChange = false,
         avgSV = 1,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
+        stuttersPerSection = 1
     },
     framesSetup = {
         menuStep = 1,
