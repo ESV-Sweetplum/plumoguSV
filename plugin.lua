@@ -1554,10 +1554,10 @@ DEFAULT_STYLE = {
     plotHistogramHovered =
         vector.New(1.00, 0.60, 0.00, 1.00)
 }
-DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Shift+Alt+L" }
+DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Shift+Alt+L", "Ctrl+Shift+Alt+E" }
 HOTKEY_LABELS = { "Execute Primary Action", "Execute Secondary Action", "Swap Primary Inputs",
     "Negate Primary Inputs", "Reset Secondary Input", "Go To Prev. Scroll Group", "Go To Next Scroll Group",
-    "Execute Vibrato Separately", "Use TG of Selected Note", "Toggle Note Lock Mode" }
+    "Execute Vibrato Separately", "Use TG of Selected Note", "Toggle Note Lock Mode", "Toggle Use End Offsets" }
 function createSVGraphStats()
     local svGraphStats = {
         minScale = 0,
@@ -3766,6 +3766,19 @@ end
 function checkForGlobalHotkeys()
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[9])) then jumpToTg() end
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[10])) then changeNoteLockMode() end
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[11])) then toggleUseEndOffsets() end
+end
+function toggleUseEndOffsets()
+    globalVars.useEndTimeOffsets = not globalVars.useEndTimeOffsets
+    if (globalVars.useEndTimeOffsets) then
+        print("s",
+            table.concat({"LN ends are now considered as their own offsets. To change this, press ", globalVars.hotkeyList[11], "."}))
+    else
+        print("e",
+            "LN ends are now no longer considered as their own offsets. To change this, press " ..
+            globalVars.hotkeyList[11] .. ".")
+    end
+    write(globalVars)
 end
 function getMapStats()
     local currentTg = state.SelectedScrollGroupId
@@ -10530,7 +10543,6 @@ function showKeybindSettings()
         imgui.SetCursorPosX(111)
         imgui.Text("" .. HOTKEY_LABELS[hotkeyIndex])
     end
-    AddSeparator()
     simpleActionMenu("Reset Hotkey Settings", 0, function()
         globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
         write(globalVars)
