@@ -3,7 +3,6 @@ function teleportStutterMenu(settingVars)
 
     AddSeparator()
     simpleActionMenu("Place SVs between selected notes", 2, placeTeleportStutterSVs, settingVars)
-    simpleActionMenu("Place SSFs between selected notes", 2, placeTeleportStutterSSFs, settingVars, true)
 end
 
 function teleportStutterSettingsMenu(settingVars)

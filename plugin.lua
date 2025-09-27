@@ -1504,7 +1504,7 @@ VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2,
 DEFAULT_STYLE = {
     windowBg = vector.New(0.00, 0.00, 0.00, 1.00),
     popupBg = vector.New(0.08, 0.08, 0.08, 0.94),
-    border = color.vctr.transparent,
+    border = vector.New(0.00, 0.00, 0.00, 0.00),
     frameBg = vector.New(0.14, 0.24, 0.28, 1.00),
     frameBgHovered =
         vector.New(0.24, 0.34, 0.38, 1.00),
@@ -2355,50 +2355,6 @@ function placeStutterSVs(settingVars)
     addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == "Override")
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
-function placeStutterSSFs(settingVars)
-    local lastFirstStutter = settingVars.startSV
-    local lastMultiplier = settingVars.svMultipliers[3]
-    if settingVars.linearlyChange then
-        lastFirstStutter = settingVars.endSV
-        lastMultiplier = settingVars.svMultipliers2[3]
-    end
-    local offsets = game.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
-    local firstOffset = offsets[1]
-    local lastOffset = offsets[#offsets]
-    local totalNumStutters = (#offsets - 1) * settingVars.stuttersPerSection
-    local firstStutterSVs = generateLinearSet(settingVars.startSV, lastFirstStutter,
-        totalNumStutters)
-    local ssfsToAdd = {}
-    local ssfsToRemove = game.getSSFsBetweenOffsets(firstOffset, lastOffset)
-    local stutterIndex = 1
-    for i = 1, #offsets - 1 do
-        local startOffset = offsets[i]
-        local endOffset = offsets[i + 1]
-        local stutterOffsets = generateLinearSet(startOffset, endOffset,
-            settingVars.stuttersPerSection + 1)
-        for j = 1, #stutterOffsets - 1 do
-            local duration = settingVars.stutterDuration
-            if settingVars.linearlyChange then
-                local x = (i - 1) / (#stutterOffsets - 2)
-                duration = x * settingVars.stutterDuration2 + (1 - x) * settingVars.stutterDuration
-            end
-            local ssfMultipliers = generateStutterSet(firstStutterSVs[stutterIndex],
-                duration,
-                settingVars.avgSV,
-                settingVars.controlLastSV)
-            local stutterStart = stutterOffsets[j]
-            local stutterEnd = stutterOffsets[j + 1]
-            local timeInterval = stutterEnd - stutterStart
-            local secondSVOffset = stutterStart + timeInterval * settingVars.stutterDuration * 0.01
-            addSSFToList(ssfsToAdd, stutterStart, ssfMultipliers[1], true)
-            addSSFToList(ssfsToAdd, secondSVOffset, ssfMultipliers[2], true)
-            stutterIndex = stutterIndex + 1
-        end
-    end
-    addFinalSSF(ssfsToAdd, lastOffset, lastMultiplier)
-    removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
-end
 function placeTeleportStutterSVs(settingVars)
     local finalSVType = FINAL_SV_TYPES[settingVars.finalSVIndex]
     local svPercent = settingVars.svPercent * 0.01
@@ -2452,52 +2408,6 @@ function placeTeleportStutterSVs(settingVars)
     end
     addFinalSV(svsToAdd, lastOffset, finalMultiplier, finalSVType == "Override")
     removeAndAddSVs(svsToRemove, svsToAdd)
-end
-function placeTeleportStutterSSFs(settingVars)
-    local finalSVType = FINAL_SV_TYPES[settingVars.finalSVIndex]
-    local svPercent = settingVars.svPercent * 0.01
-    local lastSVPercent = svPercent
-    local lastMainSV = settingVars.mainSV
-    if settingVars.linearlyChange then
-        lastSVPercent = settingVars.svPercent2 * 0.01
-        lastMainSV = settingVars.mainSV2
-    end
-    local offsets = game.uniqueNoteOffsetsBetweenSelected()
-    local firstOffset = offsets[1]
-    local lastOffset = offsets[#offsets]
-    local numTeleportSets = #offsets - 1
-    local ssfsToAdd = {}
-    local ssfsToRemove = game.getSSFsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
-    local ssfPercents = generateLinearSet(svPercent, lastSVPercent, numTeleportSets)
-    local mainSSFs = generateLinearSet(settingVars.mainSV, lastMainSV, numTeleportSets)
-    removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
-    for i = 1, numTeleportSets do
-        local thisMainSSF = mainSSFs[i]
-        local startOffset = offsets[i]
-        local endOffset = offsets[i + 1]
-        local offsetInterval = endOffset - startOffset
-        local startMultiplier = getUsableDisplacementMultiplier(startOffset)
-        local startDuration = 1 / startMultiplier
-        local endMultiplier = getUsableDisplacementMultiplier(endOffset)
-        local endDuration = 1 / endMultiplier
-        local startDistance = offsetInterval * ssfPercents[i]
-        if settingVars.useDistance then startDistance = settingVars.distance end
-        local expectedDistance = offsetInterval * settingVars.avgSV
-        local traveledDistance = offsetInterval * thisMainSSF
-        local endDistance = expectedDistance - startDistance - traveledDistance
-        local ssf1 = thisMainSSF + startDistance * startMultiplier
-        local ssf2 = thisMainSSF
-        local ssf3 = thisMainSSF + endDistance * endMultiplier
-        addSSFToList(ssfsToAdd, startOffset, ssf1, true)
-        if ssf2 ~= ssf1 then addSSFToList(ssfsToAdd, startOffset + startDuration, ssf2, true) end
-        if ssf3 ~= ssf2 then addSSFToList(ssfsToAdd, endOffset - endDuration, ssf3, true) end
-    end
-    local finalMultiplier = settingVars.avgSV
-    if finalSVType ~= "Normal" then
-        finalMultiplier = settingVars.customSV
-    end
-    addFinalSSF(ssfsToAdd, lastOffset, finalMultiplier, finalSVType == "Override")
-    removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
 end
 function placeExponentialSpecialSVs(menuVars)
     if (menuVars.settingVars.distanceMode == 2) then
@@ -7282,7 +7192,6 @@ function stutterMenu(settingVars)
     displayStutterSVWindows(settingVars)
     AddSeparator()
     simpleActionMenu("Place SVs between selected notes", 2, placeStutterSVs, settingVars)
-    simpleActionMenu("Place SSFs between selected notes", 2, placeStutterSSFs, settingVars, true)
 end
 function stutterSettingsMenu(settingVars)
     local settingsChanged = false
@@ -7308,7 +7217,6 @@ function teleportStutterMenu(settingVars)
     teleportStutterSettingsMenu(settingVars)
     AddSeparator()
     simpleActionMenu("Place SVs between selected notes", 2, placeTeleportStutterSVs, settingVars)
-    simpleActionMenu("Place SSFs between selected notes", 2, placeTeleportStutterSSFs, settingVars, true)
 end
 function teleportStutterSettingsMenu(settingVars)
     if settingVars.useDistance then

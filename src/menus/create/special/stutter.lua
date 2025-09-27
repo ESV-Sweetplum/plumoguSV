@@ -6,7 +6,6 @@ function stutterMenu(settingVars)
 
     AddSeparator()
     simpleActionMenu("Place SVs between selected notes", 2, placeStutterSVs, settingVars)
-    simpleActionMenu("Place SSFs between selected notes", 2, placeStutterSSFs, settingVars, true)
 end
 
 function stutterSettingsMenu(settingVars)

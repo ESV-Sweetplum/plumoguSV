@@ -225,7 +225,7 @@ VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2,
 DEFAULT_STYLE = {
     windowBg = vector.New(0.00, 0.00, 0.00, 1.00),
     popupBg = vector.New(0.08, 0.08, 0.08, 0.94),
-    border = color.vctr.transparent,
+    border = vector.New(0.00, 0.00, 0.00, 0.00),
     frameBg = vector.New(0.14, 0.24, 0.28, 1.00),
     frameBgHovered =
         vector.New(0.24, 0.34, 0.38, 1.00),
