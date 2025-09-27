@@ -10,7 +10,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     local newListIndex = math.clamp(listIndex, 1, #list)
     local currentComboItem = list[listIndex]
     local comboFlag = imgui_combo_flags.HeightLarge
-    rgb = {}
+    local rgb = {}
     hiddenGroups = hiddenGroups or {}
 
     if (colorList and truthy(colorList)) then

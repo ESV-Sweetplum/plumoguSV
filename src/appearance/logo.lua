@@ -1048,8 +1048,8 @@ end
 ---@param col integer
 ---@param thickness number
 function partialBezierCubic(ctx, t0, t1, p1, p2, p3, p4, col, thickness)
-    u0 = 1.0 - t0
-    u1 = 1.0 - t1
+    local u0 = 1.0 - t0
+    local u1 = 1.0 - t1
 
     local qa = p1 * u0 * u0 + p2 * 2 * t0 * u0 + p3 * t0 * t0
     local qb = p1 * u1 * u1 + p2 * 2 * t1 * u1 + p3 * t1 * t1

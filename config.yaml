@@ -635,5 +635,5 @@ presets:
 - 
 dynamicBackgroundIndex: 1
 disableLoadup: false
-useEndTimeOffsets: true
+useEndTimeOffsets: false
 ignoreNotes: false
