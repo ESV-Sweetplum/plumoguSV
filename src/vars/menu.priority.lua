@@ -137,6 +137,9 @@ DEFAULT_STARTING_MENU_VARS = {
         searchTerm = "",
         filterTerm = "",
     },
+    selectByTimingGroup = {
+        designatedTimingGroup = "$Default",
+    },
     selectChordSize = {
         select1 = true,
         select2 = false,

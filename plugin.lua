@@ -1847,6 +1847,9 @@ DEFAULT_STARTING_MENU_VARS = {
         searchTerm = "",
         filterTerm = "",
     },
+    selectByTimingGroup = {
+        designatedTimingGroup = "$Default",
+    },
     selectChordSize = {
         select1 = true,
         select2 = false,
@@ -3854,6 +3857,23 @@ function selectBySnap(menuVars)
             index = index + 1
         end
         if (math.abs(note.StartTime - currentTime) < 10) then
+            notesToSelect[#notesToSelect + 1] = note
+        end
+    end
+    actions.SetHitObjectSelection(notesToSelect)
+    print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
+end
+function selectByTimingGroup(menuVars)
+    local offsets = game.uniqueSelectedNoteOffsets()
+    if (not truthy(offsets)) then return end
+    local startOffset = offsets[1]
+    local endOffset = offsets[#offsets]
+    local notesToSelect = {}
+    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
+    notes = sort(notes, sortAscendingNoteLaneTime)
+    for _, note in pairs(notes) do
+        if (note.TimingGroup == menuVars.designatedTimingGroup) then
             notesToSelect[#notesToSelect + 1] = note
         end
     end
@@ -9791,6 +9811,7 @@ SELECT_TOOLS = {
     "Alternating",
     "Bookmark",
     "By Snap",
+    "By Timing Group",
     "Chord Size",
     "Note Type",
 }
@@ -9801,6 +9822,7 @@ function selectTab()
     if toolName == "Alternating" then selectAlternatingMenu() end
     if toolName == "Bookmark" then selectBookmarkMenu() end
     if toolName == "By Snap" then selectBySnapMenu() end
+    if toolName == "By Timing Group" then selectByTimingGroupMenu() end
     if toolName == "Chord Size" then selectChordSizeMenu() end
     if toolName == "Note Type" then selectNoteTypeMenu() end
 end
@@ -9809,6 +9831,7 @@ function chooseSelectTool()
         "Skip over notes then select one, and repeat.",
         "Select all notes with a certain snap color.",
         "Jump to a bookmark.",
+        "Select all notes within a certain timing group.",
         "Select all notes with a certain chord size.",
         "Select rice/ln notes."
     }
@@ -9836,6 +9859,35 @@ function selectBySnapMenu()
         table.concat({"Select notes with 1/", menuVars.snap, " snap"}),
         2,
         selectBySnap, menuVars)
+end
+function selectByTimingGroupMenu()
+    local menuVars = getMenuVars("selectByTimingGroup")
+    imgui.AlignTextToFramePadding()
+    imgui.Text("Select in:")
+    KeepSameLine()
+    local groups = { "$Default", "$Global" }
+    local cols = { map.TimingGroups["$Default"].ColorRgb or "86,253,110", map.TimingGroups["$Global"].ColorRgb or
+    "255,255,255" }
+    local hiddenGroups = {}
+    for tgId, tg in pairs(map.TimingGroups) do
+        if string.find(tgId, "%$") then goto cont end
+        if (globalVars.hideAutomatic and string.find(tgId, "automate_")) then
+            table.insert(hiddenGroups,
+                tgId)
+        end
+        groups[#groups + 1] = tgId
+        table.insert(cols, tg.ColorRgb or "255,255,255")
+        ::cont::
+    end
+    local prevIndex = table.indexOf(groups, menuVars.designatedTimingGroup)
+    imgui.PushItemWidth(155)
+    local newIndex = Combo("##changingScrollGroup", groups, prevIndex, cols, hiddenGroups)
+    imgui.PopItemWidth()
+    imgui.Dummy(vector.New(0, 2))
+    menuVars.designatedTimingGroup = groups[newIndex]
+    simpleActionMenu(table.concat({ "Select notes in ", menuVars.designatedTimingGroup }), 2, selectByTimingGroup,
+        menuVars)
+    cache.saveTable("selectByTimingGroupMenu", menuVars)
 end
 function showAppearanceSettings()
     if (globalVars.performanceMode) then
