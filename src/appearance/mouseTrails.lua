@@ -93,7 +93,6 @@ function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrail
         local color = color.int.whiteMask + math.floor(alpha) * color.int.alphaMask
         if trailShape == "Circles" then
             o.AddCircleFilled(point, cursorTrailSize, color)
-            imgui.Text(alpha)
         elseif trailShape == "Triangles" then
             drawTriangleTrailPoint(o, m, point, cursorTrailSize, color)
         end
