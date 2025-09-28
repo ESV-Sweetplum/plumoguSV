@@ -1,6 +1,7 @@
 EDIT_SV_TOOLS = { -- tools for editing SVs
     "Add Teleport",
     "Change Groups",
+    "Complete Duplicate",
     "Convert SV <-> SSF",
     "Copy & Paste",
     "Direct SV",
@@ -25,6 +26,7 @@ function editSVTab()
     local toolName = EDIT_SV_TOOLS[globalVars.editToolIndex]
     if toolName == "Add Teleport" then addTeleportMenu() end
     if toolName == "Change Groups" then changeGroupsMenu() end
+    if toolName == "Complete Duplicate" then completeDuplicateMenu() end
     if toolName == "Convert SV <-> SSF" then convertSVSSFMenu() end
     if toolName == "Copy & Paste" then copyNPasteMenu() end
     if toolName == "Direct SV" then directSVMenu() end
@@ -47,6 +49,7 @@ function chooseEditTool()
         "Add a large teleport SV to move far away.",
         "Moves SVs and SSFs to a designated timing group.",
         "Convert multipliers between SV/SSF.",
+        "Completely copy a section of your map and put it somewhere else.",
         "Copy SVs and SSFs and paste them somewhere else.",
         "Directly update SVs within your selection.",
         "Move where notes are hit on the screen.",

@@ -44,6 +44,9 @@ DEFAULT_STARTING_MENU_VARS = {
         changeSSFs = true,
         clone = false,
     },
+    completeDuplicate = {
+        objects = {}
+    },
     convertSVSSF = {
         conversionDirection = true
     },

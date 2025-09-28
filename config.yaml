@@ -519,6 +519,9 @@ defaultProperties:
       changeSVs: true
       changeSSFs: true
       clone: true
+    completeDuplicate:
+      objects:
+      - 
     convertSVSSF:
       conversionDirection: true
     copy:
@@ -614,6 +617,8 @@ defaultProperties:
     selectBookmark:
       searchTerm: ''
       filterTerm: ''
+    selectByTimingGroup:
+      designatedTimingGroup: $Default
     selectChordSize:
       select1: true
       select2: false

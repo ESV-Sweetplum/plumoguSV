@@ -6,6 +6,7 @@ function drawCursorTrail()
     local m = imgui.GetMousePos()
     local t = clock.getTime()
     local sz = state.WindowSize
+    if cursorTrail ~= "Snake" then cache.boolean.snakeTrailInitialized = false end
     if cursorTrail ~= "Dust" then cache.boolean.dustParticlesInitialized = false end
     if cursorTrail ~= "Sparkle" then cache.boolean.sparkleParticlesInitialized = false end
 
@@ -89,9 +90,10 @@ function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrail
         if not cursorTrailGhost then
             alpha = math.floor(255 * (trailPoints - i) / (trailPoints - 1))
         end
-        local color = color.int.whiteMask + math.floor(alpha) / 255 * color.int.alphaMask
+        local color = color.int.whiteMask + math.floor(alpha) * color.int.alphaMask
         if trailShape == "Circles" then
             o.AddCircleFilled(point, cursorTrailSize, color)
+            imgui.Text(alpha)
         elseif trailShape == "Triangles" then
             drawTriangleTrailPoint(o, m, point, cursorTrailSize, color)
         end

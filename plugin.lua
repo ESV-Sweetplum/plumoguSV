@@ -5,6 +5,7 @@ cache = {
 }
 clock = {}; cache.clock = {}
 clock.prevTime = 0
+tempClockCount = 0
 color = {
     vctr = {},
     int = {}
@@ -1754,6 +1755,9 @@ DEFAULT_STARTING_MENU_VARS = {
         changeSSFs = true,
         clone = false,
     },
+    completeDuplicate = {
+        objects = {}
+    },
     convertSVSSF = {
         conversionDirection = true
     },
@@ -2800,6 +2804,36 @@ function changeGroups(menuVars)
             "Successfully moved " .. #ssfsToRemove ..
             pluralize(" SSF", #ssfsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
     end
+end
+function storeDuplicateItems(menuVars)
+    objects = {}
+    local offsets = game.uniqueSelectedNoteOffsets()
+    local startOffset = offsets[1]
+    local endOffset = offsets[#offsets]
+    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset)
+    local tls = game.getLinesBetweenOffsets(startOffset, endOffset)
+    local bms = game.getBookmarksBetweenOffsets(startOffset, endOffset)
+    for _, note in pairs(notes) do
+        table.insert(objects, { type = "ho", data = note })
+    end
+    for _, sv in pairs(svs) do
+        table.insert(objects, { type = "sv", data = sv })
+    end
+    for _, ssf in pairs(ssfs) do
+        table.insert(objects, { type = "ssf", data = ssf })
+    end
+    for _, tl in pairs(tls) do
+        table.insert(objects, { type = "tl", data = tl })
+    end
+    for _, bm in pairs(bms) do
+        table.insert(objects, { type = "bm", data = bm })
+    end
+    menuVars.objects = objects
+end
+function clearDuplicateItems(menuVars)
+    menuVars.objects = {}
 end
 function convertSVSSF(menuVars)
     local offsets = game.uniqueSelectedNoteOffsets()
@@ -5404,6 +5438,7 @@ function drawCursorTrail()
     local m = imgui.GetMousePos()
     local t = clock.getTime()
     local sz = state.WindowSize
+    if cursorTrail ~= "Snake" then state.SetValue("boolean.snakeTrailInitialized", false) end
     if cursorTrail ~= "Dust" then state.SetValue("boolean.dustParticlesInitialized", false) end
     if cursorTrail ~= "Sparkle" then state.SetValue("boolean.sparkleParticlesInitialized", false) end
     if cursorTrail == "Snake" then drawSnakeTrail(o, m, t) end
@@ -5458,9 +5493,10 @@ function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrail
         if not cursorTrailGhost then
             alpha = math.floor(255 * (trailPoints - i) / (trailPoints - 1))
         end
-        local color = color.int.whiteMask + math.floor(alpha) / 255 * color.int.alphaMask
+        local color = color.int.whiteMask + math.floor(alpha) * color.int.alphaMask
         if trailShape == "Circles" then
             o.AddCircleFilled(point, cursorTrailSize, color)
+            imgui.Text(alpha)
         elseif trailShape == "Triangles" then
             drawTriangleTrailPoint(o, m, point, cursorTrailSize, color)
         end
@@ -7722,6 +7758,19 @@ function changeGroupsMenu()
     cache.saveTable("changeGroupsMenu", menuVars)
     simpleActionMenu(table.concat({ action, " items to ", menuVars.designatedTimingGroup }), 2, changeGroups, menuVars)
 end
+function completeDuplicateMenu()
+    local menuVars = getMenuVars("completeDuplicate")
+    local copiedItemCount = #menuVars.objects
+    if (copiedItemCount == 0) then
+        simpleActionMenu("Copy items between selected notes", 2, storeDuplicateItems, menuVars)
+        cache.saveTable("completeDuplicateMenu", menuVars)
+        return
+    else
+        FunctionButton("Clear copied items", ACTION_BUTTON_SIZE, clearDuplicateItems, menuVars)
+    end
+    simpleActionMenu("Paste items at selected notes", 1, placeDuplicateItems, menuVars)
+    cache.saveTable("completeDuplicateMenu", menuVars)
+end
 function convertSVSSFMenu()
     local menuVars = getMenuVars("convertSVSSF")
     chooseConvertSVSSFDirection(menuVars)
@@ -7938,6 +7987,7 @@ end
 EDIT_SV_TOOLS = {
     "Add Teleport",
     "Change Groups",
+    "Complete Duplicate",
     "Convert SV <-> SSF",
     "Copy & Paste",
     "Direct SV",
@@ -7961,6 +8011,7 @@ function editSVTab()
     local toolName = EDIT_SV_TOOLS[globalVars.editToolIndex]
     if toolName == "Add Teleport" then addTeleportMenu() end
     if toolName == "Change Groups" then changeGroupsMenu() end
+    if toolName == "Complete Duplicate" then completeDuplicateMenu() end
     if toolName == "Convert SV <-> SSF" then convertSVSSFMenu() end
     if toolName == "Copy & Paste" then copyNPasteMenu() end
     if toolName == "Direct SV" then directSVMenu() end
@@ -7982,6 +8033,7 @@ function chooseEditTool()
         "Add a large teleport SV to move far away.",
         "Moves SVs and SSFs to a designated timing group.",
         "Convert multipliers between SV/SSF.",
+        "Completely copy a section of your map and put it somewhere else.",
         "Copy SVs and SSFs and paste them somewhere else.",
         "Directly update SVs within your selection.",
         "Move where notes are hit on the screen.",
