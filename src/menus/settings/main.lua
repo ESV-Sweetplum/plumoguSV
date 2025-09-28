@@ -16,6 +16,7 @@ function showPluginSettingsWindow()
         imgui.PushStyleColor(imgui_col.WindowBg, bgColor)
         imgui.PushStyleColor(imgui_col.TitleBg, bgColor)
         imgui.PushStyleColor(imgui_col.TitleBgActive, bgColor)
+        imgui.PushStyleColor(imgui_col.Border, vctr4(1))
     end
     startNextWindowNotCollapsed("plumoguSV Settings")
     _, settingsOpened = imgui.Begin("plumoguSV Settings", true, 42)
