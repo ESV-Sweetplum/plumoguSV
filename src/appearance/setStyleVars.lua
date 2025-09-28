@@ -33,7 +33,7 @@ function setPluginAppearanceStyles(styleTheme)
     -- imgui.GetStyle() which hasn't worked from my testing in Quaver plugins
 end
 
-function setPluginAppearanceColors(colorTheme)
+function setPluginAppearanceColors(colorTheme, hideBorder)
     local borderColor = vctr4(1)
 
     if colorTheme == "Classic" or not colorTheme then borderColor = setClassicColors() end
@@ -52,6 +52,8 @@ function setPluginAppearanceColors(colorTheme)
     if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
     if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
     if colorTheme == "CUSTOM" then borderColor = setCustomColors() end
+
+    if (hideBorder) then return end
 
     cache.borderColor = borderColor
 end

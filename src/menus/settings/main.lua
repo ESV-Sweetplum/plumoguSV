@@ -16,7 +16,6 @@ function showPluginSettingsWindow()
         imgui.PushStyleColor(imgui_col.WindowBg, bgColor)
         imgui.PushStyleColor(imgui_col.TitleBg, bgColor)
         imgui.PushStyleColor(imgui_col.TitleBgActive, bgColor)
-        imgui.PushStyleColor(imgui_col.Border, vctr4(1))
     end
     startNextWindowNotCollapsed("plumoguSV Settings")
     _, settingsOpened = imgui.Begin("plumoguSV Settings", true, 42)
@@ -86,7 +85,8 @@ function showPluginSettingsWindow()
     end
     if (not globalVars.performanceMode) then
         imgui.PopStyleColor(41)
-        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
+        pulseController()
+        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex], true)
         setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
     end
     imgui.End()

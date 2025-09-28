@@ -5749,7 +5749,7 @@ function setPluginAppearanceStyles(styleTheme)
     imgui.PushStyleVar(imgui_style_var.ScrollbarRounding, cornerRoundnessValue)
     imgui.PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessValue)
 end
-function setPluginAppearanceColors(colorTheme)
+function setPluginAppearanceColors(colorTheme, hideBorder)
     local borderColor = vctr4(1)
     if colorTheme == "Classic" or not colorTheme then borderColor = setClassicColors() end
     if colorTheme == "Strawberry" then borderColor = setStrawberryColors() end
@@ -5767,6 +5767,7 @@ function setPluginAppearanceColors(colorTheme)
     if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
     if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
     if colorTheme == "CUSTOM" then borderColor = setCustomColors() end
+    if (hideBorder) then return end
     state.SetValue("borderColor", borderColor)
 end
 function setClassicColors()
@@ -10587,7 +10588,6 @@ function showPluginSettingsWindow()
         imgui.PushStyleColor(imgui_col.WindowBg, bgColor)
         imgui.PushStyleColor(imgui_col.TitleBg, bgColor)
         imgui.PushStyleColor(imgui_col.TitleBgActive, bgColor)
-        imgui.PushStyleColor(imgui_col.Border, vctr4(1))
     end
     startNextWindowNotCollapsed("plumoguSV Settings")
     _, settingsOpened = imgui.Begin("plumoguSV Settings", true, 42)
@@ -10648,7 +10648,8 @@ function showPluginSettingsWindow()
     end
     if (not globalVars.performanceMode) then
         imgui.PopStyleColor(41)
-        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
+        pulseController()
+        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex], true)
         setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
     end
     imgui.End()
