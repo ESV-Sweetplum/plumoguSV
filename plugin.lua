@@ -1557,10 +1557,26 @@ DEFAULT_STYLE = {
     plotHistogramHovered =
         vector.New(1.00, 0.60, 0.00, 1.00)
 }
-DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Shift+Alt+L", "Ctrl+Shift+Alt+E" }
+DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Alt+L", "Ctrl+Alt+E", "O" }
 HOTKEY_LABELS = { "Execute Primary Action", "Execute Secondary Action", "Swap Primary Inputs",
     "Negate Primary Inputs", "Reset Secondary Input", "Go To Prev. Scroll Group", "Go To Next Scroll Group",
-    "Execute Vibrato Separately", "Use TG of Selected Note", "Toggle Note Lock Mode", "Toggle Use End Offsets" }
+    "Execute Vibrato Separately", "Go To TG of Selected Note", "Toggle Note Lock Mode", "Toggle Use End Offsets",
+    "Move Selection To TG" }
+---@enum hotkeys
+hotkeys_enum = {
+    exec_primary = 1,
+    exec_secondary = 2,
+    swap_primary = 3,
+    negate_primary = 4,
+    reset_secondary = 5,
+    go_to_prev_tg = 6,
+    go_to_next_tg = 7,
+    exec_vibrato = 8,
+    go_to_note_tg = 9,
+    toggle_note_lock = 10,
+    toggle_end_offset = 11,
+    move_selection_to_tg = 12,
+}
 function createSVGraphStats()
     local svGraphStats = {
         minScale = 0,
@@ -3733,17 +3749,19 @@ function changeNoteLockMode()
         print("s", "Notes have been unlocked.")
     end
     if (mode == 1) then
-        print("e", table.concat({"Notes have been fully locked. To change the lock mode, press ", globalVars.hotkeyList[10], "."}))
+        print("e",
+            "Notes have been fully locked. To change the lock mode, press " ..
+            globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. ".")
     end
     if (mode == 2) then
         print("w",
             "Notes can no longer be placed, only moved. To change the lock mode, press " ..
-            globalVars.hotkeyList[10] .. ".")
+            globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. ".")
     end
     if (mode == 3) then
         print("w",
             "Notes can no longer be moved, only placed and deleted. To change the lock mode, press " ..
-            globalVars.hotkeyList[10] .. ".")
+            globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. ".")
     end
     state.SetValue("noteLockMode", mode)
 end
@@ -3778,19 +3796,24 @@ function jumpToTg()
     state.SelectedScrollGroupId = tgId
 end
 function checkForGlobalHotkeys()
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[9])) then jumpToTg() end
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[10])) then changeNoteLockMode() end
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[11])) then toggleUseEndOffsets() end
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_note_tg])) then jumpToTg() end
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.toggle_note_lock])) then changeNoteLockMode() end
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.toggle_end_offset])) then toggleUseEndOffsets() end
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.move_selection_to_tg])) then moveSelectionToTg() end
+end
+function moveSelectionToTg()
+    actions.Perform(createEA(action_type.MoveObjectsToTimingGroup, state.SelectedHitObjects, state.SelectedScrollGroupId))
 end
 function toggleUseEndOffsets()
     globalVars.useEndTimeOffsets = not globalVars.useEndTimeOffsets
     if (globalVars.useEndTimeOffsets) then
         print("s",
-            table.concat({"LN ends are now considered as their own offsets. To change this, press ", globalVars.hotkeyList[11], "."}))
+            "LN ends are now considered as their own offsets. To change this, press " ..
+            globalVars.hotkeyList[hotkeys_enum.toggle_end_offset] .. ".")
     else
         print("e",
             "LN ends are now no longer considered as their own offsets. To change this, press " ..
-            globalVars.hotkeyList[11] .. ".")
+            globalVars.hotkeyList[hotkeys_enum.toggle_end_offset] .. ".")
     end
     write(globalVars)
 end
@@ -6643,7 +6666,7 @@ function NegatableComputableInputFloat(label, var, decimalPlaces, suffix)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
     local newValue = ComputableInputFloat(label, var, decimalPlaces, suffix)
     imgui.PopItemWidth()
-    if ((negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[4])) and newValue ~= 0) then
+    if ((negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary])) and newValue ~= 0) then
         newValue = -newValue
     end
     imgui.PopStyleVar(2)
@@ -6668,17 +6691,18 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     imgui.PopItemWidth()
     varsTable[lowerName] = newValues.x
     varsTable[higherName] = newValues.y
-    if (swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[3])) then
+    if (swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary])) then
         varsTable[lowerName] = oldValues.y
         varsTable[higherName] = oldValues.x
     end
-    if (negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[4])) then
+    if (negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary])) then
         varsTable[lowerName] = -oldValues.x
         varsTable[higherName] = -oldValues.y
     end
     imgui.PopStyleVar(3)
-    return swapButtonPressed or negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[3]) or
-        kbm.pressedKeyCombo(globalVars.hotkeyList[4]) or
+    return swapButtonPressed or negateButtonPressed or
+        kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary]) or
+        kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary]) or
         oldValues ~= newValues
 end
 ---@class GraphPoint
@@ -7437,19 +7461,19 @@ function customVibratoMenu(menuVars, settingVars, separateWindow)
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
-        end, menuVars, false, typingCode, separateWindow and globalVars.hotkeyList[8] or nil)
+        end, menuVars, false, typingCode, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     else
         typingCode = CodeInput(settingVars, "code1", "##code1",
             "This input should return a function that takes in a number t=[0-1], and returns a value corresponding to the msx value of the vibrato at (100t)% of the way through the first and last selected note times.")
         typingCode = CodeInput(settingVars, "code2", "##code2",
-            "This input should return a function that takes in a number t=[0-1], and returns a value corresponding to the msx value of the vibrato at (100t)% of the way through the first and last selected note times.") or
-        typingCode
+                "This input should return a function that takes in a number t=[0-1], and returns a value corresponding to the msx value of the vibrato at (100t)% of the way through the first and last selected note times.") or
+            typingCode
         local func1 = eval(settingVars.code1)
         local func2 = eval(settingVars.code2)
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             ssfVibrato(v, func1, func2)
-        end, menuVars, false, typingCode, separateWindow and globalVars.hotkeyList[8] or nil)
+        end, menuVars, false, typingCode, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     end
 end
 function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
@@ -7470,7 +7494,7 @@ function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
-        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[8] or nil)
+        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     else
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
@@ -7496,7 +7520,7 @@ function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
         end
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
-            separateWindow and globalVars.hotkeyList[8] or nil)
+            separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     end
 end
 function linearVibratoMenu(menuVars, settingVars, separateWindow)
@@ -7508,7 +7532,7 @@ function linearVibratoMenu(menuVars, settingVars, separateWindow)
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
-        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[8] or nil)
+        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     else
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
@@ -7520,7 +7544,7 @@ function linearVibratoMenu(menuVars, settingVars, separateWindow)
         end
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
-            separateWindow and globalVars.hotkeyList[8] or nil)
+            separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     end
 end
 VIBRATO_SVS = {
@@ -7577,7 +7601,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
-        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[8] or nil)
+        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     else
         imgui.TextColored(color.vctr.red, "This mode is not supported.")
     end
@@ -7681,7 +7705,7 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
-        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[8] or nil)
+        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     else
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
@@ -7725,7 +7749,7 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
         end
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
-            separateWindow and globalVars.hotkeyList[8] or nil)
+            separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     end
 end
 function sinusoidalVibratoMenu(menuVars, settingVars, separateWindow)
@@ -7741,7 +7765,7 @@ function sinusoidalVibratoMenu(menuVars, settingVars, separateWindow)
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
-        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[8] or nil)
+        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     else
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
         SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
@@ -7764,10 +7788,11 @@ function sinusoidalVibratoMenu(menuVars, settingVars, separateWindow)
         end
         AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
-            separateWindow and globalVars.hotkeyList[8] or nil)
+            separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     end
 end
 function deleteTab()
+    if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
     local menuVars = getMenuVars("delete")
     _, menuVars.deleteTable[1] = imgui.Checkbox("Delete Lines", menuVars.deleteTable[1])
     KeepSameLine()
@@ -7795,28 +7820,8 @@ function changeGroupsMenu()
     local menuVars = getMenuVars("changeGroups")
     imgui.AlignTextToFramePadding()
     local action = menuVars.clone and "Clone" or "Move"
-    imgui.Text(table.concat({ "  ", action, " to: " }))
-    KeepSameLine()
-    local groups = { "$Default", "$Global" }
-    local cols = { map.TimingGroups["$Default"].ColorRgb or "86,253,110", map.TimingGroups["$Global"].ColorRgb or
-    "255,255,255" }
-    local hiddenGroups = {}
-    for tgId, tg in pairs(map.TimingGroups) do
-        if string.find(tgId, "%$") then goto cont end
-        if (globalVars.hideAutomatic and string.find(tgId, "automate_")) then
-            table.insert(hiddenGroups,
-                tgId)
-        end
-        groups[#groups + 1] = tgId
-        table.insert(cols, tg.ColorRgb or "255,255,255")
-        ::cont::
-    end
-    local prevIndex = table.indexOf(groups, menuVars.designatedTimingGroup)
-    imgui.PushItemWidth(155)
-    local newIndex = Combo("##changingScrollGroup", groups, prevIndex, cols, hiddenGroups)
-    imgui.PopItemWidth()
-    imgui.Dummy(vector.New(0, 2))
-    menuVars.designatedTimingGroup = groups[newIndex]
+    menuVars.designatedTimingGroup = chooseTimingGroup(table.concat({ "  ", action, " to: " }),
+        menuVars.designatedTimingGroup)
     _, menuVars.changeSVs = imgui.Checkbox("Change SVs?", menuVars.changeSVs)
     KeepSameLine()
     _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
@@ -8219,7 +8224,7 @@ function infoTab()
     imgui.BulletText("Choose an SV tool in the Create tab.")
     imgui.BulletText("Adjust the tool's settings to your liking.")
     imgui.BulletText("Select notes to use the tool at.")
-    imgui.BulletText(table.concat({"Press the '", globalVars.hotkeyList[1], "' hotkey."}))
+    imgui.BulletText(table.concat({"Press the '", globalVars.hotkeyList[hotkeys_enum.exec_primary], "' hotkey."}))
     AddPadding()
     imgui.SeparatorText("Special thanks to:")
     AddPadding()
@@ -9981,29 +9986,7 @@ function selectBySnapMenu()
 end
 function selectByTimingGroupMenu()
     local menuVars = getMenuVars("selectByTimingGroup")
-    imgui.AlignTextToFramePadding()
-    imgui.Text("Select in:")
-    KeepSameLine()
-    local groups = { "$Default", "$Global" }
-    local cols = { map.TimingGroups["$Default"].ColorRgb or "86,253,110", map.TimingGroups["$Global"].ColorRgb or
-    "255,255,255" }
-    local hiddenGroups = {}
-    for tgId, tg in pairs(map.TimingGroups) do
-        if string.find(tgId, "%$") then goto cont end
-        if (globalVars.hideAutomatic and string.find(tgId, "automate_")) then
-            table.insert(hiddenGroups,
-                tgId)
-        end
-        groups[#groups + 1] = tgId
-        table.insert(cols, tg.ColorRgb or "255,255,255")
-        ::cont::
-    end
-    local prevIndex = table.indexOf(groups, menuVars.designatedTimingGroup)
-    imgui.PushItemWidth(155)
-    local newIndex = Combo("##changingScrollGroup", groups, prevIndex, cols, hiddenGroups)
-    imgui.PopItemWidth()
-    imgui.Dummy(vector.New(0, 2))
-    menuVars.designatedTimingGroup = groups[newIndex]
+    menuVars.designatedTimingGroup = chooseTimingGroup("Select in:", menuVars.designatedTimingGroup)
     simpleActionMenu(table.concat({ "Select notes in ", menuVars.designatedTimingGroup }), 2, selectByTimingGroup,
         menuVars)
     cache.saveTable("selectByTimingGroupMenu", menuVars)
@@ -10619,8 +10602,8 @@ function showKeybindSettings()
             end
         end
         KeepSameLine()
-        imgui.SetCursorPosX(111)
-        imgui.Text("" .. HOTKEY_LABELS[hotkeyIndex])
+        imgui.SetCursorPosX(90)
+        imgui.Text(HOTKEY_LABELS[hotkeyIndex])
     end
     simpleActionMenu("Reset Hotkey Settings", 0, function()
         globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
@@ -11069,27 +11052,33 @@ function showHotkeyTutorial()
     imgui.TextWrapped(
         "The most basic hotkeys are ones that can simply speed up your SV making process; whether that be placing SVs/SSFs or quickly editing settings.")
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[1] .. '" to quickly place SVs.')
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[2] .. '" to quickly place SSFs.')
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[hotkeys_enum.exec_primary] .. '" to quickly place SVs.')
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[hotkeys_enum.exec_secondary] .. '" to quickly place SSFs.')
     imgui.BulletText('If you have a vibrato window, press "' ..
-        globalVars.hotkeyList[8] .. '" to quickly place vibrato.')
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[3] .. '" to quickly swap any swappable parameters.')
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[4] .. '" to quickly negatable any negatable parameters.')
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[5] .. '" to quickly reset any resettable parameters.')
+        globalVars.hotkeyList[hotkeys_enum.exec_vibrato] .. '" to quickly place vibrato.')
+    imgui.BulletText('Press "' ..
+        globalVars.hotkeyList[hotkeys_enum.swap_primary] .. '" to quickly swap any swappable parameters.')
+    imgui.BulletText('Press "' ..
+        globalVars.hotkeyList[hotkeys_enum.negate_primary] .. '" to quickly negatable any negatable parameters.')
+    imgui.BulletText('Press "' ..
+        globalVars.hotkeyList[hotkeys_enum.reset_secondary] .. '" to quickly reset any resettable parameters.')
     imgui.PopStyleColor()
     imgui.SeparatorText("Advanced Hotkeys")
     imgui.TextWrapped(
         "Typically, these hotkeys are used in combination with advanced mode to efficiently switch between timing groups:")
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[6] .. '" to go to the previous timing group.')
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[7] .. '" to go to the next timing group.')
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[9] .. '" to go to the timing group of the selected note.')
+    imgui.BulletText('Press "' ..
+        globalVars.hotkeyList[hotkeys_enum.go_to_prev_tg] .. '" to go to the previous timing group.')
+    imgui.BulletText('Press "' ..
+        globalVars.hotkeyList[hotkeys_enum.go_to_next_tg] .. '" to go to the next timing group.')
+    imgui.BulletText('Press "' ..
+        globalVars.hotkeyList[hotkeys_enum.go_to_note_tg] .. '" to go to the timing group of the selected note.')
     imgui.PopStyleColor()
     imgui.SeparatorText("Lock Mode")
     imgui.TextWrapped(
         'Sometimes, typing letters/numbers on your keyboard will unintentionally interact with the editor in ways you don\'t want. You can remedy this by using the built-in "NOTE LOCK" feature.')
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[10] .. '" to change the locking mode.')
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. '" to change the locking mode.')
     imgui.PopStyleColor()
 end
 function showWhatIsMsxTutorial()
@@ -11305,7 +11294,7 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         pos2.y = 150 - pos2.y
         local pointList = { { pos = pos1, col = red, size = 10 }, { pos = pos2, col = blue, size = 10 } }
         local ctx = renderGraph("Bezier Interactive Window" .. optionalLabel, vctr2(150), pointList, settingVars
-        .freeMode)
+            .freeMode)
         local topLeft = imgui.GetWindowPos()
         local dim = imgui.GetWindowSize()
         if (not settingVars.freeMode) then
@@ -11404,7 +11393,7 @@ function chooseConstantShift(settingVars, defaultShift)
     local oldShift = settingVars.verticalShift
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[5])) then
+    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary])) then
         settingVars.verticalShift = defaultShift
     end
     HoverToolTip("Reset vertical shift to initial values")
@@ -11428,7 +11417,7 @@ function chooseMsxVerticalShift(settingVars, defaultShift)
     local oldShift = settingVars.verticalShift
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[5])) then
+    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary])) then
         settingVars.verticalShift = defaultShift or 0
     end
     HoverToolTip("Reset vertical shift to initial values")
@@ -11709,10 +11698,10 @@ function chooseCurrentScrollGroup()
     imgui.PushItemWidth(155)
     globalVars.scrollGroupIndex = Combo("##scrollGroup", groups, globalVars.scrollGroupIndex, cols, hiddenGroups)
     imgui.PopItemWidth()
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[6])) then
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_prev_tg])) then
         globalVars.scrollGroupIndex = math.clamp(globalVars.scrollGroupIndex - 1, 1, #groups)
     end
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[7])) then
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_next_tg])) then
         globalVars.scrollGroupIndex = math.clamp(globalVars.scrollGroupIndex + 1, 1, #groups)
     end
     AddSeparator()
@@ -11722,6 +11711,31 @@ function chooseCurrentScrollGroup()
     if (state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex]) then
         globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
     end
+end
+function chooseTimingGroup(label, previousGroup)
+    imgui.AlignTextToFramePadding()
+    imgui.Text(label)
+    KeepSameLine()
+    local groups = { "$Default", "$Global" }
+    local cols = { map.TimingGroups["$Default"].ColorRgb or "86,253,110", map.TimingGroups["$Global"].ColorRgb or
+    "255,255,255" }
+    local hiddenGroups = {}
+    for tgId, tg in pairs(map.TimingGroups) do
+        if string.find(tgId, "%$") then goto cont end
+        if (globalVars.hideAutomatic and string.find(tgId, "automate_")) then
+            table.insert(hiddenGroups,
+                tgId)
+        end
+        groups[#groups + 1] = tgId
+        table.insert(cols, tg.ColorRgb or "255,255,255")
+        ::cont::
+    end
+    imgui.PushItemWidth(155)
+    local previousIndex = table.indexOf(groups, previousGroup)
+    local newIndex = Combo("##changingScrollGroup", groups, previousIndex, cols, hiddenGroups)
+    imgui.PopItemWidth()
+    imgui.Dummy(vector.New(0, 2))
+    return groups[newIndex]
 end
 function chooseRandomScale(settingVars)
     local oldScale = settingVars.randomScale
@@ -11873,7 +11887,7 @@ function chooseSVBehavior(settingVars)
     local oldBehaviorIndex = settingVars.behaviorIndex
     settingVars.behaviorIndex = Combo("Behavior", SV_BEHAVIORS, oldBehaviorIndex)
     imgui.PopItemWidth()
-    if (swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[3])) then
+    if (swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary])) then
         settingVars.behaviorIndex = tn(oldBehaviorIndex == 1) + 1
     end
     imgui.PopStyleVar()

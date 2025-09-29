@@ -276,8 +276,25 @@ DEFAULT_STYLE = {
         vector.New(1.00, 0.60, 0.00, 1.00)
 }
 
-DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Shift+Alt+L", "Ctrl+Shift+Alt+E" }
+DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Alt+L", "Ctrl+Alt+E", "O" }
 
 HOTKEY_LABELS = { "Execute Primary Action", "Execute Secondary Action", "Swap Primary Inputs",
     "Negate Primary Inputs", "Reset Secondary Input", "Go To Prev. Scroll Group", "Go To Next Scroll Group",
-    "Execute Vibrato Separately", "Use TG of Selected Note", "Toggle Note Lock Mode", "Toggle Use End Offsets" }
+    "Execute Vibrato Separately", "Go To TG of Selected Note", "Toggle Note Lock Mode", "Toggle Use End Offsets",
+    "Move Selection To TG" }
+
+---@enum hotkeys
+hotkeys_enum = {
+    exec_primary = 1,
+    exec_secondary = 2,
+    swap_primary = 3,
+    negate_primary = 4,
+    reset_secondary = 5,
+    go_to_prev_tg = 6,
+    go_to_next_tg = 7,
+    exec_vibrato = 8,
+    go_to_note_tg = 9,
+    toggle_note_lock = 10,
+    toggle_end_offset = 11,
+    move_selection_to_tg = 12,
+}

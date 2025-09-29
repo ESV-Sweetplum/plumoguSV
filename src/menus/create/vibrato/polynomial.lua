@@ -18,7 +18,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
 
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
-        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[8] or nil)
+        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     else
         imgui.TextColored(color.vctr.red, "This mode is not supported.")
     end

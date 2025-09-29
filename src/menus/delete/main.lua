@@ -1,4 +1,6 @@
 function deleteTab()
+    if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
+
     local menuVars = getMenuVars("delete")
     _, menuVars.deleteTable[1] = imgui.Checkbox("Delete Lines", menuVars.deleteTable[1])
     KeepSameLine()

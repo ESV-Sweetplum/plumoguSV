@@ -18,7 +18,7 @@ selectTypeIndex: 1
 placeTypeIndex: 1
 editToolIndex: 1
 showPresetMenu: false
-scrollGroupIndex: 26
+scrollGroupIndex: 1
 hideSVInfo: false
 showSVInfoVisualizer: true
 showVibratoWidget: true
@@ -45,8 +45,9 @@ hotkeyList:
 - M
 - V
 - G
-- Ctrl+Shift+Alt+L
-- Ctrl+Shift+Alt+E
+- Ctrl+Alt+L
+- Ctrl+Alt+E
+- O
 customStyle:
   windowBg:
   - 0
@@ -645,5 +646,5 @@ presets:
 - 
 dynamicBackgroundIndex: 1
 disableLoadup: false
-useEndTimeOffsets: true
+useEndTimeOffsets: false
 ignoreNotes: false

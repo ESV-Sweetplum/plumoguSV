@@ -9,8 +9,8 @@ function showKeybindSettings()
             end
         end
         KeepSameLine()
-        imgui.SetCursorPosX(111)
-        imgui.Text("" .. HOTKEY_LABELS[hotkeyIndex])
+        imgui.SetCursorPosX(90)
+        imgui.Text(HOTKEY_LABELS[hotkeyIndex])
     end
     simpleActionMenu("Reset Hotkey Settings", 0, function()
         globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)

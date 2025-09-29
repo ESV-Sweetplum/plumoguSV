@@ -37,7 +37,7 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         local pointList = { { pos = pos1, col = red, size = 10 }, { pos = pos2, col = blue, size = 10 } }
 
         local ctx = renderGraph("Bezier Interactive Window" .. optionalLabel, vctr2(150), pointList, settingVars
-        .freeMode)
+            .freeMode)
         local topLeft = imgui.GetWindowPos()
         local dim = imgui.GetWindowSize()
 
@@ -162,7 +162,7 @@ function chooseConstantShift(settingVars, defaultShift)
 
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[5])) then
+    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary])) then
         settingVars.verticalShift = defaultShift
     end
     HoverToolTip("Reset vertical shift to initial values")
@@ -193,7 +193,7 @@ function chooseMsxVerticalShift(settingVars, defaultShift)
 
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[5])) then
+    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary])) then
         settingVars.verticalShift = defaultShift or 0
     end
     HoverToolTip("Reset vertical shift to initial values")
@@ -515,10 +515,10 @@ function chooseCurrentScrollGroup()
     imgui.PushItemWidth(155)
     globalVars.scrollGroupIndex = Combo("##scrollGroup", groups, globalVars.scrollGroupIndex, cols, hiddenGroups)
     imgui.PopItemWidth()
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[6])) then
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_prev_tg])) then
         globalVars.scrollGroupIndex = math.clamp(globalVars.scrollGroupIndex - 1, 1, #groups)
     end
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[7])) then
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_next_tg])) then
         globalVars.scrollGroupIndex = math.clamp(globalVars.scrollGroupIndex + 1, 1, #groups)
     end
     AddSeparator()
@@ -528,6 +528,34 @@ function chooseCurrentScrollGroup()
     if (state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex]) then
         globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
     end
+end
+
+function chooseTimingGroup(label, previousGroup)
+    imgui.AlignTextToFramePadding()
+    imgui.Text(label)
+    KeepSameLine()
+
+    local groups = { "$Default", "$Global" }
+    local cols = { map.TimingGroups["$Default"].ColorRgb or "86,253,110", map.TimingGroups["$Global"].ColorRgb or
+    "255,255,255" }
+    local hiddenGroups = {}
+    for tgId, tg in pairs(map.TimingGroups) do
+        if string.find(tgId, "%$") then goto cont end
+        if (globalVars.hideAutomatic and string.find(tgId, "automate_")) then
+            table.insert(hiddenGroups,
+                tgId)
+        end
+        table.insert(groups, tgId)
+        table.insert(cols, tg.ColorRgb or "255,255,255")
+        ::cont::
+    end
+    imgui.PushItemWidth(155)
+    local previousIndex = table.indexOf(groups, previousGroup)
+    local newIndex = Combo("##changingScrollGroup", groups, previousIndex, cols, hiddenGroups)
+    imgui.PopItemWidth()
+    imgui.Dummy(vector.New(0, 2))
+
+    return groups[newIndex]
 end
 
 function chooseRandomScale(settingVars)
@@ -702,7 +730,7 @@ function chooseSVBehavior(settingVars)
     local oldBehaviorIndex = settingVars.behaviorIndex
     settingVars.behaviorIndex = Combo("Behavior", SV_BEHAVIORS, oldBehaviorIndex)
     imgui.PopItemWidth()
-    if (swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[3])) then
+    if (swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary])) then
         settingVars.behaviorIndex = tn(oldBehaviorIndex == 1) + 1
     end
     imgui.PopStyleVar()
