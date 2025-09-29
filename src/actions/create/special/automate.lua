@@ -10,7 +10,6 @@ function automateCopySVs(settingVars)
         return
     end
     local firstSVTime = svs[1].StartTime
-    local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
     for _, sv in ipairs(svs) do
         local copiedSV = {
             relativeOffset = sv.StartTime - firstSVTime,

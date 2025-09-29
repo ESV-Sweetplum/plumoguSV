@@ -104,7 +104,6 @@ function renderMemeButtons()
     end
     HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
     if (cache.boolean.destroyEditor) then
-        -- state.SelectedScrollGroupId = nil
         actions.GoToObjects(math.floor(math.random() * map.TrackLength))
         local ho1 = map.HitObjects[1]
         actions.RemoveHitObject(ho1)

@@ -45,7 +45,10 @@ DEFAULT_STARTING_MENU_VARS = {
         clone = false,
     },
     completeDuplicate = {
-        objects = {}
+        objects = {},
+        svTbl = {},
+        ssfTbl = {},
+        msOffset = 0
     },
     convertSVSSF = {
         conversionDirection = true

@@ -18,7 +18,7 @@ selectTypeIndex: 1
 placeTypeIndex: 1
 editToolIndex: 1
 showPresetMenu: false
-scrollGroupIndex: 1
+scrollGroupIndex: 26
 hideSVInfo: false
 showSVInfoVisualizer: true
 showVibratoWidget: true
@@ -522,6 +522,11 @@ defaultProperties:
     completeDuplicate:
       objects:
       - 
+      svTbl:
+      - 
+      ssfTbl:
+      - 
+      msOffset: 0
     convertSVSSF:
       conversionDirection: true
     copy:
@@ -640,5 +645,5 @@ presets:
 - 
 dynamicBackgroundIndex: 1
 disableLoadup: false
-useEndTimeOffsets: false
+useEndTimeOffsets: true
 ignoreNotes: false
