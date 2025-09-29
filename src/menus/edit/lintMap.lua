@@ -9,5 +9,6 @@ function lintMapMenu()
     AddSeparator()
     simpleActionMenu("Merge duplicate SVs", 0, mergeSVs, nil, false, true)
     simpleActionMenu("Merge duplicate SSFs", 0, mergeSSFs, nil, false, true)
+    simpleActionMenu("Remove unnecessary SVs", 0, removeUnnecessarySVs, nil, false, true)
     simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, false, true)
 end

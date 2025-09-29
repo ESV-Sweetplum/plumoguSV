@@ -3553,6 +3553,18 @@ function mergeNotes()
     local type = truthy(notesToRemove) and "s!" or "w!"
     print(type, "Removed " .. #notesToRemove .. pluralize(" note.", #notesToRemove, -2))
 end
+function removeUnnecessarySVs()
+    local svsToRemove = {}
+    local prevMultiplier = state.SelectedScrollGroup.InitialScrollVelocity or map.InitialScrollVelocity or 1
+    for _, sv in ipairs(map.ScrollVelocities) do
+        local m = sv.Multiplier
+        if (m == prevMultiplier) then svsToRemove[#svsToRemove + 1] = sv end
+        prevMultiplier = m
+    end
+    if (truthy(svsToRemove)) then actions.Perform(createEA(action_type.RemoveScrollVelocityBatch, svsToRemove)) end
+    local type = truthy(svsToRemove) and "s!" or "w!"
+    print(type, "Removed " .. #svsToRemove .. pluralize(" SV.", #svsToRemove, -2))
+end
 function measureSVs(menuVars)
     local roundingDecimalPlaces = 5
     local offsets = game.uniqueSelectedNoteOffsets()
@@ -8015,6 +8027,7 @@ function lintMapMenu()
     AddSeparator()
     simpleActionMenu("Merge duplicate SVs", 0, mergeSVs, nil, false, true)
     simpleActionMenu("Merge duplicate SSFs", 0, mergeSSFs, nil, false, true)
+    simpleActionMenu("Remove unnecessary SVs", 0, removeUnnecessarySVs, nil, false, true)
     simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, false, true)
 end
 EDIT_SV_TOOLS = {

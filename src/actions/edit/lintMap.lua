@@ -136,3 +136,16 @@ function mergeNotes()
     local type = truthy(notesToRemove) and "s!" or "w!"
     print(type, "Removed " .. #notesToRemove .. pluralize(" note.", #notesToRemove, -2))
 end
+
+function removeUnnecessarySVs()
+    local svsToRemove = {}
+    local prevMultiplier = state.SelectedScrollGroup.InitialScrollVelocity or map.InitialScrollVelocity or 1
+    for _, sv in ipairs(map.ScrollVelocities) do
+        local m = sv.Multiplier
+        if (m == prevMultiplier) then table.insert(svsToRemove, sv) end
+        prevMultiplier = m
+    end
+    if (truthy(svsToRemove)) then actions.Perform(createEA(action_type.RemoveScrollVelocityBatch, svsToRemove)) end
+    local type = truthy(svsToRemove) and "s!" or "w!"
+    print(type, "Removed " .. #svsToRemove .. pluralize(" SV.", #svsToRemove, -2))
+end
