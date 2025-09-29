@@ -3940,49 +3940,10 @@ function selectBySnap(menuVars)
     local endOffset = offsets[#offsets]
     local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
-    local timingPoint = game.getTimingPointAt(startOffset)
-    local bpm = timingPoint.Bpm
-    local times = {}
-    local disallowedTimes = {}
-    local pointer = timingPoint.StartTime
-    local counter = 0
-    local factors = {}
-    for i = 2, (menuVars.snap - 1) do
-        if (menuVars.snap % i == 0) then factors[#factors + 1] = i end
-    end
-    for k38 = 1, #factors do
-        local factor = factors[k38]
-        while (pointer <= endOffset + 10) do
-            if ((counter ~= 0 or factor == 1) and pointer >= startOffset) then disallowedTimes[#disallowedTimes + 1] = pointer end
-            counter = (counter + 1) % factor
-            pointer = pointer + (60000 / bpm) / (factor)
-        end
-        pointer = timingPoint.StartTime
-        counter = 0
-    end
-    while (pointer <= endOffset + 10) do
-        if ((counter ~= 0 or menuVars.snap == 1) and pointer >= startOffset) then times[#times + 1] = pointer end
-        counter = (counter + 1) % menuVars.snap
-        pointer = pointer + (60000 / bpm) / (menuVars.snap)
-    end
-    for k39 = 1, #disallowedTimes do
-        local bannedTime = disallowedTimes[k39]
-        for idx, time in pairs(times) do
-            if (math.abs(time - bannedTime) < 10) then table.remove(times, idx) end
-        end
-    end
     local notesToSelect = {}
-    local currentTime = times[1]
-    local index = 2
-    for k40 = 1, #notes do
-        local note = notes[k40]
-        if (note.StartTime > currentTime + 10 and index <= #times) then
-            currentTime = times[index]
-            index = index + 1
-        end
-        if (math.abs(note.StartTime - currentTime) < 10) then
-            notesToSelect[#notesToSelect + 1] = note
-        end
+    for _, note in pairs(notes) do
+        local snap = game.getSnapAt(note.StartTime, true)
+        if (snap == menuVars.snap) then notesToSelect[#notesToSelect + 1] = note end
     end
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
@@ -10002,8 +9963,8 @@ function showAppearanceSettings()
     if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
         setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
         local customStyle = {}
-        for k41 = 1, #customStyleIds do
-            local id = customStyleIds[k41]
+        for k38 = 1, #customStyleIds do
+            local id = customStyleIds[k38]
             customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[id:capitalize()])) / vctr4(255)
         end
         globalVars.customStyle = customStyle
@@ -10186,8 +10147,8 @@ end
 function stringifyCustomStyle(customStyle)
     local keys = table.keys(customStyle)
     local resultStr = "v2 "
-    for k42 = 1, #keys do
-        local key = keys[k42]
+    for k39 = 1, #keys do
+        local key = keys[k39]
         local value = customStyle[key]
         keyId = convertStrToShort(key)
         local r = math.floor(value.x * 255)
@@ -12632,8 +12593,8 @@ end
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for k43 = 1, #svs do
-        local sv = svs[k43]
+    for k40 = 1, #svs do
+        local sv = svs[k40]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
         if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
     end
