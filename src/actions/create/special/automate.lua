@@ -45,7 +45,7 @@ function automateSVs(settingVars)
             timeSinceLastObject = timeSinceLastObject + thisTime - prevTime
             if (timeSinceLastObject > settingVars.ms and settingVars.maintainMs and settingVars.optimizeTGs) then
                 idIndex = 1
-                timeSinceLastObject = 0
+                timeSinceLastObject = timeSinceLastObject - settingVars.ms
             else
                 idIndex = idIndex + 1
             end

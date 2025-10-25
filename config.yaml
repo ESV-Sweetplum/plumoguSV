@@ -18,7 +18,7 @@ selectTypeIndex: 1
 placeTypeIndex: 1
 editToolIndex: 1
 showPresetMenu: false
-scrollGroupIndex: 1
+scrollGroupIndex: 41
 hideSVInfo: false
 showSVInfoVisualizer: true
 showVibratoWidget: true
@@ -27,7 +27,7 @@ showMeasureDataWidget: true
 ignoreNotesOutsideTg: false
 advancedMode: true
 performanceMode: false
-hideAutomatic: false
+hideAutomatic: true
 pulseCoefficient: 1
 pulseColor:
 - 0.39215686917304993
@@ -644,7 +644,7 @@ defaultProperties:
       snap: 1
 presets:
 - 
-dynamicBackgroundIndex: 1
+dynamicBackgroundIndex: 3
 disableLoadup: false
 useEndTimeOffsets: false
 ignoreNotes: false

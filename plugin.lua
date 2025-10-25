@@ -2275,7 +2275,7 @@ function automateSVs(settingVars)
             timeSinceLastObject = timeSinceLastObject + thisTime - prevTime
             if (timeSinceLastObject > settingVars.ms and settingVars.maintainMs and settingVars.optimizeTGs) then
                 idIndex = 1
-                timeSinceLastObject = 0
+                timeSinceLastObject = timeSinceLastObject - settingVars.ms
             else
                 idIndex = idIndex + 1
             end
@@ -11182,7 +11182,8 @@ function renderMeasureDataWidget()
         oldEndOffset = -69,
         nsvDistance = 0,
         roundedSVDistance = 0,
-        roundedAvgSV = 0
+        roundedAvgSV = 0,
+        tgName = ""
     }
     cache.loadTable("measureWidget", widgetVars)
     local uniqueDict = {}
@@ -11201,8 +11202,8 @@ function renderMeasureDataWidget()
     uniqueDict = sort(uniqueDict, sortAscending) ---@type number[]
     local startOffset = uniqueDict[1]
     local endOffset = uniqueDict[2] or uniqueDict[1]
-    if (math.abs(endOffset - startOffset) < 1e-10 and not state.GetValue("boolean.changeOccurred")) then return end
-    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or state.GetValue("boolean.changeOccurred")) then
+    if (math.abs(endOffset - startOffset) < 1e-10 and not state.GetValue("boolean.changeOccurred") and state.SelectedScrollGroupId == widgetVars.tgName) then return end
+    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or state.GetValue("boolean.changeOccurred") or state.SelectedScrollGroupId ~= widgetVars.tgName) then
         svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
         widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
@@ -11210,6 +11211,7 @@ function renderMeasureDataWidget()
         widgetVars.roundedSVDistance = math.round(totalDistance, 3)
         avgSV = totalDistance / (endOffset - startOffset)
         widgetVars.roundedAvgSV = math.round(avgSV, 3)
+        widgetVars.tgName = state.SelectedScrollGroupId
     end
     imgui.BeginTooltip()
     imgui.Text("Measure Info:")
