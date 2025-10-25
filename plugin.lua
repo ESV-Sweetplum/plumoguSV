@@ -1772,6 +1772,7 @@ DEFAULT_STARTING_MENU_VARS = {
         changeSVs = true,
         changeSSFs = true,
         clone = false,
+        advancedMode = false
     },
     completeDuplicate = {
         objects = {},
@@ -7793,10 +7794,15 @@ function addTeleportMenu()
 end
 function changeGroupsMenu()
     local menuVars = getMenuVars("changeGroups")
-    imgui.AlignTextToFramePadding()
+    menuVars.advancedMode = RadioButtons("Type:", menuVars.advancedMode, { "Simple", "Advanced" }, { false, true })
+    AddSeparator()
     local action = menuVars.clone and "Clone" or "Move"
-    menuVars.designatedTimingGroup = chooseTimingGroup(table.concat({ "  ", action, " to: " }),
-        menuVars.designatedTimingGroup)
+    if (menuVars.advancedMode) then
+    else
+        imgui.AlignTextToFramePadding()
+        menuVars.designatedTimingGroup = chooseTimingGroup(table.concat({ "  ", action, " to: " }),
+            menuVars.designatedTimingGroup)
+    end
     _, menuVars.changeSVs = imgui.Checkbox("Change SVs?", menuVars.changeSVs)
     KeepSameLine()
     _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)

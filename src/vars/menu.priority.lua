@@ -43,6 +43,7 @@ DEFAULT_STARTING_MENU_VARS = {
         changeSVs = true,
         changeSSFs = true,
         clone = false,
+        advancedMode = false
     },
     completeDuplicate = {
         objects = {},
