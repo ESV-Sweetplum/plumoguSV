@@ -1,4 +1,4 @@
-function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance)
+function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance, queuedSVs)
     local finalSVType = FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex]
     local placingStillSVs = menuVars.noteSpacing ~= nil
     local numMultipliers = #menuVars.svMultipliers
@@ -44,7 +44,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance)
         return
     end
     local tbl = getStillSVs(menuVars, firstOffset, lastOffset,
-        sort(svsToAdd, sortAscendingStartTime), svsToAdd)
+        sort(svsToAdd, sortAscendingStartTime), svsToAdd, queuedSVs)
     svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
     return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
 end

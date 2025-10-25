@@ -2467,7 +2467,7 @@ function placeSSFs(menuVars)
     addInitialSSF(ssfsToAdd, firstOffset - 1 / getUsableDisplacementMultiplier(firstOffset))
     removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
 end
-function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance)
+function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance, queuedSVs)
     local finalSVType = FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex]
     local placingStillSVs = menuVars.noteSpacing ~= nil
     local numMultipliers = #menuVars.svMultipliers
@@ -2513,7 +2513,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance)
         return
     end
     local tbl = getStillSVs(menuVars, firstOffset, lastOffset,
-        sort(svsToAdd, sortAscendingStartTime), svsToAdd)
+        sort(svsToAdd, sortAscendingStartTime), svsToAdd, queuedSVs)
     svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
     return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
 end
@@ -2532,9 +2532,9 @@ function placeStillSVsParent(menuVars)
     if (not truthy(offsets)) then return end
     for i = 1, (#offsets - 1) do
         if (STANDARD_SVS[menuVars.svTypeIndex] == "Exponential" and menuVars.settingVars.distanceMode == 2) then
-            tbl = placeSVs(menuVars, false, offsets[i], offsets[i + 1], menuVars.settingVars.distance)
+            tbl = placeSVs(menuVars, false, offsets[i], offsets[i + 1], menuVars.settingVars.distance, svsToAdd)
         else
-            tbl = placeSVs(menuVars, false, offsets[i], offsets[i + 1])
+            tbl = placeSVs(menuVars, false, offsets[i], offsets[i + 1], nil, svsToAdd)
         end
         svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
         svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
@@ -2542,7 +2542,7 @@ function placeStillSVsParent(menuVars)
     addFinalSV(svsToAdd, offsets[#offsets], menuVars.svMultipliers[#menuVars.svMultipliers], true)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
-function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRemovalTable)
+function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRemovalTable, queuedSVs)
     local stillType = STILL_TYPES[menuVars.stillTypeIndex]
     local noteSpacing = menuVars.noteSpacing
     local stillDistance = menuVars.stillDistance
@@ -2550,17 +2550,19 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
     if (not noteOffsets) then return { svsToRemove = {}, svsToAdd = {} } end
     local firstOffset = noteOffsets[1]
     local lastOffset = noteOffsets[#noteOffsets]
+    local svMultFn = queuedSVs and function(t) return getHypotheticalSVMultiplierAt(queuedSVs, t) end or
+    game.getSVMultiplierAt
     if stillType == "Auto" then
         local multiplier = getUsableDisplacementMultiplier(firstOffset)
         local duration = 1 / multiplier
         local timeBefore = firstOffset - duration
-        multiplierBefore = game.getSVMultiplierAt(timeBefore)
+        multiplierBefore = svMultFn(timeBefore)
         stillDistance = multiplierBefore * duration
     elseif stillType == "Otua" then
         local multiplier = getUsableDisplacementMultiplier(lastOffset)
         local duration = 1 / multiplier
         local timeAt = lastOffset
-        local multiplierAt = game.getSVMultiplierAt(timeAt)
+        local multiplierAt = svMultFn(timeAt)
         stillDistance = -multiplierAt * duration
     end
     local svsToAdd = {}
