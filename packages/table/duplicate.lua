@@ -1,3 +1,4 @@
+require("packages.table.keys")
 ---Returns a deep copy of a table.
 ---@generic T : table
 ---@param tbl T The original table.
