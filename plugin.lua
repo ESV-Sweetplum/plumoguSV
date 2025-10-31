@@ -2852,6 +2852,28 @@ function convertSVSSF(menuVars)
     actions.PerformBatch(editorActions)
     toggleablePrint("s!", "Successfully converted.")
 end
+function swapSVSSF(menuVars)
+    local offsets = game.uniqueSelectedNoteOffsets()
+    local startOffset = offsets[1]
+    local endOffset = offsets[#offsets]
+    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local ssfsToRemove = game.getSSFsBetweenOffsets(startOffset, endOffset)
+    local svsToAdd = {}
+    local ssfsToAdd = {}
+    for _, sv in pairs(svsToRemove) do
+        table.insert(ssfsToAdd, createSSF(sv.StartTime, sv.Multiplier))
+    end
+    for _, ssf in pairs(ssfsToRemove) do
+        table.insert(svsToAdd, createSV(ssf.StartTime, ssf.Multiplier))
+    end
+    actions.PerformBatch({
+        createEA(action_type.RemoveScrollVelocityBatch, svsToRemove),
+        createEA(action_type.AddScrollVelocityBatch, svsToAdd),
+        createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
+        createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
+    })
+    toggleablePrint("s!", "Successfully swapped.")
+end
 function copyItems(menuVars)
     clearCopiedItems(menuVars)
     local offsets = game.uniqueSelectedNoteOffsets()
@@ -7702,6 +7724,8 @@ function convertSVSSFMenu()
     cache.saveTable("convertSVSSFMenu", menuVars)
     simpleActionMenu(menuVars.conversionDirection and "Convert SVs -> SSFs" or "Convert SSFs -> SVs", 2, convertSVSSF,
         menuVars, false, false)
+    simpleActionMenu("Swap SVs <-> SSFs", 2, swapSVSSF,
+        nil, true, true)
 end
 function copyNPasteMenu()
     local menuVars = getMenuVars("copy")
