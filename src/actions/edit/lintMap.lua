@@ -152,3 +152,23 @@ function removeUnnecessarySVs()
     local type = truthy(svsToRemove) and "s!" or "w!"
     print(type, "Removed " .. #svsToRemove .. pluralize(" SV.", #svsToRemove, -2))
 end
+
+function removeAllHitSounds()
+    local hitsoundActions = {}
+    local objs = {}
+    for _, ho in ipairs(map.HitObjects) do
+        local hs = tonumber(ho.HitSound)
+        if (hs > 1) then
+            if (ho.StartTime == 21720) then print(ho.HitSound) end
+            table.insert(hitsoundActions, createEA(action_type.RemoveHitsound, { ho }, hs))
+            table.insert(objs, ho.StartTime .. "|" .. ho.Lane)
+        end
+    end
+    local type = truthy(hitsoundActions) and "s!" or "w!"
+    print(type,
+        "Removed " ..
+        #hitsoundActions .. pluralize(" hitsound.", #hitsoundActions, -2))
+    print("w!", "Note that the Quaver hitsound system is funky and some hitsounds exist that aren't audible.")
+    imgui.SetClipboardText(table.concat(objs, ","))
+    actions.PerformBatch(hitsoundActions)
+end
