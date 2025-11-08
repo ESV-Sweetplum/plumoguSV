@@ -159,7 +159,6 @@ function removeAllHitSounds()
     for _, ho in ipairs(map.HitObjects) do
         local hs = tonumber(ho.HitSound)
         if (hs > 1) then
-            if (ho.StartTime == 21720) then print(ho.HitSound) end
             table.insert(hitsoundActions, createEA(action_type.RemoveHitsound, { ho }, hs))
             table.insert(objs, ho.StartTime .. "|" .. ho.Lane)
         end
