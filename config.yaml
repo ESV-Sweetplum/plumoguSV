@@ -616,6 +616,10 @@ defaultProperties:
       avgSV: 0.59999999999999998
       distance: 100
       ratio: 0.59999999999999998
+    split:
+      modeIndex: 1
+      cloneSVs: false
+      cloneRadius: 1000
     verticalShift:
       verticalShift: 1
     selectAlternating:
