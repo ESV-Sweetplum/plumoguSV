@@ -3821,7 +3821,6 @@ function splitNotes(menuVars)
     local editorActions = {}
     local existingIds = table.keys(map.TimingGroups)
     for name, noteList in pairs(noteDict) do
-        print(noteList)
         local id = table.concat({ "splitter_", prefix, "_", name })
         local startTimeTbl = table.unpack(table.property(noteList, "StartTime"))
         local minStartTime = math.min(startTimeTbl)
