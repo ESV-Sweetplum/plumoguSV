@@ -3,11 +3,12 @@ function splitNotes(menuVars)
     local notes = state.SelectedHitObjects
 
     if (menuVars.modeIndex == 1) then
-        for i = 1, game.keyCount do
-            noteDict[i] = {}
-        end
         for _, note in ipairs(notes) do
-            table.insert(noteDict[note.Lane], note)
+            if (noteDict[note.Lane]) then
+                table.insert(noteDict[note.Lane], note)
+            else
+                noteDict[note.Lane] = { note }
+            end
         end
     elseif (menuVars.modeIndex == 2) then
         for _, note in ipairs(notes) do
@@ -35,16 +36,23 @@ function splitNotes(menuVars)
     local existingIds = table.keys(map.TimingGroups)
 
     for name, noteList in pairs(noteDict) do
+        print(noteList)
         local id = table.concat({ "splitter_", prefix, "_", name })
+        local startTimeTbl = table.unpack(table.property(noteList, "StartTime"))
+        local minStartTime = math.min(startTimeTbl)
+        local maxStartTime = math.max(startTimeTbl)
+        local svs = menuVars.cloneSVs and
+            game.getSVsBetweenOffsets(minStartTime - menuVars.cloneRadius, maxStartTime + menuVars.cloneRadius) or {}
         if (not table.includes(existingIds, id)) then
-            local tg = createSG({}, 1, color.rgbaToStr(generateColor(false)))
+            local tg = createSG(svs, 1, color.rgbaToStr(generateColor(false)))
             local ea = createEA(action_type.CreateTimingGroup, id, tg, noteList)
 
             table.insert(editorActions, ea)
         else
             local ea = createEA(action_type.MoveObjectsToTimingGroup, noteList, id)
-
+            local svEa = createEA(action_type.AddScrollVelocityBatch, svs, map.TimingGroups[id])
             table.insert(editorActions, ea)
+            table.insert(editorActions, svEa)
         end
     end
 

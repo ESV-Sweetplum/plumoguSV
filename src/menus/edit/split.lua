@@ -6,6 +6,13 @@ function splitMenu()
         "Split all notes into their own TG regardless of any properties they have."
     })
 
+    BasicCheckbox(menuVars, "cloneSVs", "Clone SVs?",
+        "If enabled, each note will clone the SVs around it in the current timing group.")
+    if (menuVars.cloneSVs) then
+        BasicInputInt(menuVars, "cloneRadius", "Clone Radius", { 0, 69420 },
+            "SVs that are further than THIS amount of ms away will be ignored.")
+    end
+
     cache.saveTable("splitMenu", menuVars)
 
     simpleActionMenu("Split selected notes into TGs", 1, splitNotes, menuVars, false)

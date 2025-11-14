@@ -135,6 +135,8 @@ DEFAULT_STARTING_MENU_VARS = {
     },
     split = {
         modeIndex = 1,
+        cloneSVs = false,
+        cloneRadius = 1000
     },
     verticalShift = {
         verticalShift = 1

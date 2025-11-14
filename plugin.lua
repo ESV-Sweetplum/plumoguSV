@@ -1885,6 +1885,8 @@ DEFAULT_STARTING_MENU_VARS = {
     },
     split = {
         modeIndex = 1,
+        cloneSVs = false,
+        cloneRadius = 1000
     },
     verticalShift = {
         verticalShift = 1
@@ -3787,12 +3789,13 @@ function splitNotes(menuVars)
     local noteDict = {}
     local notes = state.SelectedHitObjects
     if (menuVars.modeIndex == 1) then
-        for i = 1, game.keyCount do
-            noteDict[i] = {}
-        end
         for k30 = 1, #notes do
             local note = notes[k30]
-            table.insert(noteDict[note.Lane], note)
+            if (noteDict[note.Lane]) then
+                table.insert(noteDict[note.Lane], note)
+            else
+                noteDict[note.Lane] = { note }
+            end
         end
     elseif (menuVars.modeIndex == 2) then
         for k31 = 1, #notes do
@@ -3818,14 +3821,22 @@ function splitNotes(menuVars)
     local editorActions = {}
     local existingIds = table.keys(map.TimingGroups)
     for name, noteList in pairs(noteDict) do
+        print(noteList)
         local id = table.concat({ "splitter_", prefix, "_", name })
+        local startTimeTbl = table.unpack(table.property(noteList, "StartTime"))
+        local minStartTime = math.min(startTimeTbl)
+        local maxStartTime = math.max(startTimeTbl)
+        local svs = menuVars.cloneSVs and
+            game.getSVsBetweenOffsets(minStartTime - menuVars.cloneRadius, maxStartTime + menuVars.cloneRadius) or {}
         if (not table.includes(existingIds, id)) then
-            local tg = createSG({}, 1, color.rgbaToStr(generateColor(false)))
+            local tg = createSG(svs, 1, color.rgbaToStr(generateColor(false)))
             local ea = createEA(action_type.CreateTimingGroup, id, tg, noteList)
             editorActions[#editorActions + 1] = ea
         else
             local ea = createEA(action_type.MoveObjectsToTimingGroup, noteList, id)
+            local svEa = createEA(action_type.AddScrollVelocityBatch, svs, map.TimingGroups[id])
             editorActions[#editorActions + 1] = ea
+            editorActions[#editorActions + 1] = svEa
         end
     end
     actions.PerformBatch(editorActions)
@@ -8316,6 +8327,12 @@ function splitMenu()
         "Split notes via time; each time has its own TG.",
         "Split all notes into their own TG regardless of any properties they have."
     })
+    BasicCheckbox(menuVars, "cloneSVs", "Clone SVs?",
+        "If enabled, each note will clone the SVs around it in the current timing group.")
+    if (menuVars.cloneSVs) then
+        BasicInputInt(menuVars, "cloneRadius", "Clone Radius", { 0, 69420 },
+            "SVs that are further than THIS amount of ms away will be ignored.")
+    end
     cache.saveTable("splitMenu", menuVars)
     simpleActionMenu("Split selected notes into TGs", 1, splitNotes, menuVars, false)
 end
