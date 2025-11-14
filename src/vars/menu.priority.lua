@@ -133,6 +133,9 @@ DEFAULT_STARTING_MENU_VARS = {
         distance = 100,
         ratio = 0.6
     },
+    split = {
+        modeIndex = 1,
+    },
     verticalShift = {
         verticalShift = 1
     },

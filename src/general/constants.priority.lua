@@ -97,6 +97,12 @@ DISPLACE_SCALE_SPOTS = {
     "End"
 }
 
+SPLIT_MODES = {
+    "Column",
+    "Time",
+    "Individual"
+}
+
 EMOTICONS = {
     "( - _ - )",
     "( e . e )",

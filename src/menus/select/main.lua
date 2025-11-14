@@ -31,7 +31,7 @@ function chooseSelectTool()
     imgui.AlignTextToFramePadding()
     imgui.Text("Current Type:")
     KeepSameLine()
-    globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, globalVars.selectTypeIndex, {}, {}, tooltipList)
+    globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, globalVars.selectTypeIndex, nil, nil, tooltipList)
 
     HoverToolTip(tooltipList[globalVars.selectTypeIndex])
 

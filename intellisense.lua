@@ -39,6 +39,7 @@ For more information, please refer to <https://unlicense.org>
 
 ---@alias NoteLane 1|2|3|4|5|6|7|8|9|10 The lane of a particular note.
 ---@alias SnapNumber 1|2|3|4|5|6|8|12|16 The denominator of the corresponding snap.
+---@alias HitSounds userdata A bitwise mask defining the hitsounds, which when converted to base 2, displays as abcd. `a` dictates clap, `b` dictates finish, `c` dictates whistle, and `d` is irrelevant.
 
 ---@class (exact) ScrollGroup
 ---##### (READ-ONLY)
@@ -103,9 +104,6 @@ For more information, please refer to <https://unlicense.org>
 ---##### (READ-ONLY)
 ---#### The id of the [editor layer](lua://EditorLayer) this note is in.
 ---@field EditorLayer integer
----##### (READ-ONLY)
----#### `true` if this note is a long note, false otherwise.
----@field IsLongNote boolean
 ---##### (READ-ONLY)
 ---#### The id of the [timing group](lua://ScrollGroup) that this note belongs to.
 ---@field TimingGroup string
@@ -753,7 +751,7 @@ state.CurrentTimingPoint       = {} ---@type TimingPoint
 
 ---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The current selected [editor layer](lua://EditorLayer).
-state.CurrentEditorLayer       = {} ---@type EditorLayer
+state.CurrentLayer             = {} ---@type EditorLayer
 
 ---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The selected snap's denominator. (e.g. 1/3 snap returns `3`, etc.)
@@ -861,7 +859,7 @@ function utils.CreateScrollGroup(svs, initialSV, colorRgb) end
 ---##### (READ-ONLY)
 ---#### Creates an [editor action](lua://EditorAction), to later be executed with [`actions.Perform`](lua://actions.Perform).
 ---@param type EditorActionType The type of action to perform.
----@vararg any The parameters of the action. Depending on the prefix of the action, different parameters should be passed in:
+---@param ... any The parameters of the action. Depending on the prefix of the action, different parameters should be passed in:
 ---- Place/Add/Remove // ... should only be one term, the object to add.
 ---- Place/Add/Remove Batch // ... should only be one term, a table of the objects to add.
 ---- Move/Swap/Flip/Change/Toggle // ... should be two terms, the first being the objects to manipulate, the second being the instruction for the manipulation.
@@ -1181,7 +1179,7 @@ function read() end
 
 ---##### (READ-ONLY)
 ---#### Stores the given value in the `config.yaml` file located in the plugin's directory. If multiple arguments are given, they are packed as an array before being stored.
----@vararg any The contents that should be stored.
+---@param ... any The contents that should be stored.
 function write(...) end
 
 ---##### (READ-ONLY)
@@ -1200,22 +1198,14 @@ function eval(str) end
 
 ---##### (READ-ONLY)
 ---#### Displays a notification in Quaver.
----@vararg any The notification contents.
+---@param ... any The notification contents.
 function print(...) end
 
 ---##### (READ-ONLY)
 ---#### Displays a notification in Quaver with a specific color and icon.
 ---@param notificationType "info"|"success"|"warning"|"error"|"info!"|"success!"|"warning!"|"error!" The type of notification sent. Appending an `!` will omit the plugin name in the notification.
----@vararg any The contents of the notification.
+---@param ... any The contents of the notification.
 function print(notificationType, ...) end
-
----@enum HitSounds
-hitsounds    = {
-    Normal = 1, -- Normal should be played regardless if it's 0 or 1.
-    Whistle = 2,
-    Finish = 4,
-    Clap = 8
-}
 
 ---@enum EditorActionType
 action_type  = {

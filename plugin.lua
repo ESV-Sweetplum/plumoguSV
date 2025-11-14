@@ -187,6 +187,22 @@ function color.nduaToRgba(ndua)
     end
     return color.uintToRgba(num)
 end
+---Converts a color to a Quaver-compatible string.
+---@param vctr Vector4
+---@return string
+function color.rgbaToStr(vctr)
+    return table.concat({ vctr.x, vctr.y, vctr.z }, ",")
+end
+---Generates a random color.
+---@param includeAlpha boolean If false, alpha will always be 1.
+---@return Vector4
+function generateColor(includeAlpha)
+    local r = math.random(255)
+    local g = math.random(255)
+    local b = math.random(255)
+    local a = math.random(255)
+    return vector.New(r, g, b, includeAlpha and a or 255)
+end
 ---Gets the most recent timing point, or a dummy timing point if none exists.
 ---@param offset number
 ---@return TimingPoint
@@ -1399,6 +1415,11 @@ DISPLACE_SCALE_SPOTS = {
     "Start",
     "End"
 }
+SPLIT_MODES = {
+    "Column",
+    "Time",
+    "Individual"
+}
 EMOTICONS = {
     "( - _ - )",
     "( e . e )",
@@ -1861,6 +1882,9 @@ DEFAULT_STARTING_MENU_VARS = {
         avgSV = 0.6,
         distance = 100,
         ratio = 0.6
+    },
+    split = {
+        modeIndex = 1,
     },
     verticalShift = {
         verticalShift = 1
@@ -3599,7 +3623,6 @@ function removeAllHitSounds()
     for _, ho in ipairs(map.HitObjects) do
         local hs = tonumber(ho.HitSound)
         if (hs > 1) then
-            if (ho.StartTime == 21720) then print(ho.HitSound) end
             table.insert(hitsoundActions, createEA(action_type.RemoveHitsound, { ho }, hs))
             objs[#objs + 1] = ho.StartTime .. "|" .. ho.Lane
         end
@@ -3760,6 +3783,53 @@ function scaleMultiplySVs(menuVars)
     end
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
+function splitNotes(menuVars)
+    local noteDict = {}
+    local notes = state.SelectedHitObjects
+    if (menuVars.modeIndex == 1) then
+        for i = 1, game.keyCount do
+            noteDict[i] = {}
+        end
+        for k30 = 1, #notes do
+            local note = notes[k30]
+            table.insert(noteDict[note.Lane], note)
+        end
+    elseif (menuVars.modeIndex == 2) then
+        for k31 = 1, #notes do
+            local note = notes[k31]
+            if (noteDict[note.StartTime]) then
+                table.insert(noteDict[note.StartTime], note)
+            else
+                noteDict[note.StartTime] = { note }
+            end
+        end
+    else
+        for k32 = 1, #notes do
+            local note = notes[k32]
+            noteDict[note.StartTime .. "_" .. note.Lane] = { note }
+        end
+    end
+    local prefix = "col"
+    if (menuVars.modeIndex == 2) then
+        prefix = "time"
+    elseif (menuVars.modeIndex == 3) then
+        prefix = "solo"
+    end
+    local editorActions = {}
+    local existingIds = table.keys(map.TimingGroups)
+    for name, noteList in pairs(noteDict) do
+        local id = table.concat({ "splitter_", prefix, "_", name })
+        if (not table.includes(existingIds, id)) then
+            local tg = createSG({}, 1, color.rgbaToStr(generateColor(false)))
+            local ea = createEA(action_type.CreateTimingGroup, id, tg, noteList)
+            editorActions[#editorActions + 1] = ea
+        else
+            local ea = createEA(action_type.MoveObjectsToTimingGroup, noteList, id)
+            editorActions[#editorActions + 1] = ea
+        end
+    end
+    actions.PerformBatch(editorActions)
+end
 function swapNoteSVs()
     local svsToAdd = {}
     local svsToRemove = {}
@@ -3794,8 +3864,8 @@ function verticalShiftSVs(menuVars)
     local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
     local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
-    for k30 = 1, #svsBetweenOffsets do
-        local sv = svsBetweenOffsets[k30]
+    for k33 = 1, #svsBetweenOffsets do
+        local sv = svsBetweenOffsets[k33]
         local newSVMultiplier = sv.Multiplier + menuVars.verticalShift
         addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
     end
@@ -3881,8 +3951,8 @@ function getMapStats()
     local tgList = map.GetTimingGroupIds()
     local svSum = 0
     local ssfSum = 0
-    for k31 = 1, #tgList do
-        local tg = tgList[k31]
+    for k34 = 1, #tgList do
+        local tg = tgList[k34]
         state.SelectedScrollGroupId = tg
         svSum = svSum + #map.ScrollVelocities
         ssfSum = ssfSum + #map.ScrollSpeedFactors
@@ -3907,8 +3977,8 @@ function selectAlternating(menuVars)
     local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     local times = {}
-    for k32 = 1, #notes do
-        local ho = notes[k32]
+    for k35 = 1, #notes do
+        local ho = notes[k35]
         times[#times + 1] = ho.StartTime
     end
     times = table.dedupe(times)
@@ -3921,8 +3991,8 @@ function selectAlternating(menuVars)
     local notesToSelect = {}
     local currentTime = allowedTimes[1]
     local index = 2
-    for k33 = 1, #notes do
-        local note = notes[k33]
+    for k36 = 1, #notes do
+        local note = notes[k36]
         if (note.StartTime > currentTime and index <= #allowedTimes) then
             currentTime = allowedTimes[index]
             index = index + 1
@@ -3943,8 +4013,8 @@ function selectByChordSizes(menuVars)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     notes = sort(notes, sortAscendingNoteLaneTime)
     local noteTimeTable = {}
-    for k34 = 1, #notes do
-        local note = notes[k34]
+    for k37 = 1, #notes do
+        local note = notes[k37]
         noteTimeTable[#noteTimeTable + 1] = note.StartTime
     end
     noteTimeTable = table.dedupe(noteTimeTable)
@@ -3952,13 +4022,13 @@ function selectByChordSizes(menuVars)
     for idx = 1, game.keyCount do
         sizeDict[#sizeDict + 1] = {}
     end
-    for k35 = 1, #noteTimeTable do
-        local time = noteTimeTable[k35]
+    for k38 = 1, #noteTimeTable do
+        local time = noteTimeTable[k38]
         local size = 0
         local curLane = 0
         local totalNotes = {}
-        for k36 = 1, #notes do
-            local note = notes[k36]
+        for k39 = 1, #notes do
+            local note = notes[k39]
             if (math.abs(note.StartTime - time) < 3) then
                 size = size + 1
                 curLane = curLane + 1
@@ -3984,8 +4054,8 @@ function selectByNoteType(menuVars)
     local totalNotes = game.getNotesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then totalNotes = state.SelectedHitObjects end
     local notesToSelect = {}
-    for k37 = 1, #totalNotes do
-        local note = totalNotes[k37]
+    for k40 = 1, #totalNotes do
+        local note = totalNotes[k40]
         if (note.EndTime == 0 and menuVars.rice) then notesToSelect[#notesToSelect + 1] = note end
         if (note.EndTime ~= 0 and menuVars.ln) then notesToSelect[#notesToSelect + 1] = note end
     end
@@ -7033,7 +7103,7 @@ function chooseCreateTool()
     imgui.AlignTextToFramePadding()
     imgui.Text("  Type:  ")
     KeepSameLine()
-    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex, {}, {}, tooltipList)
+    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex, nil, nil, tooltipList)
     HoverToolTip(tooltipList[globalVars.placeTypeIndex])
 end
 function renderPresetMenu(menuLabel, menuVars, settingVars)
@@ -7456,7 +7526,8 @@ function placeStillSVMenu()
     end
     imgui.Text("Still Settings:")
     menuVars.noteSpacing = ComputableInputFloat("Note Spacing", menuVars.noteSpacing, 2, "x")
-    menuVars.stillBehavior = Combo("Still Behavior", STILL_BEHAVIOR_TYPES, menuVars.stillBehavior)
+    menuVars.stillBehavior = Combo("Still Behavior", STILL_BEHAVIOR_TYPES, menuVars.stillBehavior, nil, nil,
+        { "Apply the Still across the entire selected region.", "Apply the Stills across the selected note groups." })
     chooseStillType(menuVars)
     AddSeparator()
     needSVUpdate = showSettingsMenu(currentSVType, settingVars, false, nil, "Still") or needSVUpdate
@@ -8102,6 +8173,7 @@ EDIT_SV_TOOLS = {
     "Reverse Scroll",
     "Scale (Displace)",
     "Scale (Multiply)",
+    "Split",
     "Swap Notes",
     "Vertical Shift"
 }
@@ -8126,6 +8198,7 @@ function editSVTab()
     if toolName == "Reverse Scroll" then reverseScrollMenu() end
     if toolName == "Scale (Displace)" then scaleDisplaceMenu() end
     if toolName == "Scale (Multiply)" then scaleMultiplyMenu() end
+    if toolName == "Split" then splitMenu() end
     if toolName == "Swap Notes" then swapNotesMenu() end
     if toolName == "Vertical Shift" then verticalShiftMenu() end
 end
@@ -8147,13 +8220,14 @@ function chooseEditTool()
         "Reverse the scroll direction using SVs.",
         "Scale SV values by adding teleport SVs.",
         "Scale SV values by multiplying.",
+        "Split notes into different timing groups for finer control.",
         "Swap positions of notes using SVs.",
         "Adds a constant value to SVs in a range.",
     }
     imgui.AlignTextToFramePadding()
     imgui.Text("  Current Tool:")
     KeepSameLine()
-    globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, globalVars.editToolIndex, {}, {}, tooltipList)
+    globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, globalVars.editToolIndex, nil, nil, tooltipList)
     HoverToolTip(tooltipList[globalVars.editToolIndex])
 end
 function measureMenu()
@@ -8234,6 +8308,16 @@ function scaleMultiplyMenu()
     AddSeparator()
     local buttonText = "Scale SVs between selected notes##multiply"
     simpleActionMenu(buttonText, 2, scaleMultiplySVs, menuVars)
+end
+function splitMenu()
+    local menuVars = getMenuVars("split")
+    menuVars.modeIndex = Combo("Split Mode", SPLIT_MODES, menuVars.modeIndex, nil, nil, {
+        "Split notes via column; either with individual TGs or a certain transformation of such columns.",
+        "Split notes via time; each time has its own TG.",
+        "Split all notes into their own TG regardless of any properties they have."
+    })
+    cache.saveTable("splitMenu", menuVars)
+    simpleActionMenu("Split selected notes into TGs", 1, splitNotes, menuVars, false)
 end
 function swapNotesMenu()
     simpleActionMenu("Swap selected notes using SVs", 2, swapNoteSVs, nil)
@@ -9991,7 +10075,7 @@ function chooseSelectTool()
     imgui.AlignTextToFramePadding()
     imgui.Text("Current Type:")
     KeepSameLine()
-    globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, globalVars.selectTypeIndex, {}, {}, tooltipList)
+    globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, globalVars.selectTypeIndex, nil, nil, tooltipList)
     HoverToolTip(tooltipList[globalVars.selectTypeIndex])
     local selectTool = SELECT_TOOLS[globalVars.selectTypeIndex]
 end
@@ -10031,8 +10115,8 @@ function showAppearanceSettings()
     if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
         setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
         local customStyle = {}
-        for k38 = 1, #customStyleIds do
-            local id = customStyleIds[k38]
+        for k41 = 1, #customStyleIds do
+            local id = customStyleIds[k41]
             customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[id:capitalize()])) / vctr4(255)
         end
         globalVars.customStyle = customStyle
@@ -10215,8 +10299,8 @@ end
 function stringifyCustomStyle(customStyle)
     local keys = table.keys(customStyle)
     local resultStr = "v2 "
-    for k39 = 1, #keys do
-        local key = keys[k39]
+    for k42 = 1, #keys do
+        local key = keys[k42]
         local value = customStyle[key]
         keyId = convertStrToShort(key)
         local r = math.floor(value.x * 255)
@@ -12663,8 +12747,8 @@ end
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for k40 = 1, #svs do
-        local sv = svs[k40]
+    for k43 = 1, #svs do
+        local sv = svs[k43]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
         if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
     end

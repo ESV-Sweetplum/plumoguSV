@@ -26,7 +26,7 @@ function chooseCreateTool()
     imgui.AlignTextToFramePadding()
     imgui.Text("  Type:  ")
     KeepSameLine()
-    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex, {}, {}, tooltipList)
+    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex, nil, nil, tooltipList)
 
     HoverToolTip(tooltipList[globalVars.placeTypeIndex])
 end

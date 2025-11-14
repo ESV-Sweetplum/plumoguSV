@@ -87,3 +87,10 @@ function color.nduaToRgba(ndua)
 
     return color.uintToRgba(num)
 end
+
+---Converts a color to a Quaver-compatible string.
+---@param vctr Vector4
+---@return string
+function color.rgbaToStr(vctr)
+    return table.concat({ vctr.x, vctr.y, vctr.z }, ",")
+end

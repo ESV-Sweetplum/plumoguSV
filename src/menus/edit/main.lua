@@ -15,6 +15,7 @@ EDIT_SV_TOOLS = { -- tools for editing SVs
     "Reverse Scroll",
     "Scale (Displace)",
     "Scale (Multiply)",
+    "Split",
     "Swap Notes",
     "Vertical Shift"
 }
@@ -40,6 +41,7 @@ function editSVTab()
     if toolName == "Reverse Scroll" then reverseScrollMenu() end
     if toolName == "Scale (Displace)" then scaleDisplaceMenu() end
     if toolName == "Scale (Multiply)" then scaleMultiplyMenu() end
+    if toolName == "Split" then splitMenu() end
     if toolName == "Swap Notes" then swapNotesMenu() end
     if toolName == "Vertical Shift" then verticalShiftMenu() end
 end
@@ -62,6 +64,7 @@ function chooseEditTool()
         "Reverse the scroll direction using SVs.",
         "Scale SV values by adding teleport SVs.",
         "Scale SV values by multiplying.",
+        "Split notes into different timing groups for finer control.",
         "Swap positions of notes using SVs.",
         "Adds a constant value to SVs in a range.",
     }
@@ -69,7 +72,7 @@ function chooseEditTool()
     imgui.AlignTextToFramePadding()
     imgui.Text("  Current Tool:")
     KeepSameLine()
-    globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, globalVars.editToolIndex, {}, {}, tooltipList)
+    globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, globalVars.editToolIndex, nil, nil, tooltipList)
 
     HoverToolTip(tooltipList[globalVars.editToolIndex])
 end
