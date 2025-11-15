@@ -8001,11 +8001,11 @@ function updateDirectEdit()
     if (not truthy(offsets) and not truthy(state.GetValue("lists.directSVList"))) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
-    if (#offsets < 2) then
+    if (not truthy(offsets)) then
         state.SetValue("lists.directSVList", {})
         return
     end
-    state.SetValue("lists.directSVList", game.getSVsBetweenOffsets(firstOffset, lastOffset))
+    state.SetValue("lists.directSVList", game.getSVsBetweenOffsets(firstOffset - 50, lastOffset + 50))
 end
 function directSVMenu()
     local menuVars = getMenuVars("directSV")
@@ -8015,7 +8015,7 @@ function directSVMenu()
     local svs = state.GetValue("lists.directSVList") or {}
     if (not truthy(svs)) then
         menuVars.selectableIndex = 1
-        imgui.TextWrapped("Select two notes to view SVs.")
+        imgui.TextWrapped("Select a note to view local SVs.")
         return
     end
     if (menuVars.selectableIndex > #svs) then menuVars.selectableIndex = #svs end
