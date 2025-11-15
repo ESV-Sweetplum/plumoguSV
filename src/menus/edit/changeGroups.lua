@@ -1,17 +1,14 @@
 function changeGroupsMenu()
     local menuVars = getMenuVars("changeGroups")
 
-    menuVars.advancedMode = RadioButtons("Type:", menuVars.advancedMode, { "Simple", "Advanced" }, { false, true })
     AddSeparator()
     local action = menuVars.clone and "Clone" or "Move"
 
-    if (menuVars.advancedMode) then
 
-    else
-        imgui.AlignTextToFramePadding()
-        menuVars.designatedTimingGroup = chooseTimingGroup(table.concat({ "  ", action, " to: " }),
-            menuVars.designatedTimingGroup)
-    end
+
+    imgui.AlignTextToFramePadding()
+    menuVars.designatedTimingGroup = chooseTimingGroup(table.concat({ "  ", action, " to: " }),
+        menuVars.designatedTimingGroup)
 
     _, menuVars.changeSVs = imgui.Checkbox("Change SVs?", menuVars.changeSVs)
     KeepSameLine()

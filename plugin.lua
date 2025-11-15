@@ -1793,7 +1793,6 @@ DEFAULT_STARTING_MENU_VARS = {
         changeSVs = true,
         changeSSFs = true,
         clone = false,
-        advancedMode = false
     },
     completeDuplicate = {
         objects = {},
@@ -7920,15 +7919,11 @@ function addTeleportMenu()
 end
 function changeGroupsMenu()
     local menuVars = getMenuVars("changeGroups")
-    menuVars.advancedMode = RadioButtons("Type:", menuVars.advancedMode, { "Simple", "Advanced" }, { false, true })
     AddSeparator()
     local action = menuVars.clone and "Clone" or "Move"
-    if (menuVars.advancedMode) then
-    else
-        imgui.AlignTextToFramePadding()
-        menuVars.designatedTimingGroup = chooseTimingGroup(table.concat({ "  ", action, " to: " }),
-            menuVars.designatedTimingGroup)
-    end
+    imgui.AlignTextToFramePadding()
+    menuVars.designatedTimingGroup = chooseTimingGroup(table.concat({ "  ", action, " to: " }),
+        menuVars.designatedTimingGroup)
     _, menuVars.changeSVs = imgui.Checkbox("Change SVs?", menuVars.changeSVs)
     KeepSameLine()
     _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
@@ -8445,12 +8440,14 @@ function showPatchNotesWindow()
     imgui.BulletText("Fixed still per note group finally.")
     imgui.BulletText("Now properly instantiates pulse color.")
     imgui.BulletText("Fixed relative ratio not saving.")
+    imgui.BulletText("Fixed Still per note group displacements, and enabled auto/otua on the aforementioned feature.")
     imgui.BulletText("Fixed Select Bookmark crashing the game.")
     imgui.BulletText("Fixed Select Bookmark text going off the screen.")
-    imgui.BulletText("Fixed measure msx widget not rendering in real time.")
+    imgui.BulletText(
+        "Fixed measure msx widget not rendering in real time, and not properly recalculating distances when switching TGs.")
     imgui.BulletText("Fixed bug where saving a false setting wouldn't save it at all.")
     imgui.BulletText(
-    "Fixed bug with certain functions where LN ends would not be\nconsidered if their start wasn't within the selection.")
+        "Fixed bug with certain functions where LN ends would not be\nconsidered if their start wasn't within the selection.")
     imgui.SeparatorText("New Features")
     imgui.BulletText("Added tooltips to various functions to explain their functionality.")
     imgui.BulletText("New border pulse feature that pulses along with the beat.")
@@ -8464,6 +8461,7 @@ function showPatchNotesWindow()
     imgui.BulletText("Allow defaults to be edited.")
     imgui.BulletText("Include some new automate parameters for further customization.")
     imgui.BulletText("Edit > Layer Snaps feature: Save your snap colors before using AFFINE to\nbring them back easily.")
+    imgui.BulletText("Edit > Split feature: Split notes into different TGs with the surrounding SVs in one click.")
     imgui.BulletText("Added linear equalizer to allow you to create 0x SV on linear much easier.")
     imgui.BulletText("Added custom theme input, along with exporting/importing.")
     imgui.BulletText("Added 3 custom reactive backgrounds. More will be added\nwhen the kofi products are paid for.")
@@ -8481,6 +8479,14 @@ function showPatchNotesWindow()
     imgui.BulletText("Added patch notes page.")
     imgui.BulletText("Added map stats button to quickly grab SV and SSF count.")
     imgui.BulletText("Added pagination to bookmarks.")
+    imgui.BulletText("Now allowed Direct SV to view SVs around a particular note.")
+    imgui.BulletText("Moved many linting features to Edit > Lint Map.")
+    imgui.BulletText("Added new feature to remove duplicated notes.")
+    imgui.BulletText(
+        "Added new feature to remove hitsounds, for mappers who don't use them but accidentally click on the menu.")
+    imgui.BulletText("Added a very rudimentary preset system, so you can send menu data to others.")
+    imgui.BulletText("Added a button to directly swap SVs and SSFs.")
+    imgui.BulletText("Added a startup animation.")
     AddPadding()
     imgui.BeginChild("v1.1.2Bezier", vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
