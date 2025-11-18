@@ -21,7 +21,7 @@ showPresetMenu: false
 scrollGroupIndex: 1
 hideSVInfo: false
 showSVInfoVisualizer: true
-showVibratoWidget: true
+showVibratoWidget: false
 showNoteDataWidget: true
 showMeasureDataWidget: true
 ignoreNotesOutsideTg: false
@@ -513,14 +513,13 @@ defaultProperties:
       - true
       - true
     addTeleport:
-      distance: 10727
+      distance: 10000
       teleportBeforeHand: false
     changeGroups:
       designatedTimingGroup: $Default
       changeSVs: true
       changeSSFs: true
       clone: true
-      advancedMode: false
     completeDuplicate:
       objects:
       - 

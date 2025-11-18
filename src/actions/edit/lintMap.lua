@@ -141,16 +141,25 @@ function mergeNotes()
 end
 
 function removeUnnecessarySVs()
-    local svsToRemove = {}
-    local prevMultiplier = state.SelectedScrollGroup.InitialScrollVelocity or map.InitialScrollVelocity or 1
-    for _, sv in ipairs(map.ScrollVelocities) do
-        local m = sv.Multiplier
-        if (m == prevMultiplier) then table.insert(svsToRemove, sv) end
-        prevMultiplier = m
+    local editorActions = {}
+    local ogTg = state.SelectedScrollGroupId
+    local svSum = 0
+    for tgId, tg in pairs(map.TimingGroups) do
+        local svsToRemove = {}
+        state.SelectedScrollGroupId = tgId
+        local prevMultiplier = state.SelectedScrollGroup.InitialScrollVelocity or map.InitialScrollVelocity or 1
+        for _, sv in ipairs(map.ScrollVelocities) do
+            local m = sv.Multiplier
+            if (m == prevMultiplier) then table.insert(svsToRemove, sv) end
+            prevMultiplier = m
+        end
+        table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove, tg))
+        svSum = svSum + #svsToRemove
     end
-    if (truthy(svsToRemove)) then actions.Perform(createEA(action_type.RemoveScrollVelocityBatch, svsToRemove)) end
-    local type = truthy(svsToRemove) and "s!" or "w!"
-    print(type, "Removed " .. #svsToRemove .. pluralize(" SV.", #svsToRemove, -2))
+    if (truthy(svSum)) then actions.PerformBatch(editorActions) end
+    local type = truthy(svSum) and "s!" or "w!"
+    print(type, "Removed " .. svSum .. pluralize(" SV.", svSum, -2))
+    state.SelectedScrollGroupId = ogTg
 end
 
 function removeAllHitSounds()
