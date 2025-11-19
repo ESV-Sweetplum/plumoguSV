@@ -9,7 +9,7 @@ function updateMenuSVs(currentSVType, menuVars, settingVars, skipFinalSV)
     if menuVars.interlace then interlaceMultiplier = menuVars.interlaceRatio end
     menuVars.svMultipliers = generateSVMultipliers(currentSVType, settingVars, interlaceMultiplier)
     local svMultipliersNoEndSV = table.duplicate(menuVars.svMultipliers)
-    table.remove(svMultipliersNoEndSV)
+    if (#svMultipliersNoEndSV > 1) then table.remove(svMultipliersNoEndSV) end
     menuVars.svDistances = calculateDistanceVsTime(svMultipliersNoEndSV)
 
     updateFinalSV(settingVars.finalSVIndex, menuVars.svMultipliers, settingVars.customSV,

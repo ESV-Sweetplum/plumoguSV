@@ -7,7 +7,7 @@ function generateLinearSet(startValue, endValue, numValues, placingSV)
     local linearSet = { startValue }
     if numValues < 2 then return linearSet end
 
-    if (globalVars.equalizeLinear and placingSV) then
+    if (globalVars.equalizeLinear and placingSV and numValues > 2) then
         endValue = endValue +
             (endValue - startValue) / (numValues - 2)
     end
