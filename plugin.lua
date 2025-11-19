@@ -3954,6 +3954,52 @@ function initializeNoteLockMode()
         end
     end)
 end
+function goToPrevTg()
+    local groups = state.GetValue("tgList")
+    local selectedTgDict = {}
+    if (not truthy(state.SelectedHitObjects)) then
+        globalVars.scrollGroupIndex = math.wrappedClamp(globalVars.scrollGroupIndex - 1, 1, #groups)
+        state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
+        return
+    end
+    for _, ho in pairs(state.SelectedHitObjects) do
+        if (not selectedTgDict[ho.TimingGroup]) then
+            selectedTgDict[ho.TimingGroup] = table.indexOf(groups, ho.TimingGroup)
+        end
+    end
+    local idList = table.keys(selectedTgDict)
+    if (not table.includes(idList, groups[globalVars.scrollGroupIndex])) then
+        globalVars.scrollGroupIndex = selectedTgDict[idList[#idList]]
+        state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
+        return
+    end
+    local idIndex = table.indexOf(idList, state.SelectedScrollGroupId)
+    globalVars.scrollGroupIndex = selectedTgDict[idList[math.wrappedClamp(idIndex - 1, 1, #idList)]]
+    state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
+end
+function goToNextTg()
+    local groups = state.GetValue("tgList")
+    local selectedTgDict = {}
+    if (not truthy(state.SelectedHitObjects)) then
+        globalVars.scrollGroupIndex = math.wrappedClamp(globalVars.scrollGroupIndex + 1, 1, #groups)
+        state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
+        return
+    end
+    for _, ho in pairs(state.SelectedHitObjects) do
+        if (not selectedTgDict[ho.TimingGroup]) then
+            selectedTgDict[ho.TimingGroup] = table.indexOf(groups, ho.TimingGroup)
+        end
+    end
+    local idList = table.keys(selectedTgDict)
+    if (not table.includes(idList, groups[globalVars.scrollGroupIndex])) then
+        globalVars.scrollGroupIndex = selectedTgDict[idList[1]]
+        state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
+        return
+    end
+    local idIndex = table.indexOf(idList, state.SelectedScrollGroupId)
+    globalVars.scrollGroupIndex = selectedTgDict[idList[math.wrappedClamp(idIndex + 1, 1, #idList)]]
+    state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
+end
 function jumpToTg()
     if (not truthy(state.SelectedHitObjects)) then return end
     local tgId = state.SelectedHitObjects[1].TimingGroup
@@ -3967,10 +4013,8 @@ function checkForGlobalHotkeys()
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.toggle_note_lock])) then changeNoteLockMode() end
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.toggle_end_offset])) then toggleUseEndOffsets() end
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.move_selection_to_tg])) then moveSelectionToTg() end
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_prev_tg])) then
-    end
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_next_tg])) then
-    end
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_prev_tg])) then goToPrevTg() end
+    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_next_tg])) then goToNextTg() end
 end
 function moveSelectionToTg()
     actions.Perform(createEA(action_type.MoveObjectsToTimingGroup, state.SelectedHitObjects, state.SelectedScrollGroupId))
@@ -11869,18 +11913,9 @@ function chooseCurrentScrollGroup()
     imgui.PushItemWidth(155)
     globalVars.scrollGroupIndex = Combo("##scrollGroup", groups, globalVars.scrollGroupIndex, cols, hiddenGroups)
     imgui.PopItemWidth()
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_prev_tg])) then
-        globalVars.scrollGroupIndex = math.clamp(globalVars.scrollGroupIndex - 1, 1, #groups)
-    end
-    if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_next_tg])) then
-        globalVars.scrollGroupIndex = math.clamp(globalVars.scrollGroupIndex + 1, 1, #groups)
-    end
     AddSeparator()
     if (prevIndex ~= globalVars.scrollGroupIndex) then
         state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
-    end
-    if (state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex]) then
-        globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
     end
 end
 function chooseTimingGroup(label, previousGroup)
@@ -12652,6 +12687,13 @@ function listenForHitObjectChanges()
         end
     end)
 end
+function listenForTimingGroupCount()
+    state.SetValue("tgList", game.getTimingGroupList())
+    listen(function(action, type, fromLua)
+        if (tonumber(action.Type) <= 44) then return end
+        state.SetValue("tgList", game.getTimingGroupList())
+    end)
+end
 ---Alias for [`utils.CreateScrollVelocity`](lua://utils.CreateScrollVelocity).
 ---@param startTime number
 ---@param multiplier number
@@ -13363,6 +13405,10 @@ function draw()
     imgui.End()
     logoThread()
     state.SetValue("boolean.changeOccurred", false)
+    local groups = state.GetValue("tgList")
+    if (state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex]) then
+        globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
+    end
 end
 function awake()
     local tempGlobalVars = read()
@@ -13378,6 +13424,7 @@ function awake()
     end
     initializeNoteLockMode()
     listenForHitObjectChanges()
+    listenForTimingGroupCount()
     setPluginAppearance()
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
     if (not truthy(#map.TimingPoints)) then
@@ -13442,5 +13489,9 @@ function draw()
     imgui.End()
     logoThread()
     state.SetValue("boolean.changeOccurred", false)
+    local groups = state.GetValue("tgList")
+    if (state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex]) then
+        globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
+    end
     tempClockCount = 0
 end

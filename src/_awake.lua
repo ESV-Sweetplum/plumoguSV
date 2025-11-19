@@ -14,6 +14,7 @@ function awake()
 
     initializeNoteLockMode()
     listenForHitObjectChanges()
+    listenForTimingGroupCount()
     setPluginAppearance()
 
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
