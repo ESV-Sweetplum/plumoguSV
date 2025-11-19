@@ -764,16 +764,18 @@ tn = math.toNumber
 ---@param n number
 ---@param lowerBound number
 ---@param upperBound number
+---@param discrete? boolean Whether or not to wrap discretely - that is, in a range of 1 to n, if given 0, will return n instead of n - 1. Check [OBOE or fencepost error](https://en.wikipedia.org/wiki/Off-by-one_error).
 ---@return number
-function math.wrap(n, lowerBound, upperBound)
+function math.wrap(n, lowerBound, upperBound, discrete)
     if (upperBound <= lowerBound) then return n end
     if (n >= lowerBound and n <= upperBound) then return n end
+    local additionFactor = discrete and 1 or 0
     local diff = upperBound - lowerBound
     while (n < lowerBound) do
-        n = n + diff
+        n = n + diff + additionFactor
     end
     while (n > upperBound) do
-        n = n - diff
+        n = n - diff - additionFactor
     end
     return n
 end
@@ -3954,11 +3956,11 @@ function initializeNoteLockMode()
         end
     end)
 end
-function goToPrevTg()
+function changeTGIndex(diff)
     local groups = state.GetValue("tgList")
     local selectedTgDict = {}
     if (not truthy(state.SelectedHitObjects)) then
-        globalVars.scrollGroupIndex = math.wrappedClamp(globalVars.scrollGroupIndex - 1, 1, #groups)
+        globalVars.scrollGroupIndex = math.wrap(globalVars.scrollGroupIndex + diff, 1, #groups, true)
         state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
         return
     end
@@ -3974,31 +3976,14 @@ function goToPrevTg()
         return
     end
     local idIndex = table.indexOf(idList, state.SelectedScrollGroupId)
-    globalVars.scrollGroupIndex = selectedTgDict[idList[math.wrappedClamp(idIndex - 1, 1, #idList)]]
+    globalVars.scrollGroupIndex = selectedTgDict[idList[math.wrap(idIndex + diff, 1, #idList, true)]]
     state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
 end
+function goToPrevTg()
+    changeTGIndex(-1)
+end
 function goToNextTg()
-    local groups = state.GetValue("tgList")
-    local selectedTgDict = {}
-    if (not truthy(state.SelectedHitObjects)) then
-        globalVars.scrollGroupIndex = math.wrappedClamp(globalVars.scrollGroupIndex + 1, 1, #groups)
-        state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
-        return
-    end
-    for _, ho in pairs(state.SelectedHitObjects) do
-        if (not selectedTgDict[ho.TimingGroup]) then
-            selectedTgDict[ho.TimingGroup] = table.indexOf(groups, ho.TimingGroup)
-        end
-    end
-    local idList = table.keys(selectedTgDict)
-    if (not table.includes(idList, groups[globalVars.scrollGroupIndex])) then
-        globalVars.scrollGroupIndex = selectedTgDict[idList[1]]
-        state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
-        return
-    end
-    local idIndex = table.indexOf(idList, state.SelectedScrollGroupId)
-    globalVars.scrollGroupIndex = selectedTgDict[idList[math.wrappedClamp(idIndex + 1, 1, #idList)]]
-    state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
+    changeTGIndex(1)
 end
 function jumpToTg()
     if (not truthy(state.SelectedHitObjects)) then return end

@@ -1,8 +1,8 @@
-function goToPrevTg()
+function changeTGIndex(diff)
     local groups = cache.tgList
     local selectedTgDict = {}
     if (not truthy(state.SelectedHitObjects)) then
-        globalVars.scrollGroupIndex = math.wrappedClamp(globalVars.scrollGroupIndex - 1, 1, #groups)
+        globalVars.scrollGroupIndex = math.wrap(globalVars.scrollGroupIndex + diff, 1, #groups, true)
         state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
         return
     end
@@ -18,30 +18,14 @@ function goToPrevTg()
         return
     end
     local idIndex = table.indexOf(idList, state.SelectedScrollGroupId)
-    globalVars.scrollGroupIndex = selectedTgDict[idList[math.wrappedClamp(idIndex - 1, 1, #idList)]]
+    globalVars.scrollGroupIndex = selectedTgDict[idList[math.wrap(idIndex + diff, 1, #idList, true)]]
     state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
 end
 
+function goToPrevTg()
+    changeTGIndex(-1)
+end
+
 function goToNextTg()
-    local groups = cache.tgList
-    local selectedTgDict = {}
-    if (not truthy(state.SelectedHitObjects)) then
-        globalVars.scrollGroupIndex = math.wrappedClamp(globalVars.scrollGroupIndex + 1, 1, #groups)
-        state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
-        return
-    end
-    for _, ho in pairs(state.SelectedHitObjects) do
-        if (not selectedTgDict[ho.TimingGroup]) then
-            selectedTgDict[ho.TimingGroup] = table.indexOf(groups, ho.TimingGroup)
-        end
-    end
-    local idList = table.keys(selectedTgDict)
-    if (not table.includes(idList, groups[globalVars.scrollGroupIndex])) then
-        globalVars.scrollGroupIndex = selectedTgDict[idList[1]]
-        state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
-        return
-    end
-    local idIndex = table.indexOf(idList, state.SelectedScrollGroupId)
-    globalVars.scrollGroupIndex = selectedTgDict[idList[math.wrappedClamp(idIndex + 1, 1, #idList)]]
-    state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
+    changeTGIndex(1)
 end
