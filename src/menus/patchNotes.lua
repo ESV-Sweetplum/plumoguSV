@@ -68,8 +68,7 @@ function showPatchNotesWindow()
     imgui.SeparatorText("New Features")
     imgui.BulletText("Added tooltips to various functions to explain their functionality.")
     imgui.BulletText("New border pulse feature that pulses along with the beat.")
-    imgui.BulletText("Easily switch between TGs with new keybind.")
-    imgui.BulletText("Select TG of note quickly with note keybind.")
+    imgui.BulletText("Added a new hotkey to select the TG of note(s).")
     imgui.BulletText("New menu: Edit > Convert SV <-> SSF; Self-explanatory.")
     imgui.BulletText(
         "Added vibrato to plumoguSV, with less error than AFFINE. Includes linear,\npolynomial, exponential, sinusoidal, and sigmoidal shapes. Includes presets for FPS.")
@@ -104,6 +103,9 @@ function showPatchNotesWindow()
     imgui.BulletText("Added a very rudimentary preset system, so you can send menu data to others.")
     imgui.BulletText("Added a button to directly swap SVs and SSFs.")
     imgui.BulletText("Added a startup animation.")
+    imgui.BulletText("Added hotkeys to switch between TGs.")
+    imgui.BulletText("Added hotkey to move all selected notes to the selected TG.")
+
 
     AddPadding()
 
@@ -149,7 +151,7 @@ function showPatchNotesWindow()
     imgui.SeparatorText("Bug Fixes")
     imgui.BulletText("Fixed more bugs involving stills.")
     imgui.SeparatorText("New Features")
-    imgui.BulletText("Added a new keybind to quickly place SSFs.")
+    imgui.BulletText("Added a new hotkey to quickly place SSFs.")
     imgui.BulletText("Added a new TG selector.")
 
     AddPadding()
