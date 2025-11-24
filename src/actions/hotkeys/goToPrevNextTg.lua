@@ -17,6 +17,7 @@ function changeTGIndex(diff)
         state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
         return
     end
+    if (#table.keys(selectedTgDict) == 1) then return end
     local idIndex = table.indexOf(idList, state.SelectedScrollGroupId)
     globalVars.scrollGroupIndex = selectedTgDict[idList[math.wrap(idIndex + diff, 1, #idList, true)]]
     state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
