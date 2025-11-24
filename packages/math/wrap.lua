@@ -7,7 +7,7 @@
 function math.wrap(n, lowerBound, upperBound, discrete)
     if (upperBound <= lowerBound) then return n end
     if (n >= lowerBound and n <= upperBound) then return n end
-    local additionFactor = discrete and 1 or 0
+    local additionFactor = math.toNumber(discrete)
     local diff = upperBound - lowerBound
     while (n < lowerBound) do
         n = n + diff + additionFactor
