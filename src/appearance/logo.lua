@@ -10,7 +10,7 @@ function logoThread()
     prevTime = state.UnixTime
 
     local currentTime = clock.getTime() - cache_logoStartTime
-    local logoLength = 2
+    local logoLength = 4
 
     if ((cache_logoStartTime < 3 and not globalVars.disableLoadup) or loaded) then
         if (currentTime >= 0 and currentTime <= logoLength) then
@@ -38,7 +38,7 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
     local location = windowSize / 2
     local progress = (currentTime % logoLength / logoLength)
 
-    local curvature1 = 0.3
+    local curvature1 = 0.2
     local curvature2 = 0.5
 
     progress = math.clamp(progress, 0, 1) * 2
@@ -56,10 +56,23 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
     local colTrBl = color.rgbaToUint(40, 0, 40, 170 * bgStrength)
     local colBr = color.rgbaToUint(60, 0, 60, 255 * bgStrength)
 
+    local textStrength = math.min(1, progress * 5, (1 - progress) * 2)
+
+    col = col - math.floor(255 * (1 - textStrength)) * color.int.alphaMask
+
     ctx.AddRectFilledMultiColor(vctr2(0), windowSize, colTl, colTrBl, colBr, colTrBl)
 
-    local t0 = math.max(progress * 2, 1) - 1
-    local t1 = math.min(progress * 2, 1)
+    local t0, t1
+    local trueProgress = progress * 2
+
+    if (trueProgress < 1) then
+        t0 = 20 * (trueProgress - 1)
+        t1 = 0.5 * t0 + 1
+    else
+        trueProgress = trueProgress - 1
+        t0 = trueProgress * 10
+        t1 = 1 + t0
+    end
 
     local center = vector.New(267, 48) * scale / 2
     location = location - center

@@ -17,6 +17,13 @@ function color.rgbaToUint(r, g, b, a)
     return flr(a) * 16 ^ 6 + flr(b) * 16 ^ 4 + flr(g) * 16 ^ 2 + flr(r)
 end
 
+---Converts rgba (in vector form) to an unsigned integer (0-4294967295).
+---@param col Vector4
+---@return integer
+function color.vrgbaToUint(col)
+    return color.rgbaToUint(col.x, col.y, col.z, col.w)
+end
+
 ---Converts an unsigned integer to a Vector4 of color values (0-1 for each element).
 ---@param n integer
 ---@return Vector4
