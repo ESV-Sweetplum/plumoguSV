@@ -100,7 +100,7 @@ function mergeSVs()
         end
     end
 
-    if (truthy(svsToRemove)) then actions.Perform(createEA(action_type.RemoveScrollVelocityBatch, svsToRemove)) end
+    if (truthy(svsToRemove)) then actions.RemoveScrollVelocityBatch(svsToRemove) end
     local type = truthy(svsToRemove) and "s!" or "w!"
     print(type, "Removed " .. #svsToRemove .. pluralize(" SV.", #svsToRemove, -2))
 end
@@ -135,7 +135,7 @@ function mergeNotes()
             end
         end
     end
-    if (truthy(notesToRemove)) then actions.Perform(createEA(action_type.RemoveHitObjectBatch, notesToRemove)) end
+    if (truthy(notesToRemove)) then actions.RemoveHitObjectBatch(notesToRemove) end
     local type = truthy(notesToRemove) and "s!" or "w!"
     print(type, "Removed " .. #notesToRemove .. pluralize(" note.", #notesToRemove, -2))
 end

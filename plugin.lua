@@ -2224,6 +2224,7 @@ end]],
     },
     automate = {
         copiedSVs = {},
+        deleteCopiedSVs = true,
         maintainMs = true,
         ms = 1000,
         scaleSVs = false,
@@ -2309,6 +2310,7 @@ function automateCopySVs(settingVars)
         toggleablePrint("s!",
             "Copied " .. #settingVars.copiedSVs .. pluralize(" SV.", #settingVars.copiedSVs, -2))
     end
+    if (settingVars.deleteCopiedSVs) then actions.RemoveScrollVelocityBatch(svs) end
 end
 function clearAutomateSVs(settingVars)
     settingVars.copiedSVs = {}
@@ -3598,7 +3600,7 @@ function mergeSVs()
             svTimeDict[sv.StartTime] = true
         end
     end
-    if (truthy(svsToRemove)) then actions.Perform(createEA(action_type.RemoveScrollVelocityBatch, svsToRemove)) end
+    if (truthy(svsToRemove)) then actions.RemoveScrollVelocityBatch(svsToRemove) end
     local type = truthy(svsToRemove) and "s!" or "w!"
     print(type, "Removed " .. #svsToRemove .. pluralize(" SV.", #svsToRemove, -2))
 end
@@ -3630,7 +3632,7 @@ function mergeNotes()
             end
         end
     end
-    if (truthy(notesToRemove)) then actions.Perform(createEA(action_type.RemoveHitObjectBatch, notesToRemove)) end
+    if (truthy(notesToRemove)) then actions.RemoveHitObjectBatch(notesToRemove) end
     local type = truthy(notesToRemove) and "s!" or "w!"
     print(type, "Removed " .. #notesToRemove .. pluralize(" note.", #notesToRemove, -2))
 end
@@ -4009,7 +4011,7 @@ function checkForGlobalHotkeys()
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_next_tg])) then goToNextTg() end
 end
 function moveSelectionToTg()
-    actions.Perform(createEA(action_type.MoveObjectsToTimingGroup, state.SelectedHitObjects, state.SelectedScrollGroupId))
+    actions.MoveObjectsToTimingGroup(state.SelectedHitObjects, state.SelectedScrollGroupId)
 end
 function toggleUseEndOffsets()
     globalVars.useEndTimeOffsets = not globalVars.useEndTimeOffsets
@@ -7449,6 +7451,8 @@ end
 function automateSVMenu(settingVars)
     local copiedSVCount = #settingVars.copiedSVs
     if (copiedSVCount == 0) then
+        BasicCheckbox(settingVars, "deleteCopiedSVs", "Delete Copied SVs?",
+            "If true, will automatically delete the SVs that are copied.")
         simpleActionMenu("Copy SVs between selected notes", 2, automateCopySVs, settingVars)
         return
     end

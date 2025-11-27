@@ -237,6 +237,7 @@ end]],
     },
     automate = {
         copiedSVs = {},
+        deleteCopiedSVs = true,
         maintainMs = true,
         ms = 1000,
         scaleSVs = false,

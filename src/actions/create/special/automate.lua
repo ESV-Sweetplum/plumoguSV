@@ -21,6 +21,7 @@ function automateCopySVs(settingVars)
         toggleablePrint("s!",
             "Copied " .. #settingVars.copiedSVs .. pluralize(" SV.", #settingVars.copiedSVs, -2))
     end
+    if (settingVars.deleteCopiedSVs) then actions.RemoveScrollVelocityBatch(svs) end
 end
 
 function clearAutomateSVs(settingVars)
