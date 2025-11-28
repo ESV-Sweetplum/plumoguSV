@@ -1,4 +1,6 @@
 require("packages.table.contains")
+require("packages.string.charAt")
+require("packages.math.toNumber")
 ---Converts a string (generated from [table.stringify](lua://table.stringify)) into a table.
 ---@param str string
 ---@return any
@@ -10,7 +12,8 @@ function table.parse(str)
     local tableType = str:charAt(1) == "[" and "arr" or "dict"
     local tbl = {}
     local terms = {}
-    while true do
+    local MAX_ITERATIONS = 10000
+    for i = 1, MAX_ITERATIONS do
         local nestedTableFactor = tn(table.contains({ "[", "{" }, str:charAt(2)))
         local depth = nestedTableFactor
         local searchIdx = 2 + nestedTableFactor

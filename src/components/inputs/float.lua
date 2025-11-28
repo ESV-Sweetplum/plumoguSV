@@ -10,7 +10,7 @@ function ComputableInputFloat(label, var, decimalPlaces, suffix)
 
     _, var = imgui.InputText(label,
         string.format(fmt,
-            math.toNumber(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")) or 0),
+            tn(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")) or 0),
         4096,
         imgui_input_text_flags.AutoSelectAll)
     if (imgui.IsItemDeactivatedAfterEdit()) then
@@ -18,7 +18,7 @@ function ComputableInputFloat(label, var, decimalPlaces, suffix)
         var = expr(desiredComp)
     end
 
-    return math.toNumber(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")),
+    return tn(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")),
         previousValue ~= var
 end
 

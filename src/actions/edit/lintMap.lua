@@ -4,7 +4,7 @@ function alignTimingLines()
     local starttime = currentTP.StartTime
     local length = map.GetTimingPointLength(currentTP)
     local endtime = starttime + length
-    local signature = math.toNumber(currentTP.Signature)
+    local signature = tn(currentTP.Signature)
     local bpm = currentTP.Bpm
 
     local mspb = 60000 / bpm

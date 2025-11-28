@@ -36,7 +36,7 @@ function parseDefaultProperty(v, default)
         return nil
     end
     if (type(default) == "number") then
-        return math.toNumber(v)
+        return tn(v)
     end
     if (type(default) == "boolean") then
         return truthy(v)

@@ -31,7 +31,7 @@ function renderSynthesis()
     local curTime = state.SongTime
 
     local tl = game.getTimingPointAt(curTime)
-    local msptl = 60000 / tl.Bpm * math.toNumber(tl.Signature)
+    local msptl = 60000 / tl.Bpm * tn(tl.Signature)
 
     local snapTable = bgVars.snapTable
     local pulseCount = bgVars.pulseCount

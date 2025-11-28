@@ -1093,7 +1093,8 @@ function table.parse(str)
     local tableType = str:charAt(1) == "[" and "arr" or "dict"
     local tbl = {}
     local terms = {}
-    while true do
+    local MAX_ITERATIONS = 10000
+    for i = 1, MAX_ITERATIONS do
         local nestedTableFactor = tn(table.contains({ "[", "{" }, str:charAt(2)))
         local depth = nestedTableFactor
         local searchIdx = 2 + nestedTableFactor
@@ -1688,7 +1689,7 @@ function parseDefaultProperty(v, default)
         return nil
     end
     if (type(default) == "number") then
-        return math.toNumber(v)
+        return tn(v)
     end
     if (type(default) == "boolean") then
         return truthy(v)
@@ -1747,19 +1748,19 @@ DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 function setGlobalVars(tempGlobalVars)
     globalVars.useCustomPulseColor = truthy(tempGlobalVars.useCustomPulseColor)
     globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
-    globalVars.pulseCoefficient = math.toNumber(tempGlobalVars.pulseCoefficient)
-    globalVars.stepSize = math.toNumber(tempGlobalVars.stepSize)
+    globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
+    globalVars.stepSize = tn(tempGlobalVars.stepSize)
     globalVars.dontReplaceSV = truthy(tempGlobalVars.dontReplaceSV)
     globalVars.upscroll = truthy(tempGlobalVars.upscroll)
-    globalVars.colorThemeIndex = math.toNumber(tempGlobalVars.colorThemeIndex)
-    globalVars.styleThemeIndex = math.toNumber(tempGlobalVars.styleThemeIndex)
-    globalVars.rgbPeriod = math.toNumber(tempGlobalVars.rgbPeriod)
-    globalVars.cursorTrailIndex = math.toNumber(tempGlobalVars.cursorTrailIndex)
-    globalVars.cursorTrailShapeIndex = math.toNumber(tempGlobalVars.cursorTrailShapeIndex)
-    globalVars.effectFPS = math.toNumber(tempGlobalVars.effectFPS)
-    globalVars.cursorTrailPoints = math.clamp(math.toNumber(tempGlobalVars.cursorTrailPoints), 0, 100)
-    globalVars.cursorTrailSize = math.toNumber(tempGlobalVars.cursorTrailSize)
-    globalVars.snakeSpringConstant = math.toNumber(tempGlobalVars.snakeSpringConstant)
+    globalVars.colorThemeIndex = tn(tempGlobalVars.colorThemeIndex)
+    globalVars.styleThemeIndex = tn(tempGlobalVars.styleThemeIndex)
+    globalVars.rgbPeriod = tn(tempGlobalVars.rgbPeriod)
+    globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
+    globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
+    globalVars.effectFPS = tn(tempGlobalVars.effectFPS)
+    globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
+    globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
+    globalVars.snakeSpringConstant = tn(tempGlobalVars.snakeSpringConstant)
     globalVars.cursorTrailGhost = truthy(tempGlobalVars.cursorTrailGhost)
     globalVars.drawCapybara = truthy(tempGlobalVars.drawCapybara)
     globalVars.drawCapybara2 = truthy(tempGlobalVars.drawCapybara2)
@@ -1783,7 +1784,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
     globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
     globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)
-    globalVars.dynamicBackgroundIndex = math.toNumber(tempGlobalVars.dynamicBackgroundIndex)
+    globalVars.dynamicBackgroundIndex = tn(tempGlobalVars.dynamicBackgroundIndex)
     globalVars.useEndTimeOffsets = truthy(tempGlobalVars.useEndTimeOffsets)
 end
 DEFAULT_STARTING_MENU_VARS = {
@@ -3535,7 +3536,7 @@ function alignTimingLines()
     local starttime = currentTP.StartTime
     local length = map.GetTimingPointLength(currentTP)
     local endtime = starttime + length
-    local signature = math.toNumber(currentTP.Signature)
+    local signature = tn(currentTP.Signature)
     local bpm = currentTP.Bpm
     local mspb = 60000 / bpm
     local msptl = mspb * signature
@@ -4387,7 +4388,7 @@ function renderSynthesis()
     local maxDim = math.sqrt(dim.x ^ 2 + dim.y ^ 2)
     local curTime = state.SongTime
     local tl = game.getTimingPointAt(curTime)
-    local msptl = 60000 / tl.Bpm * math.toNumber(tl.Signature)
+    local msptl = 60000 / tl.Bpm * tn(tl.Signature)
     local snapTable = bgVars.snapTable
     local pulseCount = bgVars.pulseCount
     local mostRecentStart = game.getNoteOffsetAt(curTime)
@@ -6850,14 +6851,14 @@ function ComputableInputFloat(label, var, decimalPlaces, suffix)
     if (suffix) then fmt = fmt .. suffix end
     _, var = imgui.InputText(label,
         string.format(fmt,
-            math.toNumber(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")) or 0),
+            tn(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")) or 0),
         4096,
         imgui_input_text_flags.AutoSelectAll)
     if (imgui.IsItemDeactivatedAfterEdit()) then
         local desiredComp = tostring(var):gsub(" ", "")
         var = expr(desiredComp)
     end
-    return math.toNumber(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")),
+    return tn(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")),
         previousValue ~= var
 end
 function NegatableComputableInputFloat(label, var, decimalPlaces, suffix)
@@ -13271,7 +13272,7 @@ function importCustomSVs(settingVars)
         local regex = "(-?%d*%.?%d+)"
         local values = {}
         for value, _ in string.gmatch(customSVText, regex) do
-            values[#values + 1] = math.toNumber(value)
+            values[#values + 1] = tn(value)
         end
         if #values >= 1 then
             settingVars.svMultipliers = values

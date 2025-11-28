@@ -26,7 +26,7 @@ function selectByChordSizes(menuVars)
     -- local allowedOrdering = {}
 
     -- for n in tostring(menuVars.laneSelector):gmatch("%d") do
-    --     table.insert(allowedOrdering, math.toNumber(n))
+    --     table.insert(allowedOrdering, tn(n))
     -- end
 
     for _, time in ipairs(noteTimeTable) do
