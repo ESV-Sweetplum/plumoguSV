@@ -2,7 +2,7 @@ function saveSettingPropertiesButton(settingVars, label)
     local saveButtonClicked = imgui.Button("Save##setting" .. label)
     imgui.Separator()
     if (not saveButtonClicked) then return end
-    label = label:charAt(1):lower() .. label:sub(2)
+    label = label:identify()
     if (not globalVars.defaultProperties) then globalVars.defaultProperties = {} end
     if (not globalVars.defaultProperties.settings) then globalVars.defaultProperties.settings = {} end
     globalVars.defaultProperties.settings[label] = settingVars
@@ -18,7 +18,7 @@ function saveMenuPropertiesButton(menuVars, label)
     local saveButtonClicked = imgui.Button("Save##menu" .. label)
     imgui.Separator()
     if (not saveButtonClicked) then return end
-    label = label:charAt(1):lower() .. label:sub(2)
+    label = label:identify()
     if (not globalVars.defaultProperties) then globalVars.defaultProperties = {} end
     if (not globalVars.defaultProperties.menu) then globalVars.defaultProperties.menu = {} end
     globalVars.defaultProperties.menu[label] = menuVars
@@ -51,6 +51,28 @@ function showDefaultPropertiesSettings()
         nil,
         automateSVSettingsMenu,
         penisSettingsMenu
+    }
+
+    local editFnList = {
+        addTeleportSettingsMenu,
+        changeGroupsSettingsMenu,
+        nil,
+        convertSVSSFSettingsMenu,
+        copyNPasteSettingsMenu,
+        nil,
+        displaceNoteSettingsMenu,
+        displaceViewSettingsMenu,
+        nil,
+        flickerSettingsMenu,
+        nil,
+        nil,
+        nil,
+        reverseScrollSettingsMenu,
+        scaleDisplaceSettingsMenu,
+        scaleMultiplySettingsMenu,
+        splitSettingsMenu,
+        nil,
+        verticalShiftSettingsMenu
     }
 
     imgui.SeparatorText("Create Tab Settings")
@@ -104,131 +126,20 @@ function showDefaultPropertiesSettings()
 
     imgui.SeparatorText("Edit Tab Settings")
 
-    -- local editTabDict = table.map(EDIT_SV_TOOLS, function(element, idx)
-    --     return { label = element, fn = editFnList[idx] }
-    -- end)
+    local editTabDict = table.map(EDIT_SV_TOOLS, function(element, idx)
+        return { label = element, fn = editFnList[idx] }
+    end)
 
-    -- for _, tbl in pairs(editTabDict) do
-    --     local label = tbl.label
-    --     if (not tbl.fn) then goto continue end
-    --     if (imgui.CollapsingHeader(label .. " Settings")) then
-    --         local menuVars = getMenuVars(label, "Property")
-    --         tbl.fn(menuVars)
-    --         saveMenuPropertiesButton(menuVars, label)
-    --         cache.saveTable(label .. "PropertyMenu", menuVars)
-    --     end
-    --     ::continue::
-    -- end
-
-    if (imgui.CollapsingHeader("Add Teleport Settings")) then
-        local menuVars = getMenuVars("addTeleport", "Property")
-
-        chooseDistance(menuVars)
-        BasicCheckbox(menuVars, "teleportBeforeHand", "Add teleport before note")
-
-        saveMenuPropertiesButton(menuVars, "addTeleport")
-        cache.saveTable("addTeleportPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Change Group Settings")) then
-        local menuVars = getMenuVars("changeGroups", "Property")
-
-        _, menuVars.changeSVs = imgui.Checkbox("Change SVs?", menuVars.changeSVs)
-        KeepSameLine()
-        _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
-
-        menuVars.clone = RadioButtons("Mode: ", menuVars.clone, { "Clone", "Move" }, { true, false })
-
-        saveMenuPropertiesButton(menuVars, "changeGroups")
-        cache.saveTable("changeGroupsPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Convert SV <-> SSF Settings")) then
-        local menuVars = getMenuVars("convertSVSSF", "Property")
-
-        chooseConvertSVSSFDirection(menuVars)
-
-        saveMenuPropertiesButton(menuVars, "convertSVSSF")
-        cache.saveTable("convertSVSSFPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Copy Settings")) then
-        local menuVars = getMenuVars("copy", "Property")
-
-        _, menuVars.copyTable[1] = imgui.Checkbox("Copy Lines", menuVars.copyTable[1])
-        KeepSameLine()
-        _, menuVars.copyTable[2] = imgui.Checkbox("Copy SVs", menuVars.copyTable[2])
-        _, menuVars.copyTable[3] = imgui.Checkbox("Copy SSFs", menuVars.copyTable[3])
-        imgui.SameLine(0, SAMELINE_SPACING + 3.5)
-        _, menuVars.copyTable[4] = imgui.Checkbox("Copy Bookmarks", menuVars.copyTable[4])
-
-        _, menuVars.tryAlign = imgui.Checkbox("Try to fix misalignments", menuVars.tryAlign)
-        imgui.PushItemWidth(100)
-        _, menuVars.alignWindow = imgui.SliderInt("Alignment window (ms)", menuVars.alignWindow, 1, 10)
-        imgui.PopItemWidth()
-
-        saveMenuPropertiesButton(menuVars, "copy")
-        cache.saveTable("copyPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Displace Note Settings")) then
-        local menuVars = getMenuVars("displaceNote", "Property")
-
-        chooseVaryingDistance(menuVars)
-        BasicCheckbox(menuVars, "linearlyChange", "Change distance over time")
-
-        saveMenuPropertiesButton(menuVars, "displaceNote")
-        cache.saveTable("displaceNotePropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Displace View Settings")) then
-        local menuVars = getMenuVars("displaceView", "Property")
-
-        chooseDistance(menuVars)
-
-        saveMenuPropertiesButton(menuVars, "displaceView")
-        cache.saveTable("displaceViewPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Flicker Settings")) then
-        local menuVars = getMenuVars("flicker", "Property")
-
-        menuVars.flickerTypeIndex = Combo("Flicker Type", FLICKER_TYPES, menuVars.flickerTypeIndex)
-        chooseVaryingDistance(menuVars)
-        BasicCheckbox(menuVars, "linearlyChange", "Change distance over time")
-        BasicInputInt(menuVars, "numFlickers", "Flickers", { 1, 9999 })
-        if (globalVars.advancedMode) then chooseFlickerPosition(menuVars) end
-
-        saveMenuPropertiesButton(menuVars, "flicker")
-        cache.saveTable("flickerPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Reverse Scroll Settings")) then
-        local menuVars = getMenuVars("reverseScroll", "Property")
-
-        chooseDistance(menuVars)
-        HelpMarker("Height at which reverse scroll notes are hit")
-
-        saveMenuPropertiesButton(menuVars, "reverseScroll")
-        cache.saveTable("reverseScrollPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Scale (Displace) Settings")) then
-        local menuVars = getMenuVars("scaleDisplace", "Property")
-
-        menuVars.scaleSpotIndex = Combo("Displace Spot", DISPLACE_SCALE_SPOTS, menuVars.scaleSpotIndex)
-        chooseScaleType(menuVars)
-
-        saveMenuPropertiesButton(menuVars, "scaleDisplace")
-        cache.saveTable("scaleDisplacePropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Scale (Multiply) Settings")) then
-        local menuVars = getMenuVars("scaleMultiply", "Property")
-
-        chooseScaleType(menuVars)
-
-        saveMenuPropertiesButton(menuVars, "scaleMultiply")
-        cache.saveTable("scaleMultiplyPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Vertical Shift Settings")) then
-        local menuVars = getMenuVars("verticalShift", "Property")
-
-        chooseConstantShift(menuVars, 0)
-
-        saveMenuPropertiesButton(menuVars, "verticalShift")
-        cache.saveTable("verticalShiftPropertyMenu", menuVars)
+    for _, tbl in pairs(editTabDict) do
+        local label = tbl.label
+        if (not tbl.fn) then goto continue end
+        if (imgui.CollapsingHeader(label .. " Settings")) then
+            local menuVars = getMenuVars(label, "Property")
+            tbl.fn(menuVars)
+            saveMenuPropertiesButton(menuVars, label)
+            cache.saveTable(label .. "PropertyMenu", menuVars)
+        end
+        ::continue::
     end
 
     imgui.SeparatorText("Delete Tab Settings")

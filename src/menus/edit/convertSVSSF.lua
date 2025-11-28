@@ -1,7 +1,7 @@
 function convertSVSSFMenu()
     local menuVars = getMenuVars("convertSVSSF")
 
-    chooseConvertSVSSFDirection(menuVars)
+    convertSVSSFSettingsMenu(menuVars)
 
     cache.saveTable("convertSVSSFMenu", menuVars)
 
@@ -9,4 +9,8 @@ function convertSVSSFMenu()
         menuVars, false, false)
     simpleActionMenu("Swap SVs <-> SSFs", 2, swapSVSSF,
         nil, true, true)
+end
+
+function convertSVSSFSettingsMenu(menuVars)
+    chooseConvertSVSSFDirection(menuVars)
 end

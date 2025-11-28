@@ -8,7 +8,7 @@ function copyItems(menuVars)
     local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
     local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset)
     local bms = game.getBookmarksBetweenOffsets(startOffset, endOffset)
-    if (not menuVars.copyTable[1]) then goto continue1 end
+    if (not menuVars.copyLines) then goto continue1 end
     for _, line in ipairs(lines) do
         local copiedLine = {
             relativeOffset = line.StartTime - startOffset,
@@ -19,7 +19,7 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.lines[menuVars.curSlot], copiedLine)
     end
     ::continue1::
-    if (not menuVars.copyTable[2]) then goto continue2 end
+    if (not menuVars.copySVs) then goto continue2 end
     for _, sv in ipairs(svs) do
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
@@ -28,7 +28,7 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.SVs[menuVars.curSlot], copiedSV)
     end
     ::continue2::
-    if (not menuVars.copyTable[3]) then goto continue3 end
+    if (not menuVars.copySSFs) then goto continue3 end
     for _, ssf in ipairs(ssfs) do
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
@@ -37,7 +37,7 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.SSFs[menuVars.curSlot], copiedSSF)
     end
     ::continue3::
-    if (not menuVars.copyTable[4]) then goto continue4 end
+    if (not menuVars.copyBMs) then goto continue4 end
     for _, bm in ipairs(bms) do
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
@@ -93,10 +93,10 @@ function pasteItems(menuVars)
     end
 
     local endRemoveOffset = endOffset + lastCopiedValue.relativeOffset + 1 / 128
-    local linesToRemove = menuVars.copyTable[1] and game.getLinesBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local svsToRemove = menuVars.copyTable[2] and game.getSVsBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local ssfsToRemove = menuVars.copyTable[3] and game.getSSFsBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local bmsToRemove = menuVars.copyTable[4] and game.getBookmarksBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local linesToRemove = menuVars.copyLines and game.getLinesBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local svsToRemove = menuVars.copySVs and game.getSVsBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local ssfsToRemove = menuVars.copySSFs and game.getSSFsBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local bmsToRemove = menuVars.copyBMs and game.getBookmarksBetweenOffsets(startOffset, endRemoveOffset) or {}
     if globalVars.dontReplaceSV then
         linesToRemove = {}
         svsToRemove = {}

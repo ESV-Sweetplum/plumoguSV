@@ -14,6 +14,7 @@ function loadDefaultProperties(defaultProperties)
         end
     end
     ::skipMenu::
+    if (not defaultProperties.settings) then goto skipSettings end
     for label, tbl in pairs(defaultProperties.settings) do
         for settingName, settingValue in pairs(tbl) do
             local defaultTable = DEFAULT_STARTING_SETTING_VARS[label]
@@ -26,6 +27,7 @@ function loadDefaultProperties(defaultProperties)
             ::skipSetting::
         end
     end
+    ::skipSettings::
     globalVars.defaultProperties = { settings = DEFAULT_STARTING_SETTING_VARS, menu = DEFAULT_STARTING_MENU_VARS }
 end
 

@@ -1,9 +1,13 @@
 function displaceNoteMenu()
     local menuVars = getMenuVars("displaceNote")
-    chooseVaryingDistance(menuVars)
-    BasicCheckbox(menuVars, "linearlyChange", "Change distance over time")
+    displaceNoteSettingsMenu(menuVars)
     cache.saveTable("displaceNoteMenu", menuVars)
 
     AddSeparator()
     simpleActionMenu("Displace selected notes", 1, displaceNoteSVsParent, menuVars)
+end
+
+function displaceNoteSettingsMenu(menuVars)
+    chooseVaryingDistance(menuVars)
+    BasicCheckbox(menuVars, "linearlyChange", "Change distance over time")
 end

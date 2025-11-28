@@ -850,6 +850,14 @@ function string.fixToSize(str, targetSize)
     end
     return str .. "..."
 end
+---Removes spaces and turns a string into lowerCamelCase. Also removes special characters.
+---@param str string
+---@return string
+function string.identify(str)
+    newStr = str:gsub("[%s%(%)#&]+", "")
+    newStr = newStr:charAt(1):lower() .. newStr:sub(2)
+    return newStr
+end
 ---Lots of imgui functions have ## in them as identifiers. This will remove everything after the ##.
 ---@param str string
 ---@return string
@@ -1659,6 +1667,7 @@ function loadDefaultProperties(defaultProperties)
         end
     end
     ::skipMenu::
+    if (not defaultProperties.settings) then goto skipSettings end
     for label, tbl in pairs(defaultProperties.settings) do
         for settingName, settingValue in pairs(tbl) do
             local defaultTable = DEFAULT_STARTING_SETTING_VARS[label]
@@ -1671,6 +1680,7 @@ function loadDefaultProperties(defaultProperties)
             ::skipSetting::
         end
     end
+    ::skipSettings::
     globalVars.defaultProperties = { settings = DEFAULT_STARTING_SETTING_VARS, menu = DEFAULT_STARTING_MENU_VARS }
 end
 function parseDefaultProperty(v, default)
@@ -1831,8 +1841,11 @@ DEFAULT_STARTING_MENU_VARS = {
     convertSVSSF = {
         conversionDirection = true
     },
-    copy = {
-        copyTable = { true, true, true, true },
+    copyPaste = {
+        copyLines = false,
+        copySVs = true,
+        copySSFs = true,
+        copyBMs = false,
         copied = {
             lines = { {} },
             SVs = { {} },
@@ -1955,7 +1968,8 @@ DEFAULT_STARTING_MENU_VARS = {
 ---@return table
 function getMenuVars(menuType, optionalLabel)
     optionalLabel = optionalLabel or ""
-    local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuType])
+    menuKey = menuType:identify()
+    local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuKey])
     local labelText = menuType .. optionalLabel .. "Menu"
     cache.loadTable(labelText, menuVars)
     return menuVars
@@ -2240,9 +2254,8 @@ end]],
 ---@param label string A delineator to separate two categories with similar SV types (Standard/Still, etc).
 ---@return table
 function getSettingVars(svType, label)
-    settingKey = svType:gsub("[%s%(%)#]+", "")
-    settingKey = settingKey:charAt(1):lower() .. settingKey:sub(2)
-    local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[settingKey])
+    menuKey = svType:identify()
+    local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[menuKey])
     local labelText = svType .. label .. "Settings"
     cache.loadTable(labelText, settingVars)
     return settingVars
@@ -3047,7 +3060,7 @@ function copyItems(menuVars)
     local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
     local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset)
     local bms = game.getBookmarksBetweenOffsets(startOffset, endOffset)
-    if (not menuVars.copyTable[1]) then goto continue1 end
+    if (not menuVars.copyLines) then goto continue1 end
     for k19 = 1, #lines do
         local line = lines[k19]
         local copiedLine = {
@@ -3059,7 +3072,7 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.lines[menuVars.curSlot], copiedLine)
     end
     ::continue1::
-    if (not menuVars.copyTable[2]) then goto continue2 end
+    if (not menuVars.copySVs) then goto continue2 end
     for k20 = 1, #svs do
         local sv = svs[k20]
         local copiedSV = {
@@ -3069,7 +3082,7 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.SVs[menuVars.curSlot], copiedSV)
     end
     ::continue2::
-    if (not menuVars.copyTable[3]) then goto continue3 end
+    if (not menuVars.copySSFs) then goto continue3 end
     for k21 = 1, #ssfs do
         local ssf = ssfs[k21]
         local copiedSSF = {
@@ -3079,7 +3092,7 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.SSFs[menuVars.curSlot], copiedSSF)
     end
     ::continue3::
-    if (not menuVars.copyTable[4]) then goto continue4 end
+    if (not menuVars.copyBMs) then goto continue4 end
     for k22 = 1, #bms do
         local bm = bms[k22]
         local copiedBM = {
@@ -3132,10 +3145,10 @@ function pasteItems(menuVars)
         lastCopiedValue = lastCopiedSSF or lastCopiedLine or lastCopiedBM or { relativeOffset = 0 }
     end
     local endRemoveOffset = endOffset + lastCopiedValue.relativeOffset + 1 / 128
-    local linesToRemove = menuVars.copyTable[1] and game.getLinesBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local svsToRemove = menuVars.copyTable[2] and game.getSVsBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local ssfsToRemove = menuVars.copyTable[3] and game.getSSFsBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local bmsToRemove = menuVars.copyTable[4] and game.getBookmarksBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local linesToRemove = menuVars.copyLines and game.getLinesBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local svsToRemove = menuVars.copySVs and game.getSVsBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local ssfsToRemove = menuVars.copySSFs and game.getSSFsBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local bmsToRemove = menuVars.copyBMs and game.getBookmarksBetweenOffsets(startOffset, endRemoveOffset) or {}
     if globalVars.dontReplaceSV then
         linesToRemove = {}
         svsToRemove = {}
@@ -4678,7 +4691,7 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
     local location = windowSize / 2
     local progress = (currentTime % logoLength / logoLength)
     local curvature1 = 0.4
-    local curvature2 = 0.2
+    local curvature2 = 0.25
     progress = math.clamp(progress, 0, 1) * 2
     if (progress <= 1) then
         progress = (1 - (1 - progress) ^ (1 / curvature1))
@@ -4696,12 +4709,12 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
     local t0, t1
     local trueProgress = progress * 2
     if (trueProgress < 1) then
-        t0 = 20 * (trueProgress - 1)
-        t1 = 0.5 * t0 + 1
+        t0 = 10 * (trueProgress - 1)
+        t1 = (1 - trueProgress / 2) * t0 + trueProgress
     else
         trueProgress = trueProgress - 1
-        t0 = trueProgress * 10
-        t1 = 1 + t0
+        t0 = trueProgress * 20
+        t1 = 1 - trueProgress + t0
     end
     local center = vector.New(267, 48) * scale / 2
     location = location - center
@@ -7994,15 +8007,23 @@ function deleteTab()
 end
 function addTeleportMenu()
     local menuVars = getMenuVars("addTeleport")
-    chooseDistance(menuVars)
-    BasicCheckbox(menuVars, "teleportBeforeHand", "Add teleport before note")
+    addTeleportSettingsMenu(menuVars)
     cache.saveTable("addTeleportMenu", menuVars)
     AddSeparator()
     simpleActionMenu("Add teleport SVs at selected notes", 1, addTeleportSVs, menuVars)
 end
+function addTeleportSettingsMenu(menuVars)
+    chooseDistance(menuVars)
+    BasicCheckbox(menuVars, "teleportBeforeHand", "Add teleport before note")
+end
 function changeGroupsMenu()
     local menuVars = getMenuVars("changeGroups")
+    local action = changeGroupsSettingsMenu(menuVars)
     AddSeparator()
+    cache.saveTable("changeGroupsMenu", menuVars)
+    simpleActionMenu(table.concat({ action, " items to ", menuVars.designatedTimingGroup }), 2, changeGroups, menuVars)
+end
+function changeGroupsSettingsMenu(menuVars)
     local action = menuVars.clone and "Clone" or "Move"
     imgui.AlignTextToFramePadding()
     menuVars.designatedTimingGroup = chooseTimingGroup(table.concat({ "  ", action, " to: " }),
@@ -8011,9 +8032,7 @@ function changeGroupsMenu()
     KeepSameLine()
     _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
     menuVars.clone = RadioButtons("Mode: ", menuVars.clone, { "Clone", "Move" }, { true, false })
-    AddSeparator()
-    cache.saveTable("changeGroupsMenu", menuVars)
-    simpleActionMenu(table.concat({ action, " items to ", menuVars.designatedTimingGroup }), 2, changeGroups, menuVars)
+    return action
 end
 function completeDuplicateMenu()
     local menuVars = getMenuVars("completeDuplicate")
@@ -8030,24 +8049,33 @@ function completeDuplicateMenu()
 end
 function convertSVSSFMenu()
     local menuVars = getMenuVars("convertSVSSF")
-    chooseConvertSVSSFDirection(menuVars)
+    convertSVSSFSettingsMenu(menuVars)
     cache.saveTable("convertSVSSFMenu", menuVars)
     simpleActionMenu(menuVars.conversionDirection and "Convert SVs -> SSFs" or "Convert SSFs -> SVs", 2, convertSVSSF,
         menuVars, false, false)
     simpleActionMenu("Swap SVs <-> SSFs", 2, swapSVSSF,
         nil, true, true)
 end
+function convertSVSSFSettingsMenu(menuVars)
+    chooseConvertSVSSFDirection(menuVars)
+end
 function copyNPasteMenu()
-    local menuVars = getMenuVars("copy")
-    _, menuVars.copyTable[1] = imgui.Checkbox("Copy Lines", menuVars.copyTable[1])
+    local menuVars = getMenuVars("copyPaste")
+    local copiedItemCount = copyNPasteSettingsMenu(menuVars, true)
+    cache.saveTable("copyPasteMenu", menuVars)
+    if (copiedItemCount == 0) then return end
+    simpleActionMenu("Paste items at selected notes", 1, pasteItems, menuVars)
+end
+function copyNPasteSettingsMenu(menuVars, actionable)
+    _, menuVars.copyLines = imgui.Checkbox("Copy Lines", menuVars.copyLines)
     KeepSameLine()
-    _, menuVars.copyTable[2] = imgui.Checkbox("Copy SVs", menuVars.copyTable[2])
-    _, menuVars.copyTable[3] = imgui.Checkbox("Copy SSFs", menuVars.copyTable[3])
+    _, menuVars.copySVs = imgui.Checkbox("Copy SVs", menuVars.copySVs)
+    _, menuVars.copySSFs = imgui.Checkbox("Copy SSFs", menuVars.copySSFs)
     imgui.SameLine(0, SAMELINE_SPACING + 3.5)
-    _, menuVars.copyTable[4] = imgui.Checkbox("Copy Bookmarks", menuVars.copyTable[4])
+    _, menuVars.copyBMs = imgui.Checkbox("Copy Bookmarks", menuVars.copyBMs)
     AddSeparator()
-    local _ = BasicInputInt(menuVars, "curSlot", "Current slot", { 1, 999 })
-    if #menuVars.copied.lines < menuVars.curSlot then
+    if actionable then BasicInputInt(menuVars, "curSlot", "Current slot", { 1, 999 }) end
+    if (actionable and #menuVars.copied.lines < menuVars.curSlot) then
         local newCopied = table.duplicate(menuVars.copied)
         while #newCopied.lines < menuVars.curSlot do
             table.insert(newCopied.lines, {})
@@ -8057,22 +8085,23 @@ function copyNPasteMenu()
         end
         menuVars.copied = newCopied
     end
-    AddSeparator()
+    if (actionable) then AddSeparator() end
     local copiedItemCount = #menuVars.copied.lines[menuVars.curSlot] + #menuVars.copied.SVs[menuVars.curSlot] +
         #menuVars.copied.SSFs[menuVars.curSlot] + #menuVars.copied.BMs[menuVars.curSlot]
-    if (copiedItemCount == 0) then
-        simpleActionMenu("Copy items between selected notes", 2, copyItems, menuVars)
-    else
-        FunctionButton("Clear copied items", ACTION_BUTTON_SIZE, clearCopiedItems, menuVars)
+    if (actionable) then
+        if (copiedItemCount == 0) then
+            simpleActionMenu("Copy items between selected notes", 2, copyItems, menuVars)
+        else
+            FunctionButton("Clear copied items", ACTION_BUTTON_SIZE, clearCopiedItems, menuVars)
+        end
     end
-    if copiedItemCount == 0 then
-        cache.saveTable("copyMenu", menuVars)
-        return
-    end
-    AddSeparator()
+    if (copiedItemCount == 0 and actionable) then return copiedItemCount end
+    if (actionable) then AddSeparator() end
     _, menuVars.tryAlign = imgui.Checkbox("Try to fix misalignments", menuVars.tryAlign)
-    cache.saveTable("copyMenu", menuVars)
-    simpleActionMenu("Paste items at selected notes", 1, pasteItems, menuVars)
+    imgui.PushItemWidth(100)
+    _, menuVars.alignWindow = imgui.SliderInt("Alignment window (ms)", menuVars.alignWindow, 1, 10)
+    imgui.PopItemWidth()
+    return copiedItemCount
 end
 function updateDirectEdit()
     local offsets = game.uniqueSelectedNoteOffsets()
@@ -8149,18 +8178,24 @@ function directSVMenu()
 end
 function displaceNoteMenu()
     local menuVars = getMenuVars("displaceNote")
-    chooseVaryingDistance(menuVars)
-    BasicCheckbox(menuVars, "linearlyChange", "Change distance over time")
+    displaceNoteSettingsMenu(menuVars)
     cache.saveTable("displaceNoteMenu", menuVars)
     AddSeparator()
     simpleActionMenu("Displace selected notes", 1, displaceNoteSVsParent, menuVars)
 end
+function displaceNoteSettingsMenu(menuVars)
+    chooseVaryingDistance(menuVars)
+    BasicCheckbox(menuVars, "linearlyChange", "Change distance over time")
+end
 function displaceViewMenu()
     local menuVars = getMenuVars("displaceView")
-    chooseDistance(menuVars)
+    displaceViewSettingsMenu(menuVars)
     cache.saveTable("displaceViewMenu", menuVars)
     AddSeparator()
     simpleActionMenu("Displace view between selected notes", 2, displaceViewSVs, menuVars)
+end
+function displaceViewSettingsMenu(menuVars)
+    chooseDistance(menuVars)
 end
 function dynamicScaleMenu()
     local menuVars = getMenuVars("dynamicScale")
@@ -8215,14 +8250,17 @@ function addNoteTimesToDynamicScaleButton(menuVars)
 end
 function flickerMenu()
     local menuVars = getMenuVars("flicker")
+    flickerSettingsMenu(menuVars)
+    cache.saveTable("flickerMenu", menuVars)
+    AddSeparator()
+    simpleActionMenu("Add flicker SVs between selected notes", 2, flickerSVs, menuVars)
+end
+function flickerSettingsMenu(menuVars)
     menuVars.flickerTypeIndex = Combo("Flicker Type", FLICKER_TYPES, menuVars.flickerTypeIndex)
     chooseVaryingDistance(menuVars)
     BasicCheckbox(menuVars, "linearlyChange", "Change distance over time")
     BasicInputInt(menuVars, "numFlickers", "Flickers", { 1, 9999 })
     if (globalVars.advancedMode) then chooseFlickerPosition(menuVars) end
-    cache.saveTable("flickerMenu", menuVars)
-    AddSeparator()
-    simpleActionMenu("Add flicker SVs between selected notes", 2, flickerSVs, menuVars)
 end
 function layerSnapMenu()
     simpleActionMenu("Layer snaps between selection", 2, layerSnaps, nil)
@@ -8374,17 +8412,19 @@ function CopiableBox(text, label, content)
 end
 function reverseScrollMenu()
     local menuVars = getMenuVars("reverseScroll")
-    chooseDistance(menuVars)
-    HelpMarker("Height at which reverse scroll notes are hit")
+    reverseScrollSettingsMenu(menuVars)
     cache.saveTable("reverseScrollMenu", menuVars)
     AddSeparator()
     local buttonText = "Reverse scroll between selected notes"
     simpleActionMenu(buttonText, 2, reverseScrollSVs, menuVars)
 end
+function reverseScrollSettingsMenu(menuVars)
+    chooseDistance(menuVars)
+    HelpMarker("Height at which reverse scroll notes are hit")
+end
 function scaleDisplaceMenu()
     local menuVars = getMenuVars("scaleDisplace")
-    menuVars.scaleSpotIndex = Combo("Displace Spot", DISPLACE_SCALE_SPOTS, menuVars.scaleSpotIndex)
-    chooseScaleType(menuVars)
+    scaleDisplaceSettingsMenu(menuVars)
     cache.saveTable("scaleDisplaceMenu", menuVars)
     AddSeparator()
     local buttonText = "Scale SVs between selected notes##displace"
@@ -8392,14 +8432,26 @@ function scaleDisplaceMenu()
 end
 function scaleMultiplyMenu()
     local menuVars = getMenuVars("scaleMultiply")
-    chooseScaleType(menuVars)
+    scaleMultiplySettingsMenu(menuVars)
     cache.saveTable("scaleMultiplyMenu", menuVars)
     AddSeparator()
     local buttonText = "Scale SVs between selected notes##multiply"
     simpleActionMenu(buttonText, 2, scaleMultiplySVs, menuVars)
 end
+function scaleDisplaceSettingsMenu(menuVars)
+    menuVars.scaleSpotIndex = Combo("Displace Spot", DISPLACE_SCALE_SPOTS, menuVars.scaleSpotIndex)
+    scaleMultiplySettingsMenu(menuVars)
+end
+function scaleMultiplySettingsMenu(menuVars)
+    chooseScaleType(menuVars)
+end
 function splitMenu()
     local menuVars = getMenuVars("split")
+    splitSettingsMenu(menuVars)
+    cache.saveTable("splitMenu", menuVars)
+    simpleActionMenu("Split selected notes into TGs", 1, splitNotes, menuVars, false)
+end
+function splitSettingsMenu(menuVars)
     menuVars.modeIndex = Combo("Split Mode", SPLIT_MODES, menuVars.modeIndex, nil, nil, {
         "Split notes via column; either with individual TGs or a certain transformation of such columns.",
         "Split notes via time; each time has its own TG.",
@@ -8411,19 +8463,20 @@ function splitMenu()
         BasicInputInt(menuVars, "cloneRadius", "Clone Radius", { 0, 69420 },
             "SVs that are further than THIS amount of ms away will be ignored.")
     end
-    cache.saveTable("splitMenu", menuVars)
-    simpleActionMenu("Split selected notes into TGs", 1, splitNotes, menuVars, false)
 end
 function swapNotesMenu()
     simpleActionMenu("Swap selected notes using SVs", 2, swapNoteSVs, nil)
 end
 function verticalShiftMenu()
     local menuVars = getMenuVars("verticalShift")
-    chooseConstantShift(menuVars, 0)
+    verticalShiftSettingsMenu(menuVars)
     cache.saveTable("verticalShiftMenu", menuVars)
     AddSeparator()
     local buttonText = "Vertically shift SVs between selected notes"
     simpleActionMenu(buttonText, 2, verticalShiftSVs, menuVars)
+end
+function verticalShiftSettingsMenu(menuVars)
+    chooseConstantShift(menuVars, 0)
 end
 function infoTab()
     imgui.SeparatorText("Welcome to plumoguSV!")
@@ -10462,7 +10515,7 @@ function saveSettingPropertiesButton(settingVars, label)
     local saveButtonClicked = imgui.Button("Save##setting" .. label)
     imgui.Separator()
     if (not saveButtonClicked) then return end
-    label = label:charAt(1):lower() .. label:sub(2)
+    label = label:identify()
     if (not globalVars.defaultProperties) then globalVars.defaultProperties = {} end
     if (not globalVars.defaultProperties.settings) then globalVars.defaultProperties.settings = {} end
     globalVars.defaultProperties.settings[label] = settingVars
@@ -10476,7 +10529,7 @@ function saveMenuPropertiesButton(menuVars, label)
     local saveButtonClicked = imgui.Button("Save##menu" .. label)
     imgui.Separator()
     if (not saveButtonClicked) then return end
-    label = label:charAt(1):lower() .. label:sub(2)
+    label = label:identify()
     if (not globalVars.defaultProperties) then globalVars.defaultProperties = {} end
     if (not globalVars.defaultProperties.menu) then globalVars.defaultProperties.menu = {} end
     globalVars.defaultProperties.menu[label] = menuVars
@@ -10506,6 +10559,27 @@ function showDefaultPropertiesSettings()
         nil,
         automateSVSettingsMenu,
         penisSettingsMenu
+    }
+    local editFnList = {
+        addTeleportSettingsMenu,
+        changeGroupsSettingsMenu,
+        nil,
+        convertSVSSFSettingsMenu,
+        copyNPasteSettingsMenu,
+        nil,
+        displaceNoteSettingsMenu,
+        displaceViewSettingsMenu,
+        nil,
+        flickerSettingsMenu,
+        nil,
+        nil,
+        nil,
+        reverseScrollSettingsMenu,
+        scaleDisplaceSettingsMenu,
+        scaleMultiplySettingsMenu,
+        splitSettingsMenu,
+        nil,
+        verticalShiftSettingsMenu
     }
     imgui.SeparatorText("Create Tab Settings")
     if (imgui.CollapsingHeader("General Standard Settings")) then
@@ -10547,91 +10621,19 @@ function showDefaultPropertiesSettings()
         cache.saveTable("placeVibratoPropertyMenu", menuVars)
     end
     imgui.SeparatorText("Edit Tab Settings")
-    if (imgui.CollapsingHeader("Add Teleport Settings")) then
-        local menuVars = getMenuVars("addTeleport", "Property")
-        chooseDistance(menuVars)
-        BasicCheckbox(menuVars, "teleportBeforeHand", "Add teleport before note")
-        saveMenuPropertiesButton(menuVars, "addTeleport")
-        cache.saveTable("addTeleportPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Change Group Settings")) then
-        local menuVars = getMenuVars("changeGroups", "Property")
-        _, menuVars.changeSVs = imgui.Checkbox("Change SVs?", menuVars.changeSVs)
-        KeepSameLine()
-        _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
-        menuVars.clone = RadioButtons("Mode: ", menuVars.clone, { "Clone", "Move" }, { true, false })
-        saveMenuPropertiesButton(menuVars, "changeGroups")
-        cache.saveTable("changeGroupsPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Convert SV <-> SSF Settings")) then
-        local menuVars = getMenuVars("convertSVSSF", "Property")
-        chooseConvertSVSSFDirection(menuVars)
-        saveMenuPropertiesButton(menuVars, "convertSVSSF")
-        cache.saveTable("convertSVSSFPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Copy Settings")) then
-        local menuVars = getMenuVars("copy", "Property")
-        _, menuVars.copyTable[1] = imgui.Checkbox("Copy Lines", menuVars.copyTable[1])
-        KeepSameLine()
-        _, menuVars.copyTable[2] = imgui.Checkbox("Copy SVs", menuVars.copyTable[2])
-        _, menuVars.copyTable[3] = imgui.Checkbox("Copy SSFs", menuVars.copyTable[3])
-        imgui.SameLine(0, SAMELINE_SPACING + 3.5)
-        _, menuVars.copyTable[4] = imgui.Checkbox("Copy Bookmarks", menuVars.copyTable[4])
-        _, menuVars.tryAlign = imgui.Checkbox("Try to fix misalignments", menuVars.tryAlign)
-        imgui.PushItemWidth(100)
-        _, menuVars.alignWindow = imgui.SliderInt("Alignment window (ms)", menuVars.alignWindow, 1, 10)
-        imgui.PopItemWidth()
-        saveMenuPropertiesButton(menuVars, "copy")
-        cache.saveTable("copyPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Displace Note Settings")) then
-        local menuVars = getMenuVars("displaceNote", "Property")
-        chooseVaryingDistance(menuVars)
-        BasicCheckbox(menuVars, "linearlyChange", "Change distance over time")
-        saveMenuPropertiesButton(menuVars, "displaceNote")
-        cache.saveTable("displaceNotePropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Displace View Settings")) then
-        local menuVars = getMenuVars("displaceView", "Property")
-        chooseDistance(menuVars)
-        saveMenuPropertiesButton(menuVars, "displaceView")
-        cache.saveTable("displaceViewPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Flicker Settings")) then
-        local menuVars = getMenuVars("flicker", "Property")
-        menuVars.flickerTypeIndex = Combo("Flicker Type", FLICKER_TYPES, menuVars.flickerTypeIndex)
-        chooseVaryingDistance(menuVars)
-        BasicCheckbox(menuVars, "linearlyChange", "Change distance over time")
-        BasicInputInt(menuVars, "numFlickers", "Flickers", { 1, 9999 })
-        if (globalVars.advancedMode) then chooseFlickerPosition(menuVars) end
-        saveMenuPropertiesButton(menuVars, "flicker")
-        cache.saveTable("flickerPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Reverse Scroll Settings")) then
-        local menuVars = getMenuVars("reverseScroll", "Property")
-        chooseDistance(menuVars)
-        HelpMarker("Height at which reverse scroll notes are hit")
-        saveMenuPropertiesButton(menuVars, "reverseScroll")
-        cache.saveTable("reverseScrollPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Scale (Displace) Settings")) then
-        local menuVars = getMenuVars("scaleDisplace", "Property")
-        menuVars.scaleSpotIndex = Combo("Displace Spot", DISPLACE_SCALE_SPOTS, menuVars.scaleSpotIndex)
-        chooseScaleType(menuVars)
-        saveMenuPropertiesButton(menuVars, "scaleDisplace")
-        cache.saveTable("scaleDisplacePropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Scale (Multiply) Settings")) then
-        local menuVars = getMenuVars("scaleMultiply", "Property")
-        chooseScaleType(menuVars)
-        saveMenuPropertiesButton(menuVars, "scaleMultiply")
-        cache.saveTable("scaleMultiplyPropertyMenu", menuVars)
-    end
-    if (imgui.CollapsingHeader("Vertical Shift Settings")) then
-        local menuVars = getMenuVars("verticalShift", "Property")
-        chooseConstantShift(menuVars, 0)
-        saveMenuPropertiesButton(menuVars, "verticalShift")
-        cache.saveTable("verticalShiftPropertyMenu", menuVars)
+    local editTabDict = table.map(EDIT_SV_TOOLS, function(element, idx)
+        return { label = element, fn = editFnList[idx] }
+    end)
+    for _, tbl in pairs(editTabDict) do
+        local label = tbl.label
+        if (not tbl.fn) then goto continue end
+        if (imgui.CollapsingHeader(label .. " Settings")) then
+            local menuVars = getMenuVars(label, "Property")
+            tbl.fn(menuVars)
+            saveMenuPropertiesButton(menuVars, label)
+            cache.saveTable(label .. "PropertyMenu", menuVars)
+        end
+        ::continue::
     end
     imgui.SeparatorText("Delete Tab Settings")
     if (imgui.CollapsingHeader("Delete Menu Settings")) then
@@ -11758,7 +11760,7 @@ function chooseDistance(menuVars)
 end
 function chooseVaryingDistance(settingVars)
     if (not settingVars.linearlyChange) then
-        settingVars.distance = ComputableInputFloat("Distance", settingVars.distance, 3, " msx")
+        settingVars.distance = NegatableComputableInputFloat("Distance", settingVars.distance, 3, " msx")
         return
     end
     return SwappableNegatableInputFloat2(settingVars, "distance1", "distance2", "Dist.", "msx", 2)

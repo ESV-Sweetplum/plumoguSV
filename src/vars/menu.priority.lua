@@ -53,8 +53,11 @@ DEFAULT_STARTING_MENU_VARS = {
     convertSVSSF = {
         conversionDirection = true
     },
-    copy = {
-        copyTable = { true, true, true, true }, -- 1: timing lines, 2: svs, 3: ssfs, 4: bookmarks
+    copyPaste = {
+        copyLines = false,
+        copySVs = true,
+        copySSFs = true,
+        copyBMs = false,
         copied = {
             lines = { {} },
             SVs = { {} },
@@ -178,7 +181,8 @@ DEFAULT_STARTING_MENU_VARS = {
 ---@return table
 function getMenuVars(menuType, optionalLabel)
     optionalLabel = optionalLabel or ""
-    local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuType])
+    menuKey = menuType:identify()
+    local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuKey])
 
     local labelText = menuType .. optionalLabel .. "Menu"
     cache.loadTable(labelText, menuVars)

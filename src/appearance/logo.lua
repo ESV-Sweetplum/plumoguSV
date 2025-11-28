@@ -39,7 +39,7 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
     local progress = (currentTime % logoLength / logoLength)
 
     local curvature1 = 0.4
-    local curvature2 = 0.2
+    local curvature2 = 0.25
 
     progress = math.clamp(progress, 0, 1) * 2
 
@@ -66,12 +66,12 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
     local trueProgress = progress * 2
 
     if (trueProgress < 1) then
-        t0 = 20 * (trueProgress - 1)
-        t1 = 0.5 * t0 + 1
+        t0 = 10 * (trueProgress - 1)
+        t1 = (1 - trueProgress / 2) * t0 + trueProgress
     else
         trueProgress = trueProgress - 1
-        t0 = trueProgress * 10
-        t1 = 1 + t0
+        t0 = trueProgress * 20
+        t1 = 1 - trueProgress + t0
     end
 
     local center = vector.New(267, 48) * scale / 2

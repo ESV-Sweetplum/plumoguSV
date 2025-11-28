@@ -331,7 +331,7 @@ end
 
 function chooseVaryingDistance(settingVars)
     if (not settingVars.linearlyChange) then
-        settingVars.distance = ComputableInputFloat("Distance", settingVars.distance, 3, " msx")
+        settingVars.distance = NegatableComputableInputFloat("Distance", settingVars.distance, 3, " msx")
         return
     end
     return SwappableNegatableInputFloat2(settingVars, "distance1", "distance2", "Dist.", "msx", 2)

@@ -449,6 +449,7 @@ defaultProperties:
     automate:
       copiedSVs:
       - 
+      deleteCopiedSVs: true
       maintainMs: true
       ms: 500
       scaleSVs: false
@@ -513,7 +514,7 @@ defaultProperties:
       - true
       - true
     addTeleport:
-      distance: 10000
+      distance: 5000
       teleportBeforeHand: false
     changeGroups:
       designatedTimingGroup: $Default
@@ -530,12 +531,11 @@ defaultProperties:
       msOffset: 0
     convertSVSSF:
       conversionDirection: true
-    copy:
-      copyTable:
-      - true
-      - true
-      - true
-      - true
+    copyPaste:
+      copyLines: false
+      copySVs: true
+      copySSFs: true
+      copyBMs: false
       copied:
         lines:
         - - 

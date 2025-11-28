@@ -1,10 +1,17 @@
 function changeGroupsMenu()
     local menuVars = getMenuVars("changeGroups")
 
+    local action = changeGroupsSettingsMenu(menuVars)
+
     AddSeparator()
+
+    cache.saveTable("changeGroupsMenu", menuVars)
+
+    simpleActionMenu(table.concat({ action, " items to ", menuVars.designatedTimingGroup }), 2, changeGroups, menuVars)
+end
+
+function changeGroupsSettingsMenu(menuVars)
     local action = menuVars.clone and "Clone" or "Move"
-
-
 
     imgui.AlignTextToFramePadding()
     menuVars.designatedTimingGroup = chooseTimingGroup(table.concat({ "  ", action, " to: " }),
@@ -16,9 +23,5 @@ function changeGroupsMenu()
 
     menuVars.clone = RadioButtons("Mode: ", menuVars.clone, { "Clone", "Move" }, { true, false })
 
-    AddSeparator()
-
-    cache.saveTable("changeGroupsMenu", menuVars)
-
-    simpleActionMenu(table.concat({ action, " items to ", menuVars.designatedTimingGroup }), 2, changeGroups, menuVars)
+    return action
 end
