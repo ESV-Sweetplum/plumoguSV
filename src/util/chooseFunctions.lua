@@ -34,7 +34,7 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         pos1.y = 150 - pos1.y
         pos2.y = 150 - pos2.y
 
-        local pointList = { { pos = pos1, col = red, size = 10 }, { pos = pos2, col = blue, size = 10 } }
+        local pointList = { { pos = pos1, col = red, size = 5 }, { pos = pos2, col = blue, size = 5 } }
 
         local ctx = renderGraph("Bezier Interactive Window" .. optionalLabel, vctr2(150), pointList, settingVars
             .freeMode)

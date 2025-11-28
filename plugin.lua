@@ -2010,7 +2010,7 @@ DEFAULT_STARTING_SETTING_VARS = {
         startMsx = 0,
         endMsx = 100,
         controlPointCount = 3,
-        controlPoints = { vector.New(0, 1), vector.New(0.5, 0), vector.New(1, 1) },
+        controlPoints = { vector.New(0.25, 0.25), vector.New(0.5, 0), vector.New(0.75, 0.25) },
         plotPoints = {},
         plotCoefficients = {},
     },
@@ -11516,7 +11516,7 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         local blue = 4294901760
         pos1.y = 150 - pos1.y
         pos2.y = 150 - pos2.y
-        local pointList = { { pos = pos1, col = red, size = 10 }, { pos = pos2, col = blue, size = 10 } }
+        local pointList = { { pos = pos1, col = red, size = 5 }, { pos = pos2, col = blue, size = 5 } }
         local ctx = renderGraph("Bezier Interactive Window" .. optionalLabel, vctr2(150), pointList, settingVars
             .freeMode)
         local topLeft = imgui.GetWindowPos()
