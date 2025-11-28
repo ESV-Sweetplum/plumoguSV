@@ -168,6 +168,14 @@ For more information, please refer to <https://unlicense.org>
 ---@operator div(Vector4 | number): Vector4
 ---@operator unm(Vector4): Vector4
 
+---@class (exact) EditorBpmDetector
+---@field HighestConfidenceBpm integer When done, this is the recommended BPM.
+---@field HighestConfidenceBpmPercentage integer How confident the detector is that the given BPM is correct.
+---@field TotalBpmDetectionIntervals integer The number of BPM detection cycles the detector performed.
+---@field SuggestedOffset integer The suggested offset for the timing point.
+---@field Done boolean Returns true when the detector is finished. When false, all other properties will either be 0 or nil.
+---@field Bpms { [integer]: integer }
+
 vector = {}
 
 ---@generic T : number | Vector2 | Vector3 | Vector4
@@ -597,6 +605,12 @@ function actions.GoToObjects(input) end
 ---#### Sets the [hit object selection](lua://state.SelectedHitObjects) to be the [hit objects](lua://HitObject) passed as the argument.
 ---@param hos HitObject[] The [hit objects](lua://HitObject) to select, which must be obtained via [`map.HitObjects`](lua://map.HitObjects) or something similar.
 function actions.SetHitObjectSelection(hos) end
+
+---##### (READ-ONLY)
+---#### Returns a BPM detector table, with information about suggested BPM and offset. If used, set the return value to a global variable to be used later, as this is one of the only methods that is performed asynchronously by the game.
+---@return EditorBpmDetector
+---@nodiscard
+function actions.DetectBpm() end
 
 ---##### (READ-ONLY)
 ---#### Sets the preview time of the map.
