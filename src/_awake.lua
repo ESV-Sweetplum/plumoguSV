@@ -19,13 +19,13 @@ function awake()
 
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
 
-    if (not truthy(#map.TimingPoints)) then
+    if (not truthy(map.TimingPoints)) then
         print("e!", "Please place a timing point before attempting to use plumoguSV.")
     end
 
     if (state.Scale ~= 1) then
         local printedScale = math.round(state.Scale * 100)
-        print("w!",
+        print("e!",
             "Your ImGui scale is set to " ..
             printedScale .. "% instead of 100%. For visual purposes, please set it back to 100%.")
     end

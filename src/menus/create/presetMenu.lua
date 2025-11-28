@@ -39,9 +39,15 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     imgui.PopItemWidth()
     imgui.SameLine()
     if (imgui.Button("Import##CustomPreset")) then
-        table.insert(globalVars.presets, table.parse(importCustomPreset))
-        importCustomPreset = ""
-        write(globalVars)
+        local parsedTable = table.parse(importCustomPreset)
+        if (table.includes(table.property(globalVars.presets, "name"), parsedTable.name)) then
+            print("e!",
+                "A preset with this name already exists. Please remove it or change the name in the import string.")
+        else
+            table.insert(globalVars.presets, parsedTable)
+            importCustomPreset = ""
+            write(globalVars)
+        end
     end
 
     AddSeparator()

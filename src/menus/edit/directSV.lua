@@ -21,7 +21,8 @@ function directSVMenu()
     local svs = cache.lists.directSVList or {}
     if (not truthy(svs)) then
         menuVars.selectableIndex = 1
-        imgui.TextWrapped("Select a note to view local SVs.")
+        if (not truthy(state.SelectedHitObjects)) then imgui.TextWrapped("Select a note to view local SVs.") else imgui
+                .TextWrapped("There are no SVs in this area.") end
         return
     end
 

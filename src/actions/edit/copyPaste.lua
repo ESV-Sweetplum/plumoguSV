@@ -46,25 +46,33 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.BMs[menuVars.curSlot], copiedBM)
     end
     ::continue4::
+    local printed = false
     if (#menuVars.copied.BMs[menuVars.curSlot] > 0) then
+        printed = true
         toggleablePrint("s!",
             "Copied " ..
             #menuVars.copied.BMs[menuVars.curSlot] .. pluralize(" Bookmark.", #menuVars.copied.BMs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.SSFs[menuVars.curSlot] > 0) then
+        printed = true
         toggleablePrint("s!",
             "Copied " ..
             #menuVars.copied.SSFs[menuVars.curSlot] .. pluralize(" SSF.", #menuVars.copied.SSFs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.SVs[menuVars.curSlot] > 0) then
+        printed = true
         toggleablePrint("s!",
             "Copied " ..
             #menuVars.copied.SVs[menuVars.curSlot] .. pluralize(" SV.", #menuVars.copied.SVs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.lines[menuVars.curSlot] > 0) then
+        printed = true
         toggleablePrint("s!",
             "Copied " ..
             #menuVars.copied.lines[menuVars.curSlot] .. pluralize(" Line.", #menuVars.copied.lines[menuVars.curSlot], -2))
+    end
+    if (not printed) then
+        print("w!", "There were no items to copy.")
     end
 end
 

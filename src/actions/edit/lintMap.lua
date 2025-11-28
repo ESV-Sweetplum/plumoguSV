@@ -40,7 +40,7 @@ function alignTimingLines()
     })
 
     toggleablePrint("s!", "Created " .. #timingpoints .. pluralize(" timing point.", #timingpoints, -2))
-    if (truthy(#tpsToRemove)) then
+    if (truthy(tpsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #tpsToRemove .. pluralize(" timing point.", #tpsToRemove, -2))
     end

@@ -3102,25 +3102,33 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.BMs[menuVars.curSlot], copiedBM)
     end
     ::continue4::
+    local printed = false
     if (#menuVars.copied.BMs[menuVars.curSlot] > 0) then
+        printed = true
         toggleablePrint("s!",
             "Copied " ..
             #menuVars.copied.BMs[menuVars.curSlot] .. pluralize(" Bookmark.", #menuVars.copied.BMs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.SSFs[menuVars.curSlot] > 0) then
+        printed = true
         toggleablePrint("s!",
             "Copied " ..
             #menuVars.copied.SSFs[menuVars.curSlot] .. pluralize(" SSF.", #menuVars.copied.SSFs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.SVs[menuVars.curSlot] > 0) then
+        printed = true
         toggleablePrint("s!",
             "Copied " ..
             #menuVars.copied.SVs[menuVars.curSlot] .. pluralize(" SV.", #menuVars.copied.SVs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.lines[menuVars.curSlot] > 0) then
+        printed = true
         toggleablePrint("s!",
             "Copied " ..
             #menuVars.copied.lines[menuVars.curSlot] .. pluralize(" Line.", #menuVars.copied.lines[menuVars.curSlot], -2))
+    end
+    if (not printed) then
+        print("w!", "There were no items to copy.")
     end
 end
 function clearCopiedItems(menuVars)
@@ -3559,7 +3567,7 @@ function alignTimingLines()
         createEA(action_type.RemoveTimingPointBatch, tpsToRemove)
     })
     toggleablePrint("s!", table.concat({"Created ", #timingpoints, pluralize(" timing point.", #timingpoints, -2)}))
-    if (truthy(#tpsToRemove)) then
+    if (truthy(tpsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #tpsToRemove .. pluralize(" timing point.", #tpsToRemove, -2))
     end
@@ -7251,9 +7259,15 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     imgui.PopItemWidth()
     imgui.SameLine()
     if (imgui.Button("Import##CustomPreset")) then
-        table.insert(globalVars.presets, table.parse(importCustomPreset))
-        importCustomPreset = ""
-        write(globalVars)
+        local parsedTable = table.parse(importCustomPreset)
+        if (table.includes(table.property(globalVars.presets, "name"), parsedTable.name)) then
+            print("e!",
+                "A preset with this name already exists. Please remove it or change the name in the import string.")
+        else
+            table.insert(globalVars.presets, parsedTable)
+            importCustomPreset = ""
+            write(globalVars)
+        end
     end
     AddSeparator()
     imgui.Columns(3)
@@ -8124,7 +8138,8 @@ function directSVMenu()
     local svs = state.GetValue("lists.directSVList") or {}
     if (not truthy(svs)) then
         menuVars.selectableIndex = 1
-        imgui.TextWrapped("Select a note to view local SVs.")
+        if (not truthy(state.SelectedHitObjects)) then imgui.TextWrapped("Select a note to view local SVs.") else imgui
+                .TextWrapped("There are no SVs in this area.") end
         return
     end
     if (menuVars.selectableIndex > #svs) then menuVars.selectableIndex = #svs end
@@ -13438,12 +13453,12 @@ function awake()
     listenForTimingGroupCount()
     setPluginAppearance()
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
-    if (not truthy(#map.TimingPoints)) then
+    if (not truthy(map.TimingPoints)) then
         print("e!", "Please place a timing point before attempting to use plumoguSV.")
     end
     if (state.Scale ~= 1) then
         local printedScale = math.round(state.Scale * 100)
-        print("w!",
+        print("e!",
             "Your ImGui scale is set to " ..
             printedScale .. "% instead of 100%. For visual purposes, please set it back to 100%.")
     end
