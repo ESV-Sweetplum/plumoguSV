@@ -3473,30 +3473,32 @@ function collapseSnaps()
             hoLayer = map.EditorLayers[ho.EditorLayer]
         end
         if (not hoLayer.Name:find("plumoguSV")) then goto continue end
-        color = hoLayer.Name:match("-([a-zA-Z]+)$")
-        snap = REVERSE_COLOR_MAP[color]
-        mostRecentTP = game.getTimingPointAt(ho.StartTime)
-        if (snap == 1) then
-            table.insert(snapTpsToAdd,
-                utils.CreateTimingPoint(ho.StartTime, mostRecentTP.Bpm, mostRecentTP.Signature, true))
-        else
-            table.insert(snapTpsToAdd,
-                utils.CreateTimingPoint(ho.StartTime - snapInterval,
-                    baseBpm / snap, mostRecentTP.Signature, true))
-            table.insert(normalTpsToAdd,
-                utils.CreateTimingPoint(ho.StartTime + snapInterval,
-                    mostRecentTP.Bpm, mostRecentTP.Signature, true))
+        do
+            local color = hoLayer.Name:match("-([a-zA-Z]+)$")
+            local snap = REVERSE_COLOR_MAP[color]
+            local mostRecentTP = game.getTimingPointAt(ho.StartTime)
+            if (snap == 1) then
+                table.insert(snapTpsToAdd,
+                    utils.CreateTimingPoint(ho.StartTime, mostRecentTP.Bpm, mostRecentTP.Signature, true))
+            else
+                table.insert(snapTpsToAdd,
+                    utils.CreateTimingPoint(ho.StartTime - snapInterval,
+                        baseBpm / snap, mostRecentTP.Signature, true))
+                table.insert(normalTpsToAdd,
+                    utils.CreateTimingPoint(ho.StartTime + snapInterval,
+                        mostRecentTP.Bpm, mostRecentTP.Signature, true))
+            end
+            local originalLayerName = hoLayer.Name:match("^([^-]+)-")
+            table.insert(moveNoteActions,
+                createEA(action_type.MoveToLayer,
+                    map.EditorLayers[table.indexOf(table.property(map.EditorLayers, "Name"), originalLayerName)], { ho }))
+            table.insert(removeLayerActions,
+                createEA(action_type.RemoveLayer, hoLayer))
         end
-        originalLayerName = hoLayer.Name:match("^([^-]+)-")
-        table.insert(moveNoteActions,
-            createEA(action_type.MoveToLayer,
-                map.EditorLayers[table.indexOf(table.property(map.EditorLayers, "Name"), originalLayerName)], { ho }))
-        table.insert(removeLayerActions,
-            createEA(action_type.RemoveLayer, hoLayer))
         ::continue::
     end
     actions.PerformBatch(moveNoteActions)
-    if (#normalTpsToAdd + #snapTpsToAdd + not truthy(tpsToRemove)) then
+    if (not truthy(#normalTpsToAdd + #snapTpsToAdd + #tpsToRemove)) then
         print("w!", "There were no generated layers you nonce")
         return
     end
@@ -8263,10 +8265,10 @@ function flickerSettingsMenu(menuVars)
     if (globalVars.advancedMode) then chooseFlickerPosition(menuVars) end
 end
 function layerSnapMenu()
-    simpleActionMenu("Layer snaps between selection", 2, layerSnaps, nil)
+    simpleActionMenu("Layer snaps between selection", 2, layerSnaps, nil, false, true)
     AddSeparator()
-    simpleActionMenu("Collapse snap layers", 0, collapseSnaps, nil)
-    simpleActionMenu("Clear unused snap layers", 0, clearSnappedLayers, nil)
+    simpleActionMenu("Collapse snap layers", 0, collapseSnaps, nil, false, true)
+    simpleActionMenu("Clear unused snap layers", 0, clearSnappedLayers, nil, false, true)
 end
 function lintMapMenu()
     simpleActionMenu("Align timing lines in this region", 0, alignTimingLines, nil, false, true)
@@ -10283,7 +10285,7 @@ function showAppearanceSettings()
         globalVars.colorThemeIndex = table.indexOf(COLOR_THEMES, "CUSTOM")
     end
     HoverToolTip(
-    "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
+        "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
     AddSeparator()
     chooseCursorTrail()
     chooseCursorTrailShape()
