@@ -53,18 +53,6 @@ function draw()
         showPatchNotesWindow()
     end
 
-    if (imgui.Button("hi 1")) then
-        buh = actions.DetectBpm()
-    end
-    if (imgui.Button("hi 2")) then
-        print(#buh.Bpms)
-        print(buh.Done)
-        print(buh.HighestConfidenceBpm)
-        print(buh.HighestConfidenceBpmPercentage)
-        print(buh.SuggestedOffset)
-        print(buh.TotalBpmDetectionIntervals)
-    end
-
     imgui.End()
 
     logoThread()
