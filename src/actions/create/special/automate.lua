@@ -44,7 +44,7 @@ function automateSVs(settingVars)
                 selected[math.max(1, idx - 1)].StartTime
 
             timeSinceLastObject = timeSinceLastObject + thisTime - prevTime
-            if (timeSinceLastObject > settingVars.ms and settingVars.maintainMs and settingVars.optimizeTGs) then
+            if (timeSinceLastObject - 10 > settingVars.ms and settingVars.maintainMs and settingVars.optimizeTGs) then
                 idIndex = 1
                 timeSinceLastObject = 0
             else

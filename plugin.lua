@@ -2343,7 +2343,7 @@ function automateSVs(settingVars)
             local prevTime = truthy(selected[math.max(1, idx - 1)].EndTime) and selected[math.max(1, idx - 1)].EndTime or
                 selected[math.max(1, idx - 1)].StartTime
             timeSinceLastObject = timeSinceLastObject + thisTime - prevTime
-            if (timeSinceLastObject > settingVars.ms and settingVars.maintainMs and settingVars.optimizeTGs) then
+            if (timeSinceLastObject - 10 > settingVars.ms and settingVars.maintainMs and settingVars.optimizeTGs) then
                 idIndex = 1
                 timeSinceLastObject = 0
             else
@@ -12717,7 +12717,8 @@ end
 function listenForTimingGroupCount()
     state.SetValue("tgList", game.getTimingGroupList())
     listen(function(action, type, fromLua)
-        if (tonumber(action.Type) <= 44) then return end
+        local actionIndex = tonumber(action.Type)
+        if (actionIndex <= 44 and actionIndex ~= 37) then return end
         state.SetValue("tgList", game.getTimingGroupList())
     end)
 end
