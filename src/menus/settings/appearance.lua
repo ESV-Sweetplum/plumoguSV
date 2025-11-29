@@ -43,7 +43,7 @@ function showAppearanceSettings()
     if (not globalVars.useCustomPulseColor) then imgui.BeginDisabled() end
     KeepSameLine()
     if (imgui.Button("Edit Color")) then
-        state.SetValue("showColorPicker", true)
+        state.SetValue("showColorPicker", not state.GetValue("showColorPicker", false))
     end
     if (state.GetValue("showColorPicker")) then
         choosePulseColor()

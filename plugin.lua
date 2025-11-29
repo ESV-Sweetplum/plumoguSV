@@ -1612,7 +1612,14 @@ DEFAULT_STYLE = {
     plotHistogram =
         vector.New(0.90, 0.70, 0.00, 1.00),
     plotHistogramHovered =
-        vector.New(1.00, 0.60, 0.00, 1.00)
+        vector.New(1.00, 0.60, 0.00, 1.00),
+    loadupOpeningTextColor = vector.New(0.00, 0.00, 0.00, 1.00),
+    loadupPulseTextColorLeft = vector.New(0.50, 0.00, 1.00, 1.00),
+    loadupPulseTextColorRight = vector.New(0.75, 0.25, 1.00, 1.00),
+    loadupBgTl = vector.New(0.08, 0, 0.08, 0.39),
+    loadupBgTr = vector.New(0.16, 0, 0.16, 0.67),
+    loadupBgBl = vector.New(0.16, 0, 0.16, 0.67),
+    loadupBgBr = vector.New(0.25, 0, 0.25, 1.00),
 }
 DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Alt+L", "Ctrl+Alt+E", "O" }
 HOTKEY_LABELS = { "Execute Primary Action", "Execute Secondary Action", "Swap Primary Inputs",
@@ -1776,9 +1783,13 @@ function setGlobalVars(tempGlobalVars)
     globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
     globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
     globalVars.customStyle = tempGlobalVars.customStyle or {}
-    if (globalVars.customStyle.border) then
-        globalVars.customStyle.border = table.vectorize4(globalVars.customStyle
-            .border)
+    local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
+        "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
+    for k13 = 1, #forceVectorizeList do
+        local key = forceVectorizeList[k13]
+        if (globalVars.customStyle[key]) then
+            globalVars.customStyle[key] = table.vectorize4(globalVars.customStyle[key])
+        end
     end
     globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
     globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
@@ -2312,8 +2323,8 @@ function automateCopySVs(settingVars)
         return
     end
     local firstSVTime = svs[1].StartTime
-    for k13 = 1, #svs do
-        local sv = svs[k13]
+    for k14 = 1, #svs do
+        local sv = svs[k14]
         local copiedSV = {
             relativeOffset = sv.StartTime - firstSVTime,
             multiplier = sv.Multiplier
@@ -2855,12 +2866,12 @@ function changeGroups(menuVars)
     local svsToAdd = {}
     local ssfsToAdd = {}
     local oldGroup = state.SelectedScrollGroupId
-    for k14 = 1, #svsToRemove do
-        local sv = svsToRemove[k14]
+    for k15 = 1, #svsToRemove do
+        local sv = svsToRemove[k15]
         table.insert(svsToAdd, createSV(sv.StartTime, sv.Multiplier))
     end
-    for k15 = 1, #ssfsToRemove do
-        local ssf = ssfsToRemove[k15]
+    for k16 = 1, #ssfsToRemove do
+        local ssf = ssfsToRemove[k16]
         table.insert(ssfsToAdd, createSSF(ssf.StartTime, ssf.Multiplier))
     end
     local actionList = {}
@@ -2998,22 +3009,22 @@ function convertSVSSF(menuVars)
     local editorActions = {}
     if (menuVars.conversionDirection) then
         local svs = game.getSVsBetweenOffsets(startOffset, endOffset, false)
-        for k16 = 1, #svs do
-            local sv = svs[k16]
+        for k17 = 1, #svs do
+            local sv = svs[k17]
             table.insert(objects, { StartTime = sv.StartTime, Multiplier = sv.Multiplier })
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svs))
     else
         local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset, false)
-        for k17 = 1, #ssfs do
-            local ssf = ssfs[k17]
+        for k18 = 1, #ssfs do
+            local ssf = ssfs[k18]
             table.insert(objects, { StartTime = ssf.StartTime, Multiplier = ssf.Multiplier })
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfs))
     end
     local createTable = {}
-    for k18 = 1, #objects do
-        local obj = objects[k18]
+    for k19 = 1, #objects do
+        local obj = objects[k19]
         if (menuVars.conversionDirection) then
             table.insert(createTable, createSSF(obj.StartTime,
                 obj.Multiplier))
@@ -3062,8 +3073,8 @@ function copyItems(menuVars)
     local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset)
     local bms = game.getBookmarksBetweenOffsets(startOffset, endOffset)
     if (not menuVars.copyLines) then goto continue1 end
-    for k19 = 1, #lines do
-        local line = lines[k19]
+    for k20 = 1, #lines do
+        local line = lines[k20]
         local copiedLine = {
             relativeOffset = line.StartTime - startOffset,
             bpm = line.Bpm,
@@ -3074,8 +3085,8 @@ function copyItems(menuVars)
     end
     ::continue1::
     if (not menuVars.copySVs) then goto continue2 end
-    for k20 = 1, #svs do
-        local sv = svs[k20]
+    for k21 = 1, #svs do
+        local sv = svs[k21]
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
             multiplier = sv.Multiplier
@@ -3084,8 +3095,8 @@ function copyItems(menuVars)
     end
     ::continue2::
     if (not menuVars.copySSFs) then goto continue3 end
-    for k21 = 1, #ssfs do
-        local ssf = ssfs[k21]
+    for k22 = 1, #ssfs do
+        local ssf = ssfs[k22]
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
             multiplier = ssf.Multiplier
@@ -3094,8 +3105,8 @@ function copyItems(menuVars)
     end
     ::continue3::
     if (not menuVars.copyBMs) then goto continue4 end
-    for k22 = 1, #bms do
-        local bm = bms[k22]
+    for k23 = 1, #bms do
+        local bm = bms[k23]
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
             note = bm.Note
@@ -3271,8 +3282,8 @@ function displaceNoteSVsParent(menuVars)
     if (not truthy(offsets)) then return end
     local svsToRemove = {}
     local svsToAdd = {}
-    for k23 = 1, #offsets do
-        local offset = offsets[k23]
+    for k24 = 1, #offsets do
+        local offset = offsets[k24]
         local tbl = displaceNoteSVs(
             {
                 distance = (offset - offsets[1]) / (offsets[#offsets] - offsets[1]) *
@@ -3348,8 +3359,8 @@ function dynamicScaleSVs(menuVars)
             endOffset)
         local targetDistance = targetAvgSV * (endOffset - startOffset)
         local scalingFactor = targetDistance / currentDistance
-        for k24 = 1, #svsBetweenOffsets do
-            local sv = svsBetweenOffsets[k24]
+        for k25 = 1, #svsBetweenOffsets do
+            local sv = svsBetweenOffsets[k25]
             local newSVMultiplier = scalingFactor * sv.Multiplier
             addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
         end
@@ -3429,8 +3440,8 @@ function layerSnaps()
     local originalLayerNames = table.property(map.EditorLayers, "Name")
     local layerNames = table.duplicate(originalLayerNames)
     local notes = map.HitObjects
-    for k25 = 1, #notes do
-        local ho = notes[k25]
+    for k26 = 1, #notes do
+        local ho = notes[k26]
         local color = COLOR_MAP[game.getSnapAt(ho.StartTime)]
         if (ho.EditorLayer == 0) then
             layer = { Name = "Default", ColorRgb = "255,255,255", Hidden = false }
@@ -3556,8 +3567,8 @@ function alignTimingLines()
             times[#times + 1] = originalTime
         end
     end
-    for k26 = 1, #times do
-        local time = times[k26]
+    for k27 = 1, #times do
+        local time = times[k27]
         if (game.getTimingPointAt(time).StartTime == time) then
             tpsToRemove[#tpsToRemove + 1] = game.getTimingPointAt(time)
         end
@@ -3766,14 +3777,14 @@ function reverseScrollSVs(menuVars)
         prepareDisplacingSVs(noteOffset, almostSVsToAdd, svTimeIsAdded, beforeDisplacement,
             atDisplacement, afterDisplacement)
     end
-    for k27 = 1, #svsBetweenOffsets do
-        local sv = svsBetweenOffsets[k27]
+    for k28 = 1, #svsBetweenOffsets do
+        local sv = svsBetweenOffsets[k28]
         if (not svTimeIsAdded[sv.StartTime]) then
             almostSVsToAdd[#almostSVsToAdd + 1] = sv
         end
     end
-    for k28 = 1, #almostSVsToAdd do
-        local sv = almostSVsToAdd[k28]
+    for k29 = 1, #almostSVsToAdd do
+        local sv = almostSVsToAdd[k29]
         local newSVMultiplier = -sv.Multiplier
         if sv.StartTime > endOffset then newSVMultiplier = sv.Multiplier end
         addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
@@ -3839,8 +3850,8 @@ function scaleMultiplySVs(menuVars)
         elseif scaleType == "Absolute Distance" then
             scalingFactor = menuVars.distance / currentDistance
         end
-        for k29 = 1, #svsBetweenOffsets do
-            local sv = svsBetweenOffsets[k29]
+        for k30 = 1, #svsBetweenOffsets do
+            local sv = svsBetweenOffsets[k30]
             local newSVMultiplier = scalingFactor * sv.Multiplier
             addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
         end
@@ -3851,8 +3862,8 @@ function splitNotes(menuVars)
     local noteDict = {}
     local notes = state.SelectedHitObjects
     if (menuVars.modeIndex == 1) then
-        for k30 = 1, #notes do
-            local note = notes[k30]
+        for k31 = 1, #notes do
+            local note = notes[k31]
             if (noteDict[note.Lane]) then
                 table.insert(noteDict[note.Lane], note)
             else
@@ -3860,8 +3871,8 @@ function splitNotes(menuVars)
             end
         end
     elseif (menuVars.modeIndex == 2) then
-        for k31 = 1, #notes do
-            local note = notes[k31]
+        for k32 = 1, #notes do
+            local note = notes[k32]
             if (noteDict[note.StartTime]) then
                 table.insert(noteDict[note.StartTime], note)
             else
@@ -3869,8 +3880,8 @@ function splitNotes(menuVars)
             end
         end
     else
-        for k32 = 1, #notes do
-            local note = notes[k32]
+        for k33 = 1, #notes do
+            local note = notes[k33]
             noteDict[note.StartTime .. "_" .. note.Lane] = { note }
         end
     end
@@ -3936,8 +3947,8 @@ function verticalShiftSVs(menuVars)
     local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
     local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
-    for k33 = 1, #svsBetweenOffsets do
-        local sv = svsBetweenOffsets[k33]
+    for k34 = 1, #svsBetweenOffsets do
+        local sv = svsBetweenOffsets[k34]
         local newSVMultiplier = sv.Multiplier + menuVars.verticalShift
         addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
     end
@@ -4055,8 +4066,8 @@ function getMapStats()
     local tgList = map.GetTimingGroupIds()
     local svSum = 0
     local ssfSum = 0
-    for k34 = 1, #tgList do
-        local tg = tgList[k34]
+    for k35 = 1, #tgList do
+        local tg = tgList[k35]
         state.SelectedScrollGroupId = tg
         svSum = svSum + #map.ScrollVelocities
         ssfSum = ssfSum + #map.ScrollSpeedFactors
@@ -4081,8 +4092,8 @@ function selectAlternating(menuVars)
     local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     local times = {}
-    for k35 = 1, #notes do
-        local ho = notes[k35]
+    for k36 = 1, #notes do
+        local ho = notes[k36]
         times[#times + 1] = ho.StartTime
     end
     times = table.dedupe(times)
@@ -4095,8 +4106,8 @@ function selectAlternating(menuVars)
     local notesToSelect = {}
     local currentTime = allowedTimes[1]
     local index = 2
-    for k36 = 1, #notes do
-        local note = notes[k36]
+    for k37 = 1, #notes do
+        local note = notes[k37]
         if (note.StartTime > currentTime and index <= #allowedTimes) then
             currentTime = allowedTimes[index]
             index = index + 1
@@ -4117,8 +4128,8 @@ function selectByChordSizes(menuVars)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     notes = sort(notes, sortAscendingNoteLaneTime)
     local noteTimeTable = {}
-    for k37 = 1, #notes do
-        local note = notes[k37]
+    for k38 = 1, #notes do
+        local note = notes[k38]
         noteTimeTable[#noteTimeTable + 1] = note.StartTime
     end
     noteTimeTable = table.dedupe(noteTimeTable)
@@ -4126,13 +4137,13 @@ function selectByChordSizes(menuVars)
     for idx = 1, game.keyCount do
         sizeDict[#sizeDict + 1] = {}
     end
-    for k38 = 1, #noteTimeTable do
-        local time = noteTimeTable[k38]
+    for k39 = 1, #noteTimeTable do
+        local time = noteTimeTable[k39]
         local size = 0
         local curLane = 0
         local totalNotes = {}
-        for k39 = 1, #notes do
-            local note = notes[k39]
+        for k40 = 1, #notes do
+            local note = notes[k40]
             if (math.abs(note.StartTime - time) < 3) then
                 size = size + 1
                 curLane = curLane + 1
@@ -4158,8 +4169,8 @@ function selectByNoteType(menuVars)
     local totalNotes = game.getNotesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then totalNotes = state.SelectedHitObjects end
     local notesToSelect = {}
-    for k40 = 1, #totalNotes do
-        local note = totalNotes[k40]
+    for k41 = 1, #totalNotes do
+        local note = totalNotes[k41]
         if (note.EndTime == 0 and menuVars.rice) then notesToSelect[#notesToSelect + 1] = note end
         if (note.EndTime ~= 0 and menuVars.ln) then notesToSelect[#notesToSelect + 1] = note end
     end
@@ -4681,8 +4692,9 @@ function logoThread()
     if ((cache_logoStartTime < 3 and not globalVars.disableLoadup) or loaded) then
         if (currentTime >= 0 and currentTime <= logoLength) then
             drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
-                color.vctr.black, 4,
-                { color.vctr.purple, color.vctr.purple / 2 + color.vctr.white / 2 })
+                globalVars.customStyle.loadupOpeningTextColor or DEFAULT_STYLE.loadupOpeningTextColor, 4,
+                { globalVars.customStyle.loadupPulseTextColorLeft or DEFAULT_STYLE.loadupPulseTextColorLeft, globalVars
+                .customStyle.loadupPulseTextColorRight or DEFAULT_STYLE.loadupPulseTextColorRight })
         end
     else
         cache_logoStartTime = clock.getTime() - 5
@@ -4701,6 +4713,7 @@ end
 function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thickness, pulseCol)
     if (currentTime < 0) then return end
     if (currentTime > logoLength) then return end
+    local customStyle = globalVars.customStyle
     local location = windowSize / 2
     local timeProgress = (currentTime % logoLength / logoLength)
     local curvature1 = 0.4
@@ -4713,12 +4726,14 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
     end
     progress = progress * 0.5
     local bgStrength = 4 * (progress - progress * progress)
-    local colTl = color.rgbaToUint(20, 0, 20, 100 * bgStrength)
-    local colTrBl = color.rgbaToUint(40, 0, 40, 170 * bgStrength)
-    local colBr = color.rgbaToUint(60, 0, 60, 255 * bgStrength)
+    local alphaStrengthFactor = vector.New(1, 1, 1, bgStrength)
+    local colTl = color.vrgbaToUint((customStyle.loadupBgTl or DEFAULT_STYLE.loadupBgTl) * alphaStrengthFactor)
+    local colTr = color.vrgbaToUint((customStyle.loadupBgTr or DEFAULT_STYLE.loadupBgTr) * alphaStrengthFactor)
+    local colBl = color.vrgbaToUint((customStyle.loadupBgBl or DEFAULT_STYLE.loadupBgBl) * alphaStrengthFactor)
+    local colBr = color.vrgbaToUint((customStyle.loadupBgBr or DEFAULT_STYLE.loadupBgBr) * alphaStrengthFactor)
     local textStrength = math.min(1, progress * 2, (1 - progress) * 2)
     col = col - (1 - textStrength) * color.vctr.black
-    ctx.AddRectFilledMultiColor(vctr2(0), windowSize, colTl, colTrBl, colBr, colTrBl)
+    ctx.AddRectFilledMultiColor(vctr2(0), windowSize, colTl, colTr, colBr, colBl)
     local t0, t1
     local trueProgress = progress * 2
     if (trueProgress < 1) then
@@ -10287,8 +10302,8 @@ function showAppearanceSettings()
     if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
         setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
         local customStyle = {}
-        for k41 = 1, #customStyleIds do
-            local id = customStyleIds[k41]
+        for k42 = 1, #customStyleIds do
+            local id = customStyleIds[k42]
             customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[id:capitalize()])) / vctr4(255)
         end
         globalVars.customStyle = customStyle
@@ -10322,7 +10337,7 @@ function showAppearanceSettings()
     if (not globalVars.useCustomPulseColor) then imgui.BeginDisabled() end
     KeepSameLine()
     if (imgui.Button("Edit Color")) then
-        state.SetValue("showColorPicker", true)
+        state.SetValue("showColorPicker", not state.GetValue("showColorPicker", false))
     end
     if (state.GetValue("showColorPicker")) then
         choosePulseColor()
@@ -10373,6 +10388,13 @@ customStyleIds = {
     "plotLinesHovered",
     "plotHistogram",
     "plotHistogramHovered",
+    "loadupOpeningTextColor",
+    "loadupPulseTextColorLeft",
+    "loadupPulseTextColorRight",
+    "loadupBgTl",
+    "loadupBgTr",
+    "loadupBgBl",
+    "loadupBgBr",
 }
 local customStyleNames = {
     "Window BG",
@@ -10405,7 +10427,14 @@ local customStyleNames = {
     "Plot Lines",
     "Plot Lines\n(Hovered)",
     "Plot Histogram",
-    "Plot Histogram\n(Hovered)"
+    "Plot Histogram\n(Hovered)",
+    "Loadup\nOpening Text",
+    "Loadup Pulse\nText (Left)",
+    "Loadup Pulse\nText (Right)",
+    "Loadup BG\n(Top Left)",
+    "Loadup BG\n(Top Right)",
+    "Loadup BG\n(Bottom Left)",
+    "Loadup BG\n(Bottom Right)",
 }
 function showCustomThemeSettings()
     local settingsChanged = false
@@ -10471,8 +10500,8 @@ end
 function stringifyCustomStyle(customStyle)
     local keys = table.keys(customStyle)
     local resultStr = "v2 "
-    for k42 = 1, #keys do
-        local key = keys[k42]
+    for k43 = 1, #keys do
+        local key = keys[k43]
         local value = customStyle[key]
         keyId = convertStrToShort(key)
         local r = math.floor(value.x * 255)
@@ -12865,8 +12894,8 @@ end
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for k43 = 1, #svs do
-        local sv = svs[k43]
+    for k44 = 1, #svs do
+        local sv = svs[k44]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
         if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
     end

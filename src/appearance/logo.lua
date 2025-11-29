@@ -15,8 +15,9 @@ function logoThread()
     if ((cache_logoStartTime < 3 and not globalVars.disableLoadup) or loaded) then
         if (currentTime >= 0 and currentTime <= logoLength) then
             drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
-                color.vctr.black, 4,
-                { color.vctr.purple, color.vctr.purple / 2 + color.vctr.white / 2 })
+                globalVars.customStyle.loadupOpeningTextColor or DEFAULT_STYLE.loadupOpeningTextColor, 4,
+                { globalVars.customStyle.loadupPulseTextColorLeft or DEFAULT_STYLE.loadupPulseTextColorLeft, globalVars
+                .customStyle.loadupPulseTextColorRight or DEFAULT_STYLE.loadupPulseTextColorRight })
         end
     else
         cache_logoStartTime = clock.getTime() - 5
@@ -37,6 +38,8 @@ end
 function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thickness, pulseCol)
     if (currentTime < 0) then return end
     if (currentTime > logoLength) then return end
+    local customStyle = globalVars.customStyle
+
     local location = windowSize / 2
     local timeProgress = (currentTime % logoLength / logoLength)
 
@@ -54,15 +57,17 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
     progress = progress * 0.5
 
     local bgStrength = 4 * (progress - progress * progress)
-    local colTl = color.rgbaToUint(20, 0, 20, 100 * bgStrength)
-    local colTrBl = color.rgbaToUint(40, 0, 40, 170 * bgStrength)
-    local colBr = color.rgbaToUint(60, 0, 60, 255 * bgStrength)
+    local alphaStrengthFactor = vector.New(1, 1, 1, bgStrength)
+    local colTl = color.vrgbaToUint((customStyle.loadupBgTl or DEFAULT_STYLE.loadupBgTl) * alphaStrengthFactor)
+    local colTr = color.vrgbaToUint((customStyle.loadupBgTr or DEFAULT_STYLE.loadupBgTr) * alphaStrengthFactor)
+    local colBl = color.vrgbaToUint((customStyle.loadupBgBl or DEFAULT_STYLE.loadupBgBl) * alphaStrengthFactor)
+    local colBr = color.vrgbaToUint((customStyle.loadupBgBr or DEFAULT_STYLE.loadupBgBr) * alphaStrengthFactor)
 
     local textStrength = math.min(1, progress * 2, (1 - progress) * 2)
 
     col = col - (1 - textStrength) * color.vctr.black
 
-    ctx.AddRectFilledMultiColor(vctr2(0), windowSize, colTl, colTrBl, colBr, colTrBl)
+    ctx.AddRectFilledMultiColor(vctr2(0), windowSize, colTl, colTr, colBr, colBl)
 
     local t0, t1
     local trueProgress = progress * 2

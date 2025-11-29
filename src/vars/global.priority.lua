@@ -78,10 +78,15 @@ function setGlobalVars(tempGlobalVars)
     globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
     globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
     globalVars.customStyle = tempGlobalVars.customStyle or {}
-    if (globalVars.customStyle.border) then
-        globalVars.customStyle.border = table.vectorize4(globalVars.customStyle
-            .border)
+
+    local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
+        "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
+    for _, key in ipairs(forceVectorizeList) do
+        if (globalVars.customStyle[key]) then
+            globalVars.customStyle[key] = table.vectorize4(globalVars.customStyle[key])
+        end
     end
+
     globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
     globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
     globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)

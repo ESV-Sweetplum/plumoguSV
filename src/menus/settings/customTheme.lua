@@ -30,6 +30,13 @@ customStyleIds = {
     "plotLinesHovered",
     "plotHistogram",
     "plotHistogramHovered",
+    "loadupOpeningTextColor",
+    "loadupPulseTextColorLeft",
+    "loadupPulseTextColorRight",
+    "loadupBgTl",
+    "loadupBgTr",
+    "loadupBgBl",
+    "loadupBgBr",
 }
 
 local customStyleNames = {
@@ -63,7 +70,14 @@ local customStyleNames = {
     "Plot Lines",
     "Plot Lines\n(Hovered)",
     "Plot Histogram",
-    "Plot Histogram\n(Hovered)"
+    "Plot Histogram\n(Hovered)",
+    "Loadup\nOpening Text",
+    "Loadup Pulse\nText (Left)",
+    "Loadup Pulse\nText (Right)",
+    "Loadup BG\n(Top Left)",
+    "Loadup BG\n(Top Right)",
+    "Loadup BG\n(Bottom Left)",
+    "Loadup BG\n(Bottom Right)",
 }
 
 function showCustomThemeSettings()
