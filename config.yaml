@@ -204,6 +204,41 @@ customStyle:
   - 0.57999998331069946
   - 0.69999998807907104
   - 1
+  loadupOpeningTextColor:
+  - 0
+  - 0
+  - 0
+  - 1
+  loadupPulseTextColorLeft:
+  - 0.5
+  - 0
+  - 1
+  - 1
+  loadupPulseTextColorRight:
+  - 0.75
+  - 0.25
+  - 1
+  - 1
+  loadupBgTl:
+  - 0.078431375324726105
+  - 0
+  - 0.078431375324726105
+  - 0.38823530077934265
+  loadupBgTr:
+  - 0.15999999642372131
+  - 0
+  - 0.15999999642372131
+  - 0.67000001668930054
+  loadupBgBl:
+  - 0.15999999642372131
+  - 0
+  - 0.15999999642372131
+  - 0.67000001668930054
+  loadupBgBr:
+  - 0.25
+  - 0
+  - 0.25
+  - 1
 dontPrintCreation: false
 equalizeLinear: true
 comboizeSelect: true
