@@ -21,7 +21,8 @@ end
 ---@param col Vector4
 ---@return integer
 function color.vrgbaToUint(col)
-    return color.rgbaToUint(col.x, col.y, col.z, col.w)
+    local flr = math.floor
+    return color.rgbaToUint(flr(col.x * 255), flr(col.y * 255), flr(col.z * 255), flr(col.w * 255))
 end
 
 ---Converts an unsigned integer to a Vector4 of color values (0-1 for each element).

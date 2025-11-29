@@ -39,7 +39,7 @@ color.int.blue = 4294901760
 color.vctr.purple = vector.New(1, 0, 1, 1)
 color.vctr.light_purple = vector.New(1, 0.5, 1, 1)
 
-color.int.purple = 4294902015
+color.int.purple = 4294901887
 
 color.vctr.magenta = vector.New(1, 0, 0.5, 1)
 color.vctr.light_magenta = vector.New(1, 0.5, 0.75, 1)
