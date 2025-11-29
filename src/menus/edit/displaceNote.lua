@@ -3,7 +3,6 @@ function displaceNoteMenu()
     displaceNoteSettingsMenu(menuVars)
     cache.saveTable("displaceNoteMenu", menuVars)
 
-    AddSeparator()
     simpleActionMenu("Displace selected notes", 1, displaceNoteSVsParent, menuVars)
 end
 

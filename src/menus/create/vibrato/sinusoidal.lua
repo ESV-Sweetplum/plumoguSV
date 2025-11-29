@@ -9,8 +9,6 @@ function sinusoidalVibratoMenu(menuVars, settingVars, separateWindow)
                 t * (settingVars.endMsx - settingVars.startMsx)) + settingVars.verticalShift
         end
 
-        AddSeparator()
-
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
         end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
@@ -35,7 +33,6 @@ function sinusoidalVibratoMenu(menuVars, settingVars, separateWindow)
             end
             return settingVars.higherStart + t * (settingVars.higherEnd - settingVars.higherStart)
         end
-        AddSeparator()
 
         simpleActionMenu("Vibrate", 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
             separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)

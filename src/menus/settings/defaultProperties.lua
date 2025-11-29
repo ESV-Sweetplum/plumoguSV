@@ -56,7 +56,7 @@ function showDefaultPropertiesSettings()
     local editFnList = {
         addTeleportSettingsMenu,
         changeGroupsSettingsMenu,
-        nil,
+        completeDuplicateSettingsMenu,
         convertSVSSFSettingsMenu,
         copyNPasteSettingsMenu,
         nil,

@@ -3,7 +3,6 @@ function selectBySnapMenu()
     BasicInputInt(menuVars, "snap", "Snap", { 1, 100 })
     cache.saveTable("selectBySnapMenu", menuVars)
 
-    AddSeparator()
     simpleActionMenu(
         "Select notes with 1/" .. menuVars.snap .. " snap",
         2,

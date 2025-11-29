@@ -5,9 +5,7 @@ function reverseScrollMenu()
 
     cache.saveTable("reverseScrollMenu", menuVars)
 
-    AddSeparator()
-    local buttonText = "Reverse scroll between selected notes"
-    simpleActionMenu(buttonText, 2, reverseScrollSVs, menuVars)
+    simpleActionMenu("Reverse scroll between selected notes", 2, reverseScrollSVs, menuVars)
 end
 
 function reverseScrollSettingsMenu(menuVars)

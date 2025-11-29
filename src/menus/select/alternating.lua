@@ -4,7 +4,6 @@ function selectAlternatingMenu()
     BasicInputInt(menuVars, "offset", "From note #__", { 1, menuVars.every })
     cache.saveTable("selectAlternatingMenu", menuVars)
 
-    AddSeparator()
     simpleActionMenu(
         "Select a note every " ..
         menuVars.every .. pluralize(" note, from note #", menuVars.every, 5) .. menuVars.offset,

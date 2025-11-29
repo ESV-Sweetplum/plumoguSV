@@ -44,7 +44,6 @@ function dynamicScaleMenu()
     cache.saveTable(currentSVType .. "DynamicScaleSettings", settingVars)
     cache.saveTable("dynamicScaleMenu", menuVars)
 
-    AddSeparator()
     simpleActionMenu("Scale spacing between assigned notes", 0, dynamicScaleSVs, menuVars)
 end
 

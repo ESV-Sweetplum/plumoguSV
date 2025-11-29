@@ -37,7 +37,6 @@ function placeStandardSVMenu()
         menuVars.svMultipliers, nil, false)
 
     menuVars.settingVars = settingVars
-    AddSeparator()
     if (STANDARD_SVS[menuVars.svTypeIndex] == "Exponential" and settingVars.distanceMode == 2) then
         simpleActionMenu("Place SVs between selected notes##Exponential", 2, placeExponentialSpecialSVs, menuVars)
     else

@@ -14,7 +14,6 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
                 (1 - math.clamp(math.evaluatePolynomial(settingVars.plotCoefficients, t * size) / size, 0, 1)) +
                 settingVars.endMsx -- Reversed due to the way imgui draws
         end
-        AddSeparator()
 
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)

@@ -8,6 +8,7 @@
 ---@param optionalKeyOverride? string (Assumes `disableKeyInput` is false) Optional string to change the activation keybind.
 function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNoteReq, disableKeyInput,
                           optionalKeyOverride)
+    if (not hideNoteReq) then AddSeparator() end
     local enoughSelectedNotes = checkEnoughSelectedNotes(minimumNotes)
     local infoText = table.concat({ "Select ", minimumNotes, " or more ", pluralize("note", minimumNotes) })
     if (not enoughSelectedNotes) then

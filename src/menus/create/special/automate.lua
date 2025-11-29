@@ -11,7 +11,7 @@ function automateSVMenu(settingVars)
     FunctionButton("Clear copied items", ACTION_BUTTON_SIZE, clearAutomateSVs, settingVars)
     AddSeparator()
     automateSVSettingsMenu(settingVars)
-    AddSeparator()
+
     simpleActionMenu("Automate SVs for selected notes", 2, automateSVs, settingVars)
 end
 

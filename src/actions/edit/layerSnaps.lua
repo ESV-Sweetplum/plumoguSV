@@ -27,7 +27,7 @@ function layerSnaps()
     local layerDict = {}
     local originalLayerNames = table.property(map.EditorLayers, "Name")
     local layerNames = table.duplicate(originalLayerNames)
-    local notes = game.uniqueNotesBetweenSelected()
+    local notes = map.HitObjects
     for _, ho in ipairs(notes) do
         local color = COLOR_MAP[game.getSnapAt(ho.StartTime)]
         if (ho.EditorLayer == 0) then

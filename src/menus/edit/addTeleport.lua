@@ -3,7 +3,6 @@ function addTeleportMenu()
     addTeleportSettingsMenu(menuVars)
     cache.saveTable("addTeleportMenu", menuVars)
 
-    AddSeparator()
     simpleActionMenu("Add teleport SVs at selected notes", 1, addTeleportSVs, menuVars)
 end
 

@@ -48,7 +48,8 @@ DEFAULT_STARTING_MENU_VARS = {
         objects = {},
         svTbl = {},
         ssfTbl = {},
-        msOffset = 0
+        msOffset = 0,
+        dontCloneHos = false
     },
     convertSVSSF = {
         conversionDirection = true

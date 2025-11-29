@@ -4,7 +4,6 @@ function stutterMenu(settingVars)
     if settingsChanged then updateStutterMenuSVs(settingVars) end
     displayStutterSVWindows(settingVars)
 
-    AddSeparator()
     simpleActionMenu("Place SVs between selected notes", 2, placeStutterSVs, settingVars)
 end
 

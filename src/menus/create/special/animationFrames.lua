@@ -40,9 +40,7 @@ function animationFramesSetupMenu(settingVars)
         HelpMarker("This is technically an edit SV tool, but it replaces the old animate function")
         HelpMarker("Make sure to prepare an empty area for the frames after the note you select")
         HelpMarker("Note: frame positions and viewing them will break if SV distances change")
-        AddSeparator()
-        local label = "Setup frames after selected note"
-        simpleActionMenu(label, 1, displaceNotesForAnimationFrames, settingVars)
+        simpleActionMenu("Setup frames after selected note", 1, displaceNotesForAnimationFrames, settingVars)
     end
 end
 

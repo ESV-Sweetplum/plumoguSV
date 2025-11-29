@@ -1,5 +1,6 @@
 function completeDuplicateMenu()
     local menuVars = getMenuVars("completeDuplicate")
+    completeDuplicateSettingsMenu(menuVars)
 
     local copiedItemCount = #menuVars.objects
 
@@ -13,4 +14,9 @@ function completeDuplicateMenu()
 
     simpleActionMenu("Paste items at selected notes", 1, placeDuplicateItems, menuVars)
     cache.saveTable("completeDuplicateMenu", menuVars)
+end
+
+function completeDuplicateSettingsMenu(menuVars)
+    BasicCheckbox(menuVars, "dontCloneHos", "Don't Clone Notes",
+        "If true, will not copy notes during the complete duplicate process.")
 end

@@ -1837,7 +1837,8 @@ DEFAULT_STARTING_MENU_VARS = {
         objects = {},
         svTbl = {},
         ssfTbl = {},
-        msOffset = 0
+        msOffset = 0,
+        dontCloneHos = false
     },
     convertSVSSF = {
         conversionDirection = true
@@ -3428,7 +3429,7 @@ function layerSnaps()
     local layerDict = {}
     local originalLayerNames = table.property(map.EditorLayers, "Name")
     local layerNames = table.duplicate(originalLayerNames)
-    local notes = game.uniqueNotesBetweenSelected()
+    local notes = map.HitObjects
     for k25 = 1, #notes do
         local ho = notes[k25]
         local color = COLOR_MAP[game.getSnapAt(ho.StartTime)]
@@ -7045,6 +7046,7 @@ end
 ---@param optionalKeyOverride? string (Assumes `disableKeyInput` is false) Optional string to change the activation keybind.
 function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNoteReq, disableKeyInput,
                           optionalKeyOverride)
+    if (not hideNoteReq) then AddSeparator() end
     local enoughSelectedNotes = checkEnoughSelectedNotes(minimumNotes)
     local infoText = table.concat({ "Select ", minimumNotes, " or more ", pluralize("note", minimumNotes) })
     if (not enoughSelectedNotes) then
@@ -7351,9 +7353,7 @@ function animationFramesSetupMenu(settingVars)
         HelpMarker("This is technically an edit SV tool, but it replaces the old animate function")
         HelpMarker("Make sure to prepare an empty area for the frames after the note you select")
         HelpMarker("Note: frame positions and viewing them will break if SV distances change")
-        AddSeparator()
-        local label = "Setup frames after selected note"
-        simpleActionMenu(label, 1, displaceNotesForAnimationFrames, settingVars)
+        simpleActionMenu("Setup frames after selected note", 1, displaceNotesForAnimationFrames, settingVars)
     end
 end
 function removeSelectedFrameTimeButton(settingVars)
@@ -7489,7 +7489,6 @@ function automateSVMenu(settingVars)
     FunctionButton("Clear copied items", ACTION_BUTTON_SIZE, clearAutomateSVs, settingVars)
     AddSeparator()
     automateSVSettingsMenu(settingVars)
-    AddSeparator()
     simpleActionMenu("Automate SVs for selected notes", 2, automateSVs, settingVars)
 end
 function automateSVSettingsMenu(settingVars)
@@ -7550,7 +7549,6 @@ function stutterMenu(settingVars)
     settingsChanged = stutterSettingsMenu(settingVars) or settingsChanged
     if settingsChanged then updateStutterMenuSVs(settingVars) end
     displayStutterSVWindows(settingVars)
-    AddSeparator()
     simpleActionMenu("Place SVs between selected notes", 2, placeStutterSVs, settingVars)
 end
 function stutterSettingsMenu(settingVars)
@@ -7575,7 +7573,6 @@ function stutterSettingsMenu(settingVars)
 end
 function teleportStutterMenu(settingVars)
     teleportStutterSettingsMenu(settingVars)
-    AddSeparator()
     simpleActionMenu("Place SVs between selected notes", 2, placeTeleportStutterSVs, settingVars)
 end
 function teleportStutterSettingsMenu(settingVars)
@@ -7625,7 +7622,6 @@ function placeStandardSVMenu()
     makeSVInfoWindow("SV Info", menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
         menuVars.svMultipliers, nil, false)
     menuVars.settingVars = settingVars
-    AddSeparator()
     if (STANDARD_SVS[menuVars.svTypeIndex] == "Exponential" and settingVars.distanceMode == 2) then
         simpleActionMenu("Place SVs between selected notes##Exponential", 2, placeExponentialSpecialSVs, menuVars)
     else
@@ -7660,7 +7656,6 @@ function placeStillSVMenu()
     startNextWindowNotCollapsed("SV Info")
     makeSVInfoWindow("SV Info", menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
         menuVars.svMultipliers, nil, false)
-    AddSeparator()
     menuVars.settingVars = settingVars
     simpleActionMenu("Place SVs between selected notes", 2, placeStillSVsParent, menuVars)
     cache.saveTable(currentSVType .. "StillSettings", settingVars)
@@ -7672,7 +7667,6 @@ function customVibratoMenu(menuVars, settingVars, separateWindow)
         typingCode = CodeInput(settingVars, "code", "##code",
             "This input should return a function that takes in a number t=[0-1], and returns a value corresponding to the msx value of the vibrato at (100t)% of the way through the first and last selected note times.")
         local func = eval(settingVars.code)
-        AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
         end, menuVars, false, typingCode, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
@@ -7684,7 +7678,6 @@ function customVibratoMenu(menuVars, settingVars, separateWindow)
             typingCode
         local func1 = eval(settingVars.code1)
         local func2 = eval(settingVars.code2)
-        AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             ssfVibrato(v, func1, func2)
         end, menuVars, false, typingCode, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
@@ -7705,7 +7698,6 @@ function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
             return settingVars.endMsx * t +
                 settingVars.startMsx * (1 - t)
         end
-        AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
         end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
@@ -7732,7 +7724,6 @@ function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
             end
             return settingVars.higherStart + t * (settingVars.higherEnd - settingVars.higherStart)
         end
-        AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
             separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     end
@@ -7743,7 +7734,6 @@ function linearVibratoMenu(menuVars, settingVars, separateWindow)
         local func = function(t)
             return settingVars.endMsx * t + settingVars.startMsx * (1 - t)
         end
-        AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
         end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
@@ -7756,7 +7746,6 @@ function linearVibratoMenu(menuVars, settingVars, separateWindow)
         local func2 = function(t)
             return settingVars.higherStart + t * (settingVars.higherEnd - settingVars.higherStart)
         end
-        AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
             separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     end
@@ -7812,7 +7801,6 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
                 (1 - math.clamp(math.evaluatePolynomial(settingVars.plotCoefficients, t * size) / size, 0, 1)) +
                 settingVars.endMsx
         end
-        AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
         end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
@@ -7916,7 +7904,6 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
             t = t * 0.5
             return settingVars.startMsx + t * (settingVars.endMsx - settingVars.startMsx)
         end
-        AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
         end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
@@ -7961,7 +7948,6 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
             t = t * 0.5
             return settingVars.higherStart + t * (settingVars.higherEnd - settingVars.higherStart)
         end
-        AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
             separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     end
@@ -7976,7 +7962,6 @@ function sinusoidalVibratoMenu(menuVars, settingVars, separateWindow)
             return math.sin(2 * math.pi * (settingVars.periods * t + settingVars.periodsShift)) * (settingVars.startMsx +
                 t * (settingVars.endMsx - settingVars.startMsx)) + settingVars.verticalShift
         end
-        AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v)
             svVibrato(v, func)
         end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
@@ -8000,7 +7985,6 @@ function sinusoidalVibratoMenu(menuVars, settingVars, separateWindow)
             end
             return settingVars.higherStart + t * (settingVars.higherEnd - settingVars.higherStart)
         end
-        AddSeparator()
         simpleActionMenu("Vibrate", 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
             separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     end
@@ -8026,7 +8010,6 @@ function addTeleportMenu()
     local menuVars = getMenuVars("addTeleport")
     addTeleportSettingsMenu(menuVars)
     cache.saveTable("addTeleportMenu", menuVars)
-    AddSeparator()
     simpleActionMenu("Add teleport SVs at selected notes", 1, addTeleportSVs, menuVars)
 end
 function addTeleportSettingsMenu(menuVars)
@@ -8036,7 +8019,6 @@ end
 function changeGroupsMenu()
     local menuVars = getMenuVars("changeGroups")
     local action = changeGroupsSettingsMenu(menuVars)
-    AddSeparator()
     cache.saveTable("changeGroupsMenu", menuVars)
     simpleActionMenu(table.concat({ action, " items to ", menuVars.designatedTimingGroup }), 2, changeGroups, menuVars)
 end
@@ -8053,6 +8035,7 @@ function changeGroupsSettingsMenu(menuVars)
 end
 function completeDuplicateMenu()
     local menuVars = getMenuVars("completeDuplicate")
+    completeDuplicateSettingsMenu(menuVars)
     local copiedItemCount = #menuVars.objects
     if (copiedItemCount == 0) then
         simpleActionMenu("Copy items between selected notes", 2, storeDuplicateItems, menuVars)
@@ -8063,6 +8046,10 @@ function completeDuplicateMenu()
     end
     simpleActionMenu("Paste items at selected notes", 1, placeDuplicateItems, menuVars)
     cache.saveTable("completeDuplicateMenu", menuVars)
+end
+function completeDuplicateSettingsMenu(menuVars)
+    BasicCheckbox(menuVars, "dontCloneHos", "Don't Clone Notes",
+        "If true, will not copy notes during the complete duplicate process.")
 end
 function convertSVSSFMenu()
     local menuVars = getMenuVars("convertSVSSF")
@@ -8120,85 +8107,10 @@ function copyNPasteSettingsMenu(menuVars, actionable)
     imgui.PopItemWidth()
     return copiedItemCount
 end
-function updateDirectEdit()
-    local offsets = game.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets) and not truthy(state.GetValue("lists.directSVList"))) then return end
-    local firstOffset = offsets[1]
-    local lastOffset = offsets[#offsets]
-    if (not truthy(offsets)) then
-        state.SetValue("lists.directSVList", {})
-        return
-    end
-    state.SetValue("lists.directSVList", game.getSVsBetweenOffsets(firstOffset - 50, lastOffset + 50))
-end
-function directSVMenu()
-    local menuVars = getMenuVars("directSV")
-    if (clock.listen("directSV", 300)) then
-        updateDirectEdit()
-    end
-    local svs = state.GetValue("lists.directSVList") or {}
-    if (not truthy(svs)) then
-        menuVars.selectableIndex = 1
-        if (not truthy(state.SelectedHitObjects)) then imgui.TextWrapped("Select a note to view local SVs.") else imgui
-                .TextWrapped("There are no SVs in this area.") end
-        return
-    end
-    if (menuVars.selectableIndex > #svs) then menuVars.selectableIndex = #svs end
-    _, menuVars.startTime = imgui.InputFloat("Start Time", svs[menuVars.selectableIndex].StartTime)
-    if (imgui.IsItemDeactivatedAfterEdit()) then
-        actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
-            createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime or 0, menuVars.multiplier)) })
-    end
-    _, menuVars.multiplier = imgui.InputFloat("Multiplier", svs[menuVars.selectableIndex].Multiplier)
-    if (imgui.IsItemDeactivatedAfterEdit()) then
-        actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
-            createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime, menuVars.multiplier or 1)) })
-    end
-    imgui.Separator()
-    if (imgui.ArrowButton("##DirectSVLeft", imgui_dir.Left)) then
-        menuVars.pageNumber = math.clamp(menuVars.pageNumber - 1, 1, math.ceil(#svs * 0.1))
-    end
-    KeepSameLine()
-    imgui.Text("Page ")
-    KeepSameLine()
-    imgui.SetNextItemWidth(100)
-    _, menuVars.pageNumber = imgui.InputInt("##PageNum", math.clamp(menuVars.pageNumber, 1, math.ceil(#svs * 0.1)), 0)
-    KeepSameLine()
-    imgui.Text(" of " .. math.ceil(#svs * 0.1))
-    KeepSameLine()
-    if (imgui.ArrowButton("##DirectSVRight", imgui_dir.Right)) then
-        menuVars.pageNumber = math.clamp(menuVars.pageNumber + 1, 1, math.ceil(#svs * 0.1))
-    end
-    imgui.Separator()
-    imgui.Text("Start Time")
-    KeepSameLine()
-    imgui.SetCursorPosX(150)
-    imgui.Text("Multiplier")
-    imgui.Separator()
-    local startingPoint = 10 * menuVars.pageNumber - 10
-    imgui.BeginTable("Test", 2)
-    for idx, v in pairs(table.slice(svs, startingPoint + 1, startingPoint + 10)) do
-        imgui.PushID(idx)
-        imgui.TableNextRow()
-        imgui.TableSetColumnIndex(0)
-        imgui.Selectable(tostring(math.round(v.StartTime, 2)), menuVars.selectableIndex == idx,
-            imgui_selectable_flags.SpanAllColumns)
-        if (imgui.IsItemClicked()) then
-            menuVars.selectableIndex = idx + startingPoint
-        end
-        imgui.TableSetColumnIndex(1)
-        imgui.SetCursorPosX(150)
-        imgui.Text(tostring(math.round(v.Multiplier, 2)));
-        imgui.PopID()
-    end
-    imgui.EndTable()
-    cache.saveTable("directSVMenu", menuVars)
-end
 function displaceNoteMenu()
     local menuVars = getMenuVars("displaceNote")
     displaceNoteSettingsMenu(menuVars)
     cache.saveTable("displaceNoteMenu", menuVars)
-    AddSeparator()
     simpleActionMenu("Displace selected notes", 1, displaceNoteSVsParent, menuVars)
 end
 function displaceNoteSettingsMenu(menuVars)
@@ -8209,7 +8121,6 @@ function displaceViewMenu()
     local menuVars = getMenuVars("displaceView")
     displaceViewSettingsMenu(menuVars)
     cache.saveTable("displaceViewMenu", menuVars)
-    AddSeparator()
     simpleActionMenu("Displace view between selected notes", 2, displaceViewSVs, menuVars)
 end
 function displaceViewSettingsMenu(menuVars)
@@ -8255,7 +8166,6 @@ function dynamicScaleMenu()
     local labelText = currentSVType .. "DynamicScale"
     cache.saveTable(currentSVType .. "DynamicScaleSettings", settingVars)
     cache.saveTable("dynamicScaleMenu", menuVars)
-    AddSeparator()
     simpleActionMenu("Scale spacing between assigned notes", 0, dynamicScaleSVs, menuVars)
 end
 function clearNoteTimesButton(menuVars)
@@ -8270,7 +8180,6 @@ function flickerMenu()
     local menuVars = getMenuVars("flicker")
     flickerSettingsMenu(menuVars)
     cache.saveTable("flickerMenu", menuVars)
-    AddSeparator()
     simpleActionMenu("Add flicker SVs between selected notes", 2, flickerSVs, menuVars)
 end
 function flickerSettingsMenu(menuVars)
@@ -8281,25 +8190,32 @@ function flickerSettingsMenu(menuVars)
     if (globalVars.advancedMode) then chooseFlickerPosition(menuVars) end
 end
 function layerSnapMenu()
-    simpleActionMenu("Layer snaps between selection", 2, layerSnaps, nil, false, true)
+    simpleActionMenu("Layer snaps throughout map", 0, layerSnaps, nil, true, true)
     AddSeparator()
-    simpleActionMenu("Collapse snap layers", 0, collapseSnaps, nil, false, true)
-    simpleActionMenu("Clear unused snap layers", 0, clearSnappedLayers, nil, false, true)
+    simpleActionMenu("Collapse snap layers", 0, collapseSnaps, nil, true, true)
+    simpleActionMenu("Clear unused snap layers", 0, clearSnappedLayers, nil, true, true)
 end
 function lintMapMenu()
-    simpleActionMenu("Align timing lines in this region", 0, alignTimingLines, nil, false, true)
+    simpleActionMenu("Align timing lines in this region", 0, alignTimingLines, nil, true, true)
     HoverToolTip(
         "Sometimes, due to rounding errors with BPMs, timing lines don't show up where 1/1 snapped notes should be. This will fix that within the entire timing line region you are currently in.")
     AddSeparator()
-    simpleActionMenu("Fix flipped LN ends", 0, fixFlippedLNEnds, nil, false, true)
+    simpleActionMenu("Fix flipped LN ends", 0, fixFlippedLNEnds, nil, true, true)
     HoverToolTip(
         "If there is a negative SV at an LN end, the LN end will be flipped. This is noticable especially for arrow skins and is jarring. This tool will fix that.")
-    AddSeparator()
     simpleActionMenu("Merge duplicate SVs", 0, mergeSVs, nil, false, true)
-    simpleActionMenu("Merge duplicate SSFs", 0, mergeSSFs, nil, false, true)
+    HoverToolTip(
+        "(DOESN'T VISUALLY AFFECT MAP) removes SVs that are on the same time as others. Note that Quaver always renders the second SV in the internal SV list, and this tool will only ever remove the first duplicate SV, so nothing in the map should change. If something does change, please message @kvrosakura on Discord with the map.")
+    simpleActionMenu("Merge duplicate SSFs", 0, mergeSSFs, nil, true, true)
+    HoverToolTip(
+        "(DOESN'T VISUALLY AFFECT MAP) removes SSFs that are on the same time as others. Note that Quaver always renders the second SSF in the internal SSF list, and this tool will only ever remove the first duplicate SSF, so nothing in the map should change. If something does change, please message @kvrosakura on Discord with the map.")
     simpleActionMenu("Remove unnecessary SVs", 0, removeUnnecessarySVs, nil, false, true)
-    simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, false, true)
-    simpleActionMenu("Remove all hitsounds", 0, removeAllHitSounds, nil, false, true)
+    HoverToolTip(
+        "(DOESN'T VISUALLY AFFECT MAP) If two consecutive SVs have the same multiplier, removes the second SV.")
+    simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, true, true)
+    HoverToolTip("Removes stacked notes.")
+    simpleActionMenu("Remove all hitsounds", 0, removeAllHitSounds, nil, true, true)
+    HoverToolTip("Self-explanatory.")
 end
 EDIT_SV_TOOLS = {
     "Add Teleport",
@@ -8387,7 +8303,6 @@ function measureMenu()
     AddPadding()
     imgui.TextDisabled("*** Measuring disclaimer ***")
     HoverToolTip("Measured values might not be 100%% accurate & may not work on older maps")
-    AddSeparator()
     simpleActionMenu("Measure SVs between selected notes", 2, measureSVs, menuVars)
     cache.saveTable("measureMenu", menuVars)
 end
@@ -8432,9 +8347,7 @@ function reverseScrollMenu()
     local menuVars = getMenuVars("reverseScroll")
     reverseScrollSettingsMenu(menuVars)
     cache.saveTable("reverseScrollMenu", menuVars)
-    AddSeparator()
-    local buttonText = "Reverse scroll between selected notes"
-    simpleActionMenu(buttonText, 2, reverseScrollSVs, menuVars)
+    simpleActionMenu("Reverse scroll between selected notes", 2, reverseScrollSVs, menuVars)
 end
 function reverseScrollSettingsMenu(menuVars)
     chooseDistance(menuVars)
@@ -8444,17 +8357,13 @@ function scaleDisplaceMenu()
     local menuVars = getMenuVars("scaleDisplace")
     scaleDisplaceSettingsMenu(menuVars)
     cache.saveTable("scaleDisplaceMenu", menuVars)
-    AddSeparator()
-    local buttonText = "Scale SVs between selected notes##displace"
-    simpleActionMenu(buttonText, 2, scaleDisplaceSVs, menuVars)
+    simpleActionMenu("Scale SVs between selected notes##displace", 2, scaleDisplaceSVs, menuVars)
 end
 function scaleMultiplyMenu()
     local menuVars = getMenuVars("scaleMultiply")
     scaleMultiplySettingsMenu(menuVars)
     cache.saveTable("scaleMultiplyMenu", menuVars)
-    AddSeparator()
-    local buttonText = "Scale SVs between selected notes##multiply"
-    simpleActionMenu(buttonText, 2, scaleMultiplySVs, menuVars)
+    simpleActionMenu("Scale SVs between selected notes##multiply", 2, scaleMultiplySVs, menuVars)
 end
 function scaleDisplaceSettingsMenu(menuVars)
     menuVars.scaleSpotIndex = Combo("Displace Spot", DISPLACE_SCALE_SPOTS, menuVars.scaleSpotIndex)
@@ -8483,15 +8392,14 @@ function splitSettingsMenu(menuVars)
     end
 end
 function swapNotesMenu()
+    imgui.TextWrapped("Doesn't swap note temporal positions; instead, swaps their spatial positions with two displaces.")
     simpleActionMenu("Swap selected notes using SVs", 2, swapNoteSVs, nil)
 end
 function verticalShiftMenu()
     local menuVars = getMenuVars("verticalShift")
     verticalShiftSettingsMenu(menuVars)
     cache.saveTable("verticalShiftMenu", menuVars)
-    AddSeparator()
-    local buttonText = "Vertically shift SVs between selected notes"
-    simpleActionMenu(buttonText, 2, verticalShiftSVs, menuVars)
+    simpleActionMenu("Vertically shift SVs between selected notes", 2, verticalShiftSVs, menuVars)
 end
 function verticalShiftSettingsMenu(menuVars)
     chooseConstantShift(menuVars, 0)
@@ -10143,7 +10051,6 @@ function selectAlternatingMenu()
     BasicInputInt(menuVars, "every", "Every __ notes", { 1, MAX_SV_POINTS })
     BasicInputInt(menuVars, "offset", "From note #__", { 1, menuVars.every })
     cache.saveTable("selectAlternatingMenu", menuVars)
-    AddSeparator()
     simpleActionMenu(
         "Select a note every " ..
         menuVars.every .. pluralize(" note, from note #", menuVars.every, 5) .. menuVars.offset,
@@ -10269,7 +10176,6 @@ function selectBySnapMenu()
     local menuVars = getMenuVars("selectBySnap")
     BasicInputInt(menuVars, "snap", "Snap", { 1, 100 })
     cache.saveTable("selectBySnapMenu", menuVars)
-    AddSeparator()
     simpleActionMenu(
         table.concat({"Select notes with 1/", menuVars.snap, " snap"}),
         2,
@@ -10581,7 +10487,7 @@ function showDefaultPropertiesSettings()
     local editFnList = {
         addTeleportSettingsMenu,
         changeGroupsSettingsMenu,
-        nil,
+        completeDuplicateSettingsMenu,
         convertSVSSFSettingsMenu,
         copyNPasteSettingsMenu,
         nil,

@@ -12,7 +12,6 @@ function measureMenu()
     imgui.TextDisabled("*** Measuring disclaimer ***")
     HoverToolTip("Measured values might not be 100%% accurate & may not work on older maps")
 
-    AddSeparator()
     simpleActionMenu("Measure SVs between selected notes", 2, measureSVs, menuVars)
     cache.saveTable("measureMenu", menuVars)
 end

@@ -16,7 +16,7 @@ drawCapybara2: false
 drawCapybara312: false
 selectTypeIndex: 1
 placeTypeIndex: 1
-editToolIndex: 1
+editToolIndex: 3
 showPresetMenu: false
 scrollGroupIndex: 1
 hideSVInfo: false
@@ -529,6 +529,7 @@ defaultProperties:
       ssfTbl:
       - 
       msOffset: 0
+      dontCloneHos: true
     convertSVSSF:
       conversionDirection: true
     copyPaste:

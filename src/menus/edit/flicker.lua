@@ -5,7 +5,6 @@ function flickerMenu()
 
     cache.saveTable("flickerMenu", menuVars)
 
-    AddSeparator()
     simpleActionMenu("Add flicker SVs between selected notes", 2, flickerSVs, menuVars)
 end
 
