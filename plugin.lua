@@ -11,7 +11,7 @@ color = {
     int = {}
 }
 color.int.alphaMask = 16777216
-color.int.opaqueMask = color.int.alphaMask * 255
+color.int.opaqueMask = color.int.alphaMask
 color.int.redMask = 255
 color.int.greenMask = 65280
 color.int.blueMask = 16711680
@@ -82,12 +82,12 @@ end
 color.vctr.white = vector.New(1, 1, 1, 1)
 color.vctr.black = vector.New(0, 0, 0, 1)
 color.vctr.transparent = vector.New(0, 0, 0, 0)
-color.int.white = color.int.whiteMask + color.int.opaqueMask
-color.int.black = color.int.opaqueMask
+color.int.white = color.int.whiteMask * 255 + color.int.opaqueMask * 255
+color.int.black = color.int.opaqueMask * 255
 color.int.transparent = 0
 color.vctr.red = vector.New(1, 0, 0, 1)
 color.vctr.light_red = vector.New(1, 0.5, 0.5, 1)
-color.int.red = color.int.redMask + color.int.opaqueMask
+color.int.red = color.int.redMask + color.int.opaqueMask * 255
 color.vctr.orange = vector.New(1, 0.5, 0, 1)
 color.vctr.light_orange = vector.New(1, 0.75, 0.5, 1)
 color.int.orange = 4278222975
@@ -4681,7 +4681,7 @@ function logoThread()
     if ((cache_logoStartTime < 3 and not globalVars.disableLoadup) or loaded) then
         if (currentTime >= 0 and currentTime <= logoLength) then
             drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
-                color.int.white, 4,
+                color.vctr.black, 4,
                 { color.vctr.purple, color.vctr.purple / 2 + color.vctr.white / 2 })
         end
     else
@@ -4695,7 +4695,7 @@ end
 ---@param ctx ImDrawListPtr
 ---@param windowSize Vector2
 ---@param scale number
----@param col integer
+---@param col Vector4
 ---@param thickness integer
 ---@param pulseCol [Vector4, Vector4]
 function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thickness, pulseCol)
@@ -4717,7 +4717,7 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
     local colTrBl = color.rgbaToUint(40, 0, 40, 170 * bgStrength)
     local colBr = color.rgbaToUint(60, 0, 60, 255 * bgStrength)
     local textStrength = math.min(1, progress * 2, (1 - progress) * 2)
-    col = col - math.floor(255 * (1 - textStrength)) * color.int.alphaMask
+    col = col - (1 - textStrength) * color.vctr.black
     ctx.AddRectFilledMultiColor(vctr2(0), windowSize, colTl, colTrBl, colBr, colTrBl)
     local t0, t1
     local trueProgress = progress * 2
@@ -5714,7 +5714,7 @@ end
 ---@param p2 Vector2
 ---@param p3 Vector2
 ---@param p4 Vector2
----@param col integer
+---@param col Vector4
 ---@param thickness number
 ---@param pulseCol [Vector4, Vector4]
 ---@param timeProgress number
@@ -5725,7 +5725,7 @@ function partialBezierCubic(ctx, t0, t1, location, p1, p2, p3, p4, col, thicknes
     local xProgress = avgX / maxValue
     local xCol = (1 - xProgress) * pulseCol[1] + pulseCol[2] * xProgress
     local pulseStrength = 2 ^ (-50 * (timeProgress - 1 / 3 - xProgress / 3) ^ 2)
-    local bezierCol = xCol * pulseStrength + vctr4(1) * (1 - pulseStrength)
+    local bezierCol = xCol * pulseStrength + col * (1 - pulseStrength)
     local qa = p1 * u0 * u0 + p2 * 2 * t0 * u0 + p3 * t0 * t0
     local qb = p1 * u1 * u1 + p2 * 2 * t1 * u1 + p3 * t1 * t1
     local qc = p2 * u0 * u0 + p2 * 2 * t0 * u0 + p4 * t0 * t0

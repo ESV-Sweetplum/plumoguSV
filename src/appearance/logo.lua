@@ -15,7 +15,7 @@ function logoThread()
     if ((cache_logoStartTime < 3 and not globalVars.disableLoadup) or loaded) then
         if (currentTime >= 0 and currentTime <= logoLength) then
             drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
-                color.int.white, 4,
+                color.vctr.black, 4,
                 { color.vctr.purple, color.vctr.purple / 2 + color.vctr.white / 2 })
         end
     else
@@ -31,7 +31,7 @@ end
 ---@param ctx ImDrawListPtr
 ---@param windowSize Vector2
 ---@param scale number
----@param col integer
+---@param col Vector4
 ---@param thickness integer
 ---@param pulseCol [Vector4, Vector4]
 function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thickness, pulseCol)
@@ -60,7 +60,7 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
 
     local textStrength = math.min(1, progress * 2, (1 - progress) * 2)
 
-    col = col - math.floor(255 * (1 - textStrength)) * color.int.alphaMask
+    col = col - (1 - textStrength) * color.vctr.black
 
     ctx.AddRectFilledMultiColor(vctr2(0), windowSize, colTl, colTrBl, colBr, colTrBl)
 
@@ -1062,7 +1062,7 @@ end
 ---@param p2 Vector2
 ---@param p3 Vector2
 ---@param p4 Vector2
----@param col integer
+---@param col Vector4
 ---@param thickness number
 ---@param pulseCol [Vector4, Vector4]
 ---@param timeProgress number
@@ -1074,7 +1074,7 @@ function partialBezierCubic(ctx, t0, t1, location, p1, p2, p3, p4, col, thicknes
     local xProgress = avgX / maxValue
     local xCol = (1 - xProgress) * pulseCol[1] + pulseCol[2] * xProgress
     local pulseStrength = 2 ^ (-50 * (timeProgress - 1 / 3 - xProgress / 3) ^ 2)
-    local bezierCol = xCol * pulseStrength + vctr4(1) * (1 - pulseStrength)
+    local bezierCol = xCol * pulseStrength + col * (1 - pulseStrength)
 
     local qa = p1 * u0 * u0 + p2 * 2 * t0 * u0 + p3 * t0 * t0
     local qb = p1 * u1 * u1 + p2 * 2 * t1 * u1 + p3 * t1 * t1
