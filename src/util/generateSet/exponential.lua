@@ -33,9 +33,7 @@ function generateExponentialSet2(behavior, numValues, startValue, endValue, inte
     -- reduce intensity scaling to produce more useful/practical values
     intensity = intensity * 0.2
     if (behavior == "Slow down" and startValue ~= endValue) then
-        local temp = startValue
-        startValue = endValue
-        endValue = temp
+        startValue, endValue = endValue, startValue
     end
     for i = 0, numValues - 1 do
         fx = startValue

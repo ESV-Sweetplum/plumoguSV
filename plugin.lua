@@ -736,9 +736,7 @@ function matrix.solve(mtrx, vctr)
     return table.property(augMtrx, #mtrx + 1)
 end
 function matrix.swapRows(mtrx, rowIdx1, rowIdx2)
-    local temp = table.duplicate(mtrx[rowIdx1])
-    mtrx[rowIdx1] = table.duplicate(mtrx[rowIdx2])
-    mtrx[rowIdx2] = temp
+    mtrx[rowIdx1], mtrx[rowIdx2] = table.duplicate(mtrx[rowIdx2]), table.duplicate(mtrx[rowIdx1])
 end
 ---Rounds a number to a given amount of decimal places.
 ---@param number number
@@ -12498,9 +12496,7 @@ function generateExponentialSet2(behavior, numValues, startValue, endValue, inte
     local exponentialSet = {}
     intensity = intensity * 0.2
     if (behavior == "Slow down" and startValue ~= endValue) then
-        local temp = startValue
-        startValue = endValue
-        endValue = temp
+        startValue, endValue = endValue, startValue
     end
     for i = 0, numValues - 1 do
         fx = startValue
