@@ -4669,7 +4669,7 @@ function drawHorizontalPillShape(o, point1, point2, radius, color, circleSegment
 end
 function logoThread()
     curTime = state.UnixTime or 0
-    if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 5000) then
+    if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 15000) then
         cache_logoStartTime = clock.getTime()
         if (cache_logoStartTime < 2.5) then
             cache_logoStartTime = cache_logoStartTime + 0.75
