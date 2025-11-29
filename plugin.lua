@@ -5726,7 +5726,7 @@ function partialBezierCubic(ctx, t0, t1, location, p1, p2, p3, p4, col, thicknes
     local avgX = (p1.x + p4.x) / 2
     local xProgress = avgX / maxValue
     local xCol = (1 - xProgress) * pulseCol[1] + pulseCol[2] * xProgress
-    local pulseStrength = math.exp(1) ^ (-50 * (timeProgress - 1 / 3 - xProgress / 3) ^ 2)
+    local pulseStrength = 2 ^ (-50 * (timeProgress - 1 / 3 - xProgress / 3) ^ 2)
     local bezierCol = xCol * pulseStrength + vctr4(1) * (1 - pulseStrength)
     local qa = p1 * u0 * u0 + p2 * 2 * t0 * u0 + p3 * t0 * t0
     local qb = p1 * u1 * u1 + p2 * 2 * t1 * u1 + p3 * t1 * t1
