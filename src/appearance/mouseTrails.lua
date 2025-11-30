@@ -90,7 +90,7 @@ function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrail
         if not cursorTrailGhost then
             alpha = math.floor(255 * (trailPoints - i) / (trailPoints - 1))
         end
-        local color = color.int.whiteMask + math.floor(alpha) * color.int.alphaMask
+        local color = color.int.whiteMask * 255 + math.floor(alpha) * color.int.alphaMask
         if trailShape == "Circles" then
             o.AddCircleFilled(point, cursorTrailSize, color)
         elseif trailShape == "Triangles" then

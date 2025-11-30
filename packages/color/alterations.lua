@@ -1,5 +1,5 @@
 ---Alters opacity of a given color.
----@param col number
+---@param col integer
 ---@param additiveOpacity integer
 ---@return number
 ---@overload fun(col: Vector4, additiveOpacity: number): Vector4
