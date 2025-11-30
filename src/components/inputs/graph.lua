@@ -13,7 +13,7 @@
 ---@return ImDrawListPtr
 ---@return boolean changed
 function renderGraph(label, size, points, preferForeground, gridSize, yScale)
-    local gray = color.int.white * 100 / 255
+    local gray = color.int.whiteMask * 100 / 255 + color.int.opaqueMask * 255
     local tableLabel = "graph_points_" .. label
     local initDragList = {}
     local initPointList = {}
@@ -40,11 +40,11 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
             point.pos = point.pos + kbm.mouseDelta()
         end
 
-        local col = point.col
+        local pointCol = point.col
         local alphaDifference = 150 * 16 ^ 6
-        if (not dragList[i]) then col = col - alphaDifference end
+        if (not dragList[i]) then pointCol = pointCol - alphaDifference end
 
-        ctx.AddCircleFilled(topLeft + point.pos, point.size, col)
+        ctx.AddCircleFilled(topLeft + point.pos, point.size, pointCol)
     end
 
     gridSize = gridSize or 1
@@ -61,16 +61,17 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
 
     if (gridSize ~= 1) then
         for i = 0, size.x, gridSize do
-            local col = gray
-            if (not truthy(i % 4)) then
-                col = color.rgbaToUint(100, 100, 100, 255)
+            local lineCol = gray
+            if (truthy(i % 4)) then
+                lineCol = color.rgbaToUint(40, 40, 40, 255)
             end
-            ctx.AddLine(vector.New(topLeft.x + i, topLeft.y), vector.New(topLeft.x + i, topLeft.y + dim.y), col, 1)
+
+            ctx.AddLine(vector.New(topLeft.x + i, topLeft.y), vector.New(topLeft.x + i, topLeft.y + dim.y), lineCol, 1)
         end
         for i = 0, size.y, gridSize do
-            local col = gray
-            if (not truthy(i % 4)) then
-                col = color.rgbaToUint(100, 100, 100, 255)
+            local lineCol = gray
+            if (truthy(i % 4)) then
+                lineCol = color.rgbaToUint(40, 40, 40, 255)
             end
             if (yScale and not truthy(i % 4)) then
                 local number = (yScale.y - yScale.x) * (size.y - i) / size.y + yScale.x
@@ -80,10 +81,10 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
                     color.int.white,
                     tostring(number))
                 ctx.AddLine(vector.New(topLeft.x + textSize.x + 10, topLeft.y + i),
-                    vector.New(topLeft.x + dim.x, topLeft.y + i), col,
+                    vector.New(topLeft.x + dim.x, topLeft.y + i), lineCol,
                     1)
             else
-                ctx.AddLine(vector.New(topLeft.x, topLeft.y + i), vector.New(topLeft.x + dim.x, topLeft.y + i), col,
+                ctx.AddLine(vector.New(topLeft.x, topLeft.y + i), vector.New(topLeft.x + dim.x, topLeft.y + i), lineCol,
                     1)
             end
         end

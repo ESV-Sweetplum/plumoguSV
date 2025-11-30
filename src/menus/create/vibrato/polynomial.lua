@@ -1,8 +1,7 @@
 function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Bounds##Vibrato", " msx", 0, 0.875)
-        _, settingVars.controlPointCount = imgui.InputInt("Control Points", settingVars.controlPointCount)
-        settingVars.controlPointCount = math.clamp(settingVars.controlPointCount, 1, 10)
+        BasicInputInt(settingVars, "controlPointCount", "Control Points", { 1, 10 })
         AddSeparator()
 
         local size = 220
