@@ -2,6 +2,7 @@ stepSize: 5
 dontReplaceSV: false
 upscroll: false
 colorThemeIndex: 2
+colorThemeIndex: 16
 styleThemeIndex: 1
 effectFPS: 100
 cursorTrailIndex: 1
@@ -15,7 +16,7 @@ drawCapybara: true
 drawCapybara2: false
 drawCapybara312: false
 selectTypeIndex: 1
-placeTypeIndex: 4
+placeTypeIndex: 1
 editToolIndex: 1
 showPresetMenu: false
 scrollGroupIndex: 1
