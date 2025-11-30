@@ -4403,7 +4403,7 @@ function renderSynthesis()
     local pulseCount = bgVars.pulseCount
     local mostRecentStart = game.getNoteOffsetAt(curTime)
     local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
-    if (#snapTable >= (maxDim / 1.6) / circleSize) then
+    if (#snapTable >= (maxDim / 2) / circleSize) then
         bgVars.snapOffset = circleSize
         table.remove(snapTable, 1)
     end
