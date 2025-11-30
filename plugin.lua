@@ -11,7 +11,7 @@ color = {
     int = {}
 }
 color.int.alphaMask = 16777216
-color.int.opaqueMask = color.int.alphaMask
+color.int.opaqueMask = color.int.alphaMask * 255
 color.int.redMask = 255
 color.int.greenMask = 65280
 color.int.blueMask = 16711680
@@ -82,12 +82,12 @@ end
 color.vctr.white = vector.New(1, 1, 1, 1)
 color.vctr.black = vector.New(0, 0, 0, 1)
 color.vctr.transparent = vector.New(0, 0, 0, 0)
-color.int.white = color.int.whiteMask * 255 + color.int.opaqueMask * 255
-color.int.black = color.int.opaqueMask * 255
+color.int.white = color.int.whiteMask * 255 + color.int.opaqueMask
+color.int.black = color.int.opaqueMask
 color.int.transparent = 0
 color.vctr.red = vector.New(1, 0, 0, 1)
 color.vctr.light_red = vector.New(1, 0.5, 0.5, 1)
-color.int.red = color.int.redMask + color.int.opaqueMask * 255
+color.int.red = color.int.redMask + color.int.opaqueMask
 color.vctr.orange = vector.New(1, 0.5, 0, 1)
 color.vctr.light_orange = vector.New(1, 0.75, 0.5, 1)
 color.int.orange = 4278222975
@@ -7061,7 +7061,7 @@ end
 ---@return ImDrawListPtr
 ---@return boolean changed
 function renderGraph(label, size, points, preferForeground, gridSize, yScale)
-    local gray = color.int.whiteMask * 100 / 255 + color.int.opaqueMask * 255
+    local gray = color.int.whiteMask * 100 / 255 + color.int.opaqueMask
     local tableLabel = "graph_points_" .. label
     local initDragList = {}
     local initPointList = {}

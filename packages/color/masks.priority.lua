@@ -1,5 +1,5 @@
 color.int.alphaMask = 16777216
-color.int.opaqueMask = color.int.alphaMask
+color.int.opaqueMask = color.int.alphaMask * 255
 
 color.int.redMask = 255
 color.int.greenMask = 65280

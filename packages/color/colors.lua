@@ -2,14 +2,14 @@ color.vctr.white = vector.New(1, 1, 1, 1)
 color.vctr.black = vector.New(0, 0, 0, 1)
 color.vctr.transparent = vector.New(0, 0, 0, 0)
 
-color.int.white = color.int.whiteMask * 255 + color.int.opaqueMask * 255
-color.int.black = color.int.opaqueMask * 255
+color.int.white = color.int.whiteMask * 255 + color.int.opaqueMask
+color.int.black = color.int.opaqueMask
 color.int.transparent = 0
 
 color.vctr.red = vector.New(1, 0, 0, 1)
 color.vctr.light_red = vector.New(1, 0.5, 0.5, 1)
 
-color.int.red = color.int.redMask + color.int.opaqueMask * 255
+color.int.red = color.int.redMask + color.int.opaqueMask
 
 color.vctr.orange = vector.New(1, 0.5, 0, 1)
 color.vctr.light_orange = vector.New(1, 0.75, 0.5, 1)
