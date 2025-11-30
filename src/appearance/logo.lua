@@ -15,9 +15,9 @@ function logoThread()
     if ((cache_logoStartTime < 3 and not globalVars.disableLoadup) or loaded) then
         if (currentTime >= 0 and currentTime <= logoLength) then
             drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
-                globalVars.customStyle.loadupOpeningTextColor or DEFAULT_STYLE.loadupOpeningTextColor, 4,
-                { globalVars.customStyle.loadupPulseTextColorLeft or DEFAULT_STYLE.loadupPulseTextColorLeft, globalVars
-                .customStyle.loadupPulseTextColorRight or DEFAULT_STYLE.loadupPulseTextColorRight })
+                loadup.openingTextColor or DEFAULT_STYLE.loadupOpeningTextColor, 4,
+                { loadup.PulseTextColorLeft or DEFAULT_STYLE.loadupPulseTextColorLeft, loadup.PulseTextColorRight or
+                DEFAULT_STYLE.loadupPulseTextColorRight })
         end
     else
         cache_logoStartTime = clock.getTime() - 5
@@ -38,7 +38,6 @@ end
 function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thickness, pulseCol)
     if (currentTime < 0) then return end
     if (currentTime > logoLength) then return end
-    local customStyle = globalVars.customStyle
 
     local location = windowSize / 2
     local timeProgress = (currentTime % logoLength / logoLength)
@@ -58,10 +57,10 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, col, thicknes
 
     local bgStrength = 4 * (progress - progress * progress)
     local alphaStrengthFactor = vector.New(1, 1, 1, bgStrength)
-    local colTl = color.vrgbaToUint((customStyle.loadupBgTl or DEFAULT_STYLE.loadupBgTl) * alphaStrengthFactor)
-    local colTr = color.vrgbaToUint((customStyle.loadupBgTr or DEFAULT_STYLE.loadupBgTr) * alphaStrengthFactor)
-    local colBl = color.vrgbaToUint((customStyle.loadupBgBl or DEFAULT_STYLE.loadupBgBl) * alphaStrengthFactor)
-    local colBr = color.vrgbaToUint((customStyle.loadupBgBr or DEFAULT_STYLE.loadupBgBr) * alphaStrengthFactor)
+    local colTl = color.vrgbaToUint((loadup.BgTl or DEFAULT_STYLE.loadupBgTl) * alphaStrengthFactor)
+    local colTr = color.vrgbaToUint((loadup.BgTr or DEFAULT_STYLE.loadupBgTr) * alphaStrengthFactor)
+    local colBl = color.vrgbaToUint((loadup.BgBl or DEFAULT_STYLE.loadupBgBl) * alphaStrengthFactor)
+    local colBr = color.vrgbaToUint((loadup.BgBr or DEFAULT_STYLE.loadupBgBr) * alphaStrengthFactor)
 
     local textStrength = math.min(1, progress * 2, (1 - progress) * 2)
 

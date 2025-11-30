@@ -1,4 +1,6 @@
 function awake()
+    loadup = {} -- later inserted to via setStyleVars.lua
+
     local tempGlobalVars = read()
 
     if (not tempGlobalVars) then

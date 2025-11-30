@@ -44,8 +44,8 @@ COLOR_THEMES = {
     "Glass + RGB",
     "RGB Gamer Mode",
     "edom remag BGR",
-    "BGR + otingocnI",
     "otingocnI",
+    "BGR + otingocnI",
     "CUSTOM"
 }
 
@@ -63,8 +63,8 @@ COLOR_THEME_COLORS = {
     "0,0,255",
     "255,100,100",
     "100,255,100",
-    "100,100,255",
     "255,255,255",
+    "100,100,255",
     "0,0,0",
 }
 
@@ -280,13 +280,13 @@ DEFAULT_STYLE = {
         vector.New(0.90, 0.70, 0.00, 1.00),
     plotHistogramHovered =
         vector.New(1.00, 0.60, 0.00, 1.00),
-    loadupOpeningTextColor = vector.New(0.00, 0.00, 0.00, 1.00),
-    loadupPulseTextColorLeft = vector.New(0.50, 0.00, 1.00, 1.00),
-    loadupPulseTextColorRight = vector.New(0.75, 0.25, 1.00, 1.00),
-    loadupBgTl = vector.New(0.08, 0, 0.08, 0.39),
-    loadupBgTr = vector.New(0.16, 0, 0.16, 0.67), -- RAHHHH 6 7 6 7 6 7 6 7 6 7
-    loadupBgBl = vector.New(0.16, 0, 0.16, 0.67),
-    loadupBgBr = vector.New(0.25, 0, 0.25, 1.00),
+    loadupOpeningTextColor = vector.New(1.00, 1.00, 1.00, 1.00),
+    loadupPulseTextColorLeft = vector.New(0.00, 0.50, 1.00, 1.00),
+    loadupPulseTextColorRight = vector.New(0.00, 0.00, 1.00, 1.00),
+    loadupBgTl = vector.New(0.00, 0.00, 0.00, 0.39),
+    loadupBgTr = vector.New(0.31, 0.38, 0.50, 0.67), -- RAHHHH 6 7 6 7 6 7 6 7 6 7
+    loadupBgBl = vector.New(0.31, 0.38, 0.50, 0.67),
+    loadupBgBr = vector.New(0.62, 0.76, 1, 1.00),
 }
 
 DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Alt+L", "Ctrl+Alt+E", "O" }

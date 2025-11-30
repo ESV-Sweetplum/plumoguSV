@@ -16,10 +16,7 @@ function draw()
         drawCursorTrail()
         pulseController()
         checkForGlobalHotkeys()
-
-        if (clock.listen("appearanceRefresh", 1000)) then
-            setPluginAppearance()
-        end
+        setPluginAppearance()
     end
 
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
