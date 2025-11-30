@@ -565,7 +565,7 @@ end
 function chooseRGBPeriod()
     local oldRGBPeriod = globalVars.rgbPeriod
     _, globalVars.rgbPeriod = imgui.InputFloat("RGB cycle length", oldRGBPeriod, 0, 0,
-        "%.0f seconds")
+        "%.0f second" .. (math.round(globalVars.rgbPeriod) ~= 1 and "s" or ""))
     globalVars.rgbPeriod = math.clamp(globalVars.rgbPeriod, MIN_RGB_CYCLE_TIME,
         MAX_RGB_CYCLE_TIME)
     if (oldRGBPeriod ~= globalVars.rgbPeriod) then
