@@ -57,19 +57,19 @@ console.log(
 );
 
 const packageJSON = fs.readFileSync('package.json', 'utf-8');
-const idx = packageJSON
+const packageIdx = packageJSON
     .replaceAll('\r', '')
     .split('\n')
     .findIndex((l) => l.includes(`"version": `));
 const packageVer = packageJSON
     .replaceAll('\r', '')
     .split('\n')
-    [idx].split(': "')[1]
+    [packageIdx].split(': "')[1]
     .replaceAll(/\"\,/g, '');
 
 if (packageVer !== versionNumber.slice(1)) {
     const packageLines = packageJSON.split('\n');
-    packageLines[idx] = packageLines[idx].replace(
+    packageLines[packageIdx] = packageLines[packageIdx].replace(
         packageVer,
         versionNumber.slice(1)
     );

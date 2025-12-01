@@ -218,7 +218,7 @@ VIBRATO_QUALITIES = {
     "Omega"
 }
 
-VIBRATO_FRAME_RATES = { 45, 90, 150, 210, 450 }
+VIBRATO_FRAME_RATES = { 60, 90, 150, 210, 270 }
 
 VIBRATO_DETAILED_QUALITIES = {} -- what actually shows up in-game
 
