@@ -76,18 +76,6 @@ if (packageVer !== versionNumber.slice(1)) {
     fs.writeFileSync('package.json', packageLines.join('\n'));
 }
 
-const settingsIni = fs.readFileSync('settings.ini', 'utf-8');
-const oldVersionNumber = settingsIni
-    .split('\n')[0]
-    .replaceAll('\r', '')
-    .split('plumoguSV')[1];
-
-if (!oldVersionNumber || oldVersionNumber !== versionNumber) {
-    const settingsIniLines = settingsIni.split('\n');
-    settingsIniLines[1] = `Name = plumoguSV ${versionNumber}`;
-    fs.writeFileSync('settings.ini', settingsIniLines.join('\n'));
-}
-
 console.log(
     chalk.blueBright(
         chalk.bold(`Updating ${chalk.redBright('settings.ini')}...`)
@@ -111,7 +99,21 @@ if (!fs.existsSync(`build-temp`)) fs.mkdirSync(`build-temp`);
 fs.mkdirSync(`build-temp/${packageName}`);
 
 fs.copyFileSync('plugin.lua', `build-temp/${packageName}/plugin.lua`);
-fs.copyFileSync('settings.ini', `build-temp/${packageName}/settings.ini`);
+
+const settingsIni = fs.readFileSync('settings.ini', 'utf-8');
+const oldVersionNumber = settingsIni
+    .split('\n')[0]
+    .replaceAll('\r', '')
+    .split('plumoguSV')[1];
+
+if (!oldVersionNumber || oldVersionNumber !== versionNumber) {
+    const settingsIniLines = settingsIni.split('\n');
+    settingsIniLines[1] = `Name = plumoguSV ${versionNumber}`;
+    fs.writeFileSync(
+        `build-temp/${packageName}/settings.ini`,
+        settingsIniLines.join('\n')
+    );
+}
 
 zip.addLocalFolder('build-temp');
 
