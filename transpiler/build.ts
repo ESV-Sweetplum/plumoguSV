@@ -28,7 +28,7 @@ pluginLines.forEach((line, idx) => {
     if (line.includes('PLUGIN_NAME = ')) {
         pluginLines[idx] = pluginLines[idx].replaceAll(
             /"[a-zA-Z\-]+"/g,
-            `"plumoguSV-${versionNumber}"`
+            `"plumoguSV ${versionNumber}"`
         );
     }
 });
@@ -75,6 +75,24 @@ if (packageVer !== versionNumber.slice(1)) {
     );
     fs.writeFileSync('package.json', packageLines.join('\n'));
 }
+
+const settingsIni = fs.readFileSync('settings.ini', 'utf-8');
+const oldVersionNumber = settingsIni
+    .split('\n')[0]
+    .replaceAll('\r', '')
+    .split('plumoguSV')[1];
+
+if (!oldVersionNumber || oldVersionNumber !== versionNumber) {
+    const settingsIniLines = settingsIni.split('\n');
+    settingsIniLines[1] = `Name = plumoguSV ${versionNumber}`;
+    fs.writeFileSync('settings.ini', settingsIniLines.join('\n'));
+}
+
+console.log(
+    chalk.blueBright(
+        chalk.bold(`Updating ${chalk.redBright('settings.ini')}...`)
+    )
+);
 
 const packageName = `plumoguSV-${versionNumber}`;
 

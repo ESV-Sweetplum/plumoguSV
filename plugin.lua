@@ -2600,6 +2600,7 @@ end
 function placeStillSVsParent(menuVars)
     local svsToRemove = {}
     local svsToAdd = {}
+    printLegacyLNMessage()
     if (menuVars.stillBehavior == 1) then
         if (STANDARD_SVS[menuVars.svTypeIndex] == "Exponential" and menuVars.settingVars.distanceMode == 2) then
             placeSVs(menuVars, nil, nil, nil, menuVars.settingVars.distance)
@@ -7061,7 +7062,6 @@ end
 ---@return boolean changed
 function renderGraph(label, size, points, preferForeground, gridSize, yScale)
     local gray = color.int.whiteMask * 100 + color.int.alphaMask * 255
-    print(color.uintToRgba(gray))
     local tableLabel = "graph_points_" .. label
     local initDragList = {}
     local initPointList = {}
@@ -12852,6 +12852,22 @@ function listenForTimingGroupCount()
         if (actionIndex <= 44 and actionIndex ~= 37) then return end
         state.SetValue("tgList", game.getTimingGroupList())
     end)
+end
+---Returns true if the number of notes in the given [HitObject](lua://HitObject) list contains at least `requiredLNCount` long notes. If `requiredLNCount` isn't given, the default value 1 is used.
+---@param hos HitObject[]
+---@param requiredLNCount? integer
+---@return boolean
+function checkNotesForLNs(hos, requiredLNCount)
+    requiredLNCount = requiredLNCount or 1
+    local lnCount = 0
+    for _, ho in pairs(hos) do
+        if (ho.EndTime ~= 0) then lnCount = lnCount + 1 end
+    end
+    return lnCount >= requiredLNCount
+end
+---Prints a warning message if legacy LN rendering isn't enabled.
+function printLegacyLNMessage()
+    if (not checkNotesForLNs(game.uniqueNotesBetweenSelected()) or map.LegacyLNRendering) then return end
 end
 ---Alias for [`utils.CreateScrollVelocity`](lua://utils.CreateScrollVelocity).
 ---@param startTime number
