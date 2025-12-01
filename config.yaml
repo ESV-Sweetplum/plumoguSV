@@ -687,4 +687,5 @@ presets:
 dynamicBackgroundIndex: 2
 disableLoadup: false
 useEndTimeOffsets: false
+printLegacyLNMessage: true
 ignoreNotes: false

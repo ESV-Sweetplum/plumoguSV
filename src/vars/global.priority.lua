@@ -41,7 +41,8 @@ globalVars = {
     presets = {},
     dynamicBackgroundIndex = 1,
     disableLoadup = false,
-    useEndTimeOffsets = false
+    useEndTimeOffsets = false,
+    printLegacyLNMessage = true
 }
 
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
@@ -92,4 +93,5 @@ function setGlobalVars(tempGlobalVars)
     globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)
     globalVars.dynamicBackgroundIndex = tn(tempGlobalVars.dynamicBackgroundIndex)
     globalVars.useEndTimeOffsets = truthy(tempGlobalVars.useEndTimeOffsets)
+    globalVars.printLegacyLNMessage = truthy(tempGlobalVars.printLegacyLNMessage, true)
 end

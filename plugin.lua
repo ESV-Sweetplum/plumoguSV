@@ -822,11 +822,14 @@ function pluralize(str, val, pos)
     end
     return table.concat(finalStrTbl) .. (strEnding or "")
 end
----Capitalizes the first letter of the given string.
+---Capitalizes the first letter of the given string. If `forceLowercase` is true, then all other letters will be forced into lowercase.
 ---@param str string
+---@param forceLowercase? boolean
 ---@return string
-function string.capitalize(str)
-    return str:charAt(1):upper() .. str:sub(2)
+function string.capitalize(str, forceLowercase)
+    local secondPortion = str:sub(2)
+    if (forceLowercase) then secondPortion = secondPortion:lower() end
+    return str:charAt(1):upper() .. secondPortion
 end
 ---Returns the `idx`th character in a string. Simply used for shorthand. Also supports negative indexes.
 ---@param str string The string to search.
@@ -1747,7 +1750,8 @@ globalVars = {
     presets = {},
     dynamicBackgroundIndex = 1,
     disableLoadup = false,
-    useEndTimeOffsets = false
+    useEndTimeOffsets = false,
+    printLegacyLNMessage = true
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 function setGlobalVars(tempGlobalVars)
@@ -1795,6 +1799,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)
     globalVars.dynamicBackgroundIndex = tn(tempGlobalVars.dynamicBackgroundIndex)
     globalVars.useEndTimeOffsets = truthy(tempGlobalVars.useEndTimeOffsets)
+    globalVars.printLegacyLNMessage = truthy(tempGlobalVars.printLegacyLNMessage, true)
 end
 DEFAULT_STARTING_MENU_VARS = {
     placeStandard = {
@@ -2598,9 +2603,9 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
     return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
 end
 function placeStillSVsParent(menuVars)
+    printLegacyLNMessage()
     local svsToRemove = {}
     local svsToAdd = {}
-    printLegacyLNMessage()
     if (menuVars.stillBehavior == 1) then
         if (STANDARD_SVS[menuVars.svTypeIndex] == "Exponential" and menuVars.settingVars.distanceMode == 2) then
             placeSVs(menuVars, nil, nil, nil, menuVars.settingVars.distance)
@@ -2677,6 +2682,7 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
     return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
 end
 function ssfVibrato(menuVars, func1, func2)
+    printLegacyLNMessage()
     local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startTime = offsets[1]
@@ -2710,6 +2716,7 @@ end
 ---@param menuVars any
 ---@param heightFn fun(t: number, idx?: integer): number
 function svVibrato(menuVars, heightFn)
+    printLegacyLNMessage()
     local offsets = game.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -3274,6 +3281,7 @@ function tryAlignToHitObjects(time, hitObjectTimes, alignWindow)
     return time
 end
 function displaceNoteSVsParent(menuVars)
+    printLegacyLNMessage()
     if (not menuVars.linearlyChange) then
         displaceNoteSVs(menuVars)
         return
@@ -3321,6 +3329,7 @@ function displaceNoteSVs(menuVars, place, optionalOffset)
     return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
 end
 function displaceViewSVs(menuVars)
+    printLegacyLNMessage()
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
@@ -3368,6 +3377,7 @@ function dynamicScaleSVs(menuVars)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function flickerSVs(menuVars)
+    printLegacyLNMessage()
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
@@ -3748,6 +3758,7 @@ function measureSVs(menuVars)
     menuVars.avgSVDisplaceless = tostring(trueAvgSV)
 end
 function reverseScrollSVs(menuVars)
+    printLegacyLNMessage()
     local offsets = game.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -3914,6 +3925,7 @@ function splitNotes(menuVars)
     actions.PerformBatch(editorActions)
 end
 function swapNoteSVs()
+    printLegacyLNMessage()
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
@@ -10955,6 +10967,8 @@ function showGeneralSettings()
         "Changes the behavior of the SELECT tab to select notes that are already selected, instead of all notes between the start/end selection.")
     GlobalCheckbox("useEndTimeOffsets", "Use LN Ends As Offsets",
         "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets.")
+    GlobalCheckbox("printLegacyLNMessage", "Print Legacy LN Recommendation",
+        "When true, prints a warning to enable legacy LN when the following conditions are met:\n1. Legacy LN Rendering is currently turned off.\n2: When placing stills, or using certain features that can displace, such as flicker, displace note, and displace view.")
 end
 function chooseUpscroll()
     local oldUpscroll = globalVars.upscroll
@@ -12867,7 +12881,11 @@ function checkNotesForLNs(hos, requiredLNCount)
 end
 ---Prints a warning message if legacy LN rendering isn't enabled.
 function printLegacyLNMessage()
-    if (not checkNotesForLNs(game.uniqueNotesBetweenSelected()) or map.LegacyLNRendering) then return end
+    if (not globalVars.printLegacyLNMessage or state.GetValue("disablePrintLegacyLNMessage")) then return end
+    if (not checkNotesForLNs(state.SelectedHitObjects) or map.LegacyLNRendering) then return end
+    print("w!",
+        'Using any sort of displacements with LNs while Legacy LN rendering is highly discouraged. Consider turning on Legacy LN Rendering in the F1 menu. You can permanently disable this message in the plumoguSV settings.')
+    state.SetValue("disablePrintLegacyLNMessage", true)
 end
 ---Alias for [`utils.CreateScrollVelocity`](lua://utils.CreateScrollVelocity).
 ---@param startTime number

@@ -1,4 +1,5 @@
 function flickerSVs(menuVars)
+    printLegacyLNMessage()
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}

@@ -1,4 +1,5 @@
 function displaceNoteSVsParent(menuVars)
+    printLegacyLNMessage()
     if (not menuVars.linearlyChange) then
         displaceNoteSVs(menuVars)
         return

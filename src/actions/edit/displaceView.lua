@@ -1,4 +1,5 @@
 function displaceViewSVs(menuVars)
+    printLegacyLNMessage()
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}

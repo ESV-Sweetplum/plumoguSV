@@ -1,4 +1,5 @@
 function reverseScrollSVs(menuVars)
+    printLegacyLNMessage()
     local offsets = game.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]

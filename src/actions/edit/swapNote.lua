@@ -1,4 +1,5 @@
 function swapNoteSVs()
+    printLegacyLNMessage()
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}

@@ -23,6 +23,8 @@ function showGeneralSettings()
         "Changes the behavior of the SELECT tab to select notes that are already selected, instead of all notes between the start/end selection.")
     GlobalCheckbox("useEndTimeOffsets", "Use LN Ends As Offsets",
         "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets.")
+    GlobalCheckbox("printLegacyLNMessage", "Print Legacy LN Recommendation",
+        "When true, prints a warning to enable legacy LN when the following conditions are met:\n1. Legacy LN Rendering is currently turned off.\n2: When placing stills, or using certain features that can displace, such as flicker, displace note, and displace view.")
 end
 
 function chooseUpscroll()

@@ -1,7 +1,7 @@
 function placeStillSVsParent(menuVars)
+    printLegacyLNMessage()
     local svsToRemove = {}
     local svsToAdd = {}
-    printLegacyLNMessage()
     if (menuVars.stillBehavior == 1) then
         if (STANDARD_SVS[menuVars.svTypeIndex] == "Exponential" and menuVars.settingVars.distanceMode == 2) then
             placeSVs(menuVars, nil, nil, nil, menuVars.settingVars.distance)
