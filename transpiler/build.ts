@@ -99,6 +99,10 @@ if (!fs.existsSync(`build-temp`)) fs.mkdirSync(`build-temp`);
 fs.mkdirSync(`build-temp/${packageName}`);
 
 fs.copyFileSync('plugin.lua', `build-temp/${packageName}/plugin.lua`);
+fs.copyFileSync(
+    'assets/steam_workshop_preview.png',
+    `build-temp/${packageName}/steam_workshop_preview.png`
+);
 
 const settingsIni = fs.readFileSync('settings.ini', 'utf-8');
 const oldVersionNumber = settingsIni
