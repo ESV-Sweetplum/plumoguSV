@@ -103,6 +103,10 @@ fs.copyFileSync(
     'assets/steam_workshop_preview.png',
     `build-temp/${packageName}/steam_workshop_preview.png`
 );
+fs.copyFileSync(
+    'assets/steam_workshop_id.txt',
+    `build-temp/${packageName}/steam_workshop_id.txt`
+);
 
 const settingsIni = fs.readFileSync('settings.ini', 'utf-8');
 const oldVersionNumber = settingsIni
