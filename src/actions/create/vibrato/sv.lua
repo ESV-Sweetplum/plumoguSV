@@ -23,7 +23,7 @@ function svVibrato(menuVars, heightFn)
         local teleportCount = math.floor((nextVibro - startVibro) / 1000 * fps / roundingFactor) * roundingFactor
 
         if (teleportCount < 2) then
-            print("e!", "Some notes are too close together to place vibrato.")
+            print("e!", "Some notes are too close together to place vibrato. Check for notes that are 1ms apart.")
             return
         end
 
@@ -40,48 +40,47 @@ function svVibrato(menuVars, heightFn)
                     height, 0)
             end
         elseif (menuVars.sides == 2) then
+            teleportCount = teleportCount + 1
             prepareDisplacingSVs(startVibro, svsToAdd, svTimeIsAdded, nil,
-                -heightFn(startPos, 1), 0)
-            for tp = 1, teleportCount - 2 do
+                -heightFn(startPos, 0), 0)
+            for tp = 1, teleportCount - 2, 2 do
                 local x = tp / teleportCount
                 local offset = nextVibro * x + startVibro * (1 - x)
-                local initHeight = heightFn(tp / teleportCount * posDifference +
+                local prevHeight = heightFn((tp - 1) / (teleportCount - 1) * posDifference +
                     startPos, tp)
-                local newHeight = heightFn((tp + 1) / teleportCount * posDifference +
+                local newHeight = heightFn((tp + 1) / (teleportCount - 1) * posDifference +
                     startPos, tp + 1)
-                local height = initHeight + newHeight
-                if (tp % 2 == 0) then
-                    height = -height
-                end
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
-                    height, 0)
+                    prevHeight + newHeight, 0)
+                x = (tp + 1) / teleportCount
+                offset = nextVibro * x + startVibro * (1 - x)
+                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
+                    -newHeight * 2, 0)
             end
-            prepareDisplacingSVs(nextVibro * (1 - 1 / teleportCount) + startVibro * (1 / teleportCount), svsToAdd,
-                svTimeIsAdded,
-                heightFn((1 - 2 / teleportCount) * posDifference + startPos, teleportCount), 0, nil)
+            prepareDisplacingSVs(nextVibro * (1 - 2 / teleportCount) + 2 * startVibro / teleportCount, svsToAdd,
+                svTimeIsAdded, nil,
+                heightFn(posDifference * (1 - 2 / (teleportCount - 1)) + startPos, teleportCount - 2) +
+                heightFn(endPos, teleportCount - 1), 0)
+            prepareDisplacingSVs(nextVibro * (1 - 1 / teleportCount) + startVibro / teleportCount, svsToAdd,
+                svTimeIsAdded, nil,
+                -heightFn(endPos, teleportCount), 0)
         else
-            prepareDisplacingSVs(startVibro, svsToAdd, svTimeIsAdded, nil,
-                -heightFn(startPos, 1), 0)
-            prepareDisplacingSVs(startVibro, svsToAdd, svTimeIsAdded, nil,
-                heightFn(startPos + 2 / (teleportCount - 1) * posDifference, 3) + heightFn(startPos, 1), 0)
-            for tp = 3, teleportCount - 3, 3 do
-                local x = (tp - 1) / (teleportCount - 1)
+            for tp = 1, teleportCount - 2, 3 do
+                local x = (tp - 1) / teleportCount
                 local offset = nextVibro * x + startVibro * (1 - x)
-                local height = heightFn(startPos + tp / (teleportCount - 1) * posDifference, tp)
+                local height = heightFn(startPos + (tp - 1) / teleportCount * posDifference, (tp - 1) / 3 + 1)
+                local newHeight = heightFn(startPos + (tp + 2) / teleportCount * posDifference, (tp - 1) / 3 + 2)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     -height, 0)
-                x = tp / (teleportCount - 1)
+                x = tp / teleportCount
                 offset = nextVibro * x + startVibro * (1 - x)
-                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
-                    -height, 0)
-                x = (tp + 1) / (teleportCount - 1)
-                offset = nextVibro * x + startVibro * (1 - x)
-                local newHeight = heightFn(startPos + (tp + 3) / (teleportCount - 1) * posDifference, tp + 2)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     height + newHeight, 0)
+                x = (tp + 1) / teleportCount
+                offset = nextVibro * x + startVibro * (1 - x)
+                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
+                    -newHeight, 0)
             end
-            prepareDisplacingSVs(nextVibro, svsToAdd, svTimeIsAdded,
-                heightFn(endPos, teleportCount), 0, nil)
         end
     end
 
