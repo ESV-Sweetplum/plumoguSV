@@ -402,10 +402,10 @@ defaultProperties:
       finalSVIndex: 2
       customSV: 1
     combo:
-      svType1Index: 1
+      svType1Index: 2
       svType2Index: 2
       comboPhase: 0
-      comboTypeIndex: 1
+      comboTypeIndex: 4
       comboMultiplier1: 1
       comboMultiplier2: 1
       finalSVIndex: 2
