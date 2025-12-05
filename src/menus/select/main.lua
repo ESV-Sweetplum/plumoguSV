@@ -22,8 +22,8 @@ end
 function chooseSelectTool()
     local tooltipList = {
         "Skip over notes then select one, and repeat.",
-        "Select all notes with a certain snap color.",
         "Jump to a bookmark.",
+        "Select all notes with a certain snap color.",
         "Select all notes within a certain timing group.",
         "Select all notes with a certain chord size.",
         "Select rice/ln notes."
