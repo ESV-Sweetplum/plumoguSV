@@ -238,8 +238,8 @@ end
 
 function setBarbieColors()
     local pink = vector.New(0.79, 0.31, 0.55, 1.00)
-    local white = vector.New(0.95, 0.85, 0.87, 1.00)
-    local blue = vector.New(0.37, 0.64, 0.84, 1.00)
+    local white = vector.New(1.00, 1.00, 1.00, 1.00)
+    local blue = vector.New(0.29, 0.48, 0.63, 1.00)
     local pinkTint = vector.New(1.00, 0.86, 0.86, 0.40)
 
     imgui.PushStyleColor(imgui_col.WindowBg, pink)
