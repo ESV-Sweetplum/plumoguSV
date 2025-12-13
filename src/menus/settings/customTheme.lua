@@ -156,10 +156,11 @@ function stringifyCustomStyle(customStyle)
     for _, key in ipairs(keys) do
         local value = customStyle[key]
         keyId = convertStrToShort(key)
-        local r = math.floor(value.x * 255)
-        local g = math.floor(value.y * 255)
-        local b = math.floor(value.z * 255)
-        local a = math.floor(value.w * 255)
+        if (key:sub(1, 6) == "loadup") then keyId = keyId .. key:sub(-1):upper() end
+        local r = math.round(value.x * 255)
+        local g = math.round(value.y * 255)
+        local b = math.round(value.z * 255)
+        local a = math.round(value.w * 255)
         resultStr = resultStr .. keyId .. "" .. color.rgbaToNdua(r, g, b, a) .. " "
     end
 
@@ -170,6 +171,7 @@ function setCustomStyleString(str)
     local keyIdDict = {}
     for _, key in ipairs(table.keys(DEFAULT_STYLE)) do
         keyIdDict[key] = convertStrToShort(key)
+        if (key:sub(1, 6) == "loadup") then keyIdDict[key] = keyIdDict[key] .. key:sub(-1):upper() end
     end
 
     if (str:sub(1, 3) == "v2 ") then
@@ -183,15 +185,8 @@ function parseCustomStyleV2(str, keyIdDict)
     local customStyle = {}
 
     for kvPair in str:gmatch("[^ ]+") do -- Equivalent to validate, no need to change
-        local keyId = nil
-        local keyValue = nil
-        if (kvPair:len() == 8) then
-            keyId = kvPair:sub(1, 3)
-            keyValue = kvPair:sub(4)
-        else
-            keyId = kvPair:sub(1, 2)
-            keyValue = kvPair:sub(3)
-        end
+        local keyId = kvPair:sub(1, kvPair:len() - 5)
+        local keyValue = kvPair:sub(-5)
         local key = table.indexOf(keyIdDict, keyId)
         if (not keyId or key == -1) then goto skip end
         customStyle[key] = color.nduaToRgba(keyValue) / 255
