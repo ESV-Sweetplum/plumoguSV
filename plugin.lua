@@ -4578,7 +4578,7 @@ function logoThread()
     if ((cache_logoStartTime < 3 and not globalVars.disableLoadup) or loaded) then
         if (currentTime >= 0 and currentTime <= logoLength) then
             drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
-                loadup.openingTextColor or DEFAULT_STYLE.loadupOpeningTextColor, 4,
+                loadup.OpeningTextColor or DEFAULT_STYLE.loadupOpeningTextColor, 4,
                 { loadup.PulseTextColorLeft or DEFAULT_STYLE.loadupPulseTextColorLeft, loadup.PulseTextColorRight or
                 DEFAULT_STYLE.loadupPulseTextColorRight })
         end
