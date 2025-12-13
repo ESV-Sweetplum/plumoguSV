@@ -10425,10 +10425,17 @@ function showAppearanceSettings()
         local customStyle = {}
         for k42 = 1, #customStyleIds do
             local id = customStyleIds[k42]
-            customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[id:capitalize()])) / vctr4(255)
+            local query = id:capitalize()
+            if (query:match("%u%l+") == "Loadup") then
+                customStyle[id] = loadup[query:sub(7)]
+                goto nextCustomStyle
+            end
+            customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[query])) / vctr4(255)
+            ::nextCustomStyle::
         end
         globalVars.customStyle = customStyle
         globalVars.colorThemeIndex = table.indexOf(COLOR_THEMES, "CUSTOM")
+        setPluginAppearanceColors("CUSTOM")
     end
     HoverToolTip(
         "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
