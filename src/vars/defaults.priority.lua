@@ -7,10 +7,10 @@ function loadDefaultProperties(defaultProperties)
             if (not defaultTable) then break end
             local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
             if (defaultSetting == nil) then
-                goto skipSetting
+                goto nextSetting
             end
             DEFAULT_STARTING_MENU_VARS[label][settingName] = defaultSetting
-            ::skipSetting::
+            ::nextSetting::
         end
     end
     ::skipMenu::
@@ -21,10 +21,10 @@ function loadDefaultProperties(defaultProperties)
             if (not defaultTable) then break end
             local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
             if (defaultSetting == nil) then
-                goto skipSetting
+                goto nextSetting
             end
             DEFAULT_STARTING_SETTING_VARS[label][settingName] = defaultSetting
-            ::skipSetting::
+            ::nextSetting::
         end
     end
     ::skipSettings::

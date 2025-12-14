@@ -142,7 +142,7 @@ end
 
 function removeUnnecessarySVs()
     local editorActions = {}
-    local ogTg = state.SelectedScrollGroupId
+    local ogTG = state.SelectedScrollGroupId
     local svSum = 0
     for tgId, tg in pairs(map.TimingGroups) do
         local svsToRemove = {}
@@ -159,7 +159,7 @@ function removeUnnecessarySVs()
     if (truthy(svSum)) then actions.PerformBatch(editorActions) end
     local type = truthy(svSum) and "s!" or "w!"
     print(type, "Removed " .. svSum .. pluralize(" SV.", svSum, -2))
-    state.SelectedScrollGroupId = ogTg
+    state.SelectedScrollGroupId = ogTG
 end
 
 function removeAllHitSounds()

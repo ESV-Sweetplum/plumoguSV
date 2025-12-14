@@ -16,10 +16,10 @@ function flickerSVs(menuVars)
             numTeleports + 1)
         local flickerDuration = teleportOffsets[2] - teleportOffsets[1]
         for t, _ in pairs(teleportOffsets) do
-            if (t % 2 == 1) then goto continueTeleport end
+            if (t % 2 == 1) then goto nextTeleport end
             pushFactor = (2 * menuVars.flickerPosition - 1) * flickerDuration
             teleportOffsets[t] = teleportOffsets[t] + pushFactor
-            ::continueTeleport::
+            ::nextTeleport::
         end
         for j = 1, numTeleports do
             local offsetIndex = j

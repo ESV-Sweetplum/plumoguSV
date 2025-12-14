@@ -128,9 +128,9 @@ function showCustomThemeSettings()
 
     for idx, id in ipairs(customStyleIds) do
         local name = customStyleNames[idx]
-        if (not name:lower():find(searchText:lower())) then goto skip end
+        if (not name:lower():find(searchText:lower())) then goto nextId end
         settingsChanged = ColorInput(globalVars.customStyle, id, name) or settingsChanged
-        ::skip::
+        ::nextId::
     end
     if (settingsChanged) then
         write(globalVars)
@@ -184,13 +184,13 @@ end
 function parseCustomStyleV2(str, keyIdDict)
     local customStyle = {}
 
-    for kvPair in str:gmatch("[^ ]+") do -- Equivalent to validate, no need to change
+    for kvPair in str:gmatch("[^ ]+") do
         local keyId = kvPair:sub(1, kvPair:len() - 5)
         local keyValue = kvPair:sub(-5)
         local key = table.indexOf(keyIdDict, keyId)
-        if (not keyId or key == -1) then goto skip end
+        if (not keyId or key == -1) then goto nextPair end
         customStyle[key] = color.nduaToRgba(keyValue) / 255
-        ::skip::
+        ::nextPair::
     end
 
     globalVars.customStyle = table.duplicate(customStyle)

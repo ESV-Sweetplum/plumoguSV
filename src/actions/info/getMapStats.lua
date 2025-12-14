@@ -1,5 +1,5 @@
 function getMapStats()
-    local currentTg = state.SelectedScrollGroupId
+    local currentTG = state.SelectedScrollGroupId
     local tgList = map.GetTimingGroupIds()
     local svSum = 0
     local ssfSum = 0
@@ -18,5 +18,5 @@ function getMapStats()
         svSum .. " SVs and " .. ssfSum .. " SSFs across " .. #tgList .. pluralize(" timing group.", #tgList, -2))
     print("w!",
         "Remember that the quality of map has no correlation with the object count! Try to be optimal in your object usage.")
-    state.SelectedScrollGroupId = currentTg
+    state.SelectedScrollGroupId = currentTG
 end

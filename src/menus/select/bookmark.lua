@@ -30,16 +30,16 @@ function selectBookmarkMenu()
             if (bm.StartTime < 0) then
                 skippedBookmarks = skippedBookmarks + 1
                 skippedIndices = skippedIndices + 1
-                goto skipBookmark
+                goto nextBookmark
             end
 
             if (menuVars.searchTerm:len() > 0) and (not bm.Note:find(menuVars.searchTerm)) then
                 skippedBookmarks = skippedBookmarks + 1
-                goto skipBookmark
+                goto nextBookmark
             end
             if (menuVars.filterTerm:len() > 0) and (bm.Note:find(menuVars.filterTerm)) then
                 skippedBookmarks = skippedBookmarks + 1
-                goto skipBookmark
+                goto nextBookmark
             end
 
             vPos = 126.5 + (idx - skippedBookmarks) * 32
@@ -66,7 +66,7 @@ function selectBookmarkMenu()
             imgui.NextColumn()
 
             if (idx ~= #bookmarks) then imgui.Separator() end
-            ::skipBookmark::
+            ::nextBookmark::
         end
 
         local maxTimeLength = math.log(math.max(table.unpack(times) or 0), 10) + 0.5

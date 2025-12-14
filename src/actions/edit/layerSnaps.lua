@@ -84,7 +84,7 @@ function collapseSnaps()
         else
             hoLayer = map.EditorLayers[ho.EditorLayer]
         end
-        if (not hoLayer.Name:find("plumoguSV")) then goto continue end
+        if (not hoLayer.Name:find("plumoguSV")) then goto nextLayer end
         do
             local color = hoLayer.Name:match("-([a-zA-Z]+)$")
             local snap = REVERSE_COLOR_MAP[color]
@@ -108,7 +108,7 @@ function collapseSnaps()
             table.insert(removeLayerActions,
                 createEA(action_type.RemoveLayer, hoLayer))
         end
-        ::continue::
+        ::nextLayer::
     end
     actions.PerformBatch(moveNoteActions)
     if (not truthy(#normalTpsToAdd + #snapTpsToAdd + #tpsToRemove)) then

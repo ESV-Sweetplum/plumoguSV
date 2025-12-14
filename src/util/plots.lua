@@ -204,7 +204,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
                 local x
                 local y = (#svMultipliers - idx + 1) / (#svMultipliers + 1)
                 local apx = y - (inverseProgress * 2 - 0.6)
-                if (math.abs(apx) > appearanceTime) then goto continue end
+                if (math.abs(apx) > appearanceTime) then goto nextMultiplier end
                 apx = apx / appearanceTime / 2 + 0.5
                 x = math.abs(m) / normativeMax
                 ctx.AddRectFilled(
@@ -213,7 +213,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
                     vector.New(topLeft.x + dim.x * x,
                         topLeft.y + dim.y * (y + 2 * (1 - math.max(apx, 0.5)) / (#svMultipliers + 1))),
                     imgui.GetColorU32(imgui_col.PlotHistogram, (apx - apx * apx) * 2))
-                ::continue::
+                ::nextMultiplier::
             end
         end
     end

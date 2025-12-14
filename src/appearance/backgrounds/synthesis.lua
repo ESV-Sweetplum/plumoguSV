@@ -59,11 +59,11 @@ function renderSynthesis()
     for idx, snap in pairs(snapTable) do
         local colTbl = RGB_SNAP_MAP[snap]
         local radius = circleSize * (idx - 1) + bgVars.snapOffset
-        if (radius > diagonalLength / 2) then goto continue end
+        if (radius > diagonalLength / 2) then goto nextSnap end
 
         ctx.AddCircle(dim / 2 + topLeft, radius,
             color.rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
-        ::continue::
+        ::nextSnap::
     end
 
     cache.saveTable("synthesis", bgVars)

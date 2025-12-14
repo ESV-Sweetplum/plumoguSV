@@ -8,7 +8,7 @@ function copyItems(menuVars)
     local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
     local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset)
     local bms = game.getBookmarksBetweenOffsets(startOffset, endOffset)
-    if (not menuVars.copyLines) then goto continue1 end
+    if (not menuVars.copyLines) then goto lineSkip end
     for _, line in ipairs(lines) do
         local copiedLine = {
             relativeOffset = line.StartTime - startOffset,
@@ -18,8 +18,8 @@ function copyItems(menuVars)
         }
         table.insert(menuVars.copied.lines[menuVars.curSlot], copiedLine)
     end
-    ::continue1::
-    if (not menuVars.copySVs) then goto continue2 end
+    ::lineSkip::
+    if (not menuVars.copySVs) then goto svSkip end
     for _, sv in ipairs(svs) do
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
@@ -27,8 +27,8 @@ function copyItems(menuVars)
         }
         table.insert(menuVars.copied.SVs[menuVars.curSlot], copiedSV)
     end
-    ::continue2::
-    if (not menuVars.copySSFs) then goto continue3 end
+    ::svSkip::
+    if (not menuVars.copySSFs) then goto ssfSkip end
     for _, ssf in ipairs(ssfs) do
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
@@ -36,8 +36,8 @@ function copyItems(menuVars)
         }
         table.insert(menuVars.copied.SSFs[menuVars.curSlot], copiedSSF)
     end
-    ::continue3::
-    if (not menuVars.copyBMs) then goto continue4 end
+    ::ssfSkip::
+    if (not menuVars.copyBMs) then goto bmSkip end
     for _, bm in ipairs(bms) do
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
@@ -45,7 +45,7 @@ function copyItems(menuVars)
         }
         table.insert(menuVars.copied.BMs[menuVars.curSlot], copiedBM)
     end
-    ::continue4::
+    ::bmSkip::
     local printed = false
     if (#menuVars.copied.BMs[menuVars.curSlot] > 0) then
         printed = true
@@ -123,37 +123,37 @@ function pasteItems(menuVars)
         for _, line in ipairs(menuVars.copied.lines[menuVars.curSlot]) do
             local timeToPasteLine = pasteOffset + line.relativeOffset
             if (math.abs(timeToPasteLine - nextOffset) < ignoranceTolerance and i ~= #offsets) then
-                goto skip1
+                goto nextLine
             end
             table.insert(linesToAdd, utils.CreateTimingPoint(timeToPasteLine, line.bpm, line.signature, line.hidden))
-            ::skip1::
+            ::nextLine::
         end
         for _, sv in ipairs(menuVars.copied.SVs[menuVars.curSlot]) do
             local timeToPasteSV = pasteOffset + sv.relativeOffset
             if (math.abs(timeToPasteSV - nextOffset) < ignoranceTolerance and i ~= #offsets) then
-                goto skip2
+                goto nextSV
             end
             if menuVars.tryAlign then
                 timeToPasteSV = tryAlignToHitObjects(timeToPasteSV, hitObjectTimes, menuVars.alignWindow)
             end
             table.insert(svsToAdd, createSV(timeToPasteSV, sv.multiplier))
-            ::skip2::
+            ::nextSV::
         end
         for _, ssf in ipairs(menuVars.copied.SSFs[menuVars.curSlot]) do
             local timeToPasteSSF = pasteOffset + ssf.relativeOffset
             if (math.abs(timeToPasteSSF - nextOffset) < ignoranceTolerance and i ~= #offsets) then
-                goto skip3
+                goto nextSSF
             end
             table.insert(ssfsToAdd, createSSF(timeToPasteSSF, ssf.multiplier))
-            ::skip3::
+            ::nextSSF::
         end
         for _, bm in ipairs(menuVars.copied.BMs[menuVars.curSlot]) do
             local timeToPasteBM = pasteOffset + bm.relativeOffset
             if (math.abs(timeToPasteBM - nextOffset) < ignoranceTolerance and i ~= #offsets) then
-                goto skip4
+                goto nextBM
             end
             table.insert(bmsToAdd, utils.CreateBookmark(timeToPasteBM, bm.note))
-            ::skip4::
+            ::nextBM::
         end
     end
     actions.PerformBatch({

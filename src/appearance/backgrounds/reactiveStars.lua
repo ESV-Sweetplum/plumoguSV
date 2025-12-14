@@ -26,10 +26,10 @@ function renderReactiveStars()
         local brightness = clamp(-8 * progress * (progress - 1), -1, 1)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
 
-        if (brightness < 0) then goto continue end
+        if (brightness < 0) then goto nextStar end
 
         ctx.AddCircleFilled(pos, sz, color.alterOpacity(color.int.white, 255 - math.floor(brightness * 255)))
-        ::continue::
+        ::nextStar::
     end
 end
 

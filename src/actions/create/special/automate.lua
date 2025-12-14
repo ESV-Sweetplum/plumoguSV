@@ -37,7 +37,7 @@ function automateSVs(settingVars)
     local timeSinceLastObject = 0
     local idIndex = 0
     for idx, ho in pairs(selected) do
-        if (not settingVars.maintainMs and idx == 1) then goto continue end
+        if (not settingVars.maintainMs and idx == 1) then goto nextSelected end
         do -- avoid jumping over local scope error
             local thisTime = truthy(ho.EndTime) and ho.EndTime or ho.StartTime
             local prevTime = truthy(selected[math.max(1, idx - 1)].EndTime) and selected[math.max(1, idx - 1)].EndTime or
@@ -77,7 +77,7 @@ function automateSVs(settingVars)
                 table.insert(neededIds[idName].svs, createSV(svTime, tempMultiplier))
             end
         end
-        ::continue::
+        ::nextSelected::
     end
 
     for id, data in pairs(neededIds) do

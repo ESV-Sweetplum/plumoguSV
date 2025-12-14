@@ -505,11 +505,11 @@ function chooseCurrentScrollGroup()
     "255,255,255" }
     local hiddenGroups = {}
     for tgId, tg in pairs(map.TimingGroups) do
-        if string.find(tgId, "%$") then goto cont end
+        if string.find(tgId, "%$") then goto nextTG end
         if (globalVars.hideAutomatic and string.find(tgId, "automate_")) then table.insert(hiddenGroups, tgId) end
         table.insert(groups, tgId)
         table.insert(cols, tg.ColorRgb or "255,255,255")
-        ::cont::
+        ::nextTG::
     end
     local prevIndex = globalVars.scrollGroupIndex
     imgui.PushItemWidth(155)
@@ -531,14 +531,14 @@ function chooseTimingGroup(label, previousGroup)
     "255,255,255" }
     local hiddenGroups = {}
     for tgId, tg in pairs(map.TimingGroups) do
-        if string.find(tgId, "%$") then goto cont end
+        if string.find(tgId, "%$") then goto nextTG end
         if (globalVars.hideAutomatic and string.find(tgId, "automate_")) then
             table.insert(hiddenGroups,
                 tgId)
         end
         table.insert(groups, tgId)
         table.insert(cols, tg.ColorRgb or "255,255,255")
-        ::cont::
+        ::nextTG::
     end
     imgui.PushItemWidth(155)
     local previousIndex = table.indexOf(groups, previousGroup)

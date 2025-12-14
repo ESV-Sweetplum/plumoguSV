@@ -88,9 +88,9 @@ function color.nduaToRgba(ndua)
     local num = 0
     for i = 1, 5 do
         local idx = table.indexOf(NONDUA, ndua:charAt(i))
-        if (idx == -1) then goto skip end
+        if (idx == -1) then goto nextIndex end
         num = num + (idx - 1) * 92 ^ (5 - i)
-        ::skip::
+        ::nextIndex::
     end
 
     return color.uintToRgba(num)

@@ -96,7 +96,7 @@ function showTutorialWindow()
     if (game.keyCount ~= 4) then
         imgui.SeparatorText("This tutorial does not support this key mode.")
         imgui.Text("Please go to a 4K map to continue.")
-        goto dontRenderTutorial
+        goto tutorialRenderSkip
     end
 
     if (cache.tutorialWindowQueue) then
@@ -106,12 +106,12 @@ function showTutorialWindow()
 
     if (tutorialWindowName == "") then
         nullFn()
-        goto dontRenderTutorial
+        goto tutorialRenderSkip
     end
 
     table.nestedValue(tree, tutorialWindowName:split("."))()
 
-    ::dontRenderTutorial::
+    ::tutorialRenderSkip::
     imgui.EndChild()
 
     imgui.Columns(1)

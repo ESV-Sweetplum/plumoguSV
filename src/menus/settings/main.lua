@@ -33,11 +33,11 @@ function showPluginSettingsWindow()
     imgui.Text("Setting Type")
     imgui.Separator()
     for idx, v in pairs(SETTING_TYPES) do
-        if (v == "Custom Theme" and (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)) then goto skip end
+        if (v == "Custom Theme" and (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)) then goto nextSetting end
         if (imgui.Selectable(v, typeIndex == idx)) then
             typeIndex = idx
         end
-        ::skip::
+        ::nextSetting::
     end
     AddSeparator()
     if (imgui.Button("Reset Settings")) then

@@ -14,13 +14,13 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
             if (state.SelectedScrollGroupId ~= ho.TimingGroup and globalVars.ignoreNotesOutsideTg) then skipNote = true end
             if (ho.StartTime == startOffset or ho.StartTime == endOffset) then skipNote = false end
 
-            if (skipNote) then goto skip end
+            if (skipNote) then goto nextNote end
             table.insert(noteOffsetsBetween, ho.StartTime)
             if (ho.EndTime ~= 0 and ho.EndTime <= endOffset and includeLN) then
                 table.insert(noteOffsetsBetween,
                     ho.EndTime)
             end
-            ::skip::
+            ::nextNote::
         end
         if ho.EndTime >= startOffset and ho.EndTime <= endOffset and includeLN then
             table.insert(noteOffsetsBetween, ho.EndTime)
