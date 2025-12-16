@@ -115,6 +115,9 @@ function pasteItems(menuVars)
     local svsToAdd = {}
     local ssfsToAdd = {}
     local bmsToAdd = {}
+    if (globalVars.performanceMode) then -- Delayed hit object start time calculation until absolutely necessary
+        refreshHitObjectStartTimes()
+    end
     local hitObjectTimes = cache.lists.hitObjectStartTimes
     for i = 1, #offsets do
         local pasteOffset = offsets[i]

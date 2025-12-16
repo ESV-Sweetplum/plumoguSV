@@ -3186,6 +3186,9 @@ function pasteItems(menuVars)
     local svsToAdd = {}
     local ssfsToAdd = {}
     local bmsToAdd = {}
+    if (globalVars.performanceMode) then
+        refreshHitObjectStartTimes()
+    end
     local hitObjectTimes = state.GetValue("lists.hitObjectStartTimes")
     for i = 1, #offsets do
         local pasteOffset = offsets[i]
@@ -12877,14 +12880,14 @@ function createFrameTime(thisTime, thisLanes, thisFrame, thisPosition)
     return frameTime
 end
 function listenForHitObjectChanges()
-    local function setHitObjectStartTimes()
+    function refreshHitObjectStartTimes()
         state.SetValue("lists.hitObjectStartTimes", table.dedupe(table.property(map.HitObjects, "StartTime")))
     end
-    setHitObjectStartTimes()
+    refreshHitObjectStartTimes()
     listen(function(action, type, fromLua)
         state.SetValue("boolean.changeOccurred", true)
-        if (tonumber(action.Type) <= 7) then
-            setHitObjectStartTimes()
+        if (tonumber(action.Type) <= 7 and not globalVars.performanceMode) then
+            refreshHitObjectStartTimes()
         end
     end)
 end
