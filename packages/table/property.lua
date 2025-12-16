@@ -6,7 +6,7 @@
 function table.property(tbl, property)
     local resultsTbl = {}
 
-    for _, v in ipairs(tbl) do
+    for _, v in pairs(tbl) do
         table.insert(resultsTbl, v[property])
     end
 
