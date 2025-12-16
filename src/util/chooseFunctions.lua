@@ -419,17 +419,6 @@ function chooseInterlace(menuVars)
     return interlaceChanged or oldRatio ~= menuVars.interlaceRatio
 end
 
-function chooseStepSize()
-    imgui.PushItemWidth(40)
-    local oldStepSize = globalVars.stepSize
-    local _, tempStepSize = imgui.InputFloat("Exponential Intensity Step Size", oldStepSize, 0, 0, "%.0f%%")
-    globalVars.stepSize = math.clamp(tempStepSize, 1, 100)
-    imgui.PopItemWidth()
-    if (oldStepSize ~= globalVars.stepSize) then
-        write(globalVars)
-    end
-end
-
 function chooseMainSV(settingVars)
     local label = "Main SV"
     if settingVars.linearlyChange then label = label .. " (start)" end

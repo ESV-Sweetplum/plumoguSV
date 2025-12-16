@@ -15,6 +15,7 @@ function RadioButtons(label, value, options, optionValues, tooltipText)
         if imgui.RadioButton(option, value == optionValues[idx]) then
             value = optionValues[idx]
         end
+        if (tooltipText) then HoverToolTip(tooltipText) end
     end
     return value
 end

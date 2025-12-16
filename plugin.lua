@@ -1750,7 +1750,8 @@ globalVars = {
     dynamicBackgroundIndex = 1,
     disableLoadup = false,
     useEndTimeOffsets = false,
-    printLegacyLNMessage = true
+    printLegacyLNMessage = true,
+    maxDisplacementMultiplierExponent = 6,
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 function setGlobalVars(tempGlobalVars)
@@ -1799,6 +1800,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.dynamicBackgroundIndex = tn(tempGlobalVars.dynamicBackgroundIndex)
     globalVars.useEndTimeOffsets = truthy(tempGlobalVars.useEndTimeOffsets)
     globalVars.printLegacyLNMessage = truthy(tempGlobalVars.printLegacyLNMessage, true)
+    globalVars.maxDisplacementMultiplierExponent = tn(tempGlobalVars.maxDisplacementMultiplierExponent)
 end
 DEFAULT_STARTING_MENU_VARS = {
     placeStandard = {
@@ -6322,8 +6324,8 @@ function setIncognitoColors()
     imgui.PushStyleColor(imgui_col.TitleBgActive, grey)
     imgui.PushStyleColor(imgui_col.TitleBgCollapsed, black)
     imgui.PushStyleColor(imgui_col.CheckMark, white)
-    imgui.PushStyleColor(imgui_col.SliderGrab, grey)
-    imgui.PushStyleColor(imgui_col.SliderGrabActive, whiteTint)
+    imgui.PushStyleColor(imgui_col.SliderGrab, whiteTint)
+    imgui.PushStyleColor(imgui_col.SliderGrabActive, white)
     imgui.PushStyleColor(imgui_col.Button, grey)
     imgui.PushStyleColor(imgui_col.ButtonHovered, whiteTint)
     imgui.PushStyleColor(imgui_col.ButtonActive, whiteTint)
@@ -7179,6 +7181,7 @@ function RadioButtons(label, value, options, optionValues, tooltipText)
         if imgui.RadioButton(option, value == optionValues[idx]) then
             value = optionValues[idx]
         end
+        if (tooltipText) then HoverToolTip(tooltipText) end
     end
     return value
 end
@@ -8249,6 +8252,7 @@ function copyNPasteSettingsMenu(menuVars, actionable)
     _, menuVars.tryAlign = imgui.Checkbox("Try to fix misalignments", menuVars.tryAlign)
     imgui.PushItemWidth(100)
     _, menuVars.alignWindow = imgui.SliderInt("Alignment window (ms)", menuVars.alignWindow, 1, 10)
+    menuVars.alignWindow = math.clamp(menuVars.alignWindow, 1, 10)
     imgui.PopItemWidth()
     return copiedItemCount
 end
@@ -10411,6 +10415,28 @@ function selectByTimingGroupMenu()
         menuVars)
     cache.saveTable("selectByTimingGroupMenu", menuVars)
 end
+function showAdvancedSettings()
+    GlobalCheckbox("hideAutomatic", "Hide Automatically Placed TGs",
+        'Timing groups placed by the "Automatic" feature will not be shown in the plumoguSV timing group selector.')
+    GlobalCheckbox("useEndTimeOffsets", "Use LN Ends As Offsets",
+        "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets.")
+    GlobalCheckbox("ignoreNotesOutsideTg", "Ignore Notes Not In Current Timing Group",
+        "Notes that are in a timing group outside of the current one will be ignored by stills, selection checks, etc.")
+    chooseMaxDisplacementMultiplierExponent()
+end
+function chooseMaxDisplacementMultiplierExponent()
+    imgui.PushItemWidth(70)
+    local oldMaxDisplacementMultiplierExponent = globalVars.maxDisplacementMultiplierExponent
+    _, tempMaxDisplacementMultiplierExponent = imgui.SliderInt("Max Displacement Multiplier Exp.",
+        oldMaxDisplacementMultiplierExponent, 0, 10)
+    HoverToolTip(
+    "plumoguSV designs pseudo-instantaneous movement via a very large SV immediately followed by a different SV. ")
+    globalVars.maxDisplacementMultiplierExponent = math.clamp(tempMaxDisplacementMultiplierExponent, 0, 10)
+    imgui.PopItemWidth()
+    if (oldMaxDisplacementMultiplierExponent ~= globalVars.maxDisplacementMultiplierExponent) then
+        write(globalVars)
+    end
+end
 function showAppearanceSettings()
     if (globalVars.performanceMode) then
         imgui.TextColored(color.vctr.red,
@@ -10947,17 +10973,11 @@ function showGeneralSettings()
         "Disables some visual enhancement to boost performance.")
     GlobalCheckbox("advancedMode", "Enable Advanced Mode",
         "Advanced mode enables a few features that simplify SV creation, at the cost of making the plugin more cluttered.")
-    if (not globalVars.advancedMode) then imgui.BeginDisabled() end
-    GlobalCheckbox("hideAutomatic", "Hide Automatically Placed TGs",
-        'Timing groups placed by the "Automatic" feature will not be shown in the plumoguSV timing group selector.')
-    if (not globalVars.advancedMode) then imgui.EndDisabled() end
     AddSeparator()
     chooseUpscroll()
     AddSeparator()
     GlobalCheckbox("dontReplaceSV", "Don't Replace Existing SVs",
         "Self-explanatory, but applies only to base SVs made with Standard, Special, or Still. Highly recommended to keep this setting disabled.")
-    GlobalCheckbox("ignoreNotesOutsideTg", "Ignore Notes Not In Current Timing Group",
-        "Notes that are in a timing group outside of the current one will be ignored by stills, selection checks, etc.")
     chooseStepSize()
     GlobalCheckbox("dontPrintCreation", "Don't Print SV Creation Messages",
         'Disables printing "Created __ SVs" messages.')
@@ -10965,16 +10985,26 @@ function showGeneralSettings()
         "Forces the standard > linear option to have an average sv of 0 if the start and end SVs are equal. For beginners, this should be enabled.")
     GlobalCheckbox("comboizeSelect", "Select Using Already Selected Notes",
         "Changes the behavior of the SELECT tab to select notes that are already selected, instead of all notes between the start/end selection.")
-    GlobalCheckbox("useEndTimeOffsets", "Use LN Ends As Offsets",
-        "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets.")
     GlobalCheckbox("printLegacyLNMessage", "Print Legacy LN Recommendation",
         "When true, prints a warning to enable legacy LN when the following conditions are met:\n1. Legacy LN Rendering is currently turned off.\n2: When placing stills, or using certain features that can displace, such as flicker, displace note, and displace view.")
 end
 function chooseUpscroll()
     local oldUpscroll = globalVars.upscroll
     globalVars.upscroll = RadioButtons("Scroll Direction:", globalVars.upscroll, { "Down", "Up" }, { false, true },
-        "Orientation for distance graphs and visuals")
+        "Orientation for distance graphs and visuals.")
     if (oldUpscroll ~= globalVars.upscroll) then
+        write(globalVars)
+    end
+end
+function chooseStepSize()
+    imgui.PushItemWidth(40)
+    local oldStepSize = globalVars.stepSize
+    local _, tempStepSize = imgui.InputFloat("Exponential Intensity Step Size", oldStepSize, 0, 0, "%.0f%%")
+    HoverToolTip(
+        "Changes what the exponential intensity slider will round the nearest to. Recommended to keep this as a factor of 100 (1, 2, 5, 10, etc).")
+    globalVars.stepSize = math.clamp(tempStepSize, 1, 100)
+    imgui.PopItemWidth()
+    if (oldStepSize ~= globalVars.stepSize) then
         write(globalVars)
     end
 end
@@ -11009,6 +11039,7 @@ function showKeybindSettings()
 end
 SETTING_TYPES = {
     "General",
+    "Advanced",
     "Default Properties",
     "Appearance",
     "Custom Theme",
@@ -11036,8 +11067,13 @@ function showPluginSettingsWindow()
     imgui.BeginChild("Setting Categories")
     imgui.Text("Setting Type")
     imgui.Separator()
+    --- Key is name of setting. If value with respect to key is true, will hide setting at the left
+    local hideSettingDict = {
+        ["Advanced"] = not globalVars.advancedMode,
+        ["Custom Theme"] = (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)
+    }
     for idx, v in pairs(SETTING_TYPES) do
-        if (v == "Custom Theme" and (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)) then goto nextSetting end
+        if (hideSettingDict[v]) then goto nextSetting end
         if (imgui.Selectable(v, typeIndex == idx)) then
             typeIndex = idx
         end
@@ -11057,6 +11093,9 @@ function showPluginSettingsWindow()
     if (SETTING_TYPES[typeIndex] == "General") then
         showGeneralSettings()
     end
+    if (SETTING_TYPES[typeIndex] == "Advanced") then
+        showAdvancedSettings()
+    end
     if (SETTING_TYPES[typeIndex] == "Default Properties") then
         showDefaultPropertiesSettings()
     end
@@ -11066,7 +11105,7 @@ function showPluginSettingsWindow()
     if (SETTING_TYPES[typeIndex] == "Appearance") then
         showAppearanceSettings()
     end
-    if (SETTING_TYPES[typeIndex] == "Custom Theme" and COLOR_THEMES[globalVars.colorThemeIndex] == "CUSTOM") then
+    if (SETTING_TYPES[typeIndex] == "Custom Theme") then
         showCustomThemeSettings()
     end
     if (SETTING_TYPES[typeIndex] == "Keybinds") then
@@ -12000,16 +12039,6 @@ function chooseInterlace(menuVars)
     imgui.PopItemWidth()
     return interlaceChanged or oldRatio ~= menuVars.interlaceRatio
 end
-function chooseStepSize()
-    imgui.PushItemWidth(40)
-    local oldStepSize = globalVars.stepSize
-    local _, tempStepSize = imgui.InputFloat("Exponential Intensity Step Size", oldStepSize, 0, 0, "%.0f%%")
-    globalVars.stepSize = math.clamp(tempStepSize, 1, 100)
-    imgui.PopItemWidth()
-    if (oldStepSize ~= globalVars.stepSize) then
-        write(globalVars)
-    end
-end
 function chooseMainSV(settingVars)
     local label = "Main SV"
     if settingVars.linearlyChange then label = label .. " (start)" end
@@ -12387,8 +12416,8 @@ end
 --
 --
 function getUsableDisplacementMultiplier(offset)
-    local exponent = 23 - math.floor(math.log(math.abs(offset) + 1, 2))
-    if exponent >= 6 then return 64 end
+    local exponent = math.clamp(23 - math.floor(math.log(math.abs(offset) + 1, 2)), 0,
+        globalVars.maxDisplacementMultiplierExponent)
     return 2 ^ exponent
 end
 function prepareDisplacingSV(svsToAdd, svTimeIsAdded, svTime, displacement, displacementMultiplier, hypothetical, svs)

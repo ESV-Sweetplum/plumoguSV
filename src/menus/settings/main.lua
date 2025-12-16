@@ -1,5 +1,6 @@
 SETTING_TYPES = {
     "General",
+    "Advanced",
     "Default Properties",
     "Appearance",
     "Custom Theme",
@@ -32,8 +33,15 @@ function showPluginSettingsWindow()
 
     imgui.Text("Setting Type")
     imgui.Separator()
+
+    --- Key is name of setting. If value with respect to key is true, will hide setting at the left
+    local hideSettingDict = {
+        ["Advanced"] = not globalVars.advancedMode,
+        ["Custom Theme"] = (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)
+    }
+
     for idx, v in pairs(SETTING_TYPES) do
-        if (v == "Custom Theme" and (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)) then goto nextSetting end
+        if (hideSettingDict[v]) then goto nextSetting end
         if (imgui.Selectable(v, typeIndex == idx)) then
             typeIndex = idx
         end
@@ -56,6 +64,9 @@ function showPluginSettingsWindow()
     if (SETTING_TYPES[typeIndex] == "General") then
         showGeneralSettings()
     end
+    if (SETTING_TYPES[typeIndex] == "Advanced") then
+        showAdvancedSettings()
+    end
     if (SETTING_TYPES[typeIndex] == "Default Properties") then
         showDefaultPropertiesSettings()
     end
@@ -65,7 +76,7 @@ function showPluginSettingsWindow()
     if (SETTING_TYPES[typeIndex] == "Appearance") then
         showAppearanceSettings()
     end
-    if (SETTING_TYPES[typeIndex] == "Custom Theme" and COLOR_THEMES[globalVars.colorThemeIndex] == "CUSTOM") then
+    if (SETTING_TYPES[typeIndex] == "Custom Theme") then
         showCustomThemeSettings()
     end
     if (SETTING_TYPES[typeIndex] == "Keybinds") then
