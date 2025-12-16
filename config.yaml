@@ -1,7 +1,7 @@
 stepSize: 5
 dontReplaceSV: false
 upscroll: false
-colorThemeIndex: 5
+colorThemeIndex: 16
 styleThemeIndex: 1
 effectFPS: 100
 cursorTrailIndex: 1
@@ -18,7 +18,7 @@ selectTypeIndex: 1
 placeTypeIndex: 1
 editToolIndex: 1
 showPresetMenu: false
-scrollGroupIndex: 1
+scrollGroupIndex: 3
 hideSVInfo: false
 showSVInfoVisualizer: true
 showVibratoWidget: false
@@ -688,5 +688,5 @@ dynamicBackgroundIndex: 1
 disableLoadup: false
 useEndTimeOffsets: false
 printLegacyLNMessage: true
-maxDisplacementMultiplierExponent: 6
+maxDisplacementMultiplierExponent: 5
 ignoreNotes: false
