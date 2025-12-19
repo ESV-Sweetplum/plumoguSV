@@ -4,7 +4,7 @@ function awake()
     local tempGlobalVars = read()
 
     if (not tempGlobalVars) then
-        write(globalVars) -- First time launching plugin
+        write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
         print("w!",
             'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.')
         setPresets({})
