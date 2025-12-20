@@ -24,7 +24,10 @@ function placeStutterSVs(settingVars)
         for j = 1, #stutterOffsets - 1 do
             local duration = settingVars.stutterDuration
             if settingVars.linearlyChange then
-                local x = (j - 1) / (#stutterOffsets - 1)
+                local x = (j - 1) / (#stutterOffsets - 2)
+                if (#stutterOffsets == 2) then
+                    x = (i - 1) / (#offsets - 1)
+                end
                 duration = x * settingVars.stutterDuration2 + (1 - x) * settingVars.stutterDuration
             end
             local svMultipliers = generateStutterSet(firstStutterSVs[stutterIndex],
