@@ -21,6 +21,8 @@ function stutterSettingsMenu(settingVars)
         settingVars.stutterDuration2 = math.clamp(settingVars.stutterDuration2, 1, 99)
     end
     settingsChanged = BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time") or settingsChanged
+    HoverToolTip(
+    "Affects the stutter within two offsets; does not affect the stutter over the duration of several notes.")
     AddSeparator()
     settingsChanged = BasicInputInt(settingVars, "stuttersPerSection", "Stutters", { 1, 1000 }) or settingsChanged
     settingsChanged = chooseAverageSV(settingVars) or settingsChanged

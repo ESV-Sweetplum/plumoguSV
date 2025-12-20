@@ -2449,7 +2449,7 @@ function placeStutterSVs(settingVars)
         for j = 1, #stutterOffsets - 1 do
             local duration = settingVars.stutterDuration
             if settingVars.linearlyChange then
-                local x = (i - 1) / (#stutterOffsets - 2)
+                local x = (j - 1) / (#stutterOffsets - 1)
                 duration = x * settingVars.stutterDuration2 + (1 - x) * settingVars.stutterDuration
             end
             local svMultipliers = generateStutterSet(firstStutterSVs[stutterIndex],
@@ -7717,6 +7717,8 @@ function stutterSettingsMenu(settingVars)
         settingVars.stutterDuration2 = math.clamp(settingVars.stutterDuration2, 1, 99)
     end
     settingsChanged = BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time") or settingsChanged
+    HoverToolTip(
+    "Affects the stutter within two offsets; does not affect the stutter over the duration of several notes.")
     AddSeparator()
     settingsChanged = BasicInputInt(settingVars, "stuttersPerSection", "Stutters", { 1, 1000 }) or settingsChanged
     settingsChanged = chooseAverageSV(settingVars) or settingsChanged
@@ -13640,7 +13642,7 @@ function awake()
     loadup = {} -- later inserted to via setStyleVars.lua
     local tempGlobalVars = read()
     if (not tempGlobalVars) then
-        write(globalVars) -- First time launching plugin
+        write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
         print("w!",
             'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.')
         setPresets({})
