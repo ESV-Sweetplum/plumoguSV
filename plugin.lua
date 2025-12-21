@@ -1974,7 +1974,9 @@ DEFAULT_STARTING_MENU_VARS = {
     },
     selectNoteType = {
         rice = true,
-        ln = false
+        ln = false,
+        normal = true,
+        mine = false
     },
     selectBySnap = {
         snap = 1
@@ -4179,6 +4181,7 @@ function selectByChordSizes(menuVars)
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
+---@diagnostic disable: undefined-field
 function selectByNoteType(menuVars)
     local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
@@ -4189,8 +4192,20 @@ function selectByNoteType(menuVars)
     local notesToSelect = {}
     for k40 = 1, #totalNotes do
         local note = totalNotes[k40]
-        if (note.EndTime == 0 and menuVars.rice) then notesToSelect[#notesToSelect + 1] = note end
-        if (note.EndTime ~= 0 and menuVars.ln) then notesToSelect[#notesToSelect + 1] = note end
+        if (hitobject_type) then
+            if (note.Type == hitobject_type.Normal and not menuVars.normal) then
+                goto skipType
+            end
+            if (note.Type == hitobject_type.Mine and not menuVars.mine) then
+                goto skipType
+            end
+            if (note.EndTime == 0 and menuVars.rice) then notesToSelect[#notesToSelect + 1] = note end
+            if (note.EndTime ~= 0 and menuVars.ln) then notesToSelect[#notesToSelect + 1] = note end
+            ::skipType::
+        else
+            if (note.EndTime == 0 and menuVars.rice) then notesToSelect[#notesToSelect + 1] = note end
+            if (note.EndTime ~= 0 and menuVars.ln) then notesToSelect[#notesToSelect + 1] = note end
+        end
     end
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
@@ -10404,6 +10419,12 @@ function selectNoteTypeMenu()
     _, menuVars.rice = imgui.Checkbox("Select Rice Notes", menuVars.rice)
     KeepSameLine()
     _, menuVars.ln = imgui.Checkbox("Select LNs", menuVars.ln)
+    ---@diagnostic disable-next-line: undefined-global
+    if (hitobject_type) then
+        _, menuVars.normal = imgui.Checkbox("Select Normals", menuVars.normal)
+        KeepSameLine()
+        _, menuVars.mine = imgui.Checkbox("Select Mines", menuVars.mine)
+    end
     simpleActionMenu("Select notes within region", 2, selectByNoteType, menuVars)
     cache.saveTable("selectNoteTypeMenu", menuVars)
 end

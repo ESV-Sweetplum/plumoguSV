@@ -170,7 +170,9 @@ DEFAULT_STARTING_MENU_VARS = {
     },
     selectNoteType = {
         rice = true,
-        ln = false
+        ln = false,
+        normal = true,
+        mine = false
     },
     selectBySnap = {
         snap = 1
