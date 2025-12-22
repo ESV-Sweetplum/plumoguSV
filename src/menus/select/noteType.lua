@@ -12,6 +12,5 @@ function selectNoteTypeMenu()
     end
 
     simpleActionMenu("Select notes within region", 2, selectByNoteType, menuVars)
-
     cache.saveTable("selectNoteTypeMenu", menuVars)
 end
