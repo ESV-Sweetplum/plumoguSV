@@ -57,6 +57,5 @@ If you want any custom features or rush orders, check out the link below.
 
 ## TO-DO
 
--   Fix 3 side algo
 -   Animation palette generator (v2.1)
 -   Allow for dynamic sv fps instead of static sv points (v2.1)
