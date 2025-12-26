@@ -60,13 +60,6 @@ function clock.listen(id, interval)
     end
     return false
 end
----A temporary clock that can be called multiple times. Should only be used for testing/debugging.
----@param interval integer The interval at which the clock should run.
----@return boolean ev True if the clock has reached its interval time.
-function clock.temp(interval)
-    tempClockCount = tempClockCount + 1
-    return clock.listen("temporary" .. tempClockCount, interval)
-end
 ---Alters opacity of a given color.
 ---@param col integer
 ---@param additiveOpacity integer
@@ -140,20 +133,6 @@ function color.uintToRgba(n)
         tbl[#tbl + 1] = math.floor(n / 256 ^ i) % 256
     end
     return table.vectorize4(tbl)
-end
----Converts rgba to a hexa string.
----@param r integer
----@param g integer
----@param b integer
----@param a integer
----@return string
-function color.rgbaToHexa(r, g, b, a)
-    local flr = math.floor
-    local hexaStr = ""
-    for _, col in ipairs({ r, g, b, a }) do
-        hexaStr = hexaStr .. HEXADECIMAL[flr(col / 16) + 1] .. HEXADECIMAL[flr(col) % 16 + 1]
-    end
-    return hexaStr
 end
 ---Converts a hexa string to an rgba Vector4 (0-1 for each element).
 ---@param hexa string
@@ -261,15 +240,6 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     if (math.floor(48 / v) ~= 48 / v) then return 5 end
     if (48 / v > 16) then return 5 end
     return 48 / v
-end
----Gets the start time of the most recent SSF, or returns -1 if there is no SSF before the given offset.
----@param offset number
----@param tgId? string
----@return number
-function game.getSSFStartTimeAt(offset, tgId)
-    local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
-    if ssf then return ssf.StartTime end
-    return -1
 end
 ---Gets the multiplier of the most recent SSF, or returns 1 if there is no SSF before the given offset.
 ---@param offset number
@@ -408,25 +378,6 @@ function game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return {} end
     return offsets
 end
----Returns an array of hit objects within the selection time.
----@return HitObject[]
-function game.uniqueNotesBetweenSelected()
-    local selectedNoteOffsets = game.uniqueSelectedNoteOffsets()
-    if (not selectedNoteOffsets) then
-        toggleablePrint("e!",
-            "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
-        return {}
-    end
-    local startOffset = selectedNoteOffsets[1]
-    local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
-    local hos = game.getNotesBetweenOffsets(startOffset, endOffset)
-    if (#hos < 2) then
-        toggleablePrint("e!",
-            "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
-        return {}
-    end
-    return hos
-end
 function game.getTimingGroupList()
     local baseList = table.keys(map.TimingGroups)
     local defaultIndex = table.indexOf(baseList, "$Default")
@@ -471,12 +422,6 @@ game.getUniqueNoteOffsetsBetween = game.uniqueNoteOffsetsBetween
 function game.window.getCenter()
     local windowDim = state.WindowSize
     return vector.New(state.WindowSize[1] / 2, state.WindowSize[2] / 2)
-end
----Returns `true` if the input (which should be a number) is not a number.
----@param v number
----@return boolean
-function isNaN(v)
-    return type(v) == "number" and v ~= v
 end
 ---Listens to the keyboard and returns specific values based on if keys are pressed.
 ---@return string[] prefixes An array of prefixes like "Ctrl" or "Shift".
@@ -553,13 +498,6 @@ end
 function math.quadraticBezier(p2, t)
     return 2 * t * (1 - t) * p2 + t * t
 end
----Returns n choose r, or nCr.
----@param n integer
----@param r integer
----@return integer
-function math.binom(n, r)
-    return math.factorial(n) / (math.factorial(r) * math.factorial(n - r))
-end
 ---Restricts a number to be within a chosen bound.
 ---@param number number
 ---@param lowerBound number
@@ -596,16 +534,6 @@ function math.expoClamp(n, lowerBound, upperBound, multiplicativeFactor)
     end
     return n
 end
----Returns the factorial of an integer.
----@param n integer
----@return integer
-function math.factorial(n)
-    local product = 1
-    for i = 2, n do
-        product = product * i
-    end
-    return product
-end
 ---Forces a number to have a quarterly decimal part.
 ---@param number number
 ---@return number
@@ -629,53 +557,6 @@ function math.hermite(m1, m2, y2, t)
     local b = 3 * y2 - 2 * m1 - m2
     local c = m1
     return a * t * t * t + b * t * t + c * t
-end
----Interpolates circular parameters of the form (x-h)^2+(y-k)^2=r^2 with three, non-colinear points.
----@param p1 Vector2
----@param p2 Vector2
----@param p3 Vector2
----@return number, number?, number?
-function math.interpolateCircle(p1, p2, p3)
-    local mtrx = {
-        vector.Table(2 * (p2 - p1)),
-        vector.Table(2 * (p3 - p1))
-    }
-    local vctr = {
-        vector.Length(p2) ^ 2 - vector.Length(p1) ^ 2,
-        vector.Length(p3) ^ 2 - vector.Length(p1) ^ 2
-    }
-    vtx = matrix.solve(mtrx, vctr)
-    if (type(vtx) == "number") then return -1 / 0 end
-    r = math.sqrt((p1.x) ^ 2 + (p1.y) ^ 2 + vtx[1] ^ 2 + vtx[2] ^ 2 - 2 * vtx[1] * p1.x - 2 * vtx[2] * p1.y)
-    return vtx[1], vtx[2], r
-end
----Interpolates quadratic parameters of the form y=ax^2+bx+c with three, non-colinear points.
----@param p1 Vector2
----@param p2 Vector2
----@param p3 Vector2
----@return number, number?, number?
-function math.interpolateQuadratic(p1, p2, p3)
-    local mtrx = {
-        (p2.x) ^ 2 - (p1.x) ^ 2, (p2 - p1).x,
-        (p3.x) ^ 2 - (p1.x) ^ 2, (p3 - p1).x,
-    }
-    local vctr = {
-        (p2 - p1).y,
-        (p3 - p1).y
-    }
-    local coeffs = matrix.solve(mtrx, vctr)
-    if (type(coeffs) == "number") then return 1 / 0 end
-    c = p1.y - p1.x * coeffs[2] - (p1.x) ^ 2 * coeffs[1]
-    ---@type number, number, number
-    return coeffs[1], coeffs[2], c
-end
----Returns a number that is `(weight * 100)%` of the way from travelling between `lowerBound` and `upperBound`.
----@param weight number
----@param lowerBound number
----@param upperBound number
----@return number
-function math.lerp(weight, lowerBound, upperBound)
-    return upperBound * weight + lowerBound * (1 - weight)
 end
 ---Returns the weight of a number between `lowerBound` and `upperBound`.
 ---@param num number
@@ -733,9 +614,6 @@ function matrix.solve(mtrx, vctr)
         end
     end
     return table.property(augMtrx, #mtrx + 1)
-end
-function matrix.swapRows(mtrx, rowIdx1, rowIdx2)
-    mtrx[rowIdx1], mtrx[rowIdx2] = table.duplicate(mtrx[rowIdx2]), table.duplicate(mtrx[rowIdx1])
 end
 ---Rounds a number to a given amount of decimal places.
 ---@param number number
@@ -1360,9 +1238,6 @@ end
 function vctr2(n)
     return vector.New(n, n)
 end
-function unit2(theta)
-    return vector.New(math.cos(theta), math.sin(theta))
-end
 imgui_disable_vector_packing = true
 DEFAULT_WIDGET_HEIGHT = 26
 DEFAULT_WIDGET_WIDTH = 160
@@ -1707,85 +1582,92 @@ function parseDefaultProperty(v, default)
     return v
 end
 globalVars = {
-    stepSize = 5,
-    dontReplaceSV = false,
-    upscroll = false,
+    advancedMode = false,
     colorThemeIndex = 1,
-    styleThemeIndex = 1,
-    effectFPS = 90,
-    cursorTrailIndex = 1,
-    cursorTrailShapeIndex = 1,
-    cursorTrailPoints = 10,
-    cursorTrailSize = 5,
-    snakeSpringConstant = 1,
+    comboizeSelect = false,
     cursorTrailGhost = false,
-    rgbPeriod = 2,
+    cursorTrailIndex = 1,
+    cursorTrailPoints = 10,
+    cursorTrailShapeIndex = 1,
+    cursorTrailSize = 5,
+    customStyle = {},
+    defaultProperties = { settings = {}, menu = {} },
+    disableLoadup = false,
+    dontPrintCreation = false,
+    dontReplaceSV = false,
     drawCapybara = false,
     drawCapybara2 = false,
     drawCapybara312 = false,
-    selectTypeIndex = 1,
-    placeTypeIndex = 1,
+    dynamicBackgroundIndex = 1,
     editToolIndex = 1,
-    showPresetMenu = false,
-    scrollGroupIndex = 1,
-    hideSVInfo = false,
-    showSVInfoVisualizer = true,
-    showVibratoWidget = false,
-    showNoteDataWidget = false,
-    showMeasureDataWidget = false,
-    ignoreNotesOutsideTg = false,
-    advancedMode = false,
-    performanceMode = false,
+    effectFPS = 90,
+    equalizeLinear = true,
     hideAutomatic = false,
+    hideSVInfo = false,
+    hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST),
+    ignoreNotesOutsideTg = false,
+    maxDisplacementMultiplierExponent = 6,
+    performanceMode = false,
+    placeTypeIndex = 1,
+    presets = {},
+    printLegacyLNMessage = true,
     pulseCoefficient = 0,
     pulseColor = vector.New(0, 0, 0, 0),
+    rgbPeriod = 2,
+    scrollGroupIndex = 1,
+    selectTypeIndex = 1,
+    showMeasureDataWidget = false,
+    showNoteDataWidget = false,
+    showPresetMenu = false,
+    showSVInfoVisualizer = true,
+    showVibratoWidget = false,
+    snakeSpringConstant = 1,
+    stepSize = 5,
+    styleThemeIndex = 1,
+    upscroll = false,
     useCustomPulseColor = false,
-    hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST),
-    customStyle = {},
-    dontPrintCreation = false,
-    equalizeLinear = true,
-    comboizeSelect = false,
-    defaultProperties = { settings = {}, menu = {} },
-    presets = {},
-    dynamicBackgroundIndex = 1,
-    disableLoadup = false,
     useEndTimeOffsets = false,
-    printLegacyLNMessage = true,
-    maxDisplacementMultiplierExponent = 6,
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 function setGlobalVars(tempGlobalVars)
-    globalVars.useCustomPulseColor = truthy(tempGlobalVars.useCustomPulseColor)
-    globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
-    globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
-    globalVars.stepSize = tn(tempGlobalVars.stepSize)
-    globalVars.dontReplaceSV = truthy(tempGlobalVars.dontReplaceSV)
-    globalVars.upscroll = truthy(tempGlobalVars.upscroll)
+    globalVars.advancedMode = truthy(tempGlobalVars.advancedMode)
     globalVars.colorThemeIndex = tn(tempGlobalVars.colorThemeIndex)
-    globalVars.styleThemeIndex = tn(tempGlobalVars.styleThemeIndex)
-    globalVars.rgbPeriod = tn(tempGlobalVars.rgbPeriod)
-    globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
-    globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
-    globalVars.effectFPS = tn(tempGlobalVars.effectFPS)
-    globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
-    globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
-    globalVars.snakeSpringConstant = tn(tempGlobalVars.snakeSpringConstant)
+    globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
     globalVars.cursorTrailGhost = truthy(tempGlobalVars.cursorTrailGhost)
+    globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
+    globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
+    globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
+    globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
+    globalVars.customStyle = tempGlobalVars.customStyle or {}
+    globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)
+    globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
+    globalVars.dontReplaceSV = truthy(tempGlobalVars.dontReplaceSV)
     globalVars.drawCapybara = truthy(tempGlobalVars.drawCapybara)
     globalVars.drawCapybara2 = truthy(tempGlobalVars.drawCapybara2)
     globalVars.drawCapybara312 = truthy(tempGlobalVars.drawCapybara312)
-    globalVars.ignoreNotes = truthy(tempGlobalVars.ignoreNotesOutsideTg)
+    globalVars.dynamicBackgroundIndex = tn(tempGlobalVars.dynamicBackgroundIndex)
+    globalVars.effectFPS = tn(tempGlobalVars.effectFPS)
+    globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
+    globalVars.hideAutomatic = truthy(tempGlobalVars.hideAutomatic)
     globalVars.hideSVInfo = truthy(tempGlobalVars.hideSVInfo)
+    globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
+    globalVars.ignoreNotes = truthy(tempGlobalVars.ignoreNotesOutsideTg)
+    globalVars.maxDisplacementMultiplierExponent = tn(tempGlobalVars.maxDisplacementMultiplierExponent)
+    globalVars.performanceMode = truthy(tempGlobalVars.performanceMode)
+    globalVars.printLegacyLNMessage = truthy(tempGlobalVars.printLegacyLNMessage, true)
+    globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
+    globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
+    globalVars.rgbPeriod = tn(tempGlobalVars.rgbPeriod)
+    globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
+    globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
     globalVars.showSVInfoVisualizer = truthy(tempGlobalVars.showSVInfoVisualizer, true)
     globalVars.showVibratoWidget = truthy(tempGlobalVars.showVibratoWidget)
-    globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
-    globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
-    globalVars.advancedMode = truthy(tempGlobalVars.advancedMode)
-    globalVars.performanceMode = truthy(tempGlobalVars.performanceMode)
-    globalVars.hideAutomatic = truthy(tempGlobalVars.hideAutomatic)
-    globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
-    globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
-    globalVars.customStyle = tempGlobalVars.customStyle or {}
+    globalVars.snakeSpringConstant = tn(tempGlobalVars.snakeSpringConstant)
+    globalVars.stepSize = tn(tempGlobalVars.stepSize)
+    globalVars.styleThemeIndex = tn(tempGlobalVars.styleThemeIndex)
+    globalVars.upscroll = truthy(tempGlobalVars.upscroll)
+    globalVars.useCustomPulseColor = truthy(tempGlobalVars.useCustomPulseColor)
+    globalVars.useEndTimeOffsets = truthy(tempGlobalVars.useEndTimeOffsets)
     local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
         "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
     for k12 = 1, #forceVectorizeList do
@@ -1794,13 +1676,9 @@ function setGlobalVars(tempGlobalVars)
             globalVars.customStyle[key] = table.vectorize4(globalVars.customStyle[key])
         end
     end
-    globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
-    globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
-    globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)
-    globalVars.dynamicBackgroundIndex = tn(tempGlobalVars.dynamicBackgroundIndex)
-    globalVars.useEndTimeOffsets = truthy(tempGlobalVars.useEndTimeOffsets)
-    globalVars.printLegacyLNMessage = truthy(tempGlobalVars.printLegacyLNMessage, true)
-    globalVars.maxDisplacementMultiplierExponent = tn(tempGlobalVars.maxDisplacementMultiplierExponent)
+    globalVars.placeTypeIndex = state.GetValue("global.placeTypeIndex", globalVars.placeTypeIndex)
+    globalVars.editToolIndex = state.GetValue("global.editToolIndex", globalVars.editToolIndex)
+    globalVars.selectTypeIndex = state.GetValue("global.selectTypeIndex", globalVars.selectTypeIndex)
 end
 DEFAULT_STARTING_MENU_VARS = {
     placeStandard = {
@@ -7013,8 +6891,6 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     imgui.EndCombo()
     return newListIndex
 end
-function BasicInputFloat(label, var, decimalPlaces, suffix, step)
-end
 function ComputableInputFloat(label, var, decimalPlaces, suffix)
     local previousValue = var
     local fmt = table.concat({"%.", decimalPlaces, "f"})
@@ -7245,14 +7121,6 @@ end
 function KeepSameLine()
     imgui.SameLine(0, SAMELINE_SPACING)
 end
-function BeginPaddinglessChild(label, size, flags)
-    imgui.PushStyleVar(imgui_style_var.WindowPadding, vctr2(0))
-    imgui.BeginChild(label, size, bit32.bor(flags or 2, 2))
-end
-function EndPaddinglessChild()
-    imgui.EndChild()
-    imgui.PopStyleVar()
-end
 function AddPadding()
     imgui.Dummy(vector.New(0, 0))
 end
@@ -7260,16 +7128,6 @@ function AddSeparator()
     AddPadding()
     imgui.Separator()
     AddPadding()
-end
----Creates text that shifts between two colors.
----@param text string The text to render.
----@param color1 Vector4 The first color.
----@param color2 Vector4 The second color.
----@param oscillationPeriod? integer The amount of time to switch from color 1 -> 2 -> 1, in milliseconds.
-function GradientText(color1, color2, text, oscillationPeriod)
-    PushGradientStyle(color1, color2, imgui_col.Text, oscillationPeriod)
-    imgui.Text(text)
-    imgui.PopStyleColor()
 end
 function HoverToolTip(text)
     if not imgui.IsItemHovered() then return end
@@ -7373,8 +7231,9 @@ CREATE_TYPES = {
 }
 function createSVTab()
     if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
-    chooseCreateTool()
+    local changedTool = chooseCreateTool()
     local placeType = CREATE_TYPES[globalVars.placeTypeIndex]
+    if (changedTool) then state.SetValue("global.placeTypeIndex", globalVars.placeTypeIndex) end
     if placeType == "Standard" then placeStandardSVMenu() end
     if placeType == "Special" then placeSpecialSVMenu() end
     if placeType == "Still" then placeStillSVMenu() end
@@ -7390,8 +7249,10 @@ function chooseCreateTool()
     imgui.AlignTextToFramePadding()
     imgui.Text("  Type:  ")
     KeepSameLine()
-    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex, nil, nil, tooltipList)
+    local oldPlaceTypeIndex = globalVars.placeTypeIndex
+    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, oldPlaceTypeIndex, nil, nil, tooltipList)
     HoverToolTip(tooltipList[globalVars.placeTypeIndex])
+    return oldPlaceTypeIndex ~= globalVars.placeTypeIndex
 end
 function renderPresetMenu(menuLabel, menuVars, settingVars)
     local newPresetName = state.GetValue("newPresetName", "")
@@ -7644,9 +7505,6 @@ function addSelectedNoteTimesToList(menuVars)
     end
     menuVars.noteTimes = table.dedupe(menuVars.noteTimes)
     menuVars.noteTimes = sort(menuVars.noteTimes, sortAscending)
-end
-function animationPaletteMenu(settingVars)
-    CodeInput(settingVars, "instructions", "", "Write instructions here.")
 end
 function automateSVMenu(settingVars)
     local copiedSVCount = #settingVars.copiedSVs
@@ -8490,7 +8348,8 @@ EDIT_SV_TOOLS = {
 }
 function editSVTab()
     if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
-    chooseEditTool()
+    local changedTool = chooseEditTool()
+    if (changedTool) then state.SetValue("global.editToolIndex", globalVars.editToolIndex) end
     AddSeparator()
     local toolName = EDIT_SV_TOOLS[globalVars.editToolIndex]
     if toolName == "Add Teleport" then addTeleportMenu() end
@@ -8538,8 +8397,10 @@ function chooseEditTool()
     imgui.AlignTextToFramePadding()
     imgui.Text("  Current Tool:")
     KeepSameLine()
-    globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, globalVars.editToolIndex, nil, nil, tooltipList)
+    local oldEditToolIndex = globalVars.editToolIndex
+    globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, oldEditToolIndex, nil, nil, tooltipList)
     HoverToolTip(tooltipList[globalVars.editToolIndex])
+    return oldEditToolIndex ~= globalVars.editToolIndex
 end
 function measureMenu()
     local menuVars = getMenuVars("measure")
@@ -10388,8 +10249,9 @@ SELECT_TOOLS = {
     "Note Type",
 }
 function selectTab()
-    chooseSelectTool()
+    local changedTool = chooseSelectTool()
     AddSeparator()
+    if (changedTool) then state.SetValue("global.selectTypeIndex", globalVars.selectTypeIndex) end
     local toolName = SELECT_TOOLS[globalVars.selectTypeIndex]
     if toolName == "Alternating" then selectAlternatingMenu() end
     if toolName == "Bookmark" then selectBookmarkMenu() end
@@ -10410,9 +10272,10 @@ function chooseSelectTool()
     imgui.AlignTextToFramePadding()
     imgui.Text("Current Type:")
     KeepSameLine()
-    globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, globalVars.selectTypeIndex, nil, nil, tooltipList)
+    local oldSelectTypeIndex = globalVars.selectTypeIndex
+    globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, oldSelectTypeIndex, nil, nil, tooltipList)
     HoverToolTip(tooltipList[globalVars.selectTypeIndex])
-    local selectTool = SELECT_TOOLS[globalVars.selectTypeIndex]
+    return oldSelectTypeIndex ~= globalVars.selectTypeIndex
 end
 function selectNoteTypeMenu()
     local menuVars = getMenuVars("selectNoteType")
@@ -13073,22 +12936,6 @@ function getHypotheticalSVMultiplierAt(svs, offset)
         end
     end
     return 1
-end
----Returns the SV time in a given array of SVs.
----@param svs ScrollVelocity[]
----@param offset number
----@return number
-function getHypotheticalSVTimeAt(svs, offset)
-    if (#svs == 1) then return svs[1].StartTime end
-    local index = #svs
-    while (index >= 1) do
-        if (svs[index].StartTime > offset) then
-            index = index - 1
-        else
-            return svs[index].StartTime
-        end
-    end
-    return -69
 end
 ---Given a predetermined set of SVs, returns a list of [scroll velocities](lua://ScrollVelocity) within a temporal boundary.
 ---@param startOffset number The lower bound of the search area.

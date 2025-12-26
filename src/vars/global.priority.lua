@@ -1,86 +1,94 @@
 globalVars = {
-    stepSize = 5,
-    dontReplaceSV = false,
-    upscroll = false,
+    advancedMode = false,
     colorThemeIndex = 1,
-    styleThemeIndex = 1,
-    effectFPS = 90,
-    cursorTrailIndex = 1,
-    cursorTrailShapeIndex = 1,
-    cursorTrailPoints = 10,
-    cursorTrailSize = 5,
-    snakeSpringConstant = 1,
+    comboizeSelect = false,
     cursorTrailGhost = false,
-    rgbPeriod = 2,
+    cursorTrailIndex = 1,
+    cursorTrailPoints = 10,
+    cursorTrailShapeIndex = 1,
+    cursorTrailSize = 5,
+    customStyle = {},
+    defaultProperties = { settings = {}, menu = {} },
+    disableLoadup = false,
+    dontPrintCreation = false,
+    dontReplaceSV = false,
     drawCapybara = false,
     drawCapybara2 = false,
     drawCapybara312 = false,
-    selectTypeIndex = 1,
-    placeTypeIndex = 1,
+    dynamicBackgroundIndex = 1,
     editToolIndex = 1,
-    showPresetMenu = false,
-    scrollGroupIndex = 1,
-    hideSVInfo = false,
-    showSVInfoVisualizer = true,
-    showVibratoWidget = false,
-    showNoteDataWidget = false,
-    showMeasureDataWidget = false,
-    ignoreNotesOutsideTg = false,
-    advancedMode = false,
-    performanceMode = false,
+    effectFPS = 90,
+    equalizeLinear = true,
     hideAutomatic = false,
+    hideSVInfo = false,
+    hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST),
+    ignoreNotesOutsideTg = false,
+    maxDisplacementMultiplierExponent = 6,
+    performanceMode = false,
+    placeTypeIndex = 1,
+    presets = {},
+    printLegacyLNMessage = true,
     pulseCoefficient = 0,
     pulseColor = vector.New(0, 0, 0, 0),
+    rgbPeriod = 2,
+    scrollGroupIndex = 1,
+    selectTypeIndex = 1,
+    showMeasureDataWidget = false,
+    showNoteDataWidget = false,
+    showPresetMenu = false,
+    showSVInfoVisualizer = true,
+    showVibratoWidget = false,
+    snakeSpringConstant = 1,
+    stepSize = 5,
+    styleThemeIndex = 1,
+    upscroll = false,
     useCustomPulseColor = false,
-    hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST),
-    customStyle = {},
-    dontPrintCreation = false,
-    equalizeLinear = true,
-    comboizeSelect = false,
-    defaultProperties = { settings = {}, menu = {} },
-    presets = {},
-    dynamicBackgroundIndex = 1,
-    disableLoadup = false,
     useEndTimeOffsets = false,
-    printLegacyLNMessage = true,
-    maxDisplacementMultiplierExponent = 6,
 }
 
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 
 function setGlobalVars(tempGlobalVars)
-    globalVars.useCustomPulseColor = truthy(tempGlobalVars.useCustomPulseColor)
-    globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
-    globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
-    globalVars.stepSize = tn(tempGlobalVars.stepSize)
-    globalVars.dontReplaceSV = truthy(tempGlobalVars.dontReplaceSV)
-    globalVars.upscroll = truthy(tempGlobalVars.upscroll)
+    globalVars.advancedMode = truthy(tempGlobalVars.advancedMode)
     globalVars.colorThemeIndex = tn(tempGlobalVars.colorThemeIndex)
-    globalVars.styleThemeIndex = tn(tempGlobalVars.styleThemeIndex)
-    globalVars.rgbPeriod = tn(tempGlobalVars.rgbPeriod)
-    globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
-    globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
-    globalVars.effectFPS = tn(tempGlobalVars.effectFPS)
-    globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
-    globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
-    globalVars.snakeSpringConstant = tn(tempGlobalVars.snakeSpringConstant)
+    globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
     globalVars.cursorTrailGhost = truthy(tempGlobalVars.cursorTrailGhost)
+    globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
+    globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
+    globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
+    globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
+    globalVars.customStyle = tempGlobalVars.customStyle or {}
+    globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)
+    globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
+    globalVars.dontReplaceSV = truthy(tempGlobalVars.dontReplaceSV)
     globalVars.drawCapybara = truthy(tempGlobalVars.drawCapybara)
     globalVars.drawCapybara2 = truthy(tempGlobalVars.drawCapybara2)
     globalVars.drawCapybara312 = truthy(tempGlobalVars.drawCapybara312)
-    globalVars.ignoreNotes = truthy(tempGlobalVars.ignoreNotesOutsideTg)
+    globalVars.dynamicBackgroundIndex = tn(tempGlobalVars.dynamicBackgroundIndex)
+    globalVars.effectFPS = tn(tempGlobalVars.effectFPS)
+    globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
+    globalVars.hideAutomatic = truthy(tempGlobalVars.hideAutomatic)
     globalVars.hideSVInfo = truthy(tempGlobalVars.hideSVInfo)
+    globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
+    globalVars.ignoreNotes = truthy(tempGlobalVars.ignoreNotesOutsideTg)
+    globalVars.maxDisplacementMultiplierExponent = tn(tempGlobalVars.maxDisplacementMultiplierExponent)
+    globalVars.performanceMode = truthy(tempGlobalVars.performanceMode)
+    globalVars.printLegacyLNMessage = truthy(tempGlobalVars.printLegacyLNMessage, true)
+    globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
+    globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
+    globalVars.rgbPeriod = tn(tempGlobalVars.rgbPeriod)
+    globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
+    globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
     globalVars.showSVInfoVisualizer = truthy(tempGlobalVars.showSVInfoVisualizer, true)
     globalVars.showVibratoWidget = truthy(tempGlobalVars.showVibratoWidget)
-    globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
-    globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
-    globalVars.advancedMode = truthy(tempGlobalVars.advancedMode)
-    globalVars.performanceMode = truthy(tempGlobalVars.performanceMode)
-    globalVars.hideAutomatic = truthy(tempGlobalVars.hideAutomatic)
-    globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
-    globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
-    globalVars.customStyle = tempGlobalVars.customStyle or {}
+    globalVars.snakeSpringConstant = tn(tempGlobalVars.snakeSpringConstant)
+    globalVars.stepSize = tn(tempGlobalVars.stepSize)
+    globalVars.styleThemeIndex = tn(tempGlobalVars.styleThemeIndex)
+    globalVars.upscroll = truthy(tempGlobalVars.upscroll)
+    globalVars.useCustomPulseColor = truthy(tempGlobalVars.useCustomPulseColor)
+    globalVars.useEndTimeOffsets = truthy(tempGlobalVars.useEndTimeOffsets)
 
+    -- All fields below are colors that must be vectorized to properly perform color arithmetic.
     local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
         "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
     for _, key in ipairs(forceVectorizeList) do
@@ -89,11 +97,8 @@ function setGlobalVars(tempGlobalVars)
         end
     end
 
-    globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
-    globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
-    globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)
-    globalVars.dynamicBackgroundIndex = tn(tempGlobalVars.dynamicBackgroundIndex)
-    globalVars.useEndTimeOffsets = truthy(tempGlobalVars.useEndTimeOffsets)
-    globalVars.printLegacyLNMessage = truthy(tempGlobalVars.printLegacyLNMessage, true)
-    globalVars.maxDisplacementMultiplierExponent = tn(tempGlobalVars.maxDisplacementMultiplierExponent)
+    -- All fields below are not settings, but menu operators that need to be kept on hot-reload.
+    globalVars.placeTypeIndex = state.GetValue("global.placeTypeIndex", globalVars.placeTypeIndex)
+    globalVars.editToolIndex = state.GetValue("global.editToolIndex", globalVars.editToolIndex)
+    globalVars.selectTypeIndex = state.GetValue("global.selectTypeIndex", globalVars.selectTypeIndex)
 end

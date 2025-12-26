@@ -22,7 +22,8 @@ EDIT_SV_TOOLS = { -- tools for editing SVs
 
 function editSVTab()
     if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
-    chooseEditTool()
+    local changedTool = chooseEditTool()
+    if (changedTool) then state.SetValue("global.editToolIndex", globalVars.editToolIndex) end
     AddSeparator()
     local toolName = EDIT_SV_TOOLS[globalVars.editToolIndex]
     if toolName == "Add Teleport" then addTeleportMenu() end
@@ -72,7 +73,9 @@ function chooseEditTool()
     imgui.AlignTextToFramePadding()
     imgui.Text("  Current Tool:")
     KeepSameLine()
-    globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, globalVars.editToolIndex, nil, nil, tooltipList)
+    local oldEditToolIndex = globalVars.editToolIndex
+    globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, oldEditToolIndex, nil, nil, tooltipList)
 
     HoverToolTip(tooltipList[globalVars.editToolIndex])
+    return oldEditToolIndex ~= globalVars.editToolIndex
 end

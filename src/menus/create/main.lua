@@ -7,8 +7,11 @@ CREATE_TYPES = { -- general categories of SVs to place
 
 function createSVTab()
     if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
-    chooseCreateTool()
+    local changedTool = chooseCreateTool()
     local placeType = CREATE_TYPES[globalVars.placeTypeIndex]
+
+    if (changedTool) then state.SetValue("global.placeTypeIndex", globalVars.placeTypeIndex) end
+
     if placeType == "Standard" then placeStandardSVMenu() end
     if placeType == "Special" then placeSpecialSVMenu() end
     if placeType == "Still" then placeStillSVMenu() end
@@ -26,7 +29,10 @@ function chooseCreateTool()
     imgui.AlignTextToFramePadding()
     imgui.Text("  Type:  ")
     KeepSameLine()
-    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, globalVars.placeTypeIndex, nil, nil, tooltipList)
+    local oldPlaceTypeIndex = globalVars.placeTypeIndex
+    globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, oldPlaceTypeIndex, nil, nil, tooltipList)
 
     HoverToolTip(tooltipList[globalVars.placeTypeIndex])
+
+    return oldPlaceTypeIndex ~= globalVars.placeTypeIndex
 end
