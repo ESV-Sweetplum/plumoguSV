@@ -28,7 +28,7 @@ chokidar.watch(['src', 'packages'], { ignoreInitial: true }).on(
     )
 );
 
-async function main(event, path) {
+async function main(event: keyof chokidar.FSWatcherEventMap, path: string) {
     const startTime = performance.now();
     console.log(
         `\nEvent ${chalk.red(event)} detected on file ${chalk.red(
@@ -37,7 +37,7 @@ async function main(event, path) {
     );
 
     const devMode = path.includes('src\\dev\\unlock');
-    const fileCount = await transpiler(devMode, false);
+    const fileCount = await transpiler(devMode, true);
     const endTime = performance.now();
     console.log(
         `Successfully transpiled ${chalk.green(
