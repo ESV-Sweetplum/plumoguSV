@@ -4591,16 +4591,16 @@ function drawHorizontalPillShape(o, point1, point2, radius, color, circleSegment
 end
 function logoThread()
     curTime = state.UnixTime or 0
-    if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 15000) then
-        cache_logoStartTime = clock.getTime()
-        if (cache_logoStartTime < 2.5) then
-            cache_logoStartTime = cache_logoStartTime + 0.75
+    if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 60000) then
+        state.SetValue("logoStartTime", clock.getTime())
+        if (state.GetValue("logoStartTime") < 2.5) then
+            state.SetValue("logoStartTime", state.GetValue("logoStartTime") + 0.75)
         end
     end
     prevTime = state.UnixTime
-    local currentTime = clock.getTime() - cache_logoStartTime
+    local currentTime = clock.getTime() - state.GetValue("logoStartTime")
     local logoLength = 3
-    if ((cache_logoStartTime < 3 and not globalVars.disableLoadup) or loaded) then
+    if ((state.GetValue("logoStartTime") < 3 or loaded) and not globalVars.disableLoadup) then
         if (currentTime >= 0 and currentTime <= logoLength) then
             drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
                 loadup.OpeningTextColor or DEFAULT_STYLE.loadupOpeningTextColor, 4,
@@ -4608,7 +4608,7 @@ function logoThread()
                 DEFAULT_STYLE.loadupPulseTextColorRight })
         end
     else
-        cache_logoStartTime = clock.getTime() - 5
+        state.SetValue("logoStartTime", clock.getTime() - 5)
     end
     loaded = true
 end
@@ -10369,7 +10369,7 @@ function showAppearanceSettings()
         "Disables the loadup animation when launching the editor.")
     KeepSameLine()
     if (imgui.Button("Play", vector.New(42, 24))) then
-        cache_logoStartTime = clock.getTime()
+        state.SetValue("logoStartTime", clock.getTime())
     end
     AddSeparator()
     GlobalCheckbox("drawCapybara", "Capybara", "Draws a capybara at the bottom right of the screen")
@@ -11417,7 +11417,7 @@ function showWhatIsMsxTutorial()
     imgui.SetCursorPosX(115)
     imgui.TextColored(INSTRUCTION_COLOR, "(300 msx) / (500 ms) = 0.6x")
     imgui.TextWrapped(
-    "Hopefully the nomenclature for msx makes sense; it is quite literally ms * x. If you know a little bit of dimensional analysis, you can use this fact to easily compute average SVs and displacements.")
+        "Hopefully the nomenclature for msx makes sense; it is quite literally ms * x. If you know a little bit of dimensional analysis, you can use this fact to easily compute average SVs and displacements.")
 end
 function showTutorialWindow()
     imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
