@@ -16,5 +16,5 @@ function showWhatIsMsxTutorial()
     imgui.SetCursorPosX(115)
     imgui.TextColored(INSTRUCTION_COLOR, "(300 msx) / (500 ms) = 0.6x")
     imgui.TextWrapped(
-    "Hopefully the nomenclature for msx makes sense; it is quite literally ms * x. If you know a little bit of dimensional analysis, you can use this fact to easily compute average SVs and displacements.")
+        "Hopefully the nomenclature for msx makes sense; it is quite literally ms * x. If you know a little bit of dimensional analysis, you can use this fact to easily compute average SVs and displacements.")
 end
