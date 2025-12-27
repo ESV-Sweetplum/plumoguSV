@@ -37,7 +37,7 @@ function showAppearanceSettings()
         "Disables the loadup animation when launching the editor.")
     KeepSameLine()
     if (imgui.Button("Play", vector.New(42, 24))) then
-        cache_logoStartTime = clock.getTime()
+        cache.logoStartTime = clock.getTime()
     end
     AddSeparator()
     GlobalCheckbox("drawCapybara", "Capybara", "Draws a capybara at the bottom right of the screen")
