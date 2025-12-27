@@ -12,7 +12,7 @@ function selectAlternating(menuVars)
     times = table.dedupe(times)
     local allowedTimes = {}
     for i, time in pairs(times) do
-        if ((i - 2 + menuVars.offset) % menuVars.every == 0) then
+        if ((i - menuVars.offset) % menuVars.every == 0) then
             table.insert(allowedTimes, time)
         end
     end

@@ -1,53 +1,11 @@
-stepSize: 5
-dontReplaceSV: false
-upscroll: false
-colorThemeIndex: 16
-styleThemeIndex: 1
-effectFPS: 100
-cursorTrailIndex: 1
-cursorTrailShapeIndex: 1
-cursorTrailPoints: 20
-cursorTrailSize: 10
-snakeSpringConstant: 0.5
-cursorTrailGhost: false
-rgbPeriod: 1
-drawCapybara: true
-drawCapybara2: false
-drawCapybara312: false
-selectTypeIndex: 1
-placeTypeIndex: 1
-editToolIndex: 1
-showPresetMenu: false
-scrollGroupIndex: 3
-hideSVInfo: false
-showSVInfoVisualizer: true
-showVibratoWidget: false
-showNoteDataWidget: true
-showMeasureDataWidget: true
-ignoreNotesOutsideTg: false
 advancedMode: true
-performanceMode: false
-hideAutomatic: true
-pulseCoefficient: 1
-pulseColor:
-- 0.39215686917304993
-- 0
-- 1
-- 1
-useCustomPulseColor: true
-hotkeyList:
-- T
-- Shift+T
-- S
-- N
-- R
-- B
-- M
-- V
-- G
-- Ctrl+Alt+L
-- Ctrl+Alt+E
-- O
+colorThemeIndex: 16
+comboizeSelect: true
+cursorTrailGhost: false
+cursorTrailIndex: 1
+cursorTrailPoints: 20
+cursorTrailShapeIndex: 2
+cursorTrailSize: 10
 customStyle:
   windowBg:
   - 0
@@ -239,9 +197,6 @@ customStyle:
   - 0.57999998331069946
   - 0.69999998807907104
   - 1
-dontPrintCreation: false
-equalizeLinear: true
-comboizeSelect: true
 defaultProperties:
   settings:
     linearVibratoSV:
@@ -680,13 +635,60 @@ defaultProperties:
     selectNoteType:
       rice: true
       ln: false
+      normal: true
+      mine: false
     selectBySnap:
       snap: 1
+disableLoadup: false
+dontPrintCreation: false
+dontReplaceSV: false
+drawCapybara: true
+drawCapybara2: false
+drawCapybara312: false
+dynamicBackgroundIndex: 1
+editToolIndex: 5
+effectFPS: 100
+equalizeLinear: true
+hideAutomatic: true
+hideSVInfo: false
+hotkeyList:
+- T
+- Shift+T
+- S
+- N
+- R
+- B
+- M
+- V
+- G
+- Ctrl+Alt+L
+- Ctrl+Alt+E
+- O
+ignoreNotesOutsideTg: false
+maxDisplacementMultiplierExponent: 5
+performanceMode: false
+placeTypeIndex: 3
 presets:
 - 
-dynamicBackgroundIndex: 1
-disableLoadup: false
-useEndTimeOffsets: false
 printLegacyLNMessage: true
-maxDisplacementMultiplierExponent: 5
+pulseCoefficient: 1
+pulseColor:
+- 0.39215686917304993
+- 0
+- 1
+- 1
+rgbPeriod: 1
+scrollGroupIndex: 1
+selectTypeIndex: 1
+showMeasureDataWidget: true
+showNoteDataWidget: true
+showPresetMenu: false
+showSVInfoVisualizer: true
+showVibratoWidget: false
+snakeSpringConstant: 0.5
+stepSize: 5
+styleThemeIndex: 1
+upscroll: false
+useCustomPulseColor: true
+useEndTimeOffsets: false
 ignoreNotes: false
