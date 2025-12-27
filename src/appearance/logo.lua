@@ -36,8 +36,8 @@ end
 ---@param thickness integer
 ---@param pulseCol [Vector4, Vector4]
 function drawLogo(currentTime, logoLength, ctx, windowSize, scale, textCol, thickness, pulseCol)
-    if (currentTime < 0) then return end
-    if (currentTime > logoLength) then return end
+    if currentTime < 0 then return end
+    if currentTime > logoLength then return end
 
     local location = windowSize / 2
     local timeProgress = (currentTime % logoLength / logoLength)
@@ -47,7 +47,7 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, textCol, thic
 
     local progress = math.clamp(timeProgress, 0, 1) * 2
 
-    if (progress <= 1) then
+    if progress <= 1 then
         progress = (1 - (1 - progress) ^ (1 / curvature1))
     else
         progress = (progress - 1) ^ (1 / curvature2) + 1
@@ -71,7 +71,7 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, textCol, thic
     local t0, t1
     local trueProgress = progress * 2
 
-    if (trueProgress < 1) then
+    if trueProgress < 1 then
         t0 = 10 * (trueProgress - 1)
         t1 = (1 - trueProgress / 2) * t0 + trueProgress
     else

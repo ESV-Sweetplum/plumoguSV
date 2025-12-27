@@ -6,6 +6,6 @@ require("packages.string.charAt")
 ---@return string
 function string.capitalize(str, forceLowercase)
     local secondPortion = str:sub(2)
-    if (forceLowercase) then secondPortion = secondPortion:lower() end
+    if forceLowercase then secondPortion = secondPortion:lower() end
     return str:charAt(1):upper() .. secondPortion
 end

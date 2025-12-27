@@ -267,7 +267,7 @@ function chooseCursorTrailPoints()
     if currentTrail ~= "Snake" then return end
 
     local settingChanged = BasicInputInt(globalVars, "cursorTrailPoints", "Trail Points")
-    if (settingChanged) then
+    if settingChanged then
         write(globalVars)
     end
 end
@@ -289,7 +289,7 @@ function chooseCursorShapeSize()
     if currentTrail ~= "Snake" then return end
 
     local settingChanged = BasicInputInt(globalVars, "cursorTrailSize", "Shape Size")
-    if (settingChanged) then
+    if settingChanged then
         write(globalVars)
     end
 end
@@ -342,7 +342,7 @@ function chooseEffectFPS()
     if currentTrail ~= "Snake" then return end
     local settingChanged = BasicInputInt(globalVars, "effectFPS", "Effect FPS", { 2, 1000 },
         "Set this to a multiple of UPS or FPS to make cursor effects smooth")
-    if (settingChanged) then
+    if settingChanged then
         write(globalVars)
     end
 end
@@ -378,7 +378,7 @@ function chooseFrameSpacing(settingVars)
 end
 
 function chooseFrameTimeData(settingVars)
-    if #settingVars.frameTimes == 0 then return end
+    if not truthy(settingVars.frameTimes) then return end
     local frameTime = settingVars.frameTimes[settingVars.selectedTimeIndex]
     _, frameTime.frame = imgui.InputInt("Frame #", math.floor(frameTime.frame))
     frameTime.frame = math.clamp(frameTime.frame, 1, settingVars.numFrames)

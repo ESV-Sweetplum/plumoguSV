@@ -96,7 +96,7 @@ function pasteItems(menuVars)
     local lastCopiedBM = menuVars.copied.BMs[menuVars.curSlot][#menuVars.copied.BMs[menuVars.curSlot]]
 
     local lastCopiedValue = lastCopiedSV
-    if (lastCopiedValue == nil) then
+    if lastCopiedValue == nil then
         lastCopiedValue = lastCopiedSSF or lastCopiedLine or lastCopiedBM or { relativeOffset = 0 }
     end
 

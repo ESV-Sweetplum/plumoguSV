@@ -5,7 +5,7 @@ function copyNPasteMenu()
 
     cache.saveTable("copyPasteMenu", menuVars)
 
-    if (copiedItemCount == 0) then return end
+    if copiedItemCount == 0 then return end
 
     simpleActionMenu("Paste items at selected notes", 1, pasteItems, menuVars)
 end
@@ -29,13 +29,13 @@ function copyNPasteSettingsMenu(menuVars, actionable)
         end
         menuVars.copied = newCopied
     end
-    if (actionable) then AddSeparator() end
+    if actionable then AddSeparator() end
 
     local copiedItemCount = #menuVars.copied.lines[menuVars.curSlot] + #menuVars.copied.SVs[menuVars.curSlot] +
         #menuVars.copied.SSFs[menuVars.curSlot] + #menuVars.copied.BMs[menuVars.curSlot]
 
-    if (actionable) then
-        if (copiedItemCount == 0) then
+    if actionable then
+        if copiedItemCount == 0 then
             simpleActionMenu("Copy items between selected notes", 2, copyItems, menuVars)
         else
             FunctionButton("Clear copied items", ACTION_BUTTON_SIZE, clearCopiedItems, menuVars)
@@ -44,7 +44,7 @@ function copyNPasteSettingsMenu(menuVars, actionable)
 
     if (copiedItemCount == 0 and actionable) then return copiedItemCount end
 
-    if (actionable) then AddSeparator() end
+    if actionable then AddSeparator() end
 
     _, menuVars.tryAlign = imgui.Checkbox("Try to fix misalignments", menuVars.tryAlign)
     imgui.PushItemWidth(100)

@@ -6,7 +6,7 @@ function loadDefaultProperties(defaultProperties)
             local defaultTable = DEFAULT_STARTING_MENU_VARS[label]
             if (not defaultTable) then break end
             local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
-            if (defaultSetting == nil) then
+            if defaultSetting == nil then
                 goto nextSetting
             end
             DEFAULT_STARTING_MENU_VARS[label][settingName] = defaultSetting
@@ -20,7 +20,7 @@ function loadDefaultProperties(defaultProperties)
             local defaultTable = DEFAULT_STARTING_SETTING_VARS[label]
             if (not defaultTable) then break end
             local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
-            if (defaultSetting == nil) then
+            if defaultSetting == nil then
                 goto nextSetting
             end
             DEFAULT_STARTING_SETTING_VARS[label][settingName] = defaultSetting

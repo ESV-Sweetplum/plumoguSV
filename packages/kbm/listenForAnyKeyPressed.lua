@@ -9,9 +9,9 @@ function kbm.listenForAnyKeyPressed()
     local key = -1
 
     local prefixes = {}
-    if (isCtrlHeld) then table.insert(prefixes, "Ctrl") end
-    if (isShiftHeld) then table.insert(prefixes, "Shift") end
-    if (isAltHeld) then table.insert(prefixes, "Alt") end
+    if isCtrlHeld then table.insert(prefixes, "Ctrl") end
+    if isShiftHeld then table.insert(prefixes, "Shift") end
+    if isAltHeld then table.insert(prefixes, "Alt") end
 
     for i = 65, 90 do
         if (utils.IsKeyPressed(i)) then

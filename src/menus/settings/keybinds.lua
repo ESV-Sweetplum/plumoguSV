@@ -2,7 +2,7 @@ function showKeybindSettings()
     local awaitingIndex = state.GetValue("hotkey_awaitingIndex", 0)
     for hotkeyIndex, hotkeyCombo in pairs(globalVars.hotkeyList) do
         if imgui.Button(awaitingIndex == hotkeyIndex and "Listening...##listening" or hotkeyCombo .. "##" .. hotkeyIndex) then
-            if (awaitingIndex == hotkeyIndex) then
+            if awaitingIndex == hotkeyIndex then
                 awaitingIndex = 0
             else
                 awaitingIndex = hotkeyIndex
@@ -18,7 +18,7 @@ function showKeybindSettings()
         awaitingIndex = 0
     end, nil, true, true)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
-    if (awaitingIndex == 0) then return end
+    if awaitingIndex == 0 then return end
     local prefixes, key = kbm.listenForAnyKeyPressed()
     if (key == -1) then return end
     globalVars.hotkeyList[awaitingIndex] = table.concat(prefixes, "+") ..

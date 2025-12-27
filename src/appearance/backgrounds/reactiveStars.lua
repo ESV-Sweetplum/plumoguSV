@@ -26,7 +26,7 @@ function renderReactiveStars()
         local brightness = clamp(-8 * progress * (progress - 1), -1, 1)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
 
-        if (brightness < 0) then goto nextStar end
+        if brightness < 0 then goto nextStar end
 
         ctx.AddCircleFilled(pos, sz, color.alterOpacity(color.int.white, 255 - math.floor(brightness * 255)))
         ::nextStar::
@@ -63,7 +63,7 @@ function updateStars(dimX, dimY, dt)
             x = x + dimX + 20
         end
         stars_xList[i] = x
-        if (starWrapped) then
+        if starWrapped then
             stars_yList[i] = random() * dimY
             stars_vxList[i] = random() * 3 + 1
             stars_szList[i] = random(3) * 0.5

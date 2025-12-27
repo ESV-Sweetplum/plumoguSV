@@ -46,7 +46,7 @@ end
 function game.getSSFsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
     local ssfsBetweenOffsets = {} ---@type ScrollSpeedFactor[]
     local ssfs = map.ScrollSpeedFactors
-    if (ssfs == nil) then
+    if ssfs == nil then
         ssfs = {}
     else
         for _, ssf in ipairs(map.ScrollSpeedFactors) do
@@ -55,7 +55,7 @@ function game.getSSFsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort
             if ssfIsInRange then table.insert(ssfsBetweenOffsets, ssf) end
         end
     end
-    if (dontSort) then return ssfsBetweenOffsets end
+    if dontSort then return ssfsBetweenOffsets end
     return sort(ssfsBetweenOffsets, sortAscendingStartTime)
 end
 
@@ -72,6 +72,6 @@ function game.getSVsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
         if (includeEnd and sv.StartTime == endOffset) then svIsInRange = true end
         if svIsInRange then table.insert(svsBetweenOffsets, sv) end
     end
-    if (dontSort) then return svsBetweenOffsets end
+    if dontSort then return svsBetweenOffsets end
     return sort(svsBetweenOffsets, sortAscendingStartTime)
 end

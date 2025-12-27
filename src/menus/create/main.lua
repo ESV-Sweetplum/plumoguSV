@@ -10,7 +10,7 @@ function createSVTab()
     local changedTool = chooseCreateTool()
     local placeType = CREATE_TYPES[globalVars.placeTypeIndex]
 
-    if (changedTool) then state.SetValue("global.placeTypeIndex", globalVars.placeTypeIndex) end
+    if changedTool then state.SetValue("global.placeTypeIndex", globalVars.placeTypeIndex) end
 
     if placeType == "Standard" then placeStandardSVMenu() end
     if placeType == "Special" then placeSpecialSVMenu() end

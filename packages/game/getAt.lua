@@ -41,7 +41,7 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     local index = -1
 
     for _ = 1, 48 do
-        if (checkingTime > distanceAbovePrev) then break end
+        if checkingTime > distanceAbovePrev then break end
         checkingTime = checkingTime + snap48
         index = index + 1
     end
@@ -105,8 +105,8 @@ function game.getSVMultiplierAt(offset, tgId)
     if sv then return sv.Multiplier end
 
     local initTgSv = state.SelectedScrollGroup.InitialScrollVelocity
-    if (initTgSv ~= nil) then return initTgSv end
+    if initTgSv ~= nil then return initTgSv end
     local initSV = map.InitialScrollVelocity
-    if (initSV ~= nil) then return initSV end
+    if initSV ~= nil then return initSV end
     return 1
 end

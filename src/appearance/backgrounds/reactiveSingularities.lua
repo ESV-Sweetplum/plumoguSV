@@ -97,7 +97,7 @@ function updateParticles(dimX, dimY, dt, multiplier)
         local xDist = sgPosx - x
         local yDist = sgPosy - y
         local dist = sqrt(xDist ^ 2 + yDist ^ 2)
-        if (dist < 10) then dist = 10 end
+        if dist < 10 then dist = 10 end
 
         local gravityFactor = bit32.rshift(dist ^ 3, 9)
 

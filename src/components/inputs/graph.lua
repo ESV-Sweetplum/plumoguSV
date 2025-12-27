@@ -27,7 +27,7 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
 
-    if (preferForeground) then ctx = imgui.GetForegroundDrawList() end
+    if preferForeground then ctx = imgui.GetForegroundDrawList() end
 
     for i, point in ipairs(points) do
         imgui.SetCursorPos(point.pos - vctr2(point.size))
@@ -59,7 +59,7 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
         end
     end
 
-    if (gridSize ~= 1) then
+    if gridSize ~= 1 then
         for i = 0, size.x, gridSize do
             local lineCol = gray
             if (truthy(i % 4)) then

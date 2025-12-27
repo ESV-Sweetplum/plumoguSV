@@ -5,7 +5,7 @@ function selectNoteTypeMenu()
     KeepSameLine()
     _, menuVars.ln = imgui.Checkbox("Select LNs", menuVars.ln)
     ---@diagnostic disable-next-line: undefined-global
-    if (hitobject_type) then
+    if hitobject_type then
         _, menuVars.normal = imgui.Checkbox("Select Normals", menuVars.normal)
         KeepSameLine()
         _, menuVars.mine = imgui.Checkbox("Select Mines", menuVars.mine)

@@ -8,6 +8,6 @@ function CodeInput(varsTable, parameterName, label, tooltipText)
     local oldCode = varsTable[parameterName]
     _, varsTable[parameterName] = imgui.InputTextMultiline(label, oldCode, 16384,
         vector.New(240, 120))
-    if (tooltipText) then HoverToolTip(tooltipText) end
+    if tooltipText then HoverToolTip(tooltipText) end
     return imgui.IsItemActive()
 end

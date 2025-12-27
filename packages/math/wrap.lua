@@ -5,7 +5,7 @@
 ---@param discrete? boolean Whether or not to wrap discretely - that is, in a range of 1 to n, if given 0, will return n instead of n - 1. Check [OBOE or fencepost error](https://en.wikipedia.org/wiki/Off-by-one_error).
 ---@return number
 function math.wrap(n, lowerBound, upperBound, discrete)
-    if (upperBound <= lowerBound) then return n end
+    if upperBound <= lowerBound then return n end
     if (n >= lowerBound and n <= upperBound) then return n end
     local additionFactor = math.toNumber(discrete)
     local diff = upperBound - lowerBound

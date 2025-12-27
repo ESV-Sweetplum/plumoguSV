@@ -4,7 +4,7 @@ function completeDuplicateMenu()
 
     local copiedItemCount = #menuVars.objects
 
-    if (copiedItemCount == 0) then
+    if copiedItemCount == 0 then
         simpleActionMenu("Copy items between selected notes", 2, storeDuplicateItems, menuVars)
         cache.saveTable("completeDuplicateMenu", menuVars)
         return

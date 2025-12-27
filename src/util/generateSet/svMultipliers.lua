@@ -36,7 +36,7 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
             settingVars.verticalShift, settingVars.svPoints + 1,
             settingVars.dontNormalize)
     elseif svType == "Random" then
-        if #settingVars.svMultipliers == 0 then
+        if not truthy(settingVars.svMultipliers) then
             generateRandomSetMenuSVs(settingVars)
         end
         multipliers = getRandomSet(settingVars.svMultipliers, settingVars.avgSV,

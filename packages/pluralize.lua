@@ -9,12 +9,12 @@ CONSONANTS = { "B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", 
 ---@return string pluralizedStr A new string that is pluralized if `val ~= 1`.
 function pluralize(str, val, pos)
     local strEnding = ""
-    if (pos) then
+    if pos then
         strEnding = str:sub(pos + 1, -1)
         str = str:sub(1, pos)
     end
     local finalStrTbl = { str, "s" }
-    if (val == 1) then return str .. (strEnding or "") end
+    if val == 1 then return str .. (strEnding or "") end
     local lastLetter = str:sub(-1):upper()
     local secondToLastLetter = str:charAt(-2):upper()
     if (lastLetter == "Y" and table.contains(CONSONANTS, secondToLastLetter)) then

@@ -81,7 +81,7 @@ function plotExponentialCurvature(settingVars)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local t = i / RESOLUTION
         local value = t
-        if (curvature >= 1) then
+        if curvature >= 1 then
             value = t ^ curvature
         else
             value = (1 - (1 - t) ^ (1 / curvature))
@@ -107,14 +107,14 @@ function plotSigmoidalCurvature(settingVars)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local t = i / RESOLUTION * 2
         local value = t
-        if (curvature >= 1) then
-            if (t <= 1) then
+        if curvature >= 1 then
+            if t <= 1 then
                 value = t ^ curvature
             else
                 value = 2 - (2 - t) ^ curvature
             end
         else
-            if (t <= 1) then
+            if t <= 1 then
                 value = (1 - (1 - t) ^ (1 / curvature))
             else
                 value = (t - 1) ^ (1 / curvature) + 1
@@ -196,7 +196,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
                 vector.New(topLeft.x + i * dim.x / game.keyCount - 5, heightValue + 20),
                 imgui.GetColorU32(imgui_col.Header, (1 - (1 - progress) ^ 10)))
         end
-        if (svStats) then
+        if svStats then
             local normativeMax = math.max(math.abs(svStats.minSV), math.abs(svStats.maxSV))
             local appearanceTime = 0.5
             local inverseProgress = 1 - progress

@@ -53,7 +53,7 @@ function setPluginAppearanceColors(colorTheme, hideBorder)
     if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
     if colorTheme == "CUSTOM" then borderColor = setCustomColors() end
 
-    if (hideBorder) then return end
+    if hideBorder then return end
 
     cache.borderColor = borderColor
 end

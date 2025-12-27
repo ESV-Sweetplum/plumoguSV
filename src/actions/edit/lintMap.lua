@@ -150,7 +150,7 @@ function removeUnnecessarySVs()
         local prevMultiplier = state.SelectedScrollGroup.InitialScrollVelocity or map.InitialScrollVelocity or 1
         for _, sv in ipairs(map.ScrollVelocities) do
             local m = sv.Multiplier
-            if (m == prevMultiplier) then table.insert(svsToRemove, sv) end
+            if m == prevMultiplier then table.insert(svsToRemove, sv) end
             prevMultiplier = m
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove, tg))
@@ -167,7 +167,7 @@ function removeAllHitSounds()
     local objs = {}
     for _, ho in ipairs(map.HitObjects) do
         local hs = tonumber(ho.HitSound)
-        if (hs > 1) then
+        if hs > 1 then
             table.insert(hitsoundActions, createEA(action_type.RemoveHitsound, { ho }, hs))
             table.insert(objs, ho.StartTime .. "|" .. ho.Lane)
         end

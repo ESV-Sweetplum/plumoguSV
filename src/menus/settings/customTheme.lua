@@ -132,7 +132,7 @@ function showCustomThemeSettings()
         settingsChanged = ColorInput(globalVars.customStyle, id, name) or settingsChanged
         ::nextId::
     end
-    if (settingsChanged) then
+    if settingsChanged then
         write(globalVars)
     end
 end

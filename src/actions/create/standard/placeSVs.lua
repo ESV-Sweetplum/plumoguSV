@@ -7,7 +7,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
     if placingStillSVs then
         offsets = game.uniqueNoteOffsetsBetweenSelected()
         if (not truthy(offsets)) then return end
-        if (place == false) then
+        if place == false then
             offsets = game.uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
         end
     end
@@ -26,7 +26,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
         for j = 1, #svOffsets - 1 do
             local offset = svOffsets[j]
             local multiplier = menuVars.svMultipliers[j]
-            if (optionalDistance ~= nil) then
+            if optionalDistance ~= nil then
                 multiplier = optionalDistance / (endOffset - startOffset) * math.abs(multiplier)
             end
             addSVToList(svsToAdd, offset, multiplier, true)

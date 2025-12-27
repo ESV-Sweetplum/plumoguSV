@@ -21,7 +21,7 @@ end
 
 function addInitialSSF(ssfsToAdd, startOffset)
     local ssf = map.GetScrollSpeedFactorAt(startOffset)
-    if (ssf == nil) then return end
+    if ssf == nil then return end
     local ssfExistsAtStartOffset = ssf and (ssf.StartTime == startOffset)
     if ssfExistsAtStartOffset then return end
 

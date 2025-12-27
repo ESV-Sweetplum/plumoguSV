@@ -1,5 +1,5 @@
 function renderMeasureDataWidget()
-    if #state.SelectedHitObjects == 0 then return end
+    if not truthy(state.SelectedHitObjects) then return end
 
     local widgetVars = {
         oldStartOffset = -69,

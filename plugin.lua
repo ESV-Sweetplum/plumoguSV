@@ -222,7 +222,7 @@ function game.getSnapAt(time, dontPrintInaccuracy)
     local checkingTime = 0
     local index = -1
     for _ = 1, 48 do
-        if (checkingTime > distanceAbovePrev) then break end
+        if checkingTime > distanceAbovePrev then break end
         checkingTime = checkingTime + snap48
         index = index + 1
     end
@@ -267,9 +267,9 @@ function game.getSVMultiplierAt(offset, tgId)
     local sv = map.GetScrollVelocityAt(offset, tgId)
     if sv then return sv.Multiplier end
     local initTgSv = state.SelectedScrollGroup.InitialScrollVelocity
-    if (initTgSv ~= nil) then return initTgSv end
+    if initTgSv ~= nil then return initTgSv end
     local initSV = map.InitialScrollVelocity
-    if (initSV ~= nil) then return initSV end
+    if initSV ~= nil then return initSV end
     return 1
 end
 ---Returns a list of [bookmarks](lua://Bookmark) between two times, inclusive.
@@ -317,7 +317,7 @@ end
 function game.getSSFsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
     local ssfsBetweenOffsets = {} ---@type ScrollSpeedFactor[]
     local ssfs = map.ScrollSpeedFactors
-    if (ssfs == nil) then
+    if ssfs == nil then
         ssfs = {}
     else
         for _, ssf in ipairs(map.ScrollSpeedFactors) do
@@ -326,7 +326,7 @@ function game.getSSFsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort
             if ssfIsInRange then ssfsBetweenOffsets[#ssfsBetweenOffsets + 1] = ssf end
         end
     end
-    if (dontSort) then return ssfsBetweenOffsets end
+    if dontSort then return ssfsBetweenOffsets end
     return sort(ssfsBetweenOffsets, sortAscendingStartTime)
 end
 ---Returns a list of [scroll velocities](lua://ScrollVelocity) between two times, inclusive.
@@ -342,7 +342,7 @@ function game.getSVsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
         if (includeEnd and sv.StartTime == endOffset) then svIsInRange = true end
         if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
     end
-    if (dontSort) then return svsBetweenOffsets end
+    if dontSort then return svsBetweenOffsets end
     return sort(svsBetweenOffsets, sortAscendingStartTime)
 end
 ---Finds and returns a list of all unique offsets of notes between selected notes [Table]
@@ -402,7 +402,7 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
             local skipNote = false
             if (state.SelectedScrollGroupId ~= ho.TimingGroup and globalVars.ignoreNotesOutsideTg) then skipNote = true end
             if (ho.StartTime == startOffset or ho.StartTime == endOffset) then skipNote = false end
-            if (skipNote) then goto nextNote end
+            if skipNote then goto nextNote end
             noteOffsetsBetween[#noteOffsetsBetween + 1] = ho.StartTime
             if (ho.EndTime ~= 0 and ho.EndTime <= endOffset and includeLN) then
                 table.insert(noteOffsetsBetween,
@@ -432,9 +432,9 @@ function kbm.listenForAnyKeyPressed()
     local isAltHeld = utils.IsKeyDown(keys.LeftAlt) or utils.IsKeyDown(keys.RightAlt)
     local key = -1
     local prefixes = {}
-    if (isCtrlHeld) then prefixes[#prefixes + 1] = "Ctrl" end
-    if (isShiftHeld) then prefixes[#prefixes + 1] = "Shift" end
-    if (isAltHeld) then prefixes[#prefixes + 1] = "Alt" end
+    if isCtrlHeld then prefixes[#prefixes + 1] = "Ctrl" end
+    if isShiftHeld then prefixes[#prefixes + 1] = "Shift" end
+    if isAltHeld then prefixes[#prefixes + 1] = "Alt" end
     for i = 65, 90 do
         if (utils.IsKeyPressed(i)) then
             key = i
@@ -523,7 +523,7 @@ end
 ---@param multiplicativeFactor? number
 ---@return number
 function math.expoClamp(n, lowerBound, upperBound, multiplicativeFactor)
-    if (upperBound <= lowerBound) then return n end
+    if upperBound <= lowerBound then return n end
     if (n <= upperBound and n >= lowerBound) then return n end
     local factor = multiplicativeFactor < 1 and 1 / multiplicativeFactor or multiplicativeFactor
     while (n < lowerBound) do
@@ -571,12 +571,12 @@ function matrix.findZeroRow(mtrx)
         local zeroRow = true
         for k1 = 1, #row do
             local num = row[k1]
-            if (num ~= 0) then
+            if num ~= 0 then
                 zeroRow = false
                 break
             end
         end
-        if (zeroRow) then return idx end
+        if zeroRow then return idx end
     end
     return -1
 end
@@ -636,7 +636,7 @@ end
 ---@return number
 function math.toNumber(x)
     if (not x) then return 0 end
-    if (x == true) then return 1 end
+    if x == true then return 1 end
     local result = tonumber(x)
     if (not result or type(result) ~= "number") then return 0 end
     return result
@@ -649,7 +649,7 @@ tn = math.toNumber
 ---@param discrete? boolean Whether or not to wrap discretely - that is, in a range of 1 to n, if given 0, will return n instead of n - 1. Check [OBOE or fencepost error](https://en.wikipedia.org/wiki/Off-by-one_error).
 ---@return number
 function math.wrap(n, lowerBound, upperBound, discrete)
-    if (upperBound <= lowerBound) then return n end
+    if upperBound <= lowerBound then return n end
     if (n >= lowerBound and n <= upperBound) then return n end
     local additionFactor = math.toNumber(discrete)
     local diff = upperBound - lowerBound
@@ -679,12 +679,12 @@ CONSONANTS = { "B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", 
 ---@return string pluralizedStr A new string that is pluralized if `val ~= 1`.
 function pluralize(str, val, pos)
     local strEnding = ""
-    if (pos) then
+    if pos then
         strEnding = str:sub(pos + 1, -1)
         str = str:sub(1, pos)
     end
     local finalStrTbl = { str, "s" }
-    if (val == 1) then return str .. (strEnding or "") end
+    if val == 1 then return str .. (strEnding or "") end
     local lastLetter = str:sub(-1):upper()
     local secondToLastLetter = str:charAt(-2):upper()
     if (lastLetter == "Y" and table.contains(CONSONANTS, secondToLastLetter)) then
@@ -706,7 +706,7 @@ end
 ---@return string
 function string.capitalize(str, forceLowercase)
     local secondPortion = str:sub(2)
-    if (forceLowercase) then secondPortion = secondPortion:lower() end
+    if forceLowercase then secondPortion = secondPortion:lower() end
     return str:charAt(1):upper() .. secondPortion
 end
 ---Returns the `idx`th character in a string. Simply used for shorthand. Also supports negative indexes.
@@ -722,7 +722,7 @@ end
 ---@return string dottedStr
 function string.fixToSize(str, targetSize)
     local size = imgui.CalcTextSize(str).x
-    if (size <= targetSize) then return str end
+    if size <= targetSize then return str end
     while (str:len() > 3 and size > targetSize) do
         str = str:sub(1, -2)
         size = imgui.CalcTextSize(str .. "...").x
@@ -857,7 +857,7 @@ end
 function table.contains(tbl, item)
     for k3 = 1, #tbl do
         local v = tbl[k3]
-        if (v == item) then return true end
+        if v == item then return true end
     end
     return false
 end
@@ -909,10 +909,10 @@ end
 ---@param item any The item to search for.
 ---@return integer idx The index of the item. If the item doesn't exist, returns -1 instead.
 function table.indexOf(tbl, item)
-  for i, v in pairs(tbl) do
-    if (v == item) then return i end
-  end
-  return -1
+    for i, v in pairs(tbl) do
+        if v == item then return i end
+    end
+    return -1
 end
 ---Returns a table of keys from a table.
 ---@param tbl { [string]: any } The table to search in.
@@ -1542,7 +1542,7 @@ function loadDefaultProperties(defaultProperties)
             local defaultTable = DEFAULT_STARTING_MENU_VARS[label]
             if (not defaultTable) then break end
             local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
-            if (defaultSetting == nil) then
+            if defaultSetting == nil then
                 goto nextSetting
             end
             DEFAULT_STARTING_MENU_VARS[label][settingName] = defaultSetting
@@ -1556,7 +1556,7 @@ function loadDefaultProperties(defaultProperties)
             local defaultTable = DEFAULT_STARTING_SETTING_VARS[label]
             if (not defaultTable) then break end
             local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
-            if (defaultSetting == nil) then
+            if defaultSetting == nil then
                 goto nextSetting
             end
             DEFAULT_STARTING_SETTING_VARS[label][settingName] = defaultSetting
@@ -2445,7 +2445,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
     if placingStillSVs then
         offsets = game.uniqueNoteOffsetsBetweenSelected()
         if (not truthy(offsets)) then return end
-        if (place == false) then
+        if place == false then
             offsets = game.uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
         end
     end
@@ -2464,7 +2464,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
         for j = 1, #svOffsets - 1 do
             local offset = svOffsets[j]
             local multiplier = menuVars.svMultipliers[j]
-            if (optionalDistance ~= nil) then
+            if optionalDistance ~= nil then
                 multiplier = optionalDistance / (endOffset - startOffset) * math.abs(multiplier)
             end
             addSVToList(svsToAdd, offset, multiplier, true)
@@ -2616,7 +2616,7 @@ function svVibrato(menuVars, heightFn)
         local posDifference = endPos - startPos
         local roundingFactor = math.max(menuVars.sides, 2)
         local teleportCount = math.floor((nextVibro - startVibro) / 1000 * fps / roundingFactor) * roundingFactor
-        if (teleportCount < 2) then
+        if teleportCount < 2 then
             print("e!", "Some notes are too close together to place vibrato. Check for notes that are 1ms apart.")
             return
         end
@@ -2767,7 +2767,7 @@ function changeGroups(menuVars)
     local actionList = {}
     local willChangeSVs = menuVars.changeSVs and #svsToRemove ~= 0
     local willChangeSSFs = menuVars.changeSSFs and #ssfsToRemove ~= 0
-    if (willChangeSVs) then
+    if willChangeSVs then
         if (not menuVars.clone) then
             table.insert(actionList, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
         end
@@ -2775,7 +2775,7 @@ function changeGroups(menuVars)
             .designatedTimingGroup
         table.insert(actionList, createEA(action_type.AddScrollVelocityBatch, svsToAdd))
     end
-    if (willChangeSSFs) then
+    if willChangeSSFs then
         if (not menuVars.clone) then
             table.insert(actionList, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
         end
@@ -2787,12 +2787,12 @@ function changeGroups(menuVars)
         return
     end
     actions.PerformBatch(actionList)
-    if (willChangeSVs) then
+    if willChangeSVs then
         toggleablePrint("s!",
             "Successfully moved " .. #svsToRemove ..
             pluralize(" SV", #svsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
     end
-    if (willChangeSSFs) then
+    if willChangeSSFs then
         toggleablePrint("s!",
             "Successfully moved " .. #ssfsToRemove ..
             pluralize(" SSF", #ssfsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
@@ -3051,7 +3051,7 @@ function pasteItems(menuVars)
     local lastCopiedSSF = menuVars.copied.SSFs[menuVars.curSlot][#menuVars.copied.SSFs[menuVars.curSlot]]
     local lastCopiedBM = menuVars.copied.BMs[menuVars.curSlot][#menuVars.copied.BMs[menuVars.curSlot]]
     local lastCopiedValue = lastCopiedSV
-    if (lastCopiedValue == nil) then
+    if lastCopiedValue == nil then
         lastCopiedValue = lastCopiedSSF or lastCopiedLine or lastCopiedBM or { relativeOffset = 0 }
     end
     local endRemoveOffset = endOffset + lastCopiedValue.relativeOffset + 1 / 128
@@ -3195,7 +3195,7 @@ function displaceNoteSVs(menuVars, place, optionalOffset)
     local svTimeIsAdded = {}
     local offsets = game.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return { svsToRemove = {}, svsToAdd = {} } end
-    if (place == false) then offsets = { optionalOffset } end
+    if place == false then offsets = { optionalOffset } end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local displaceAmount = menuVars.distance
@@ -3208,7 +3208,7 @@ function displaceNoteSVs(menuVars, place, optionalOffset)
             atDisplacement, afterDisplacement)
     end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
-    if (place ~= false) then
+    if place ~= false then
         removeAndAddSVs(svsToRemove, svsToAdd)
         return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
     end
@@ -3393,7 +3393,7 @@ function collapseSnaps()
             local color = hoLayer.Name:match("-([a-zA-Z]+)$")
             local snap = REVERSE_COLOR_MAP[color]
             local mostRecentTP = game.getTimingPointAt(ho.StartTime)
-            if (snap == 1) then
+            if snap == 1 then
                 table.insert(snapTpsToAdd,
                     utils.CreateTimingPoint(ho.StartTime, mostRecentTP.Bpm, mostRecentTP.Signature, true))
             else
@@ -3577,7 +3577,7 @@ function removeUnnecessarySVs()
         local prevMultiplier = state.SelectedScrollGroup.InitialScrollVelocity or map.InitialScrollVelocity or 1
         for _, sv in ipairs(map.ScrollVelocities) do
             local m = sv.Multiplier
-            if (m == prevMultiplier) then svsToRemove[#svsToRemove + 1] = sv end
+            if m == prevMultiplier then svsToRemove[#svsToRemove + 1] = sv end
             prevMultiplier = m
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove, tg))
@@ -3593,7 +3593,7 @@ function removeAllHitSounds()
     local objs = {}
     for _, ho in ipairs(map.HitObjects) do
         local hs = tonumber(ho.HitSound)
-        if (hs > 1) then
+        if hs > 1 then
             table.insert(hitsoundActions, createEA(action_type.RemoveHitsound, { ho }, hs))
             objs[#objs + 1] = ho.StartTime .. "|" .. ho.Lane
         end
@@ -3855,20 +3855,20 @@ end
 function changeNoteLockMode()
     local mode = state.GetValue("noteLockMode") or 0
     mode = (mode + 1) % 4
-    if (mode == 0) then
+    if mode == 0 then
         print("s", "Notes have been unlocked.")
     end
-    if (mode == 1) then
+    if mode == 1 then
         print("e",
             "Notes have been fully locked. To change the lock mode, press " ..
             globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. ".")
     end
-    if (mode == 2) then
+    if mode == 2 then
         print("w",
             "Notes can no longer be placed, only moved. To change the lock mode, press " ..
             globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. ".")
     end
-    if (mode == 3) then
+    if mode == 3 then
         print("w",
             "Notes can no longer be moved, only placed and deleted. To change the lock mode, press " ..
             globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. ".")
@@ -3878,19 +3878,19 @@ end
 function initializeNoteLockMode()
     state.SetValue("noteLockMode", 0)
     listen(function(action, type, fromLua)
-        if (fromLua) then return end
+        if fromLua then return end
         local actionIndex = tonumber(action.Type) ---@cast actionIndex EditorActionType
         local mode = state.GetValue("noteLockMode") or 0
-        if (mode == 1) then
-            if (actionIndex > 9) then return end
+        if mode == 1 then
+            if actionIndex > 9 then return end
             actions.Undo()
         end
-        if (mode == 2) then
+        if mode == 2 then
             local allowedIndices = { 0, 1, 3, 4, 8, 9 }
             if (not table.contains(allowedIndices, actionIndex)) then return end
             actions.Undo()
         end
-        if (mode == 3) then
+        if mode == 3 then
             local allowedIndices = { 2, 5, 6, 7 }
             if (not table.contains(allowedIndices, actionIndex)) then return end
             actions.Undo()
@@ -4070,7 +4070,7 @@ function selectByNoteType(menuVars)
     local notesToSelect = {}
     for k40 = 1, #totalNotes do
         local note = totalNotes[k40]
-        if (hitobject_type) then
+        if hitobject_type then
             if (note.Type == hitobject_type.Normal and not menuVars.normal) then
                 goto skipType
             end
@@ -4198,7 +4198,7 @@ function updateParticles(dimX, dimY, dt, multiplier)
         local xDist = sgPosx - x
         local yDist = sgPosy - y
         local dist = sqrt(xDist ^ 2 + yDist ^ 2)
-        if (dist < 10) then dist = 10 end
+        if dist < 10 then dist = 10 end
         local gravityFactor = bit32.rshift(dist ^ 3, 9)
         local gx = xDist / gravityFactor
         local gy = yDist / gravityFactor
@@ -4244,7 +4244,7 @@ function renderReactiveStars()
         local progress = x / dimX
         local brightness = clamp(-8 * progress * (progress - 1), -1, 1)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
-        if (brightness < 0) then goto nextStar end
+        if brightness < 0 then goto nextStar end
         ctx.AddCircleFilled(pos, sz, color.alterOpacity(color.int.white, 255 - math.floor(brightness * 255)))
         ::nextStar::
     end
@@ -4274,7 +4274,7 @@ function updateStars(dimX, dimY, dt)
             x = x + dimX + 20
         end
         stars_xList[i] = x
-        if (starWrapped) then
+        if starWrapped then
             stars_yList[i] = random() * dimY
             stars_vxList[i] = random() * 3 + 1
             stars_szList[i] = random(3) * 0.5
@@ -4622,14 +4622,14 @@ end
 ---@param thickness integer
 ---@param pulseCol [Vector4, Vector4]
 function drawLogo(currentTime, logoLength, ctx, windowSize, scale, textCol, thickness, pulseCol)
-    if (currentTime < 0) then return end
-    if (currentTime > logoLength) then return end
+    if currentTime < 0 then return end
+    if currentTime > logoLength then return end
     local location = windowSize / 2
     local timeProgress = (currentTime % logoLength / logoLength)
     local curvature1 = 0.4
     local curvature2 = 0.25
     local progress = math.clamp(timeProgress, 0, 1) * 2
-    if (progress <= 1) then
+    if progress <= 1 then
         progress = (1 - (1 - progress) ^ (1 / curvature1))
     else
         progress = (progress - 1) ^ (1 / curvature2) + 1
@@ -4646,7 +4646,7 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, textCol, thic
     ctx.AddRectFilledMultiColor(vctr2(0), windowSize, colTl, colTr, colBr, colBl)
     local t0, t1
     local trueProgress = progress * 2
-    if (trueProgress < 1) then
+    if trueProgress < 1 then
         t0 = 10 * (trueProgress - 1)
         t1 = (1 - trueProgress / 2) * t0 + trueProgress
     else
@@ -5997,7 +5997,7 @@ function setPluginAppearanceColors(colorTheme, hideBorder)
     if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
     if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
     if colorTheme == "CUSTOM" then borderColor = setCustomColors() end
-    if (hideBorder) then return end
+    if hideBorder then return end
     state.SetValue("borderColor", borderColor)
 end
 function setClassicColors()
@@ -6801,7 +6801,7 @@ end
 function BasicCheckbox(varsTable, parameterName, label, tooltipText)
     local oldValue = varsTable[parameterName]
     _, varsTable[parameterName] = imgui.Checkbox(label, oldValue)
-    if (tooltipText) then HelpMarker(tooltipText) end
+    if tooltipText then HelpMarker(tooltipText) end
     return oldValue ~= varsTable[parameterName]
 end
 ---Creates a checkbox that directly saves to globalVars and the universal `.yaml` file.
@@ -6811,7 +6811,7 @@ end
 function GlobalCheckbox(parameterName, label, tooltipText)
     local oldValue = globalVars[parameterName] ---@cast oldValue boolean
     _, globalVars[parameterName] = imgui.Checkbox(label, oldValue)
-    if (tooltipText) then HoverToolTip(tooltipText) end
+    if tooltipText then HoverToolTip(tooltipText) end
     if (oldValue ~= globalVars[parameterName]) then
         write(globalVars)
     end
@@ -6826,7 +6826,7 @@ function CodeInput(varsTable, parameterName, label, tooltipText)
     local oldCode = varsTable[parameterName]
     _, varsTable[parameterName] = imgui.InputTextMultiline(label, oldCode, 16384,
         vector.New(240, 120))
-    if (tooltipText) then HoverToolTip(tooltipText) end
+    if tooltipText then HoverToolTip(tooltipText) end
     return imgui.IsItemActive()
 end
 ---Creates a color input.
@@ -6839,7 +6839,7 @@ function ColorInput(customStyle, parameterName, label, tooltipText)
     AddSeparator()
     local oldCode = customStyle[parameterName]
     _, customStyle[parameterName] = imgui.ColorPicker4(label, customStyle[parameterName] or DEFAULT_STYLE[parameterName])
-    if (tooltipText) then HoverToolTip(tooltipText) end
+    if tooltipText then HoverToolTip(tooltipText) end
     return oldCode ~= customStyle[parameterName]
 end
 ---Creates a combo element.
@@ -6894,7 +6894,7 @@ end
 function ComputableInputFloat(label, var, decimalPlaces, suffix)
     local previousValue = var
     local fmt = table.concat({"%.", decimalPlaces, "f"})
-    if (suffix) then fmt = fmt .. suffix end
+    if suffix then fmt = fmt .. suffix end
     _, var = imgui.InputText(label,
         string.format(fmt,
             tn(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")) or 0),
@@ -6982,7 +6982,7 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
-    if (preferForeground) then ctx = imgui.GetForegroundDrawList() end
+    if preferForeground then ctx = imgui.GetForegroundDrawList() end
     for i, point in ipairs(points) do
         imgui.SetCursorPos(point.pos - vctr2(point.size))
         imgui.InvisibleButton(tableLabel .. i, vctr2(point.size * 2))
@@ -7006,7 +7006,7 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
             points[i].pos = vector.New(roundedX, roundedY)
         end
     end
-    if (gridSize ~= 1) then
+    if gridSize ~= 1 then
         for i = 0, size.x, gridSize do
             local lineCol = gray
             if (truthy(i % 4)) then
@@ -7055,7 +7055,7 @@ end
 function BasicInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 1, 1)
-    if (tooltipText) then HelpMarker(tooltipText) end
+    if tooltipText then HelpMarker(tooltipText) end
     if (bounds and bounds[1] and bounds[2]) then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
     end
@@ -7072,13 +7072,13 @@ end
 function RadioButtons(label, value, options, optionValues, tooltipText)
     imgui.AlignTextToFramePadding()
     imgui.Text(label)
-    if (tooltipText) then HoverToolTip(tooltipText) end
+    if tooltipText then HoverToolTip(tooltipText) end
     for idx, option in pairs(options) do
         imgui.SameLine(0, RADIO_BUTTON_SPACING)
         if imgui.RadioButton(option, value == optionValues[idx]) then
             value = optionValues[idx]
         end
-        if (tooltipText) then HoverToolTip(tooltipText) end
+        if tooltipText then HoverToolTip(tooltipText) end
     end
     return value
 end
@@ -7100,7 +7100,7 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
         return
     end
     FunctionButton(buttonText, ACTION_BUTTON_SIZE, actionfunc, menuVars)
-    if (disableKeyInput) then return end
+    if disableKeyInput then return end
     local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + tn(hideNoteReq)]
     local tooltip = HoverToolTip("Press \'" .. keyCombo ..
         "\' on your keyboard to do the same thing as this button")
@@ -7163,7 +7163,7 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
     for i = 1, #colTbl do
         for _, col in ipairs(colTbl[i]) do
             local height = 50 * (#colTbl * distanceFn(math.wrap(progress + 0.25, 0, 1), i) + #colTbl - i)
-            if (height > 150) then
+            if height > 150 then
                 height = height - 50 * #colTbl
             end
             local notePos = vector.New((col - 1) * 60 + 20, height) * szFactor
@@ -7233,7 +7233,7 @@ function createSVTab()
     if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
     local changedTool = chooseCreateTool()
     local placeType = CREATE_TYPES[globalVars.placeTypeIndex]
-    if (changedTool) then state.SetValue("global.placeTypeIndex", globalVars.placeTypeIndex) end
+    if changedTool then state.SetValue("global.placeTypeIndex", globalVars.placeTypeIndex) end
     if placeType == "Standard" then placeStandardSVMenu() end
     if placeType == "Special" then placeSpecialSVMenu() end
     if placeType == "Still" then placeStillSVMenu() end
@@ -7375,7 +7375,7 @@ function animationFramesSetupMenu(settingVars)
         KeepSameLine()
         imgui.Text("Place SVs")
         AddSeparator()
-        if #settingVars.frameTimes == 0 then
+        if not truthy(settingVars.frameTimes) then
             imgui.Text("No notes added in Step 2, so can't place SVs yet")
             return
         end
@@ -7388,7 +7388,7 @@ function animationFramesSetupMenu(settingVars)
     end
 end
 function removeSelectedFrameTimeButton(settingVars)
-    if #settingVars.frameTimes == 0 then return end
+    if not truthy(settingVars.frameTimes) then return end
     if not imgui.Button("Removed currently selected time", BEEG_BUTTON_SIZE) then return end
     table.remove(settingVars.frameTimes, settingVars.selectedTimeIndex)
     local maxIndex = math.max(1, #settingVars.frameTimes)
@@ -7434,7 +7434,7 @@ function addFrameTimes(settingVars)
     settingVars.frameTimes = sort(settingVars.frameTimes, sortAscendingTime)
 end
 function displayFrameTimes(settingVars)
-    if #settingVars.frameTimes == 0 then
+    if not truthy(settingVars.frameTimes) then
         imgui.Text("Add notes to fill the selection box below")
     else
         imgui.Text("time | lanes | frame # | position")
@@ -7508,7 +7508,7 @@ function addSelectedNoteTimesToList(menuVars)
 end
 function automateSVMenu(settingVars)
     local copiedSVCount = #settingVars.copiedSVs
-    if (copiedSVCount == 0) then
+    if copiedSVCount == 0 then
         BasicCheckbox(settingVars, "deleteCopiedSVs", "Delete Copied SVs?",
             "If true, will automatically delete the SVs that are copied.")
         simpleActionMenu("Copy SVs between selected notes", 2, automateCopySVs, settingVars)
@@ -7573,7 +7573,7 @@ function penisSettingsMenu(settingVars)
         settingVars.bCurvature .. "%%")
 end
 function stutterMenu(settingVars)
-    local settingsChanged = #settingVars.svMultipliers == 0
+    local settingsChanged = not truthy(settingVars.svMultipliers)
     settingsChanged = stutterSettingsMenu(settingVars) or settingsChanged
     if settingsChanged then updateStutterMenuSVs(settingVars) end
     displayStutterSVWindows(settingVars)
@@ -7594,7 +7594,7 @@ function stutterSettingsMenu(settingVars)
     end
     settingsChanged = BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time") or settingsChanged
     HoverToolTip(
-    "Affects the stutter within two offsets; does not affect the stutter over the duration of several notes.")
+        "Affects the stutter within two offsets; does not affect the stutter over the duration of several notes.")
     AddSeparator()
     settingsChanged = BasicInputInt(settingVars, "stuttersPerSection", "Stutters", { 1, 1000 }) or settingsChanged
     settingsChanged = chooseAverageSV(settingVars) or settingsChanged
@@ -7635,7 +7635,7 @@ STANDARD_SVS = {
 function placeStandardSVMenu()
     PresetButton()
     local menuVars = getMenuVars("placeStandard")
-    local needSVUpdate = #menuVars.svMultipliers == 0
+    local needSVUpdate = not truthy(menuVars.svMultipliers)
     needSVUpdate = chooseStandardSVType(menuVars, false) or needSVUpdate
     AddSeparator()
     local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
@@ -7664,7 +7664,7 @@ end
 function placeStillSVMenu()
     PresetButton()
     local menuVars = getMenuVars("placeStill")
-    local needSVUpdate = #menuVars.svMultipliers == 0
+    local needSVUpdate = not truthy(menuVars.svMultipliers)
     needSVUpdate = chooseStandardSVType(menuVars, false) or needSVUpdate
     AddSeparator()
     local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
@@ -7720,7 +7720,7 @@ function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func = function(t)
             t = math.clamp(t, 0, 1)
-            if (curvature < 10) then
+            if curvature < 10 then
                 t = 1 - (1 - t) ^ (1 / curvature)
             else
                 t = t ^ curvature
@@ -7738,7 +7738,7 @@ function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func1 = function(t)
             t = math.clamp(t, 0, 1)
-            if (curvature < 10) then
+            if curvature < 10 then
                 t = 1 - (1 - t) ^ (1 / curvature)
             else
                 t = t ^ curvature
@@ -7747,7 +7747,7 @@ function exponentialVibratoMenu(menuVars, settingVars, separateWindow)
         end
         local func2 = function(t)
             t = math.clamp(t, 0, 1)
-            if (curvature < 10) then
+            if curvature < 10 then
                 t = 1 - (1 - t) ^ (1 / curvature)
             else
                 t = t ^ curvature
@@ -7917,14 +7917,14 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func = function(t)
             t = math.clamp(t, 0, 1) * 2
-            if (curvature >= 1) then
-                if (t <= 1) then
+            if curvature >= 1 then
+                if t <= 1 then
                     t = t ^ curvature
                 else
                     t = 2 - (2 - t) ^ curvature
                 end
             else
-                if (t <= 1) then
+                if t <= 1 then
                     t = (1 - (1 - t) ^ (1 / curvature))
                 else
                     t = (t - 1) ^ (1 / curvature) + 1
@@ -7943,14 +7943,14 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func1 = function(t)
             t = math.clamp(t, 0, 1) * 2
-            if (curvature >= 1) then
-                if (t <= 1) then
+            if curvature >= 1 then
+                if t <= 1 then
                     t = t ^ curvature
                 else
                     t = 2 - (2 - t) ^ curvature
                 end
             else
-                if (t <= 1) then
+                if t <= 1 then
                     t = (1 - (1 - t) ^ (1 / curvature))
                 else
                     t = (t - 1) ^ (1 / curvature) + 1
@@ -7961,14 +7961,14 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
         end
         local func2 = function(t)
             t = math.clamp(t, 0, 1) * 2
-            if (curvature >= 1) then
-                if (t <= 1) then
+            if curvature >= 1 then
+                if t <= 1 then
                     t = t ^ curvature
                 else
                     t = 2 - (2 - t) ^ curvature
                 end
             else
-                if (t <= 1) then
+                if t <= 1 then
                     t = (1 - (1 - t) ^ (1 / curvature))
                 else
                     t = (t - 1) ^ (1 / curvature) + 1
@@ -8066,7 +8066,7 @@ function completeDuplicateMenu()
     local menuVars = getMenuVars("completeDuplicate")
     completeDuplicateSettingsMenu(menuVars)
     local copiedItemCount = #menuVars.objects
-    if (copiedItemCount == 0) then
+    if copiedItemCount == 0 then
         simpleActionMenu("Copy items between selected notes", 2, storeDuplicateItems, menuVars)
         cache.saveTable("completeDuplicateMenu", menuVars)
         return
@@ -8096,7 +8096,7 @@ function copyNPasteMenu()
     local menuVars = getMenuVars("copyPaste")
     local copiedItemCount = copyNPasteSettingsMenu(menuVars, true)
     cache.saveTable("copyPasteMenu", menuVars)
-    if (copiedItemCount == 0) then return end
+    if copiedItemCount == 0 then return end
     simpleActionMenu("Paste items at selected notes", 1, pasteItems, menuVars)
 end
 function copyNPasteSettingsMenu(menuVars, actionable)
@@ -8118,18 +8118,18 @@ function copyNPasteSettingsMenu(menuVars, actionable)
         end
         menuVars.copied = newCopied
     end
-    if (actionable) then AddSeparator() end
+    if actionable then AddSeparator() end
     local copiedItemCount = #menuVars.copied.lines[menuVars.curSlot] + #menuVars.copied.SVs[menuVars.curSlot] +
         #menuVars.copied.SSFs[menuVars.curSlot] + #menuVars.copied.BMs[menuVars.curSlot]
-    if (actionable) then
-        if (copiedItemCount == 0) then
+    if actionable then
+        if copiedItemCount == 0 then
             simpleActionMenu("Copy items between selected notes", 2, copyItems, menuVars)
         else
             FunctionButton("Clear copied items", ACTION_BUTTON_SIZE, clearCopiedItems, menuVars)
         end
     end
     if (copiedItemCount == 0 and actionable) then return copiedItemCount end
-    if (actionable) then AddSeparator() end
+    if actionable then AddSeparator() end
     _, menuVars.tryAlign = imgui.Checkbox("Try to fix misalignments", menuVars.tryAlign)
     imgui.PushItemWidth(100)
     _, menuVars.alignWindow = imgui.SliderInt("Alignment window (ms)", menuVars.alignWindow, 1, 10)
@@ -8253,7 +8253,7 @@ function dynamicScaleMenu()
         return
     end
     local numSVPoints = numNoteTimes - 1
-    local needSVUpdate = #menuVars.svMultipliers == 0 or (#menuVars.svMultipliers ~= numSVPoints)
+    local needSVUpdate = not truthy(menuVars.svMultipliers) or (#menuVars.svMultipliers ~= numSVPoints)
     imgui.AlignTextToFramePadding()
     imgui.Text("Shape:")
     KeepSameLine()
@@ -8349,7 +8349,7 @@ EDIT_SV_TOOLS = {
 function editSVTab()
     if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
     local changedTool = chooseEditTool()
-    if (changedTool) then state.SetValue("global.editToolIndex", globalVars.editToolIndex) end
+    if changedTool then state.SetValue("global.editToolIndex", globalVars.editToolIndex) end
     AddSeparator()
     local toolName = EDIT_SV_TOOLS[globalVars.editToolIndex]
     if toolName == "Add Teleport" then addTeleportMenu() end
@@ -10251,7 +10251,7 @@ SELECT_TOOLS = {
 function selectTab()
     local changedTool = chooseSelectTool()
     AddSeparator()
-    if (changedTool) then state.SetValue("global.selectTypeIndex", globalVars.selectTypeIndex) end
+    if changedTool then state.SetValue("global.selectTypeIndex", globalVars.selectTypeIndex) end
     local toolName = SELECT_TOOLS[globalVars.selectTypeIndex]
     if toolName == "Alternating" then selectAlternatingMenu() end
     if toolName == "Bookmark" then selectBookmarkMenu() end
@@ -10283,7 +10283,7 @@ function selectNoteTypeMenu()
     KeepSameLine()
     _, menuVars.ln = imgui.Checkbox("Select LNs", menuVars.ln)
     ---@diagnostic disable-next-line: undefined-global
-    if (hitobject_type) then
+    if hitobject_type then
         _, menuVars.normal = imgui.Checkbox("Select Normals", menuVars.normal)
         KeepSameLine()
         _, menuVars.mine = imgui.Checkbox("Select Mines", menuVars.mine)
@@ -10527,7 +10527,7 @@ function showCustomThemeSettings()
         settingsChanged = ColorInput(globalVars.customStyle, id, name) or settingsChanged
         ::nextId::
     end
-    if (settingsChanged) then
+    if settingsChanged then
         write(globalVars)
     end
 end
@@ -10904,7 +10904,7 @@ function showKeybindSettings()
     local awaitingIndex = state.GetValue("hotkey_awaitingIndex", 0)
     for hotkeyIndex, hotkeyCombo in pairs(globalVars.hotkeyList) do
         if imgui.Button(awaitingIndex == hotkeyIndex and "Listening...##listening" or hotkeyCombo .. "##" .. hotkeyIndex) then
-            if (awaitingIndex == hotkeyIndex) then
+            if awaitingIndex == hotkeyIndex then
                 awaitingIndex = 0
             else
                 awaitingIndex = hotkeyIndex
@@ -10920,7 +10920,7 @@ function showKeybindSettings()
         awaitingIndex = 0
     end, nil, true, true)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
-    if (awaitingIndex == 0) then return end
+    if awaitingIndex == 0 then return end
     local prefixes, key = kbm.listenForAnyKeyPressed()
     if (key == -1) then return end
     globalVars.hotkeyList[awaitingIndex] = table.concat(prefixes, "+") ..
@@ -11520,7 +11520,7 @@ function showTutorialWindow()
     imgui.PopStyleColor(2)
 end
 function renderMeasureDataWidget()
-    if #state.SelectedHitObjects == 0 then return end
+    if not truthy(state.SelectedHitObjects) then return end
     local widgetVars = {
         oldStartOffset = -69,
         oldEndOffset = -69,
@@ -11800,7 +11800,7 @@ function chooseCursorTrailPoints()
     local currentTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
     if currentTrail ~= "Snake" then return end
     local settingChanged = BasicInputInt(globalVars, "cursorTrailPoints", "Trail Points")
-    if (settingChanged) then
+    if settingChanged then
         write(globalVars)
     end
 end
@@ -11818,7 +11818,7 @@ function chooseCursorShapeSize()
     local currentTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
     if currentTrail ~= "Snake" then return end
     local settingChanged = BasicInputInt(globalVars, "cursorTrailSize", "Shape Size")
-    if (settingChanged) then
+    if settingChanged then
         write(globalVars)
     end
 end
@@ -11866,7 +11866,7 @@ function chooseEffectFPS()
     if currentTrail ~= "Snake" then return end
     local settingChanged = BasicInputInt(globalVars, "effectFPS", "Effect FPS", { 2, 1000 },
         "Set this to a multiple of UPS or FPS to make cursor effects smooth")
-    if (settingChanged) then
+    if settingChanged then
         write(globalVars)
     end
 end
@@ -11898,7 +11898,7 @@ function chooseFrameSpacing(settingVars)
     settingVars.frameDistance = math.clamp(settingVars.frameDistance, 2000, 100000)
 end
 function chooseFrameTimeData(settingVars)
-    if #settingVars.frameTimes == 0 then return end
+    if not truthy(settingVars.frameTimes) then return end
     local frameTime = settingVars.frameTimes[settingVars.selectedTimeIndex]
     _, frameTime.frame = imgui.InputInt("Frame #", math.floor(frameTime.frame))
     frameTime.frame = math.clamp(frameTime.frame, 1, settingVars.numFrames)
@@ -12315,7 +12315,7 @@ end
 function prepareDisplacingSV(svsToAdd, svTimeIsAdded, svTime, displacement, displacementMultiplier, hypothetical, svs)
     svTimeIsAdded[svTime] = true
     local currentSVMultiplier = game.getSVMultiplierAt(svTime)
-    if (hypothetical == true) then
+    if hypothetical == true then
         currentSVMultiplier = getHypotheticalSVMultiplierAt(svs, svTime)
     end
     local newSVMultiplier = displacementMultiplier * displacement + currentSVMultiplier
@@ -12708,7 +12708,7 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
             settingVars.verticalShift, settingVars.svPoints + 1,
             settingVars.dontNormalize)
     elseif svType == "Random" then
-        if #settingVars.svMultipliers == 0 then
+        if not truthy(settingVars.svMultipliers) then
             generateRandomSetMenuSVs(settingVars)
         end
         multipliers = getRandomSet(settingVars.svMultipliers, settingVars.avgSV,
@@ -12879,7 +12879,7 @@ function addFinalSSF(ssfsToAdd, endOffset, ssfMultiplier, force)
 end
 function addInitialSSF(ssfsToAdd, startOffset)
     local ssf = map.GetScrollSpeedFactorAt(startOffset)
-    if (ssf == nil) then return end
+    if ssf == nil then return end
     local ssfExistsAtStartOffset = ssf and (ssf.StartTime == startOffset)
     if ssfExistsAtStartOffset then return end
     addSSFToList(ssfsToAdd, startOffset, ssf.Multiplier, true)
@@ -13071,7 +13071,7 @@ function plotExponentialCurvature(settingVars)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local t = i / RESOLUTION
         local value = t
-        if (curvature >= 1) then
+        if curvature >= 1 then
             value = t ^ curvature
         else
             value = (1 - (1 - t) ^ (1 / curvature))
@@ -13096,14 +13096,14 @@ function plotSigmoidalCurvature(settingVars)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local t = i / RESOLUTION * 2
         local value = t
-        if (curvature >= 1) then
-            if (t <= 1) then
+        if curvature >= 1 then
+            if t <= 1 then
                 value = t ^ curvature
             else
                 value = 2 - (2 - t) ^ curvature
             end
         else
-            if (t <= 1) then
+            if t <= 1 then
                 value = (1 - (1 - t) ^ (1 / curvature))
             else
                 value = (t - 1) ^ (1 / curvature) + 1
@@ -13156,7 +13156,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
                 vector.New(topLeft.x + i * dim.x / game.keyCount - 5, heightValue + 20),
                 imgui.GetColorU32(imgui_col.Header, (1 - (1 - progress) ^ 10)))
         end
-        if (svStats) then
+        if svStats then
             local normativeMax = math.max(math.abs(svStats.minSV), math.abs(svStats.maxSV))
             local appearanceTime = 0.5
             local inverseProgress = 1 - progress

@@ -8,7 +8,7 @@
 function BasicInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 1, 1)
-    if (tooltipText) then HelpMarker(tooltipText) end
+    if tooltipText then HelpMarker(tooltipText) end
     if (bounds and bounds[1] and bounds[2]) then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
     end

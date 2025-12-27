@@ -89,7 +89,7 @@ function collapseSnaps()
             local color = hoLayer.Name:match("-([a-zA-Z]+)$")
             local snap = REVERSE_COLOR_MAP[color]
             local mostRecentTP = game.getTimingPointAt(ho.StartTime)
-            if (snap == 1) then
+            if snap == 1 then
                 table.insert(snapTpsToAdd,
                     utils.CreateTimingPoint(ho.StartTime, mostRecentTP.Bpm, mostRecentTP.Signature, true))
             else

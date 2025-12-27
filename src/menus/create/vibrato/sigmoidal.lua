@@ -5,14 +5,14 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func = function(t)
             t = math.clamp(t, 0, 1) * 2
-            if (curvature >= 1) then
-                if (t <= 1) then
+            if curvature >= 1 then
+                if t <= 1 then
                     t = t ^ curvature
                 else
                     t = 2 - (2 - t) ^ curvature
                 end
             else
-                if (t <= 1) then
+                if t <= 1 then
                     t = (1 - (1 - t) ^ (1 / curvature))
                 else
                     t = (t - 1) ^ (1 / curvature) + 1
@@ -33,14 +33,14 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
 
         local func1 = function(t)
             t = math.clamp(t, 0, 1) * 2
-            if (curvature >= 1) then
-                if (t <= 1) then
+            if curvature >= 1 then
+                if t <= 1 then
                     t = t ^ curvature
                 else
                     t = 2 - (2 - t) ^ curvature
                 end
             else
-                if (t <= 1) then
+                if t <= 1 then
                     t = (1 - (1 - t) ^ (1 / curvature))
                 else
                     t = (t - 1) ^ (1 / curvature) + 1
@@ -51,14 +51,14 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
         end
         local func2 = function(t)
             t = math.clamp(t, 0, 1) * 2
-            if (curvature >= 1) then
-                if (t <= 1) then
+            if curvature >= 1 then
+                if t <= 1 then
                     t = t ^ curvature
                 else
                     t = 2 - (2 - t) ^ curvature
                 end
             else
-                if (t <= 1) then
+                if t <= 1 then
                     t = (1 - (1 - t) ^ (1 / curvature))
                 else
                     t = (t - 1) ^ (1 / curvature) + 1

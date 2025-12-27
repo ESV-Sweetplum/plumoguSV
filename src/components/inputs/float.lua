@@ -6,7 +6,7 @@ function ComputableInputFloat(label, var, decimalPlaces, suffix)
     local previousValue = var
 
     local fmt = "%." .. decimalPlaces .. "f"
-    if (suffix) then fmt = fmt .. suffix end
+    if suffix then fmt = fmt .. suffix end
 
     _, var = imgui.InputText(label,
         string.format(fmt,

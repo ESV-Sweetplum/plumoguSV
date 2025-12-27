@@ -1,5 +1,5 @@
 function stutterMenu(settingVars)
-    local settingsChanged = #settingVars.svMultipliers == 0
+    local settingsChanged = not truthy(settingVars.svMultipliers)
     settingsChanged = stutterSettingsMenu(settingVars) or settingsChanged
     if settingsChanged then updateStutterMenuSVs(settingVars) end
     displayStutterSVWindows(settingVars)
@@ -22,7 +22,7 @@ function stutterSettingsMenu(settingVars)
     end
     settingsChanged = BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time") or settingsChanged
     HoverToolTip(
-    "Affects the stutter within two offsets; does not affect the stutter over the duration of several notes.")
+        "Affects the stutter within two offsets; does not affect the stutter over the duration of several notes.")
     AddSeparator()
     settingsChanged = BasicInputInt(settingVars, "stuttersPerSection", "Stutters", { 1, 1000 }) or settingsChanged
     settingsChanged = chooseAverageSV(settingVars) or settingsChanged

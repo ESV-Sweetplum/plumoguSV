@@ -1,7 +1,7 @@
 function placeStillSVMenu()
     PresetButton()
     local menuVars = getMenuVars("placeStill")
-    local needSVUpdate = #menuVars.svMultipliers == 0
+    local needSVUpdate = not truthy(menuVars.svMultipliers)
     needSVUpdate = chooseStandardSVType(menuVars, false) or needSVUpdate
 
     AddSeparator()

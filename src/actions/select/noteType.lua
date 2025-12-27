@@ -11,7 +11,7 @@ function selectByNoteType(menuVars)
     local notesToSelect = {}
 
     for _, note in ipairs(totalNotes) do
-        if (hitobject_type) then
+        if hitobject_type then
             if (note.Type == hitobject_type.Normal and not menuVars.normal) then
                 goto skipType
             end

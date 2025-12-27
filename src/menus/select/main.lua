@@ -10,7 +10,7 @@ SELECT_TOOLS = {
 function selectTab()
     local changedTool = chooseSelectTool()
     AddSeparator()
-    if (changedTool) then state.SetValue("global.selectTypeIndex", globalVars.selectTypeIndex) end
+    if changedTool then state.SetValue("global.selectTypeIndex", globalVars.selectTypeIndex) end
     local toolName = SELECT_TOOLS[globalVars.selectTypeIndex]
     if toolName == "Alternating" then selectAlternatingMenu() end
     if toolName == "Bookmark" then selectBookmarkMenu() end

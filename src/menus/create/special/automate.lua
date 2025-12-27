@@ -1,7 +1,7 @@
 function automateSVMenu(settingVars)
     local copiedSVCount = #settingVars.copiedSVs
 
-    if (copiedSVCount == 0) then
+    if copiedSVCount == 0 then
         BasicCheckbox(settingVars, "deleteCopiedSVs", "Delete Copied SVs?",
             "If true, will automatically delete the SVs that are copied.")
         simpleActionMenu("Copy SVs between selected notes", 2, automateCopySVs, settingVars)

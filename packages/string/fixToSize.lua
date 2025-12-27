@@ -4,7 +4,7 @@
 ---@return string dottedStr
 function string.fixToSize(str, targetSize)
     local size = imgui.CalcTextSize(str).x
-    if (size <= targetSize) then return str end
+    if size <= targetSize then return str end
     while (str:len() > 3 and size > targetSize) do
         str = str:sub(1, -2)
         size = imgui.CalcTextSize(str .. "...").x

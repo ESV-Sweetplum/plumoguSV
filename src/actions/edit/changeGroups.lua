@@ -27,7 +27,7 @@ function changeGroups(menuVars)
     local actionList = {}
     local willChangeSVs = menuVars.changeSVs and #svsToRemove ~= 0
     local willChangeSSFs = menuVars.changeSSFs and #ssfsToRemove ~= 0
-    if (willChangeSVs) then
+    if willChangeSVs then
         if (not menuVars.clone) then
             table.insert(actionList, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
         end
@@ -35,7 +35,7 @@ function changeGroups(menuVars)
             .designatedTimingGroup -- must change in the middle because previous line applies to previous tg, next line applies to next tg
         table.insert(actionList, createEA(action_type.AddScrollVelocityBatch, svsToAdd))
     end
-    if (willChangeSSFs) then
+    if willChangeSSFs then
         if (not menuVars.clone) then
             table.insert(actionList, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
         end
@@ -49,12 +49,12 @@ function changeGroups(menuVars)
     end
 
     actions.PerformBatch(actionList)
-    if (willChangeSVs) then
+    if willChangeSVs then
         toggleablePrint("s!",
             "Successfully moved " .. #svsToRemove ..
             pluralize(" SV", #svsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
     end
-    if (willChangeSSFs) then
+    if willChangeSSFs then
         toggleablePrint("s!",
             "Successfully moved " .. #ssfsToRemove ..
             pluralize(" SSF", #ssfsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
