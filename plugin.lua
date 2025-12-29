@@ -1613,6 +1613,7 @@ globalVars = {
     printLegacyLNMessage = true,
     pulseCoefficient = 0,
     pulseColor = vector.New(0, 0, 0, 0),
+    restrictSinusoidalPeriod = true,
     rgbPeriod = 2,
     scrollGroupIndex = 1,
     selectTypeIndex = 1,
@@ -1657,6 +1658,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.printLegacyLNMessage = truthy(tempGlobalVars.printLegacyLNMessage, true)
     globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
     globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
+    globalVars.restrictSinusoidalPeriod = truthy(tempGlobalVars.restrictSinusoidalPeriod, true)
     globalVars.rgbPeriod = tn(tempGlobalVars.rgbPeriod)
     globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
     globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
@@ -10875,6 +10877,8 @@ function showGeneralSettings()
         'Disables printing "Created __ SVs" messages.')
     GlobalCheckbox("equalizeLinear", "Equalize Linear SV",
         "Forces the standard > linear option to have an average sv of 0 if the start and end SVs are equal. For beginners, this should be enabled.")
+    GlobalCheckbox("restrictSinusoidalPeriod", "Restrict Sinusoidal Period",
+        "If true, restricts the sinusoidal period shift parameter to be the nearest 4th.")
     GlobalCheckbox("comboizeSelect", "Select Using Already Selected Notes",
         "Changes the behavior of the SELECT tab to select notes that are already selected, instead of all notes between the start/end selection.")
     GlobalCheckbox("printLegacyLNMessage", "Print Legacy LN Recommendation",
@@ -11984,8 +11988,12 @@ end
 function choosePeriodShift(settingVars)
     local oldShift = settingVars.periodsShift
     local _, newShift = imgui.InputFloat("Phase Shift", oldShift, 0.25, 0.25, "%.2f")
-    newShift = math.quarter(newShift)
-    newShift = math.wrappedClamp(newShift, -0.75, 1)
+    if (globalVars.restrictSinusoidalPeriod) then
+        newShift = math.quarter(newShift)
+        newShift = math.wrappedClamp(newShift, -0.75, 1)
+    else
+        newShift = math.wrappedClamp(newShift, -1, 1)
+    end
     settingVars.periodsShift = newShift
     return oldShift ~= newShift
 end

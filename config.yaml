@@ -645,8 +645,8 @@ dontReplaceSV: false
 drawCapybara: true
 drawCapybara2: false
 drawCapybara312: false
-dynamicBackgroundIndex: 1
-editToolIndex: 5
+dynamicBackgroundIndex: 3
+editToolIndex: 1
 effectFPS: 100
 equalizeLinear: true
 hideAutomatic: true
@@ -667,7 +667,7 @@ hotkeyList:
 ignoreNotesOutsideTg: false
 maxDisplacementMultiplierExponent: 5
 performanceMode: false
-placeTypeIndex: 3
+placeTypeIndex: 1
 presets:
 - 
 printLegacyLNMessage: true
@@ -677,6 +677,7 @@ pulseColor:
 - 0
 - 1
 - 1
+restrictSinusoidalPeriod: false
 rgbPeriod: 1
 scrollGroupIndex: 1
 selectTypeIndex: 1

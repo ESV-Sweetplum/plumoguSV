@@ -479,8 +479,12 @@ end
 function choosePeriodShift(settingVars)
     local oldShift = settingVars.periodsShift
     local _, newShift = imgui.InputFloat("Phase Shift", oldShift, 0.25, 0.25, "%.2f")
-    newShift = math.quarter(newShift)
-    newShift = math.wrappedClamp(newShift, -0.75, 1)
+    if (globalVars.restrictSinusoidalPeriod) then
+        newShift = math.quarter(newShift)
+        newShift = math.wrappedClamp(newShift, -0.75, 1)
+    else
+        newShift = math.wrappedClamp(newShift, -1, 1)
+    end
     settingVars.periodsShift = newShift
     return oldShift ~= newShift
 end

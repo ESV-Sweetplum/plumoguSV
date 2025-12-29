@@ -30,6 +30,7 @@ globalVars = {
     printLegacyLNMessage = true,
     pulseCoefficient = 0,
     pulseColor = vector.New(0, 0, 0, 0),
+    restrictSinusoidalPeriod = true,
     rgbPeriod = 2,
     scrollGroupIndex = 1,
     selectTypeIndex = 1,
@@ -76,6 +77,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.printLegacyLNMessage = truthy(tempGlobalVars.printLegacyLNMessage, true)
     globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
     globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
+    globalVars.restrictSinusoidalPeriod = truthy(tempGlobalVars.restrictSinusoidalPeriod, true)
     globalVars.rgbPeriod = tn(tempGlobalVars.rgbPeriod)
     globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
     globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
