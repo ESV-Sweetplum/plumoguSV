@@ -1,5 +1,5 @@
 advancedMode: true
-colorThemeIndex: 16
+colorThemeIndex: 6
 comboizeSelect: true
 cursorTrailGhost: false
 cursorTrailIndex: 1
@@ -645,7 +645,7 @@ dontReplaceSV: false
 drawCapybara: true
 drawCapybara2: false
 drawCapybara312: false
-dynamicBackgroundIndex: 3
+dynamicBackgroundIndex: 1
 editToolIndex: 1
 effectFPS: 100
 equalizeLinear: true

@@ -4122,6 +4122,17 @@ function selectByTimingGroup(menuVars)
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
+function addGradient()
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    local buttonColor = imgui.GetColorU32("Button")
+    local bgColor = imgui.GetColorU32("WindowBg")
+    local buttonFactor = 0.3
+    local tlTr = color.vrgbaToUint(color.uintToRgba(buttonColor) * buttonFactor / 255 +
+        color.uintToRgba(bgColor) * (1 - buttonFactor) / 255)
+    ctx.AddRectFilledMultiColor(topLeft, topLeft + dim, bgColor, tlTr, buttonColor, tlTr)
+end
 local singularity_xList = {}
 local singularity_yList = {}
 local singularity_vxList = {}
@@ -13473,6 +13484,7 @@ function draw()
     imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
     imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
     if (not performanceMode) then
+        addGradient()
         renderBackground()
         drawCapybaraParent()
         drawCursorTrail()
@@ -13556,6 +13568,7 @@ function draw()
     imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
     imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
     if (not performanceMode) then
+        addGradient()
         renderBackground()
         drawCapybaraParent()
         drawCursorTrail()

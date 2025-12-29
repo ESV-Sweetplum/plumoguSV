@@ -11,6 +11,7 @@ function draw()
     imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
 
     if (not performanceMode) then
+        addGradient()
         renderBackground()
         drawCapybaraParent()
         drawCursorTrail()
