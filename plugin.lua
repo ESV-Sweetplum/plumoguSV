@@ -132,7 +132,7 @@ function color.uintToRgba(n)
     for i = 0, 3 do
         tbl[#tbl + 1] = math.floor(n / 256 ^ i) % 256
     end
-    return table.vectorize4(tbl)
+    return table.vectorize4(tbl) / 255
 end
 ---Converts a hexa string to an rgba Vector4 (0-1 for each element).
 ---@param hexa string
@@ -4129,8 +4129,8 @@ function addGradient()
     local buttonColor = imgui.GetColorU32("Button")
     local bgColor = imgui.GetColorU32("WindowBg")
     local buttonFactor = 0.3
-    local tlTr = color.vrgbaToUint(color.uintToRgba(buttonColor) * buttonFactor / 255 +
-        color.uintToRgba(bgColor) * (1 - buttonFactor) / 255)
+    local tlTr = color.vrgbaToUint(color.uintToRgba(buttonColor) * buttonFactor +
+        color.uintToRgba(bgColor) * (1 - buttonFactor))
     ctx.AddRectFilledMultiColor(topLeft, topLeft + dim, bgColor, tlTr, buttonColor, tlTr)
 end
 local singularity_xList = {}
@@ -10360,7 +10360,7 @@ function showAppearanceSettings()
                 customStyle[id] = loadup[query:sub(7)]
                 goto nextCustomStyle
             end
-            customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[query])) / vctr4(255)
+            customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[query]))
             ::nextCustomStyle::
         end
         globalVars.customStyle = customStyle
@@ -11617,8 +11617,8 @@ function chooseAverageSV(menuVars)
     return settingsChanged
 end
 function chooseInteractiveBezier(settingVars, optionalLabel)
-    local pos1 = (settingVars.p1 * vctr2(150)) or vector.New(30, 75)
-    local pos2 = (settingVars.p2 * vctr2(150)) or vector.New(120, 75)
+    local pos1 = (settingVars.p1 * 150) or vector.New(30, 75)
+    local pos2 = (settingVars.p2 * 150) or vector.New(120, 75)
     local normalizedPos1 = pos1 / 150
     local normalizedPos2 = pos2 / 150
     if (not settingVars.manualMode) then
@@ -11655,8 +11655,8 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         imgui.SetCursorPosX(7)
         pos1.y = 150 - pos1.y
         pos2.y = 150 - pos2.y
-        normalizedPos1 = pos1 / vctr2(150)
-        normalizedPos2 = pos2 / vctr2(150)
+        normalizedPos1 = pos1 / 150
+        normalizedPos2 = pos2 / 150
         imgui.Text("\n         Point 1:\n      (" ..
             string.format("%.2f", normalizedPos1.x) ..
             table.concat({", ", string.format("%.2f", normalizedPos1.y), ")\n         Point 2:\n      ("}) ..

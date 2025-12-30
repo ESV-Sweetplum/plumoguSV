@@ -20,8 +20,8 @@ function chooseAverageSV(menuVars)
 end
 
 function chooseInteractiveBezier(settingVars, optionalLabel)
-    local pos1 = (settingVars.p1 * vctr2(150)) or vector.New(30, 75)
-    local pos2 = (settingVars.p2 * vctr2(150)) or vector.New(120, 75)
+    local pos1 = (settingVars.p1 * 150) or vector.New(30, 75)
+    local pos2 = (settingVars.p2 * 150) or vector.New(120, 75)
 
     local normalizedPos1 = pos1 / 150
     local normalizedPos2 = pos2 / 150
@@ -72,8 +72,8 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         pos1.y = 150 - pos1.y
         pos2.y = 150 - pos2.y
 
-        normalizedPos1 = pos1 / vctr2(150)
-        normalizedPos2 = pos2 / vctr2(150)
+        normalizedPos1 = pos1 / 150
+        normalizedPos2 = pos2 / 150
 
         imgui.Text("\n         Point 1:\n      (" ..
             string.format("%.2f", normalizedPos1.x) ..

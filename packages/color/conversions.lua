@@ -34,7 +34,7 @@ function color.uintToRgba(n)
         table.insert(tbl, math.floor(n / 256 ^ i) % 256)
     end
 
-    return table.vectorize4(tbl)
+    return table.vectorize4(tbl) / 255
 end
 
 ---Converts rgba to a hexa string.

@@ -15,7 +15,7 @@ function showAppearanceSettings()
                 customStyle[id] = loadup[query:sub(7)]
                 goto nextCustomStyle
             end
-            customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[query])) / vctr4(255)
+            customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[query]))
             ::nextCustomStyle::
         end
         globalVars.customStyle = customStyle

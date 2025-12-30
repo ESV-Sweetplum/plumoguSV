@@ -7,8 +7,8 @@ function addGradient()
     local bgColor = imgui.GetColorU32("WindowBg")
 
     local buttonFactor = 0.3
-    local tlTr = color.vrgbaToUint(color.uintToRgba(buttonColor) * buttonFactor / 255 +
-        color.uintToRgba(bgColor) * (1 - buttonFactor) / 255)
+    local tlTr = color.vrgbaToUint(color.uintToRgba(buttonColor) * buttonFactor +
+        color.uintToRgba(bgColor) * (1 - buttonFactor))
 
     ctx.AddRectFilledMultiColor(topLeft, topLeft + dim, bgColor, tlTr, buttonColor, tlTr)
 end
