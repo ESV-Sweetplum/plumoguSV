@@ -5908,9 +5908,6 @@ function renderBackground()
     if (DYNAMIC_BACKGROUND_TYPES[idx] == "Reactive Singularity") then
         renderReactiveSingularities()
     end
-    if (DYNAMIC_BACKGROUND_TYPES[idx] == "Synthesis") then
-        renderSynthesis()
-    end
 end
 function setPluginAppearance()
     local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
