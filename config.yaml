@@ -1,5 +1,5 @@
 advancedMode: true
-colorThemeIndex: 16
+colorThemeIndex: 2
 comboizeSelect: true
 cursorTrailGhost: false
 cursorTrailIndex: 1
@@ -639,13 +639,13 @@ defaultProperties:
       mine: false
     selectBySnap:
       snap: 1
-disableLoadup: false
+disableLoadup: true
 dontPrintCreation: false
 dontReplaceSV: false
 drawCapybara: true
 drawCapybara2: false
 drawCapybara312: false
-dynamicBackgroundIndex: 2
+dynamicBackgroundIndex: 4
 editToolIndex: 1
 effectFPS: 100
 equalizeLinear: true
