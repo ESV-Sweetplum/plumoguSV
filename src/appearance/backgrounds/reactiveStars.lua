@@ -28,7 +28,9 @@ function renderReactiveStars()
 
         if brightness < 0 then goto nextStar end
 
-        ctx.AddCircleFilled(pos, sz, color.alterOpacity(color.int.white, 255 - math.floor(brightness * 255)))
+        -- ctx.AddCircleFilled(pos, sz * 2, color.alterOpacity(color.int.white, (255 - math.floor(brightness * 255)) - 255))
+        ctx.AddCircleFilled(pos, sz * 2, color.int.whiteMask * 255 + color.int.alphaMask * 255 * brightness / 10)
+        ctx.AddCircleFilled(pos, sz, color.alterOpacity(color.int.white, math.floor(brightness * 255) - 255))
         ::nextStar::
     end
 end

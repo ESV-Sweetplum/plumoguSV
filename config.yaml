@@ -645,7 +645,7 @@ dontReplaceSV: false
 drawCapybara: true
 drawCapybara2: false
 drawCapybara312: false
-dynamicBackgroundIndex: 1
+dynamicBackgroundIndex: 2
 editToolIndex: 1
 effectFPS: 100
 equalizeLinear: true
