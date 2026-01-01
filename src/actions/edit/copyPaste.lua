@@ -115,10 +115,7 @@ function pasteItems(menuVars)
     local svsToAdd = {}
     local ssfsToAdd = {}
     local bmsToAdd = {}
-    if (globalVars.performanceMode) then -- Delayed hit object start time calculation until absolutely necessary
-        refreshHitObjectStartTimes()
-    end
-    local hitObjectTimes = cache.lists.hitObjectStartTimes
+    local hitObjectTimes = table.dedupe(table.property(map.HitObjects, "StartTime"))
     for i = 1, #offsets do
         local pasteOffset = offsets[i]
         local nextOffset = offsets[math.clamp(i + 1, 1, #offsets)]

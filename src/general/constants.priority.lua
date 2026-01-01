@@ -72,7 +72,6 @@ DYNAMIC_BACKGROUND_TYPES = {
     "None",
     "Reactive Stars",
     "Reactive Singularity",
-    "Synthesis",
 }
 
 COMBO_SV_TYPE = {

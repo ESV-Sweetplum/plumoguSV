@@ -15,7 +15,6 @@ function awake()
     end
 
     initializeNoteLockMode()
-    listenForHitObjectChanges()
     listenForTimingGroupCount()
     setPluginAppearance()
 

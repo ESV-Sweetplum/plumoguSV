@@ -3,7 +3,7 @@ function listenForTimingGroupCount()
 
     listen(function(action, type, fromLua)
         local actionIndex = tonumber(action.Type)
-        if (actionIndex <= 44 and actionIndex ~= 37) then return end
+        if (actionIndex < action_type.CreateTimingGroup and actionIndex ~= action_type.Batch) then return end
         cache.tgList = game.getTimingGroupList()
     end)
 end

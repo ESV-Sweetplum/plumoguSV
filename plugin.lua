@@ -196,18 +196,6 @@ function game.getTimingPointAt(offset)
     if line then return line end
     return { StartTime = -69420, Bpm = 42.69, Signature = 4, Hidden = false }
 end
----Gets the start time of the most recent note, or returns -1 if there is no note beforehand.
----@param offset number
----@param forward? boolean If true, will only search for notes above the offset. If false, will only search for notes below the offset.
----@return integer
-function game.getNoteOffsetAt(offset, forward)
-    local startTimes = state.GetValue("lists.hitObjectStartTimes")
-    if (not truthy(startTimes)) then return -1 end
-    if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
-    if (state.SongTime < startTimes[1]) then return startTimes[1] end
-    local startTime = table.searchClosest(startTimes, offset, tn(forward) + 1)
-    return startTime
-end
 local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---Gets the snap color from a given time.
 ---@param time number The time to reference.
@@ -1306,7 +1294,6 @@ DYNAMIC_BACKGROUND_TYPES = {
     "None",
     "Reactive Stars",
     "Reactive Singularity",
-    "Synthesis",
 }
 COMBO_SV_TYPE = {
     "Add",
@@ -3071,10 +3058,7 @@ function pasteItems(menuVars)
     local svsToAdd = {}
     local ssfsToAdd = {}
     local bmsToAdd = {}
-    if (globalVars.performanceMode) then
-        refreshHitObjectStartTimes()
-    end
-    local hitObjectTimes = state.GetValue("lists.hitObjectStartTimes")
+    local hitObjectTimes = table.dedupe(table.property(map.HitObjects, "StartTime"))
     for i = 1, #offsets do
         local pasteOffset = offsets[i]
         local nextOffset = offsets[math.clamp(i + 1, 1, #offsets)]
@@ -3884,17 +3868,29 @@ function initializeNoteLockMode()
         local actionIndex = tonumber(action.Type) ---@cast actionIndex EditorActionType
         local mode = state.GetValue("noteLockMode") or 0
         if mode == 1 then
-            if actionIndex > 9 then return end
+            if actionIndex >= action_type.CreateLayer then return end
             actions.Undo()
         end
         if mode == 2 then
-            local allowedIndices = { 0, 1, 3, 4, 8, 9 }
-            if (not table.contains(allowedIndices, actionIndex)) then return end
+            local allowedActions = {
+                action_type.PlaceHitObject,
+                action_type.RemoveHitObject,
+                action_type.PlaceHitObjectBatch,
+                action_type.RemoveHitObjectBatch,
+                action_type.AddHitsound,
+                action_type.RemoveHitsound,
+            }
+            if (not table.contains(allowedActions, actionIndex)) then return end
             actions.Undo()
         end
         if mode == 3 then
-            local allowedIndices = { 2, 5, 6, 7 }
-            if (not table.contains(allowedIndices, actionIndex)) then return end
+            local allowedActions = {
+                action_type.ResizeLongNote,
+                action_type.FlipHitObjects,
+                action_type.SwapLanes,
+                action_type.MoveHitObjects,
+            }
+            if (not table.contains(allowedActions, actionIndex)) then return end
             actions.Undo()
         end
     end)
@@ -4296,59 +4292,6 @@ function updateStars(dimX, dimY, dt)
                 clamp(2 * m, -50, 50)
         end
     end
-end
-local RGB_SNAP_MAP = {
-    [1] = { 255, 0, 0 },
-    [2] = { 0, 0, 255 },
-    [3] = { 120, 0, 255 },
-    [4] = { 255, 255, 0 },
-    [5] = { 255, 255, 255 },
-    [6] = { 255, 0, 255 },
-    [8] = { 255, 120, 0 },
-    [12] = { 0, 120, 255 },
-    [16] = { 0, 255, 0 },
-}
-function renderSynthesis()
-    local bgVars = {
-        snapTable = {},
-        pulseCount = 0,
-        snapOffset = 0,
-        lastDifference = 0
-    }
-    cache.loadTable("synthesis", bgVars)
-    local circleSize = 10
-    local ctx = imgui.GetWindowDrawList()
-    local topLeft = imgui.GetWindowPos()
-    local dim = imgui.GetWindowSize()
-    local maxDim = math.sqrt(dim.x ^ 2 + dim.y ^ 2)
-    local curTime = state.SongTime
-    local tl = game.getTimingPointAt(curTime)
-    local msptl = 60000 / tl.Bpm * tn(tl.Signature)
-    local snapTable = bgVars.snapTable
-    local pulseCount = bgVars.pulseCount
-    local mostRecentStart = game.getNoteOffsetAt(curTime)
-    local nearestBar = map.GetNearestSnapTimeFromTime(false, 1, curTime)
-    if (#snapTable >= (maxDim / 2) / circleSize) then
-        bgVars.snapOffset = circleSize
-        table.remove(snapTable, 1)
-    end
-    if (bgVars.snapOffset > 0.001) then
-        bgVars.snapOffset = bgVars.snapOffset * 0.99 ^ state.DeltaTime
-    end
-    if (curTime - mostRecentStart < bgVars.lastDifference) then
-        table.insert(snapTable, game.getSnapAt(mostRecentStart, true))
-    end
-    bgVars.lastDifference = curTime - mostRecentStart
-    local diagonalLength = vector.Distance(dim, vctr2(0))
-    for idx, snap in pairs(snapTable) do
-        local colTbl = RGB_SNAP_MAP[snap]
-        local radius = circleSize * (idx - 1) + bgVars.snapOffset
-        if (radius > diagonalLength / 2) then goto nextSnap end
-        ctx.AddCircle(dim / 2 + topLeft, radius,
-            color.rgbaToUint(colTbl[1] * 4 / 5 + 51, colTbl[2] * 4 / 5 + 51, colTbl[3] * 4 / 5 + 51, 100))
-        ::nextSnap::
-    end
-    cache.saveTable("synthesis", bgVars)
 end
 function drawCapybaraParent()
     drawCapybara()
@@ -13096,23 +13039,11 @@ function createFrameTime(thisTime, thisLanes, thisFrame, thisPosition)
     }
     return frameTime
 end
-function listenForHitObjectChanges()
-    function refreshHitObjectStartTimes()
-        state.SetValue("lists.hitObjectStartTimes", table.dedupe(table.property(map.HitObjects, "StartTime")))
-    end
-    refreshHitObjectStartTimes()
-    listen(function(action, type, fromLua)
-        state.SetValue("boolean.changeOccurred", true)
-        if (tonumber(action.Type) <= 7 and not globalVars.performanceMode) then
-            refreshHitObjectStartTimes()
-        end
-    end)
-end
 function listenForTimingGroupCount()
     state.SetValue("tgList", game.getTimingGroupList())
     listen(function(action, type, fromLua)
         local actionIndex = tonumber(action.Type)
-        if (actionIndex <= 44 and actionIndex ~= 37) then return end
+        if (actionIndex < action_type.CreateTimingGroup and actionIndex ~= action_type.Batch) then return end
         state.SetValue("tgList", game.getTimingGroupList())
     end)
 end
@@ -13852,7 +13783,6 @@ function awake()
         setPresets(tempGlobalVars.presets or {})
     end
     initializeNoteLockMode()
-    listenForHitObjectChanges()
     listenForTimingGroupCount()
     setPluginAppearance()
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]

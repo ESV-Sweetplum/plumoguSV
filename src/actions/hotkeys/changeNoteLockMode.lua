@@ -32,17 +32,29 @@ function initializeNoteLockMode()
         local actionIndex = tonumber(action.Type) ---@cast actionIndex EditorActionType
         local mode = cache.noteLockMode or 0
         if mode == 1 then -- No note modification at all
-            if actionIndex > 9 then return end
+            if actionIndex >= action_type.CreateLayer then return end
             actions.Undo()
         end
         if mode == 2 then -- Only place and delete notes
-            local allowedIndices = { 0, 1, 3, 4, 8, 9 }
-            if (not table.contains(allowedIndices, actionIndex)) then return end
+            local allowedActions = {
+                action_type.PlaceHitObject,
+                action_type.RemoveHitObject,
+                action_type.PlaceHitObjectBatch,
+                action_type.RemoveHitObjectBatch,
+                action_type.AddHitsound,
+                action_type.RemoveHitsound,
+            }
+            if (not table.contains(allowedActions, actionIndex)) then return end
             actions.Undo()
         end
         if mode == 3 then -- Only move notes
-            local allowedIndices = { 2, 5, 6, 7 }
-            if (not table.contains(allowedIndices, actionIndex)) then return end
+            local allowedActions = {
+                action_type.ResizeLongNote,
+                action_type.FlipHitObjects,
+                action_type.SwapLanes,
+                action_type.MoveHitObjects,
+            }
+            if (not table.contains(allowedActions, actionIndex)) then return end
             actions.Undo()
         end
     end)

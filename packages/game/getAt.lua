@@ -9,20 +9,6 @@ function game.getTimingPointAt(offset)
     return { StartTime = -69420, Bpm = 42.69, Signature = 4, Hidden = false }
 end
 
----Gets the start time of the most recent note, or returns -1 if there is no note beforehand.
----@param offset number
----@param forward? boolean If true, will only search for notes above the offset. If false, will only search for notes below the offset.
----@return integer
-function game.getNoteOffsetAt(offset, forward)
-    local startTimes = cache.lists.hitObjectStartTimes
-    if (not truthy(startTimes)) then return -1 end
-    if (state.SongTime > startTimes[#startTimes]) then return startTimes[#startTimes] end
-    if (state.SongTime < startTimes[1]) then return startTimes[1] end
-
-    local startTime = table.searchClosest(startTimes, offset, tn(forward) + 1)
-    return startTime
-end
-
 local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 
 ---Gets the snap color from a given time.
