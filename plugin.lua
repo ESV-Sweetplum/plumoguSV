@@ -6405,9 +6405,9 @@ function setTobiRGBGlassColors(rgbPeriod)
     loadup.PulseTextColorLeft = rgbColor
     loadup.PulseTextColorRight = rgbColor
     loadup.BgTl = transparentBlack
-    loadup.BgTr = color.vctr.white / 4 + 3 * color.vctr.black / 4
-    loadup.BgBl = color.vctr.white / 4 + 3 * color.vctr.black / 4
-    loadup.BgBr = color.vctr.white / 2 + color.vctr.black / 2
+    loadup.BgTr = color.vctr.white / 5 + 4 * color.vctr.black / 5
+    loadup.BgBl = color.vctr.white / 5 + 4 * color.vctr.black / 5
+    loadup.BgBr = color.vctr.blue / 12 + color.vctr.white / 4 + 2 * color.vctr.black / 3
     return rgbColor
 end
 function setGlassColors()
