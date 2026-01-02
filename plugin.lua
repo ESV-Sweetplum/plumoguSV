@@ -1602,7 +1602,7 @@ globalVars = {
     pulseCoefficient = 0,
     pulseColor = vector.New(0, 0, 0, 0),
     restrictSinusoidalPeriod = true,
-    rgbPeriod = 2,
+    rgbPeriod = 3,
     scrollGroupIndex = 1,
     selectTypeIndex = 1,
     showMeasureDataWidget = false,
@@ -4126,9 +4126,12 @@ function addGradient()
     local buttonColor = imgui.GetColorU32("Button")
     local bgColor = imgui.GetColorU32("WindowBg")
     local buttonFactor = 0.3
+    local scalingFactor = 2.5
     local tlTr = color.vrgbaToUint(color.uintToRgba(buttonColor) * buttonFactor +
         color.uintToRgba(bgColor) * (1 - buttonFactor))
-    ctx.AddRectFilledMultiColor(topLeft, topLeft + dim, bgColor, tlTr, buttonColor, tlTr)
+    local br = color.vrgbaToUint(color.uintToRgba(buttonColor) * buttonFactor * scalingFactor +
+        color.uintToRgba(bgColor) * (1 - buttonFactor * scalingFactor))
+    ctx.AddRectFilledMultiColor(topLeft, topLeft + dim, bgColor, tlTr, br, tlTr)
 end
 local nodes_xList = {}
 local nodes_yList = {}
@@ -5960,13 +5963,6 @@ function pulseController()
     state.SetValue("pulseValue", math.max(pulseVars.pulseStatus, 0))
     state.SetValue("pulsedThisFrame", pulseVars.pulsedThisFrame)
 end
----@class PhysicsObject
----@field pos Vector2
----@field v Vector2
----@field a Vector2
----@class Particle: PhysicsObject
----@field col Vector4
----@field size integer
 function renderBackground()
     local idx = globalVars.dynamicBackgroundIndex
     if (DYNAMIC_BACKGROUND_TYPES[idx] == "Reactive Stars") then
