@@ -1,3 +1,4 @@
+ENVIRONMENT = "development"
 cache = {
     boolean = {},
     windows = {},

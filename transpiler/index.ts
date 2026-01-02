@@ -19,10 +19,14 @@ export function getCounterAndIncrement() {
     return counter;
 }
 
-export default async function transpiler(devMode = false, lint = true) {
+export default async function transpiler(
+    devMode = false,
+    lint = true,
+    environment = 'production'
+) {
     counter = 0;
     let fileCount = 0;
-    let output = '';
+    let output = `ENVIRONMENT = "${environment}"`;
 
     const entryPoints = ['_draw.lua', '_awake.lua'];
     const ignoredFiles = ['intellisense.lua', join('packages', 'tests')];
@@ -218,5 +222,3 @@ export default async function transpiler(devMode = false, lint = true) {
 
     return fileCount;
 }
-
-transpiler();

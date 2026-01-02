@@ -37,7 +37,7 @@ async function main(event: keyof chokidar.FSWatcherEventMap, path: string) {
     );
 
     const devMode = path.includes('src\\dev\\unlock');
-    const fileCount = await transpiler(devMode, true);
+    const fileCount = await transpiler(devMode, true, 'development');
     const endTime = performance.now();
     console.log(
         `Successfully transpiled ${chalk.green(

@@ -1,5 +1,5 @@
 advancedMode: true
-colorThemeIndex: 9
+colorThemeIndex: 16
 comboizeSelect: true
 cursorTrailGhost: false
 cursorTrailIndex: 1
@@ -667,7 +667,7 @@ hotkeyList:
 ignoreNotesOutsideTg: false
 maxDisplacementMultiplierExponent: 5
 performanceMode: false
-placeTypeIndex: 1
+placeTypeIndex: 3
 presets:
 - 
 printLegacyLNMessage: true
