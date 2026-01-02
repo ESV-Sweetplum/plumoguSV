@@ -1,5 +1,5 @@
 advancedMode: true
-colorThemeIndex: 16
+colorThemeIndex: 9
 comboizeSelect: true
 cursorTrailGhost: false
 cursorTrailIndex: 1
@@ -678,7 +678,7 @@ pulseColor:
 - 1
 - 1
 restrictSinusoidalPeriod: false
-rgbPeriod: 1
+rgbPeriod: 3
 scrollGroupIndex: 1
 selectTypeIndex: 1
 showMeasureDataWidget: true
