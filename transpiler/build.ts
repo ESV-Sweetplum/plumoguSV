@@ -10,7 +10,7 @@ console.log(
         chalk.bold(`Transpiling ${chalk.redBright('plugin.lua')}...`)
     )
 );
-transpiler(false, true);
+transpiler(false, true, 'production');
 
 const versionNumber = `v${fs.readFileSync('.version', 'utf-8')}`;
 
@@ -93,48 +93,77 @@ console.log(
 );
 
 const zip = new AdmZip();
+try {
+    if (!fs.existsSync('builds')) fs.mkdirSync('builds');
+    if (!fs.existsSync(`temp-build-github`)) fs.mkdirSync(`temp-build-github`);
+    if (!fs.existsSync(`temp-build-steam`)) fs.mkdirSync(`temp-build-steam`);
+    fs.mkdirSync(`temp-build-github/${packageName}`);
+    fs.mkdirSync(`temp-build-steam/${packageName}`);
 
-if (!fs.existsSync('builds')) fs.mkdirSync('builds');
-if (!fs.existsSync(`build-temp`)) fs.mkdirSync(`build-temp`);
-fs.mkdirSync(`build-temp/${packageName}`);
-
-fs.copyFileSync('plugin.lua', `build-temp/${packageName}/plugin.lua`);
-fs.copyFileSync(
-    'assets/steam_workshop_preview.png',
-    `build-temp/${packageName}/steam_workshop_preview.png`
-);
-fs.copyFileSync(
-    'assets/steam_workshop_id.txt',
-    `build-temp/${packageName}/steam_workshop_id.txt`
-);
-
-const settingsIni = fs.readFileSync('settings.ini', 'utf-8');
-const oldVersionNumber = settingsIni
-    .split('\n')[0]
-    .replaceAll('\r', '')
-    .split('plumoguSV')[1];
-
-if (!oldVersionNumber || oldVersionNumber !== versionNumber) {
-    const settingsIniLines = settingsIni.split('\n');
-    settingsIniLines[1] = `Name = plumoguSV ${versionNumber}`;
-    fs.writeFileSync(
-        `build-temp/${packageName}/settings.ini`,
-        settingsIniLines.join('\n')
+    fs.copyFileSync(
+        'plugin.lua',
+        `temp-build-github/${packageName}/plugin.lua`
     );
-}
+    fs.copyFileSync('plugin.lua', `temp-build-steam/${packageName}/plugin.lua`);
+    fs.copyFileSync(
+        'assets/steam_workshop_preview.png',
+        `temp-build-steam/${packageName}/steam_workshop_preview.png`
+    );
+    fs.copyFileSync(
+        'assets/steam_workshop_id.txt',
+        `temp-build-steam/${packageName}/steam_workshop_id.txt`
+    );
 
-zip.addLocalFolder('build-temp');
+    const settingsIni = fs.readFileSync('settings.ini', 'utf-8');
+    const oldVersionNumber = settingsIni
+        .split('\n')[0]
+        .replaceAll('\r', '')
+        .split('plumoguSV')[1];
 
-zip.writeZip(`builds/${packageName}.zip`);
+    if (!oldVersionNumber || oldVersionNumber !== versionNumber) {
+        const settingsIniLines = settingsIni.split('\n');
+        settingsIniLines[1] = `Name = plumoguSV ${versionNumber}`;
+        fs.writeFileSync(
+            `temp-build-github/${packageName}/settings.ini`,
+            settingsIniLines.join('\n')
+        );
+        fs.writeFileSync(
+            `temp-build-steam/${packageName}/settings.ini`,
+            settingsIniLines.join('\n')
+        );
+    }
 
-console.log(
-    chalk.greenBright(
-        chalk.bold(
-            `Process completed in ${
-                Date.now() - startTime
-            }ms. Find the build at ${chalk.redBright(`builds/${packageName}`)}.`
+    zip.addLocalFolder('temp-build-github');
+    zip.writeZip(`builds/${packageName}.zip`);
+
+    fs.cpSync(
+        `temp-build-steam/${packageName}`,
+        `builds/${packageName}-steam`,
+        {
+            recursive: true,
+            force: true,
+        }
+    );
+
+    console.log(
+        chalk.greenBright(
+            chalk.bold(
+                `Process completed in ${
+                    Date.now() - startTime
+                }ms. Find the build at ${chalk.redBright(
+                    `builds/${packageName}`
+                )}.`
+            )
         )
-    )
-);
+    );
 
-fs.rmSync('build-temp', { recursive: true, force: true });
+    fs.rmSync('temp-build-github', { recursive: true, force: true });
+    fs.rmSync('temp-build-steam', { recursive: true, force: true });
+} catch (e) {
+    console.log(
+        chalk.bgRedBright(`An error occurred during the build process: ${e}`)
+    );
+
+    fs.rmSync('temp-build-github', { recursive: true, force: true });
+    fs.rmSync('temp-build-steam', { recursive: true, force: true });
+}
