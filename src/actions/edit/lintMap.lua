@@ -162,6 +162,36 @@ function removeUnnecessarySVs()
     state.SelectedScrollGroupId = ogTG
 end
 
+function removeUnnecessarySSFs()
+    local editorActions = {}
+    local ogTG = state.SelectedScrollGroupId
+    local ssfSum = 0
+    for tgId, tg in pairs(map.TimingGroups) do
+        local ssfsToRemove = {}
+        state.SelectedScrollGroupId = tgId
+        local tgSsfCount = #map.ScrollSpeedFactors
+        local doublePrevSSFMult = -1
+        local prevSSFMult = -1
+        local atRiskSSF = {}
+        for idx, ssf in ipairs(map.ScrollSpeedFactors) do
+            if (idx <= 2) then goto nextSSF end
+            if (ssf.Multiplier == prevSSFMult and prevSSFMult == doublePrevSSFMult) then
+                table.insert(ssfsToRemove, atRiskSSF)
+            end
+            ::nextSSF::
+            doublePrevSSFMult = prevSSFMult
+            prevSSFMult = ssf.Multiplier
+            atRiskSSF = ssf
+        end
+        table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove, tg))
+        ssfSum = ssfSum + #ssfsToRemove
+    end
+    if (truthy(ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = truthy(ssfSum) and "s!" or "w!"
+    print(type, "Removed " .. ssfSum .. pluralize(" SSF.", ssfSum, -2))
+    state.SelectedScrollGroupId = ogTG
+end
+
 function removeAllHitSounds()
     local hitsoundActions = {}
     local objs = {}

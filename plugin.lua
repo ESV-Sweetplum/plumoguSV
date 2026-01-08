@@ -3577,6 +3577,35 @@ function removeUnnecessarySVs()
     print(type, "Removed " .. svSum .. pluralize(" SV.", svSum, -2))
     state.SelectedScrollGroupId = ogTG
 end
+function removeUnnecessarySSFs()
+    local editorActions = {}
+    local ogTG = state.SelectedScrollGroupId
+    local ssfSum = 0
+    for tgId, tg in pairs(map.TimingGroups) do
+        local ssfsToRemove = {}
+        state.SelectedScrollGroupId = tgId
+        local tgSsfCount = #map.ScrollSpeedFactors
+        local doublePrevSSFMult = -1
+        local prevSSFMult = -1
+        local atRiskSSF = {}
+        for idx, ssf in ipairs(map.ScrollSpeedFactors) do
+            if (idx <= 2) then goto nextSSF end
+            if (ssf.Multiplier == prevSSFMult and prevSSFMult == doublePrevSSFMult) then
+                ssfsToRemove[#ssfsToRemove + 1] = atRiskSSF
+            end
+            ::nextSSF::
+            doublePrevSSFMult = prevSSFMult
+            prevSSFMult = ssf.Multiplier
+            atRiskSSF = ssf
+        end
+        table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove, tg))
+        ssfSum = ssfSum + #ssfsToRemove
+    end
+    if (truthy(ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = truthy(ssfSum) and "s!" or "w!"
+    print(type, "Removed " .. ssfSum .. pluralize(" SSF.", ssfSum, -2))
+    state.SelectedScrollGroupId = ogTG
+end
 function removeAllHitSounds()
     local hitsoundActions = {}
     local objs = {}
@@ -8329,8 +8358,7 @@ function lintMapMenu()
     simpleActionMenu("Align timing lines in this region", 0, alignTimingLines, nil, true, true)
     HoverToolTip(
         "Sometimes, due to rounding errors with BPMs, timing lines don't show up where 1/1 snapped notes should be. This will fix that within the entire timing line region you are currently in.")
-    AddSeparator()
-    simpleActionMenu("Fix flipped LN ends", 0, fixFlippedLNEnds, nil, true, true)
+    simpleActionMenu("Fix flipped LN ends", 0, fixFlippedLNEnds, nil, false, true)
     HoverToolTip(
         "If there is a negative SV at an LN end, the LN end will be flipped. This is noticable especially for arrow skins and is jarring. This tool will fix that.")
     simpleActionMenu("Merge duplicate SVs", 0, mergeSVs, nil, false, true)
@@ -8342,7 +8370,10 @@ function lintMapMenu()
     simpleActionMenu("Remove unnecessary SVs", 0, removeUnnecessarySVs, nil, false, true)
     HoverToolTip(
         "(DOESN'T VISUALLY AFFECT MAP) If two consecutive SVs have the same multiplier, removes the second SV.")
-    simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, true, true)
+    simpleActionMenu("Remove unnecessary SSFs", 0, removeUnnecessarySSFs, nil, true, true)
+    HoverToolTip(
+        "(DOESN'T VISUALLY AFFECT MAP) If three consecutive SSFs have the same multiplier, removes the middle SSF.")
+    simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, false, true)
     HoverToolTip("Removes stacked notes.")
     simpleActionMenu("Remove all hitsounds", 0, removeAllHitSounds, nil, true, true)
     HoverToolTip("Self-explanatory.")
