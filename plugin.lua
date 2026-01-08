@@ -2846,7 +2846,7 @@ function placeDuplicateItems(menuVars)
     local offset = placeTime - menuVars.msOffset
     for _, obj in ipairs(menuVars.objects) do
         local data = obj.data
-        if (obj.type == "ho") then
+        if (obj.type == "ho" and not menuVars.dontCloneHos) then
             local ho = utils.CreateHitObject(data.StartTime + offset, data.Lane,
                 data.EndTime == 0 and 0 or data.EndTime + offset, data.HitSound, data.EditorLayer)
             hosToAdd[#hosToAdd + 1] = ho
@@ -13105,6 +13105,15 @@ function createFrameTime(thisTime, thisLanes, thisFrame, thisPosition)
     }
     return frameTime
 end
+function listenForGeneralChanges()
+    listen(function(_, _, _)
+        state.SetValue("boolean.changeOccurred", true)
+    end)
+end
+function triggerListeners()
+    listenForTimingGroupCount()
+    listenForGeneralChanges()
+end
 function listenForTimingGroupCount()
     state.SetValue("tgList", game.getTimingGroupList())
     listen(function(action, type, fromLua)
@@ -13842,6 +13851,7 @@ function awake()
         write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
         print("w!",
             'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.')
+        ---@diagnostic disable-next-line: undefined-global
         if (DISTRO == "steam") then
             print("w!",
                 "Additionally, Steam Workshop will reset your settings when the plugin is updated. To prevent this, please save your 'config.yaml' file after you're finished configuring settings, and drop it back in when an update comes around.")
@@ -13853,7 +13863,7 @@ function awake()
         setPresets(tempGlobalVars.presets or {})
     end
     initializeNoteLockMode()
-    listenForTimingGroupCount()
+    triggerListeners()
     setPluginAppearance()
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
     if (not truthy(map.TimingPoints)) then

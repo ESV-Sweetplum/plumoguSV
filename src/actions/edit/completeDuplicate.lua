@@ -60,7 +60,7 @@ function placeDuplicateItems(menuVars)
     local offset = placeTime - menuVars.msOffset
     for _, obj in ipairs(menuVars.objects) do
         local data = obj.data
-        if (obj.type == "ho") then
+        if (obj.type == "ho" and not menuVars.dontCloneHos) then
             local ho = utils.CreateHitObject(data.StartTime + offset, data.Lane,
                 data.EndTime == 0 and 0 or data.EndTime + offset, data.HitSound, data.EditorLayer)
             table.insert(hosToAdd, ho)

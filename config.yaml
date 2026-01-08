@@ -640,12 +640,12 @@ defaultProperties:
     selectBySnap:
       snap: 1
 disableLoadup: false
-dontPrintCreation: false
+dontPrintCreation: true
 dontReplaceSV: false
 drawCapybara: true
 drawCapybara2: false
 drawCapybara312: false
-dynamicBackgroundIndex: 2
+dynamicBackgroundIndex: 1
 editToolIndex: 1
 effectFPS: 100
 equalizeLinear: true
@@ -665,9 +665,9 @@ hotkeyList:
 - Ctrl+Alt+E
 - O
 ignoreNotesOutsideTg: false
-maxDisplacementMultiplierExponent: 5
+maxDisplacementMultiplierExponent: 0
 performanceMode: false
-placeTypeIndex: 3
+placeTypeIndex: 1
 presets:
 - 
 printLegacyLNMessage: true

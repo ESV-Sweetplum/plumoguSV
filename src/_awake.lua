@@ -7,6 +7,7 @@ function awake()
         write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
         print("w!",
             'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.')
+        ---@diagnostic disable-next-line: undefined-global
         if (DISTRO == "steam") then
             print("w!",
                 "Additionally, Steam Workshop will reset your settings when the plugin is updated. To prevent this, please save your 'config.yaml' file after you're finished configuring settings, and drop it back in when an update comes around.")
@@ -19,7 +20,7 @@ function awake()
     end
 
     initializeNoteLockMode()
-    listenForTimingGroupCount()
+    triggerListeners()
     setPluginAppearance()
 
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
