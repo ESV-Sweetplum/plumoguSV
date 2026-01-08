@@ -3585,11 +3585,11 @@ function removeUnnecessarySSFs()
         local ssfsToRemove = {}
         state.SelectedScrollGroupId = tgId
         local tgSsfCount = #map.ScrollSpeedFactors
-        local doublePrevSSFMult = -1
-        local prevSSFMult = -1
+        local doublePrevSSFMult = 1
+        local prevSSFMult = 1
         local atRiskSSF = {}
         for idx, ssf in ipairs(map.ScrollSpeedFactors) do
-            if (idx <= 2) then goto nextSSF end
+            if (idx == 1) then goto nextSSF end
             if (ssf.Multiplier == prevSSFMult and prevSSFMult == doublePrevSSFMult) then
                 ssfsToRemove[#ssfsToRemove + 1] = atRiskSSF
             end
