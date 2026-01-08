@@ -5,20 +5,16 @@ function lintMapMenu()
     simpleActionMenu("Fix flipped LN ends", 0, fixFlippedLNEnds, nil, false, true)
     HoverToolTip(
         "If there is a negative SV at an LN end, the LN end will be flipped. This is noticable especially for arrow skins and is jarring. This tool will fix that.")
-    simpleActionMenu("Merge duplicate SVs", 0, mergeSVs, nil, false, true)
+    simpleActionMenu("Merge duplicate SVs/SSFs", 0, mergeSVsAndSSFs, nil, false, true)
     HoverToolTip(
-        "(DOESN'T VISUALLY AFFECT MAP) removes SVs that are on the same time as others. Note that Quaver always renders the second SV in the internal SV list, and this tool will only ever remove the first duplicate SV, so nothing in the map should change. If something does change, please message @kvrosakura on Discord with the map.")
-    simpleActionMenu("Merge duplicate SSFs", 0, mergeSSFs, nil, true, true)
+        "(DOESN'T VISUALLY AFFECT MAP) removes SVs/SSFs that are on the same time as others within their timing group. Note that Quaver always renders the second SV/SSF in the internal SV/SSF list, and this tool will only ever remove the first duplicate SV/SSF, so nothing in the map should change. If something does change, please message @kvrosakura on Discord with the map.")
+    simpleActionMenu("Remove unnecessary SVs/SSFs", 0, removeUnnecessarySVsAndSSFs, nil, false, true)
     HoverToolTip(
-        "(DOESN'T VISUALLY AFFECT MAP) removes SSFs that are on the same time as others. Note that Quaver always renders the second SSF in the internal SSF list, and this tool will only ever remove the first duplicate SSF, so nothing in the map should change. If something does change, please message @kvrosakura on Discord with the map.")
-    simpleActionMenu("Remove unnecessary SVs", 0, removeUnnecessarySVs, nil, false, true)
-    HoverToolTip(
-        "(DOESN'T VISUALLY AFFECT MAP) If two consecutive SVs have the same multiplier, removes the second SV.")
-    simpleActionMenu("Remove unnecessary SSFs", 0, removeUnnecessarySSFs, nil, true, true)
-    HoverToolTip(
-        "(DOESN'T VISUALLY AFFECT MAP) If three consecutive SSFs have the same multiplier, removes the middle SSF.")
+        "(DOESN'T VISUALLY AFFECT MAP) If two consecutive SVs have the same multiplier, removes the second SV. If three consecutive SSFs have the same multiplier, removes the middle SSF.")
     simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, false, true)
     HoverToolTip("Removes stacked notes.")
     simpleActionMenu("Remove all hitsounds", 0, removeAllHitSounds, nil, true, true)
     HoverToolTip("Self-explanatory.")
+    -- simpleActionMenu("DO IT ALLLLL", 0, DOITALL, nil, false, true)
+    -- HoverToolTip("RAHHHHHH")
 end

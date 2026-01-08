@@ -3511,9 +3511,11 @@ function fixFlippedLNEnds()
     local type = truthy(fixedLNEndsCount) and "s!" or "w!"
     print(type, "Fixed " .. fixedLNEndsCount .. pluralize(" flipped LN end.", fixedLNEndsCount, -2))
 end
-function mergeSVs()
+function mergeSVsAndSSFs()
     local svTimeDict = {}
     local svsToRemove = {}
+    local ssfTimeDict = {}
+    local ssfsToRemove = {}
     for _, sv in ipairs(table.reverse(map.ScrollVelocities)) do
         if (svTimeDict[sv.StartTime]) then
             svsToRemove[#svsToRemove + 1] = sv
@@ -3521,13 +3523,6 @@ function mergeSVs()
             svTimeDict[sv.StartTime] = true
         end
     end
-    if (truthy(svsToRemove)) then actions.RemoveScrollVelocityBatch(svsToRemove) end
-    local type = truthy(svsToRemove) and "s!" or "w!"
-    print(type, "Removed " .. #svsToRemove .. pluralize(" SV.", #svsToRemove, -2))
-end
-function mergeSSFs()
-    local ssfTimeDict = {}
-    local ssfsToRemove = {}
     for _, ssf in ipairs(table.reverse(map.ScrollSpeedFactors)) do
         if (ssfTimeDict[ssf.StartTime]) then
             ssfsToRemove[#ssfsToRemove + 1] = ssf
@@ -3535,9 +3530,16 @@ function mergeSSFs()
             ssfTimeDict[ssf.StartTime] = true
         end
     end
-    if (truthy(ssfsToRemove)) then actions.Perform(createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove)) end
-    local type = truthy(ssfsToRemove) and "s!" or "w!"
-    print(type, "Removed " .. #ssfsToRemove .. pluralize(" SSF.", #ssfsToRemove, -2))
+    if (truthy(#svsToRemove + #ssfsToRemove)) then
+        actions.PerformBatch({
+            utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
+            utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove)
+        })
+    end
+    local type = truthy(#svsToRemove + #ssfsToRemove) and "s!" or "w!"
+    print(type,
+        table.concat({ "Removed ", #svsToRemove, pluralize(" SV", #svsToRemove), " and ", #ssfsToRemove, pluralize(
+            " SSF.", #ssfsToRemove, -2) }))
 end
 function mergeNotes()
     local noteDict = {}
@@ -3557,10 +3559,11 @@ function mergeNotes()
     local type = truthy(notesToRemove) and "s!" or "w!"
     print(type, "Removed " .. #notesToRemove .. pluralize(" note.", #notesToRemove, -2))
 end
-function removeUnnecessarySVs()
+function removeUnnecessarySVsAndSSFs()
     local editorActions = {}
     local ogTG = state.SelectedScrollGroupId
     local svSum = 0
+    local ssfSum = 0
     for tgId, tg in pairs(map.TimingGroups) do
         local svsToRemove = {}
         state.SelectedScrollGroupId = tgId
@@ -3572,19 +3575,7 @@ function removeUnnecessarySVs()
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove, tg))
         svSum = svSum + #svsToRemove
-    end
-    if (truthy(svSum)) then actions.PerformBatch(editorActions) end
-    local type = truthy(svSum) and "s!" or "w!"
-    print(type, "Removed " .. svSum .. pluralize(" SV.", svSum, -2))
-    state.SelectedScrollGroupId = ogTG
-end
-function removeUnnecessarySSFs()
-    local editorActions = {}
-    local ogTG = state.SelectedScrollGroupId
-    local ssfSum = 0
-    for tgId, tg in pairs(map.TimingGroups) do
         local ssfsToRemove = {}
-        state.SelectedScrollGroupId = tgId
         local tgSsfCount = #map.ScrollSpeedFactors
         local doublePrevSSFMult = 1
         local prevSSFMult = 1
@@ -3602,9 +3593,10 @@ function removeUnnecessarySSFs()
         table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove, tg))
         ssfSum = ssfSum + #ssfsToRemove
     end
-    if (truthy(ssfSum)) then actions.PerformBatch(editorActions) end
-    local type = truthy(ssfSum) and "s!" or "w!"
-    print(type, "Removed " .. ssfSum .. pluralize(" SSF.", ssfSum, -2))
+    if (truthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = truthy(svSum + ssfSum) and "s!" or "w!"
+    print(type,
+        table.concat({ "Removed ", svSum, pluralize(" SV", svSum), " and ", ssfSum, pluralize(" SSF.", ssfSum, -2) }))
     state.SelectedScrollGroupId = ogTG
 end
 function removeAllHitSounds()
@@ -8362,18 +8354,12 @@ function lintMapMenu()
     simpleActionMenu("Fix flipped LN ends", 0, fixFlippedLNEnds, nil, false, true)
     HoverToolTip(
         "If there is a negative SV at an LN end, the LN end will be flipped. This is noticable especially for arrow skins and is jarring. This tool will fix that.")
-    simpleActionMenu("Merge duplicate SVs", 0, mergeSVs, nil, false, true)
+    simpleActionMenu("Merge duplicate SVs/SSFs", 0, mergeSVsAndSSFs, nil, false, true)
     HoverToolTip(
-        "(DOESN'T VISUALLY AFFECT MAP) removes SVs that are on the same time as others. Note that Quaver always renders the second SV in the internal SV list, and this tool will only ever remove the first duplicate SV, so nothing in the map should change. If something does change, please message @kvrosakura on Discord with the map.")
-    simpleActionMenu("Merge duplicate SSFs", 0, mergeSSFs, nil, true, true)
+        "(DOESN'T VISUALLY AFFECT MAP) removes SVs/SSFs that are on the same time as others within their timing group. Note that Quaver always renders the second SV/SSF in the internal SV/SSF list, and this tool will only ever remove the first duplicate SV/SSF, so nothing in the map should change. If something does change, please message @kvrosakura on Discord with the map.")
+    simpleActionMenu("Remove unnecessary SVs/SSFs", 0, removeUnnecessarySVsAndSSFs, nil, false, true)
     HoverToolTip(
-        "(DOESN'T VISUALLY AFFECT MAP) removes SSFs that are on the same time as others. Note that Quaver always renders the second SSF in the internal SSF list, and this tool will only ever remove the first duplicate SSF, so nothing in the map should change. If something does change, please message @kvrosakura on Discord with the map.")
-    simpleActionMenu("Remove unnecessary SVs", 0, removeUnnecessarySVs, nil, false, true)
-    HoverToolTip(
-        "(DOESN'T VISUALLY AFFECT MAP) If two consecutive SVs have the same multiplier, removes the second SV.")
-    simpleActionMenu("Remove unnecessary SSFs", 0, removeUnnecessarySSFs, nil, true, true)
-    HoverToolTip(
-        "(DOESN'T VISUALLY AFFECT MAP) If three consecutive SSFs have the same multiplier, removes the middle SSF.")
+        "(DOESN'T VISUALLY AFFECT MAP) If two consecutive SVs have the same multiplier, removes the second SV. If three consecutive SSFs have the same multiplier, removes the middle SSF.")
     simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, false, true)
     HoverToolTip("Removes stacked notes.")
     simpleActionMenu("Remove all hitsounds", 0, removeAllHitSounds, nil, true, true)

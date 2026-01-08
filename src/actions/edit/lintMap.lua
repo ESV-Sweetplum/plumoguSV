@@ -90,9 +90,12 @@ function fixFlippedLNEnds()
     print(type, "Fixed " .. fixedLNEndsCount .. pluralize(" flipped LN end.", fixedLNEndsCount, -2))
 end
 
-function mergeSVs()
+function mergeSVsAndSSFs()
     local svTimeDict = {}
     local svsToRemove = {}
+    local ssfTimeDict = {}
+    local ssfsToRemove = {}
+
     for _, sv in ipairs(table.reverse(map.ScrollVelocities)) do -- reverse to prioritize second sv in list
         if (svTimeDict[sv.StartTime]) then
             table.insert(svsToRemove, sv)
@@ -101,14 +104,6 @@ function mergeSVs()
         end
     end
 
-    if (truthy(svsToRemove)) then actions.RemoveScrollVelocityBatch(svsToRemove) end
-    local type = truthy(svsToRemove) and "s!" or "w!"
-    print(type, "Removed " .. #svsToRemove .. pluralize(" SV.", #svsToRemove, -2))
-end
-
-function mergeSSFs()
-    local ssfTimeDict = {}
-    local ssfsToRemove = {}
     for _, ssf in ipairs(table.reverse(map.ScrollSpeedFactors)) do -- reverse to prioritize second sv in list
         if (ssfTimeDict[ssf.StartTime]) then
             table.insert(ssfsToRemove, ssf)
@@ -117,9 +112,20 @@ function mergeSSFs()
         end
     end
 
-    if (truthy(ssfsToRemove)) then actions.Perform(createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove)) end
-    local type = truthy(ssfsToRemove) and "s!" or "w!"
-    print(type, "Removed " .. #ssfsToRemove .. pluralize(" SSF.", #ssfsToRemove, -2))
+    if (truthy(#svsToRemove + #ssfsToRemove)) then
+        actions.PerformBatch({
+            utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
+            utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove)
+        })
+    end
+    local type = truthy(#svsToRemove + #ssfsToRemove) and "s!" or "w!"
+    print(type,
+        table.concat({ "Removed ", #svsToRemove, pluralize(" SV", #svsToRemove), " and ", #ssfsToRemove, pluralize(
+            " SSF.", #ssfsToRemove, -2) }))
+end
+
+function mergeSSFs()
+
 end
 
 function mergeNotes()
@@ -141,10 +147,11 @@ function mergeNotes()
     print(type, "Removed " .. #notesToRemove .. pluralize(" note.", #notesToRemove, -2))
 end
 
-function removeUnnecessarySVs()
+function removeUnnecessarySVsAndSSFs()
     local editorActions = {}
     local ogTG = state.SelectedScrollGroupId
     local svSum = 0
+    local ssfSum = 0
     for tgId, tg in pairs(map.TimingGroups) do
         local svsToRemove = {}
         state.SelectedScrollGroupId = tgId
@@ -156,20 +163,8 @@ function removeUnnecessarySVs()
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove, tg))
         svSum = svSum + #svsToRemove
-    end
-    if (truthy(svSum)) then actions.PerformBatch(editorActions) end
-    local type = truthy(svSum) and "s!" or "w!"
-    print(type, "Removed " .. svSum .. pluralize(" SV.", svSum, -2))
-    state.SelectedScrollGroupId = ogTG
-end
 
-function removeUnnecessarySSFs()
-    local editorActions = {}
-    local ogTG = state.SelectedScrollGroupId
-    local ssfSum = 0
-    for tgId, tg in pairs(map.TimingGroups) do
         local ssfsToRemove = {}
-        state.SelectedScrollGroupId = tgId
         local tgSsfCount = #map.ScrollSpeedFactors
         local doublePrevSSFMult = 1
         local prevSSFMult = 1
@@ -187,9 +182,10 @@ function removeUnnecessarySSFs()
         table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove, tg))
         ssfSum = ssfSum + #ssfsToRemove
     end
-    if (truthy(ssfSum)) then actions.PerformBatch(editorActions) end
-    local type = truthy(ssfSum) and "s!" or "w!"
-    print(type, "Removed " .. ssfSum .. pluralize(" SSF.", ssfSum, -2))
+    if (truthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = truthy(svSum + ssfSum) and "s!" or "w!"
+    print(type,
+        table.concat({ "Removed ", svSum, pluralize(" SV", svSum), " and ", ssfSum, pluralize(" SSF.", ssfSum, -2) }))
     state.SelectedScrollGroupId = ogTG
 end
 
