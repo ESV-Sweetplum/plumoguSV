@@ -13,7 +13,7 @@ function alignTimingLines()
     local noteTimes = table.property(map.HitObjects, "StartTime")
 
     local times = {}
-    local timingpoints = {}
+    local tpsToAdd = {}
 
     for time = starttime, endtime, msptl do
         local originalTime = math.floor(time)
@@ -29,17 +29,18 @@ function alignTimingLines()
         end
     end
     for _, time in ipairs(times) do
-        if (game.getTimingPointAt(time).StartTime == time) then
-            table.insert(tpsToRemove, game.getTimingPointAt(time))
+        local initialTl = game.getTimingPointAt(time)
+        if (initialTl.StartTime == time) then
+            table.insert(tpsToRemove, initialTl)
         end
-        table.insert(timingpoints, utils.CreateTimingPoint(time, bpm, signature))
+        table.insert(tpsToAdd, utils.CreateTimingPoint(time, initialTl.Bpm, initialTl.Signature, initialTl.Hidden))
     end
     actions.PerformBatch({
-        createEA(action_type.AddTimingPointBatch, timingpoints),
+        createEA(action_type.AddTimingPointBatch, tpsToAdd),
         createEA(action_type.RemoveTimingPointBatch, tpsToRemove)
     })
 
-    toggleablePrint("s!", "Created " .. #timingpoints .. pluralize(" timing point.", #timingpoints, -2))
+    toggleablePrint("s!", "Created " .. #tpsToAdd .. pluralize(" timing point.", #tpsToAdd, -2))
     if (truthy(tpsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #tpsToRemove .. pluralize(" timing point.", #tpsToRemove, -2))
