@@ -8304,11 +8304,6 @@ function dynamicScaleMenu()
     needSVUpdate = chooseStandardSVType(menuVars, true) or needSVUpdate
     AddSeparator()
     local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
-    if currentSVType == "Sinusoidal" then
-        imgui.Text("Import sinusoidal values using 'Custom' instead")
-        cache.saveTable("dynamicScaleMenu", menuVars)
-        return
-    end
     local settingVars = getSettingVars(currentSVType, "DynamicScale")
     needSVUpdate = showSettingsMenu(currentSVType, settingVars, true, numSVPoints, "DynamicScale") or needSVUpdate
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, true) end
