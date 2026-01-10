@@ -2,7 +2,7 @@
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@return Bookmark[] bms All of the [bookmarks](lua://Bookmark) within the area.
-function game.getBookmarksBetweenOffsets(startOffset, endOffset)
+function game.get.bookmarksBetweenOffsets(startOffset, endOffset)
     local bookmarksBetweenOffsets = {} ---@type Bookmark[]
     for _, bm in ipairs(map.Bookmarks) do
         local bmIsInRange = bm.StartTime >= startOffset and bm.StartTime < endOffset
@@ -15,7 +15,7 @@ end
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@return TimingPoint[] tps All of the [timing points](lua://TimingPoint) within the area.
-function game.getLinesBetweenOffsets(startOffset, endOffset)
+function game.get.linesBetweenOffsets(startOffset, endOffset)
     local linesBetweenoffsets = {} ---@type TimingPoint[]
     for _, line in ipairs(map.TimingPoints) do
         local lineIsInRange = line.StartTime >= startOffset and line.StartTime < endOffset
@@ -28,7 +28,7 @@ end
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@return HitObject[] objs All of the [hit objects](lua://HitObject) within the area.
-function game.getNotesBetweenOffsets(startOffset, endOffset)
+function game.get.notesBetweenOffsets(startOffset, endOffset)
     local notesBetweenOffsets = {} ---@type HitObject[]
     for _, note in ipairs(map.HitObjects) do
         local noteIsInRange = note.StartTime >= startOffset and note.StartTime <= endOffset
@@ -43,7 +43,7 @@ end
 ---@param includeEnd? boolean Whether or not to include any SVs on the end time.
 ---@param dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
 ---@return ScrollSpeedFactor[] ssfs All of the [scroll speed factors](lua://ScrollSpeedFactor) within the area.
-function game.getSSFsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
+function game.get.ssfsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
     local ssfsBetweenOffsets = {} ---@type ScrollSpeedFactor[]
     local ssfs = map.ScrollSpeedFactors
     if ssfs == nil then
@@ -65,7 +65,7 @@ end
 ---@param includeEnd? boolean Whether or not to include any SVs on the end time.
 ---@param dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
-function game.getSVsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
+function game.get.svsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
     for _, sv in ipairs(map.ScrollVelocities) do
         local svIsInRange = sv.StartTime >= startOffset and sv.StartTime < endOffset

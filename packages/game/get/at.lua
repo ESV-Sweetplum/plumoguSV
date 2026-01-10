@@ -3,7 +3,7 @@ require("packages.table.searchClosest")
 ---Gets the most recent timing point, or a dummy timing point if none exists.
 ---@param offset number
 ---@return TimingPoint
-function game.getTimingPointAt(offset)
+function game.get.timingPointAt(offset)
     local line = map.getTimingPointAt(offset)
     if line then return line end
     return { StartTime = -69420, Bpm = 42.69, Signature = 4, Hidden = false }
@@ -15,9 +15,9 @@ local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---@param time number The time to reference.
 ---@param dontPrintInaccuracy? boolean If set to true, will not print warning messages on unconfident guesses.
 ---@return SnapNumber
-function game.getSnapAt(time, dontPrintInaccuracy)
+function game.get.snapAt(time, dontPrintInaccuracy)
     local previousBar = math.floor(map.GetNearestSnapTimeFromTime(false, 1, time + 6) or 0)
-    local barLength = 60000 / game.getTimingPointAt(state.SongTime).Bpm
+    local barLength = 60000 / game.get.timingPointAt(state.SongTime).Bpm
 
     local distanceAbovePrev = time - previousBar
     if (distanceAbovePrev <= 5 or distanceAbovePrev >= barLength - 5) then return 1 end
@@ -56,7 +56,7 @@ end
 ---@param offset number
 ---@param tgId? string
 ---@return number
-function game.getSSFStartTimeAt(offset, tgId)
+function game.get.ssfStartTimeAt(offset, tgId)
     local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
     if ssf then return ssf.StartTime end
     return -1
@@ -66,7 +66,7 @@ end
 ---@param offset number
 ---@param tgId? string
 ---@return number
-function game.getSSFMultiplierAt(offset, tgId)
+function game.get.ssfMultiplierAt(offset, tgId)
     local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
     if ssf then return ssf.Multiplier end
     return 1
@@ -76,7 +76,7 @@ end
 ---@param offset number
 ---@param tgId? string
 ---@return number
-function game.getSVStartTimeAt(offset, tgId)
+function game.get.svStartTimeAt(offset, tgId)
     local sv = map.GetScrollVelocityAt(offset, tgId)
     if sv then return sv.StartTime end
     return -1
@@ -86,7 +86,7 @@ end
 ---@param offset number
 ---@param tgId? string
 ---@return number
-function game.getSVMultiplierAt(offset, tgId)
+function game.get.svMultiplierAt(offset, tgId)
     local sv = map.GetScrollVelocityAt(offset, tgId)
     if sv then return sv.Multiplier end
 

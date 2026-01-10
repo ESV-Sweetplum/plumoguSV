@@ -10,7 +10,7 @@ function placeStillSVsParent(menuVars)
         end
         return
     end
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     for i = 1, (#offsets - 1) do
         if (STANDARD_SVS[menuVars.svTypeIndex] == "Exponential" and menuVars.settingVars.distanceMode == 2) then
@@ -29,12 +29,12 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
     local stillType = STILL_TYPES[menuVars.stillTypeIndex]
     local noteSpacing = menuVars.noteSpacing
     local stillDistance = menuVars.stillDistance
-    local noteOffsets = game.uniqueNoteOffsetsBetween(optionalStart, optionalEnd, true)
+    local noteOffsets = game.get.uniqueNoteOffsetsBetween(optionalStart, optionalEnd, true)
     if (not noteOffsets) then return { svsToRemove = {}, svsToAdd = {} } end
     local firstOffset = noteOffsets[1]
     local lastOffset = noteOffsets[#noteOffsets]
     local svMultFn = truthy(queuedSVs) and function(t) return getHypotheticalSVMultiplierAt(queuedSVs, t) end or
-        game.getSVMultiplierAt
+        game.get.svMultiplierAt
     if stillType == "Auto" then
         local multiplier = getUsableDisplacementMultiplier(firstOffset)
         local duration = 1 / multiplier

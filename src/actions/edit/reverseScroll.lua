@@ -1,14 +1,14 @@
 function reverseScrollSVs(menuVars)
     printLegacyLNMessage()
-    local offsets = game.uniqueNoteOffsetsBetweenSelected(true)
+    local offsets = game.get.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {}
     local almostSVsToAdd = {}
     local extraOffset = 2 / getUsableDisplacementMultiplier(endOffset)
-    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset + extraOffset)
+    local svsToRemove = game.get.svsBetweenOffsets(startOffset, endOffset + extraOffset)
     local svTimeIsAdded = {}
-    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
     local sectionDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
     -- opposite-sign distances and displacements b/c flips SV multiplier signs at the end

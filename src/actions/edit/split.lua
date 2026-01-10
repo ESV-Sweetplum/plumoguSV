@@ -41,7 +41,7 @@ function splitNotes(menuVars)
         local minStartTime = math.min(startTimeTbl)
         local maxStartTime = math.max(startTimeTbl)
         local svs = menuVars.cloneSVs and
-            game.getSVsBetweenOffsets(minStartTime - menuVars.cloneRadius, maxStartTime + menuVars.cloneRadius) or {}
+            game.get.svsBetweenOffsets(minStartTime - menuVars.cloneRadius, maxStartTime + menuVars.cloneRadius) or {}
         if (not table.includes(existingIds, id)) then
             local tg = createSG(svs, 1, color.rgbaToStr(generateColor(false)))
             local ea = createEA(action_type.CreateTimingGroup, id, tg, noteList)

@@ -1,5 +1,5 @@
 function placePenisSV(settingVars)
-    local startTime = state.SelectedHitObjects[1].StartTime
+    local startTime = game.get.uniqueSelectedNoteOffsets()[1]
 
     local svs = {}
 
@@ -22,5 +22,5 @@ function placePenisSV(settingVars)
         table.insert(svs, createSV(time, trueVal))
     end
 
-    removeAndAddSVs(game.getSVsBetweenOffsets(startTime, startTime + settingVars.sWidth + settingVars.bWidth * 2), svs)
+    removeAndAddSVs(game.get.svsBetweenOffsets(startTime, startTime + settingVars.sWidth + settingVars.bWidth * 2), svs)
 end

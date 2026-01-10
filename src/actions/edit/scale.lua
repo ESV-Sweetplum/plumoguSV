@@ -2,7 +2,7 @@ function scaleDisplaceSVs(menuVars)
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -10,7 +10,7 @@ function scaleDisplaceSVs(menuVars)
     for i = 1, (#offsets - 1) do
         local note1Offset = offsets[i]
         local note2Offset = offsets[i + 1]
-        local svsBetweenOffsets = game.getSVsBetweenOffsets(note1Offset, note2Offset)
+        local svsBetweenOffsets = game.get.svsBetweenOffsets(note1Offset, note2Offset)
         addStartSVIfMissing(svsBetweenOffsets, note1Offset)
         local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, note1Offset,
@@ -33,20 +33,20 @@ function scaleDisplaceSVs(menuVars)
                 0, nil)
         end
     end
-    if isStartDisplace then addFinalSV(svsToAdd, endOffset, game.getSVMultiplierAt(endOffset)) end
+    if isStartDisplace then addFinalSV(svsToAdd, endOffset, game.get.svMultiplierAt(endOffset)) end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 
 function scaleMultiplySVs(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local svsToAdd = {}
-    local svsToRemove = game.getSVsBetweenOffsets(offsets[1], offsets[#offsets])
+    local svsToRemove = game.get.svsBetweenOffsets(offsets[1], offsets[#offsets])
     for i = 1, (#offsets - 1) do
         local startOffset = offsets[i]
         local endOffset = offsets[i + 1]
-        local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+        local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         local scalingFactor = menuVars.ratio
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,

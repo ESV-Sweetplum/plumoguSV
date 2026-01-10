@@ -175,7 +175,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
         local topLeft = imgui.GetWindowPos()
         local dim = imgui.GetWindowSize()
 
-        local simTime = math.expoClamp(120000 / game.getTimingPointAt(state.SongTime).Bpm, 600, 1200, 2)
+        local simTime = math.expoClamp(120000 / game.get.timingPointAt(state.SongTime).Bpm, 600, 1200, 2)
         local curTime = state.UnixTime % simTime
         local progress = curTime / simTime
 

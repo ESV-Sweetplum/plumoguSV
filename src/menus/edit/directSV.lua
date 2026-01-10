@@ -1,5 +1,5 @@
 function updateDirectEdit()
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets) and not truthy(cache.lists.directSVList)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
@@ -9,7 +9,7 @@ function updateDirectEdit()
         return
     end
 
-    cache.lists.directSVList = game.getSVsBetweenOffsets(firstOffset - 50, lastOffset + 50)
+    cache.lists.directSVList = game.get.svsBetweenOffsets(firstOffset - 50, lastOffset + 50)
 end
 
 function directSVMenu()

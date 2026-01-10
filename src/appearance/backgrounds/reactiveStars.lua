@@ -47,7 +47,7 @@ function updateStars(dimX, dimY, dt)
     local random = math.random
     local clamp = math.clamp
 
-    local m = game.getSVMultiplierAt(state.SongTime)
+    local m = game.get.svMultiplierAt(state.SongTime)
 
     for i = 1, #stars_xList do
         local starWrapped = false

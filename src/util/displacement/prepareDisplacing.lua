@@ -7,7 +7,7 @@
 --    displacementMultiplier : displacement multiplier value [Int/Float]
 function prepareDisplacingSV(svsToAdd, svTimeIsAdded, svTime, displacement, displacementMultiplier, hypothetical, svs)
     svTimeIsAdded[svTime] = true
-    local currentSVMultiplier = game.getSVMultiplierAt(svTime)
+    local currentSVMultiplier = game.get.svMultiplierAt(svTime)
     if hypothetical == true then
         currentSVMultiplier = getHypotheticalSVMultiplierAt(svs, svTime)
     end

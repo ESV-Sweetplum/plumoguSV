@@ -1,8 +1,8 @@
 function setPresets(presetList)
     globalVars.presets = {}
     for _, preset in pairs(presetList) do
-        local presetIsValid, presetData = checkPresetValidity(preset)
-        if (not presetIsValid) then goto nextPreset end
+        local presetIsvalid, presetData = checkPresetValidity(preset)
+        if (not presetIsvalid) then goto nextPreset end
         table.insert(globalVars.presets,
             { name = preset.name, type = preset.type, menu = preset.menu, data = presetData })
         ::nextPreset::

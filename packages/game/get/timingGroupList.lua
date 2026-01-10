@@ -1,4 +1,4 @@
-function game.getTimingGroupList()
+function game.get.timingGroupList()
     local baseList = table.keys(map.TimingGroups)
     local defaultIndex = table.indexOf(baseList, "$Default")
     table.remove(baseList, defaultIndex)

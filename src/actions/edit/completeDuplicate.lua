@@ -1,11 +1,11 @@
 function storeDuplicateItems(menuVars)
     objects = {}
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
-    local tls = game.getLinesBetweenOffsets(startOffset, endOffset)
-    local bms = game.getBookmarksBetweenOffsets(startOffset, endOffset)
+    local notes = game.get.notesBetweenOffsets(startOffset, endOffset)
+    local tls = game.get.linesBetweenOffsets(startOffset, endOffset)
+    local bms = game.get.bookmarksBetweenOffsets(startOffset, endOffset)
 
     for _, note in pairs(notes) do
         table.insert(objects, { type = "ho", data = note })
@@ -24,8 +24,8 @@ function storeDuplicateItems(menuVars)
         svTbl[tgId] = {}
         ssfTbl[tgId] = {}
         state.SelectedScrollGroupId = tgId
-        local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
-        local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset)
+        local svs = game.get.svsBetweenOffsets(startOffset, endOffset)
+        local ssfs = game.get.ssfsBetweenOffsets(startOffset, endOffset)
         for _, sv in pairs(svs) do
             table.insert(svTbl[tgId], sv)
         end
@@ -47,7 +47,7 @@ function clearDuplicateItems(menuVars)
 end
 
 function placeDuplicateItems(menuVars)
-    local placeTime = state.SelectedHitObjects[1].StartTime
+    local placeTime = game.get.uniqueSelectedNoteOffsets()[1]
     local hosToAdd = {}
     local tlsToAdd = {}
     local bmsToAdd = {}

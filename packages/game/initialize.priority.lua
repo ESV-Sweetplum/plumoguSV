@@ -1,5 +1,6 @@
 ---@meta game-class
 
 game = {
-    window = {}
+    window = {},
+    get = {}
 }

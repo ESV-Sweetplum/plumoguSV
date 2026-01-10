@@ -2,7 +2,7 @@ function addTeleportSVs(menuVars)
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]

@@ -1,18 +1,18 @@
 function convertSVSSF(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local objects = {}
     local editorActions = {}
 
     if (menuVars.conversionDirection) then
-        local svs = game.getSVsBetweenOffsets(startOffset, endOffset, false)
+        local svs = game.get.svsBetweenOffsets(startOffset, endOffset, false)
         for _, sv in ipairs(svs) do
             table.insert(objects, { StartTime = sv.StartTime, Multiplier = sv.Multiplier })
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svs))
     else
-        local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset, false)
+        local ssfs = game.get.ssfsBetweenOffsets(startOffset, endOffset, false)
         for _, ssf in ipairs(ssfs) do
             table.insert(objects, { StartTime = ssf.StartTime, Multiplier = ssf.Multiplier })
         end
@@ -37,11 +37,11 @@ function convertSVSSF(menuVars)
 end
 
 function swapSVSSF(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
-    local ssfsToRemove = game.getSSFsBetweenOffsets(startOffset, endOffset)
+    local svsToRemove = game.get.svsBetweenOffsets(startOffset, endOffset)
+    local ssfsToRemove = game.get.ssfsBetweenOffsets(startOffset, endOffset)
     local svsToAdd = {}
     local ssfsToAdd = {}
 

@@ -3,7 +3,7 @@ function displaceViewSVs(menuVars)
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local offsets = game.uniqueNoteOffsetsBetweenSelected(true)
+    local offsets = game.get.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local displaceAmount = menuVars.distance

@@ -14,7 +14,7 @@ function renderReactiveSingularities()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
 
-    local multiplier = game.getSVMultiplierAt(state.SongTime)
+    local multiplier = game.get.svMultiplierAt(state.SongTime)
 
     local dimX = dim.x
     local dimY = dim.y

@@ -3,7 +3,7 @@ function BasicInputFloat(label, value, decimalPlaces, suffix, step)
 end
 
 function ComputableInputFloat(label, value, decimalPlaces, suffix)
-    local previousValue = value
+    local previousvalue = value
     local output = value
 
     local fmt = "%." .. decimalPlaces .. "f"
@@ -19,7 +19,7 @@ function ComputableInputFloat(label, value, decimalPlaces, suffix)
     end
 
     return tn(tostring(output):match("[%-]?%d+[%.]?%d+") or tostring(output):match("[%-]?%d+")),
-        previousValue ~= output -- Need both matches due to modifiers not working on whole groups
+        previousvalue ~= output -- Need both matches due to modifiers not working on whole groups
 end
 
 function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)

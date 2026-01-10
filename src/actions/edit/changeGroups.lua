@@ -5,12 +5,12 @@ function changeGroups(menuVars)
                 " from one timing group to the same timing group will do nothing." }))
         return
     end
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
 
-    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset, true)
-    local ssfsToRemove = game.getSSFsBetweenOffsets(startOffset, endOffset, true)
+    local svsToRemove = game.get.svsBetweenOffsets(startOffset, endOffset, true)
+    local ssfsToRemove = game.get.ssfsBetweenOffsets(startOffset, endOffset, true)
 
     local svsToAdd = {}
     local ssfsToAdd = {}

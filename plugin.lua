@@ -18,7 +18,8 @@ color.int.greenMask = 256
 color.int.blueMask = 65536
 color.int.whiteMask = color.int.redMask + color.int.greenMask + color.int.blueMask
 game = {
-    window = {}
+    window = {},
+    get = {}
 }
 kbm = {}
 matrix = {}
@@ -193,7 +194,7 @@ end
 ---Gets the most recent timing point, or a dummy timing point if none exists.
 ---@param offset number
 ---@return TimingPoint
-function game.getTimingPointAt(offset)
+function game.get.timingPointAt(offset)
     local line = map.getTimingPointAt(offset)
     if line then return line end
     return { StartTime = -69420, Bpm = 42.69, Signature = 4, Hidden = false }
@@ -203,9 +204,9 @@ local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---@param time number The time to reference.
 ---@param dontPrintInaccuracy? boolean If set to true, will not print warning messages on unconfident guesses.
 ---@return SnapNumber
-function game.getSnapAt(time, dontPrintInaccuracy)
+function game.get.snapAt(time, dontPrintInaccuracy)
     local previousBar = math.floor(map.GetNearestSnapTimeFromTime(false, 1, time + 6) or 0)
-    local barLength = 60000 / game.getTimingPointAt(state.SongTime).Bpm
+    local barLength = 60000 / game.get.timingPointAt(state.SongTime).Bpm
     local distanceAbovePrev = time - previousBar
     if (distanceAbovePrev <= 5 or distanceAbovePrev >= barLength - 5) then return 1 end
     local snap48 = barLength / 48
@@ -235,7 +236,7 @@ end
 ---@param offset number
 ---@param tgId? string
 ---@return number
-function game.getSSFMultiplierAt(offset, tgId)
+function game.get.ssfMultiplierAt(offset, tgId)
     local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
     if ssf then return ssf.Multiplier end
     return 1
@@ -244,7 +245,7 @@ end
 ---@param offset number
 ---@param tgId? string
 ---@return number
-function game.getSVStartTimeAt(offset, tgId)
+function game.get.svStartTimeAt(offset, tgId)
     local sv = map.GetScrollVelocityAt(offset, tgId)
     if sv then return sv.StartTime end
     return -1
@@ -253,7 +254,7 @@ end
 ---@param offset number
 ---@param tgId? string
 ---@return number
-function game.getSVMultiplierAt(offset, tgId)
+function game.get.svMultiplierAt(offset, tgId)
     local sv = map.GetScrollVelocityAt(offset, tgId)
     if sv then return sv.Multiplier end
     local initTgSv = state.SelectedScrollGroup.InitialScrollVelocity
@@ -266,7 +267,7 @@ end
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@return Bookmark[] bms All of the [bookmarks](lua://Bookmark) within the area.
-function game.getBookmarksBetweenOffsets(startOffset, endOffset)
+function game.get.bookmarksBetweenOffsets(startOffset, endOffset)
     local bookmarksBetweenOffsets = {} ---@type Bookmark[]
     for _, bm in ipairs(map.Bookmarks) do
         local bmIsInRange = bm.StartTime >= startOffset and bm.StartTime < endOffset
@@ -278,7 +279,7 @@ end
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@return TimingPoint[] tps All of the [timing points](lua://TimingPoint) within the area.
-function game.getLinesBetweenOffsets(startOffset, endOffset)
+function game.get.linesBetweenOffsets(startOffset, endOffset)
     local linesBetweenoffsets = {} ---@type TimingPoint[]
     for _, line in ipairs(map.TimingPoints) do
         local lineIsInRange = line.StartTime >= startOffset and line.StartTime < endOffset
@@ -290,7 +291,7 @@ end
 ---@param startOffset number The lower bound of the search area.
 ---@param endOffset number The upper bound of the search area.
 ---@return HitObject[] objs All of the [hit objects](lua://HitObject) within the area.
-function game.getNotesBetweenOffsets(startOffset, endOffset)
+function game.get.notesBetweenOffsets(startOffset, endOffset)
     local notesBetweenOffsets = {} ---@type HitObject[]
     for _, note in ipairs(map.HitObjects) do
         local noteIsInRange = note.StartTime >= startOffset and note.StartTime <= endOffset
@@ -304,7 +305,7 @@ end
 ---@param includeEnd? boolean Whether or not to include any SVs on the end time.
 ---@param dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
 ---@return ScrollSpeedFactor[] ssfs All of the [scroll speed factors](lua://ScrollSpeedFactor) within the area.
-function game.getSSFsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
+function game.get.ssfsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
     local ssfsBetweenOffsets = {} ---@type ScrollSpeedFactor[]
     local ssfs = map.ScrollSpeedFactors
     if ssfs == nil then
@@ -325,7 +326,7 @@ end
 ---@param includeEnd? boolean Whether or not to include any SVs on the end time.
 ---@param dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
-function game.getSVsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
+function game.get.svsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
     for _, sv in ipairs(map.ScrollVelocities) do
         local svIsInRange = sv.StartTime >= startOffset and sv.StartTime < endOffset
@@ -335,40 +336,7 @@ function game.getSVsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
     if dontSort then return svsBetweenOffsets end
     return sort(svsBetweenOffsets, sortAscendingStartTime)
 end
----Finds and returns a list of all unique offsets of notes between selected notes [Table]
----@param includeLN? boolean
----@return number[]
-function game.uniqueNoteOffsetsBetweenSelected(includeLN)
-    local selectedNoteOffsets = game.uniqueSelectedNoteOffsets()
-    if (not selectedNoteOffsets) then
-        toggleablePrint("e!",
-            "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
-        return {}
-    end
-    local startOffset = selectedNoteOffsets[1]
-    local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
-    local offsets = game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
-    if (#offsets < 2) then
-        toggleablePrint("e!",
-            "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
-        return {}
-    end
-    return offsets
-end
----Returns a list of unique offsets (in increasing order) of selected notes [Table]
----@return number[]
-function game.uniqueSelectedNoteOffsets()
-    local offsets = {}
-    for _, ho in pairs(state.SelectedHitObjects) do
-        offsets[#offsets + 1] = ho.StartTime
-        if (ho.EndTime ~= 0 and globalVars.useEndTimeOffsets) then offsets[#offsets + 1] = ho.EndTime end
-    end
-    offsets = table.dedupe(offsets)
-    offsets = sort(offsets, sortAscending)
-    if (not truthy(offsets)) then return {} end
-    return offsets
-end
-function game.getTimingGroupList()
+function game.get.timingGroupList()
     local baseList = table.keys(map.TimingGroups)
     local defaultIndex = table.indexOf(baseList, "$Default")
     table.remove(baseList, defaultIndex)
@@ -379,12 +347,64 @@ function game.getTimingGroupList()
     if (globalVars.hideAutomatic) then table.filter(baseList, function(str) return not string.find(str, "automate_") end) end
     return baseList
 end
+---Finds and returns a list of all unique offsets of notes between selected notes [Table]
+---@param includeLN? boolean
+---@return number[]
+function game.get.uniqueNoteOffsetsBetweenSelected(includeLN)
+    local selectedNoteOffsets = game.get.uniqueSelectedNoteOffsets()
+    if (not selectedNoteOffsets) then
+        toggleablePrint("e!",
+            "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
+        return {}
+    end
+    local startOffset = selectedNoteOffsets[1]
+    local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
+    local offsets = game.get.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
+    if (#offsets < 2) then
+        toggleablePrint("e!",
+            "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
+        return {}
+    end
+    return offsets
+end
+---Returns a list of unique offsets (in increasing order) of selected notes [Table]
+---@return number[]
+function game.get.uniqueSelectedNoteOffsets()
+    local offsets = {}
+    for _, ho in pairs(state.SelectedHitObjects) do
+        offsets[#offsets + 1] = ho.StartTime
+        if (ho.EndTime ~= 0 and globalVars.useEndTimeOffsets) then offsets[#offsets + 1] = ho.EndTime end
+    end
+    if (not truthy(offsets)) then return {} end
+    offsets = table.dedupe(offsets)
+    offsets = sort(offsets, sortAscending)
+    return offsets
+end
+---Returns an array of hit objects within the selection time.
+---@return HitObject[]
+function game.get.uniqueNotesBetweenSelected()
+    local selectedNoteOffsets = game.get.uniqueSelectedNoteOffsets()
+    if (not selectedNoteOffsets) then
+        toggleablePrint("e!",
+            "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
+        return {}
+    end
+    local startOffset = selectedNoteOffsets[1]
+    local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
+    local hos = game.get.notesBetweenOffsets(startOffset, endOffset)
+    if (#hos < 2) then
+        toggleablePrint("e!",
+            "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
+        return {}
+    end
+    return hos
+end
 ---Finds and returns a list of all unique offsets of notes between a start and an end time [Table]
 ---@param startOffset number
 ---@param endOffset number
 ---@param includeLN? boolean
 ---@return number[]
-function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
+function game.get.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     local noteOffsetsBetween = {}
     includeLN = includeLN or globalVars.useEndTimeOffsets
     for _, ho in ipairs(map.HitObjects) do
@@ -408,7 +428,6 @@ function game.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     noteOffsetsBetween = sort(noteOffsetsBetween, sortAscending)
     return noteOffsetsBetween
 end
-game.getUniqueNoteOffsetsBetween = game.uniqueNoteOffsetsBetween
 function game.window.getCenter()
     local windowDim = state.WindowSize
     return vector.New(state.WindowSize[1] / 2, state.WindowSize[2] / 2)
@@ -1866,8 +1885,8 @@ end
 function setPresets(presetList)
     globalVars.presets = {}
     for _, preset in pairs(presetList) do
-        local presetIsValid, presetData = checkPresetValidity(preset)
-        if (not presetIsValid) then goto nextPreset end
+        local presetIsvalid, presetData = checkPresetValidity(preset)
+        if (not presetIsvalid) then goto nextPreset end
         table.insert(globalVars.presets,
             { name = preset.name, type = preset.type, menu = preset.menu, data = presetData })
         ::nextPreset::
@@ -2156,7 +2175,7 @@ function displaceNotesForAnimationFrames(settingVars)
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local selectedStartTime = game.uniqueSelectedNoteOffsets()[1]
+    local selectedStartTime = game.get.uniqueSelectedNoteOffsets()[1]
     local firstFrameTimeTime = settingVars.frameTimes[1].time
     local lastFrameTimeTime = settingVars.frameTimes[#settingVars.frameTimes].time
     local firstOffset = math.min(selectedStartTime, firstFrameTimeTime)
@@ -2168,7 +2187,7 @@ function displaceNotesForAnimationFrames(settingVars)
         local position = frameTime.position
         local startOffset = math.min(selectedStartTime, noteOffset)
         local endOffset = math.max(selectedStartTime, noteOffset)
-        local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+        local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         local distanceBetweenOffsets = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
             endOffset)
@@ -2190,11 +2209,11 @@ function displaceNotesForAnimationFrames(settingVars)
 end
 function automateCopySVs(settingVars)
     settingVars.copiedSVs = {}
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local svs = game.get.svsBetweenOffsets(startOffset, endOffset)
     if (not truthy(svs)) then
         toggleablePrint("w!", "No SVs found within the copiable region.")
         return
@@ -2277,7 +2296,7 @@ function automateSVs(settingVars)
     toggleablePrint("w!", "Automated.")
 end
 function placePenisSV(settingVars)
-    local startTime = state.SelectedHitObjects[1].StartTime
+    local startTime = game.get.uniqueSelectedNoteOffsets()[1]
     local svs = {}
     for j = 0, 1 do
         for i = 0, 100 do
@@ -2293,7 +2312,7 @@ function placePenisSV(settingVars)
         local trueVal = settingVars.sCurvature * 0.01 * circVal + (3.75 - settingVars.sCurvature * 0.01)
         table.insert(svs, createSV(time, trueVal))
     end
-    removeAndAddSVs(game.getSVsBetweenOffsets(startTime, startTime + settingVars.sWidth + settingVars.bWidth * 2), svs)
+    removeAndAddSVs(game.get.svsBetweenOffsets(startTime, startTime + settingVars.sWidth + settingVars.bWidth * 2), svs)
 end
 function placeStutterSVs(settingVars)
     local finalSVType = FINAL_SV_TYPES[settingVars.finalSVIndex]
@@ -2303,7 +2322,7 @@ function placeStutterSVs(settingVars)
         lastFirstStutter = settingVars.endSV
         lastMultiplier = settingVars.svMultipliers2[3]
     end
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
@@ -2311,7 +2330,7 @@ function placeStutterSVs(settingVars)
     local firstStutterSVs = generateLinearSet(settingVars.startSV, lastFirstStutter,
         totalNumStutters)
     local svsToAdd = {}
-    local svsToRemove = game.getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
     local stutterIndex = 1
     for i = 1, #offsets - 1 do
         local startOffset = offsets[i]
@@ -2352,12 +2371,12 @@ function placeTeleportStutterSVs(settingVars)
         lastSVPercent = settingVars.svPercent2 * 0.01
         lastMainSV = settingVars.mainSV2
     end
-    local offsets = game.uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.get.uniqueNoteOffsetsBetweenSelected()
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local numTeleportSets = #offsets - 1
     local svsToAdd = {}
-    local svsToRemove = game.getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
     local svPercents = generateLinearSet(svPercent, lastSVPercent, numTeleportSets)
     local mainSVs = generateLinearSet(settingVars.mainSV, lastMainSV, numTeleportSets)
     removeAndAddSVs(svsToRemove, svsToAdd)
@@ -2404,12 +2423,12 @@ function placeExponentialSpecialSVs(menuVars)
 end
 function placeSSFs(menuVars)
     local numMultipliers = #menuVars.svMultipliers
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local ssfsToAdd = {}
-    local ssfsToRemove = game.getSSFsBetweenOffsets(firstOffset, lastOffset)
+    local ssfsToRemove = game.get.ssfsBetweenOffsets(firstOffset, lastOffset)
     if globalVars.dontReplaceSV then
         ssfsToRemove = {}
     end
@@ -2432,20 +2451,20 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
     local finalSVType = FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex]
     local placingStillSVs = menuVars.noteSpacing ~= nil
     local numMultipliers = #menuVars.svMultipliers
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     if placingStillSVs then
-        offsets = game.uniqueNoteOffsetsBetweenSelected()
+        offsets = game.get.uniqueNoteOffsetsBetweenSelected()
         if (not truthy(offsets)) then return end
         if place == false then
-            offsets = game.uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
+            offsets = game.get.uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
         end
     end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     if placingStillSVs then offsets = { firstOffset, lastOffset } end
     local svsToAdd = {}
-    local svsToRemove = game.getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
     if (not placingStillSVs) and globalVars.dontReplaceSV then
         svsToRemove = {}
     end
@@ -2490,7 +2509,7 @@ function placeStillSVsParent(menuVars)
         end
         return
     end
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     for i = 1, (#offsets - 1) do
         if (STANDARD_SVS[menuVars.svTypeIndex] == "Exponential" and menuVars.settingVars.distanceMode == 2) then
@@ -2508,12 +2527,12 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
     local stillType = STILL_TYPES[menuVars.stillTypeIndex]
     local noteSpacing = menuVars.noteSpacing
     local stillDistance = menuVars.stillDistance
-    local noteOffsets = game.uniqueNoteOffsetsBetween(optionalStart, optionalEnd, true)
+    local noteOffsets = game.get.uniqueNoteOffsetsBetween(optionalStart, optionalEnd, true)
     if (not noteOffsets) then return { svsToRemove = {}, svsToAdd = {} } end
     local firstOffset = noteOffsets[1]
     local lastOffset = noteOffsets[#noteOffsets]
     local svMultFn = truthy(queuedSVs) and function(t) return getHypotheticalSVMultiplierAt(queuedSVs, t) end or
-        game.getSVMultiplierAt
+        game.get.svMultiplierAt
     if stillType == "Auto" then
         local multiplier = getUsableDisplacementMultiplier(firstOffset)
         local duration = 1 / multiplier
@@ -2559,7 +2578,7 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
 end
 function ssfVibrato(menuVars, func1, func2)
     printLegacyLNMessage()
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startTime = offsets[1]
     local endTime = offsets[#offsets]
@@ -2567,7 +2586,7 @@ function ssfVibrato(menuVars, func1, func2)
     local delta = 1000 / fps
     local time = startTime
     local ssfs = { createSSF(startTime - 1 / getUsableDisplacementMultiplier(startTime),
-        game.getSSFMultiplierAt(time)) }
+        game.get.ssfMultiplierAt(time)) }
     while time < endTime do
         local x = math.inverseLerp(time, startTime, endTime)
         local y = math.inverseLerp(time + delta, startTime, endTime)
@@ -2582,7 +2601,7 @@ function ssfVibrato(menuVars, func1, func2)
             createSSF(time + delta + 1 / getUsableDisplacementMultiplier(time), func2(y)))
         time = time + 2 * delta
     end
-    addFinalSSF(ssfs, endTime, game.getSSFMultiplierAt(endTime))
+    addFinalSSF(ssfs, endTime, game.get.ssfMultiplierAt(endTime))
     actions.PerformBatch({
         createEA(action_type.AddScrollSpeedFactorBatch, ssfs)
     })
@@ -2593,7 +2612,7 @@ end
 ---@param heightFn fun(t: number, idx?: integer): number
 function svVibrato(menuVars, heightFn)
     printLegacyLNMessage()
-    local offsets = game.uniqueNoteOffsetsBetweenSelected(true)
+    local offsets = game.get.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {} ---@type ScrollVelocity[]
@@ -2672,14 +2691,14 @@ function svVibrato(menuVars, heightFn)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function deleteItems(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local linesToRemove = game.getLinesBetweenOffsets(startOffset, endOffset)
-    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
-    local ssfsToRemove = game.getSSFsBetweenOffsets(startOffset, endOffset)
-    local bmsToRemove = game.getBookmarksBetweenOffsets(startOffset, endOffset)
+    local linesToRemove = game.get.linesBetweenOffsets(startOffset, endOffset)
+    local svsToRemove = game.get.svsBetweenOffsets(startOffset, endOffset)
+    local ssfsToRemove = game.get.ssfsBetweenOffsets(startOffset, endOffset)
+    local bmsToRemove = game.get.bookmarksBetweenOffsets(startOffset, endOffset)
     if (not menuVars.deleteTable[1]) then linesToRemove = {} end
     if (not menuVars.deleteTable[2]) then svsToRemove = {} end
     if (not menuVars.deleteTable[3]) then ssfsToRemove = {} end
@@ -2714,7 +2733,7 @@ function addTeleportSVs(menuVars)
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -2740,11 +2759,11 @@ function changeGroups(menuVars)
                 " from one timing group to the same timing group will do nothing." }))
         return
     end
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset, true)
-    local ssfsToRemove = game.getSSFsBetweenOffsets(startOffset, endOffset, true)
+    local svsToRemove = game.get.svsBetweenOffsets(startOffset, endOffset, true)
+    local ssfsToRemove = game.get.ssfsBetweenOffsets(startOffset, endOffset, true)
     local svsToAdd = {}
     local ssfsToAdd = {}
     local oldGroup = state.SelectedScrollGroupId
@@ -2792,12 +2811,12 @@ function changeGroups(menuVars)
 end
 function storeDuplicateItems(menuVars)
     objects = {}
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
-    local tls = game.getLinesBetweenOffsets(startOffset, endOffset)
-    local bms = game.getBookmarksBetweenOffsets(startOffset, endOffset)
+    local notes = game.get.notesBetweenOffsets(startOffset, endOffset)
+    local tls = game.get.linesBetweenOffsets(startOffset, endOffset)
+    local bms = game.get.bookmarksBetweenOffsets(startOffset, endOffset)
     for _, note in pairs(notes) do
         table.insert(objects, { type = "ho", data = note })
     end
@@ -2814,8 +2833,8 @@ function storeDuplicateItems(menuVars)
         svTbl[tgId] = {}
         ssfTbl[tgId] = {}
         state.SelectedScrollGroupId = tgId
-        local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
-        local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset)
+        local svs = game.get.svsBetweenOffsets(startOffset, endOffset)
+        local ssfs = game.get.ssfsBetweenOffsets(startOffset, endOffset)
         for _, sv in pairs(svs) do
             svTbl[tgId][#svTbl[tgId] + 1] = sv
         end
@@ -2833,7 +2852,7 @@ function clearDuplicateItems(menuVars)
     menuVars.objects = {}
 end
 function placeDuplicateItems(menuVars)
-    local placeTime = state.SelectedHitObjects[1].StartTime
+    local placeTime = game.get.uniqueSelectedNoteOffsets()[1]
     local hosToAdd = {}
     local tlsToAdd = {}
     local bmsToAdd = {}
@@ -2884,20 +2903,20 @@ function placeDuplicateItems(menuVars)
     actions.PerformBatch(moveActions)
 end
 function convertSVSSF(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local objects = {}
     local editorActions = {}
     if (menuVars.conversionDirection) then
-        local svs = game.getSVsBetweenOffsets(startOffset, endOffset, false)
+        local svs = game.get.svsBetweenOffsets(startOffset, endOffset, false)
         for k16 = 1, #svs do
             local sv = svs[k16]
             table.insert(objects, { StartTime = sv.StartTime, Multiplier = sv.Multiplier })
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svs))
     else
-        local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset, false)
+        local ssfs = game.get.ssfsBetweenOffsets(startOffset, endOffset, false)
         for k17 = 1, #ssfs do
             local ssf = ssfs[k17]
             table.insert(objects, { StartTime = ssf.StartTime, Multiplier = ssf.Multiplier })
@@ -2923,11 +2942,11 @@ function convertSVSSF(menuVars)
     toggleablePrint("s!", "Successfully converted.")
 end
 function swapSVSSF(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
-    local ssfsToRemove = game.getSSFsBetweenOffsets(startOffset, endOffset)
+    local svsToRemove = game.get.svsBetweenOffsets(startOffset, endOffset)
+    local ssfsToRemove = game.get.ssfsBetweenOffsets(startOffset, endOffset)
     local svsToAdd = {}
     local ssfsToAdd = {}
     for _, sv in pairs(svsToRemove) do
@@ -2946,14 +2965,14 @@ function swapSVSSF(menuVars)
 end
 function copyItems(menuVars)
     clearCopiedItems(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local lines = game.getLinesBetweenOffsets(startOffset, endOffset)
-    local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
-    local ssfs = game.getSSFsBetweenOffsets(startOffset, endOffset)
-    local bms = game.getBookmarksBetweenOffsets(startOffset, endOffset)
+    local lines = game.get.linesBetweenOffsets(startOffset, endOffset)
+    local svs = game.get.svsBetweenOffsets(startOffset, endOffset)
+    local ssfs = game.get.ssfsBetweenOffsets(startOffset, endOffset)
+    local bms = game.get.bookmarksBetweenOffsets(startOffset, endOffset)
     if (not menuVars.copyLines) then goto lineSkip end
     for k19 = 1, #lines do
         local line = lines[k19]
@@ -3034,7 +3053,7 @@ function clearCopiedItems(menuVars)
     menuVars.copied = newCopied
 end
 function pasteItems(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -3047,10 +3066,10 @@ function pasteItems(menuVars)
         lastCopiedValue = lastCopiedSSF or lastCopiedLine or lastCopiedBM or { relativeOffset = 0 }
     end
     local endRemoveOffset = endOffset + lastCopiedValue.relativeOffset + 1 / 128
-    local linesToRemove = menuVars.copyLines and game.getLinesBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local svsToRemove = menuVars.copySVs and game.getSVsBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local ssfsToRemove = menuVars.copySSFs and game.getSSFsBetweenOffsets(startOffset, endRemoveOffset) or {}
-    local bmsToRemove = menuVars.copyBMs and game.getBookmarksBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local linesToRemove = menuVars.copyLines and game.get.linesBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local svsToRemove = menuVars.copySVs and game.get.svsBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local ssfsToRemove = menuVars.copySSFs and game.get.ssfsBetweenOffsets(startOffset, endRemoveOffset) or {}
+    local bmsToRemove = menuVars.copyBMs and game.get.bookmarksBetweenOffsets(startOffset, endRemoveOffset) or {}
     if globalVars.dontReplaceSV then
         linesToRemove = {}
         svsToRemove = {}
@@ -3161,7 +3180,7 @@ function displaceNoteSVsParent(menuVars)
         displaceNoteSVs(menuVars)
         return
     end
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local svsToRemove = {}
     local svsToAdd = {}
@@ -3182,7 +3201,7 @@ function displaceNoteSVs(menuVars, place, optionalOffset)
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return { svsToRemove = {}, svsToAdd = {} } end
     if place == false then offsets = { optionalOffset } end
     local startOffset = offsets[1]
@@ -3208,7 +3227,7 @@ function displaceViewSVs(menuVars)
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local offsets = game.uniqueNoteOffsetsBetweenSelected(true)
+    local offsets = game.get.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local displaceAmount = menuVars.distance
@@ -3232,12 +3251,12 @@ function dynamicScaleSVs(menuVars)
     local offsets = menuVars.noteTimes
     local targetAvgSVs = menuVars.svMultipliers
     local svsToAdd = {}
-    local svsToRemove = game.getSVsBetweenOffsets(offsets[1], offsets[#offsets])
+    local svsToRemove = game.get.svsBetweenOffsets(offsets[1], offsets[#offsets])
     for i = 1, (#offsets - 1) do
         local startOffset = offsets[i]
         local endOffset = offsets[i + 1]
         local targetAvgSV = targetAvgSVs[i]
-        local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+        local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
             endOffset)
@@ -3256,7 +3275,7 @@ function flickerSVs(menuVars)
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -3327,7 +3346,7 @@ function layerSnaps()
     local notes = map.HitObjects
     for k25 = 1, #notes do
         local ho = notes[k25]
-        local color = COLOR_MAP[game.getSnapAt(ho.StartTime)]
+        local color = COLOR_MAP[game.get.snapAt(ho.StartTime)]
         if (ho.EditorLayer == 0) then
             layer = { Name = "Default", ColorRgb = "255,255,255", Hidden = false }
         else
@@ -3381,7 +3400,7 @@ function collapseSnaps()
         do
             local color = hoLayer.Name:match("-([a-zA-Z]+)$")
             local snap = REVERSE_COLOR_MAP[color]
-            local mostRecentTP = game.getTimingPointAt(ho.StartTime)
+            local mostRecentTP = game.get.timingPointAt(ho.StartTime)
             if snap == 1 then
                 table.insert(snapTpsToAdd,
                     utils.CreateTimingPoint(ho.StartTime, mostRecentTP.Bpm, mostRecentTP.Signature, true))
@@ -3454,7 +3473,7 @@ function alignTimingLines()
     end
     for k26 = 1, #times do
         local time = times[k26]
-        local initialTl = game.getTimingPointAt(time)
+        local initialTl = game.get.timingPointAt(time)
         if (initialTl.StartTime == time) then
             tpsToRemove[#tpsToRemove + 1] = initialTl
         end
@@ -3479,7 +3498,7 @@ function fixFlippedLNEnds()
     for _, ho in ipairs(map.HitObjects) do
         local lnEndTime = ho.EndTime
         local isLN = lnEndTime ~= 0
-        local endHasNegativeSV = (game.getSVMultiplierAt(lnEndTime) <= 0)
+        local endHasNegativeSV = (game.get.svMultiplierAt(lnEndTime) <= 0)
         local hasntAlreadyBeenFixed = lnEndTimeFixed[lnEndTime] == nil
         if isLN and endHasNegativeSV and hasntAlreadyBeenFixed then
             lnEndTimeFixed[lnEndTime] = true
@@ -3491,9 +3510,9 @@ function fixFlippedLNEnds()
             svTimeIsAdded[timeAt] = true
             svTimeIsAdded[timeAfter] = true
             svTimeIsAdded[timeAfterAfter] = true
-            local svMultiplierAt = game.getSVMultiplierAt(timeAt)
-            local svMultiplierAfter = game.getSVMultiplierAt(timeAfter)
-            local svMultiplierAfterAfter = game.getSVMultiplierAt(timeAfterAfter)
+            local svMultiplierAt = game.get.svMultiplierAt(timeAt)
+            local svMultiplierAfter = game.get.svMultiplierAt(timeAfter)
+            local svMultiplierAfterAfter = game.get.svMultiplierAt(timeAfterAfter)
             local newMultiplierAt = 0.001
             local newMultiplierAfter = svMultiplierAt + svMultiplierAfter
             local newMultiplierAfterAfter = svMultiplierAfterAfter
@@ -3602,7 +3621,13 @@ end
 function removeAllHitSounds()
     local hitsoundActions = {}
     local objs = {}
-    for _, ho in ipairs(map.HitObjects) do
+    if (not truthy(#state.SelectedHitObjects)) then
+        print("e!", "You are not currently selecting anything.")
+        return
+    end
+    local hos = game.get.uniqueNotesBetweenSelected()
+    for k27 = 1, #hos do
+        local ho = hos[k27]
         local hs = tonumber(ho.HitSound)
         if hs > 1 then
             table.insert(hitsoundActions, createEA(action_type.RemoveHitsound, { ho }, hs))
@@ -3619,11 +3644,11 @@ function removeAllHitSounds()
 end
 function measureSVs(menuVars)
     local roundingDecimalPlaces = 5
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
     menuVars.roundedNSVDistance = endOffset - startOffset
     menuVars.nsvDistance = tostring(menuVars.roundedNSVDistance)
@@ -3636,16 +3661,16 @@ function measureSVs(menuVars)
     local durationStart = 1 / getUsableDisplacementMultiplier(startOffset)
     local timeAt = startOffset
     local timeAfter = startOffset + durationStart
-    local multiplierAt = game.getSVMultiplierAt(timeAt)
-    local multiplierAfter = game.getSVMultiplierAt(timeAfter)
+    local multiplierAt = game.get.svMultiplierAt(timeAt)
+    local multiplierAfter = game.get.svMultiplierAt(timeAfter)
     local startDisplacement = -(multiplierAt - multiplierAfter) * durationStart
     menuVars.roundedStartDisplacement = math.round(startDisplacement, roundingDecimalPlaces)
     menuVars.startDisplacement = tostring(startDisplacement)
     local durationEnd = 1 / getUsableDisplacementMultiplier(startOffset)
     local timeBefore = endOffset - durationEnd
     local timeBeforeBefore = timeBefore - durationEnd
-    local multiplierBefore = game.getSVMultiplierAt(timeBefore)
-    local multiplierBeforeBefore = game.getSVMultiplierAt(timeBeforeBefore)
+    local multiplierBefore = game.get.svMultiplierAt(timeBefore)
+    local multiplierBeforeBefore = game.get.svMultiplierAt(timeBeforeBefore)
     local endDisplacement = (multiplierBefore - multiplierBeforeBefore) * durationEnd
     menuVars.roundedEndDisplacement = math.round(endDisplacement, roundingDecimalPlaces)
     menuVars.endDisplacement = tostring(endDisplacement)
@@ -3656,15 +3681,15 @@ function measureSVs(menuVars)
 end
 function reverseScrollSVs(menuVars)
     printLegacyLNMessage()
-    local offsets = game.uniqueNoteOffsetsBetweenSelected(true)
+    local offsets = game.get.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {}
     local almostSVsToAdd = {}
     local extraOffset = 2 / getUsableDisplacementMultiplier(endOffset)
-    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset + extraOffset)
+    local svsToRemove = game.get.svsBetweenOffsets(startOffset, endOffset + extraOffset)
     local svTimeIsAdded = {}
-    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
     local sectionDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
     local msxSeparatingDistance = -10000
@@ -3685,14 +3710,14 @@ function reverseScrollSVs(menuVars)
         prepareDisplacingSVs(noteOffset, almostSVsToAdd, svTimeIsAdded, beforeDisplacement,
             atDisplacement, afterDisplacement)
     end
-    for k27 = 1, #svsBetweenOffsets do
-        local sv = svsBetweenOffsets[k27]
+    for k28 = 1, #svsBetweenOffsets do
+        local sv = svsBetweenOffsets[k28]
         if (not svTimeIsAdded[sv.StartTime]) then
             almostSVsToAdd[#almostSVsToAdd + 1] = sv
         end
     end
-    for k28 = 1, #almostSVsToAdd do
-        local sv = almostSVsToAdd[k28]
+    for k29 = 1, #almostSVsToAdd do
+        local sv = almostSVsToAdd[k29]
         local newSVMultiplier = -sv.Multiplier
         if sv.StartTime > endOffset then newSVMultiplier = sv.Multiplier end
         addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
@@ -3703,7 +3728,7 @@ function scaleDisplaceSVs(menuVars)
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -3711,7 +3736,7 @@ function scaleDisplaceSVs(menuVars)
     for i = 1, (#offsets - 1) do
         local note1Offset = offsets[i]
         local note2Offset = offsets[i + 1]
-        local svsBetweenOffsets = game.getSVsBetweenOffsets(note1Offset, note2Offset)
+        local svsBetweenOffsets = game.get.svsBetweenOffsets(note1Offset, note2Offset)
         addStartSVIfMissing(svsBetweenOffsets, note1Offset)
         local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, note1Offset,
@@ -3734,19 +3759,19 @@ function scaleDisplaceSVs(menuVars)
                 0, nil)
         end
     end
-    if isStartDisplace then addFinalSV(svsToAdd, endOffset, game.getSVMultiplierAt(endOffset)) end
+    if isStartDisplace then addFinalSV(svsToAdd, endOffset, game.get.svMultiplierAt(endOffset)) end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function scaleMultiplySVs(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local svsToAdd = {}
-    local svsToRemove = game.getSVsBetweenOffsets(offsets[1], offsets[#offsets])
+    local svsToRemove = game.get.svsBetweenOffsets(offsets[1], offsets[#offsets])
     for i = 1, (#offsets - 1) do
         local startOffset = offsets[i]
         local endOffset = offsets[i + 1]
-        local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+        local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         local scalingFactor = menuVars.ratio
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
@@ -3758,8 +3783,8 @@ function scaleMultiplySVs(menuVars)
         elseif scaleType == "Absolute Distance" then
             scalingFactor = menuVars.distance / currentDistance
         end
-        for k29 = 1, #svsBetweenOffsets do
-            local sv = svsBetweenOffsets[k29]
+        for k30 = 1, #svsBetweenOffsets do
+            local sv = svsBetweenOffsets[k30]
             local newSVMultiplier = scalingFactor * sv.Multiplier
             addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
         end
@@ -3770,8 +3795,8 @@ function splitNotes(menuVars)
     local noteDict = {}
     local notes = state.SelectedHitObjects
     if (menuVars.modeIndex == 1) then
-        for k30 = 1, #notes do
-            local note = notes[k30]
+        for k31 = 1, #notes do
+            local note = notes[k31]
             if (noteDict[note.Lane]) then
                 table.insert(noteDict[note.Lane], note)
             else
@@ -3779,8 +3804,8 @@ function splitNotes(menuVars)
             end
         end
     elseif (menuVars.modeIndex == 2) then
-        for k31 = 1, #notes do
-            local note = notes[k31]
+        for k32 = 1, #notes do
+            local note = notes[k32]
             if (noteDict[note.StartTime]) then
                 table.insert(noteDict[note.StartTime], note)
             else
@@ -3788,8 +3813,8 @@ function splitNotes(menuVars)
             end
         end
     else
-        for k32 = 1, #notes do
-            local note = notes[k32]
+        for k33 = 1, #notes do
+            local note = notes[k33]
             noteDict[note.StartTime .. "_" .. note.Lane] = { note }
         end
     end
@@ -3807,7 +3832,7 @@ function splitNotes(menuVars)
         local minStartTime = math.min(startTimeTbl)
         local maxStartTime = math.max(startTimeTbl)
         local svs = menuVars.cloneSVs and
-            game.getSVsBetweenOffsets(minStartTime - menuVars.cloneRadius, maxStartTime + menuVars.cloneRadius) or {}
+            game.get.svsBetweenOffsets(minStartTime - menuVars.cloneRadius, maxStartTime + menuVars.cloneRadius) or {}
         if (not table.includes(existingIds, id)) then
             local tg = createSG(svs, 1, color.rgbaToStr(generateColor(false)))
             local ea = createEA(action_type.CreateTimingGroup, id, tg, noteList)
@@ -3826,11 +3851,11 @@ function swapNoteSVs()
     local svsToAdd = {}
     local svsToRemove = {}
     local svTimeIsAdded = {}
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
     local oldSVDisplacements = calculateDisplacementsFromSVs(svsBetweenOffsets, offsets)
     for i = 1, #offsets do
@@ -3848,16 +3873,16 @@ function swapNoteSVs()
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function verticalShiftSVs(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {}
-    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
-    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local svsToRemove = game.get.svsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
-    for k33 = 1, #svsBetweenOffsets do
-        local sv = svsBetweenOffsets[k33]
+    for k34 = 1, #svsBetweenOffsets do
+        local sv = svsBetweenOffsets[k34]
         local newSVMultiplier = sv.Multiplier + menuVars.verticalShift
         addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
     end
@@ -3952,7 +3977,7 @@ function goToNextTg()
 end
 function jumpToTg()
     if (not truthy(state.SelectedHitObjects)) then return end
-    local tgId = state.SelectedHitObjects[1].TimingGroup
+    local tgId = game.get.uniqueNotesBetweenSelected()[1].TimingGroup
     for _, ho in pairs(state.SelectedHitObjects) do
         if (ho.TimingGroup ~= tgId) then return end
     end
@@ -3987,8 +4012,8 @@ function getMapStats()
     local tgList = map.GetTimingGroupIds()
     local svSum = 0
     local ssfSum = 0
-    for k34 = 1, #tgList do
-        local tg = tgList[k34]
+    for k35 = 1, #tgList do
+        local tg = tgList[k35]
         state.SelectedScrollGroupId = tg
         svSum = svSum + #map.ScrollVelocities
         ssfSum = ssfSum + #map.ScrollSpeedFactors
@@ -4006,15 +4031,15 @@ function getMapStats()
     state.SelectedScrollGroupId = currentTG
 end
 function selectAlternating(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    local notes = game.get.notesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     local times = {}
-    for k35 = 1, #notes do
-        local ho = notes[k35]
+    for k36 = 1, #notes do
+        local ho = notes[k36]
         times[#times + 1] = ho.StartTime
     end
     times = table.dedupe(times)
@@ -4027,8 +4052,8 @@ function selectAlternating(menuVars)
     local notesToSelect = {}
     local currentTime = allowedTimes[1]
     local index = 2
-    for k36 = 1, #notes do
-        local note = notes[k36]
+    for k37 = 1, #notes do
+        local note = notes[k37]
         if (note.StartTime > currentTime and index <= #allowedTimes) then
             currentTime = allowedTimes[index]
             index = index + 1
@@ -4041,16 +4066,16 @@ function selectAlternating(menuVars)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
 function selectByChordSizes(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    local notes = game.get.notesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     notes = sort(notes, sortAscendingNoteLaneTime)
     local noteTimeTable = {}
-    for k37 = 1, #notes do
-        local note = notes[k37]
+    for k38 = 1, #notes do
+        local note = notes[k38]
         noteTimeTable[#noteTimeTable + 1] = note.StartTime
     end
     noteTimeTable = table.dedupe(noteTimeTable)
@@ -4058,13 +4083,13 @@ function selectByChordSizes(menuVars)
     for idx = 1, game.keyCount do
         sizeDict[#sizeDict + 1] = {}
     end
-    for k38 = 1, #noteTimeTable do
-        local time = noteTimeTable[k38]
+    for k39 = 1, #noteTimeTable do
+        local time = noteTimeTable[k39]
         local size = 0
         local curLane = 0
         local totalNotes = {}
-        for k39 = 1, #notes do
-            local note = notes[k39]
+        for k40 = 1, #notes do
+            local note = notes[k40]
             if (math.abs(note.StartTime - time) < 3) then
                 size = size + 1
                 curLane = curLane + 1
@@ -4084,15 +4109,15 @@ function selectByChordSizes(menuVars)
 end
 ---@diagnostic disable: undefined-field
 function selectByNoteType(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local totalNotes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    local totalNotes = game.get.notesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then totalNotes = state.SelectedHitObjects end
     local notesToSelect = {}
-    for k40 = 1, #totalNotes do
-        local note = totalNotes[k40]
+    for k41 = 1, #totalNotes do
+        local note = totalNotes[k41]
         if hitobject_type then
             if (note.Type == hitobject_type.Normal and not menuVars.normal) then
                 goto skipType
@@ -4112,27 +4137,27 @@ function selectByNoteType(menuVars)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
 function selectBySnap(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    local notes = game.get.notesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     local notesToSelect = {}
     for _, note in pairs(notes) do
-        local snap = game.getSnapAt(note.StartTime, true)
+        local snap = game.get.snapAt(note.StartTime, true)
         if (snap == menuVars.snap) then notesToSelect[#notesToSelect + 1] = note end
     end
     actions.SetHitObjectSelection(notesToSelect)
     print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
 function selectByTimingGroup(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local notesToSelect = {}
-    local notes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    local notes = game.get.notesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     notes = sort(notes, sortAscendingNoteLaneTime)
     for _, note in pairs(notes) do
@@ -4235,7 +4260,7 @@ function renderReactiveSingularities()
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
-    local multiplier = game.getSVMultiplierAt(state.SongTime)
+    local multiplier = game.get.svMultiplierAt(state.SongTime)
     local dimX = dim.x
     local dimY = dim.y
     local sqrt = math.sqrt
@@ -4362,7 +4387,7 @@ end
 function updateStars(dimX, dimY, dt)
     local random = math.random
     local clamp = math.clamp
-    local m = game.getSVMultiplierAt(state.SongTime)
+    local m = game.get.svMultiplierAt(state.SongTime)
     for i = 1, #stars_xList do
         local starWrapped = false
         local x = stars_xList[i]
@@ -5964,18 +5989,18 @@ function pulseController()
     }
     cache.loadTable("pulseController", pulseVars)
     local timeOffset = 50
-    local timeSinceLastBar = ((state.SongTime + timeOffset) - game.getTimingPointAt(state.SongTime).StartTime) %
-        ((60000 / game.getTimingPointAt(state.SongTime).Bpm))
+    local timeSinceLastBar = ((state.SongTime + timeOffset) - game.get.timingPointAt(state.SongTime).StartTime) %
+        ((60000 / game.get.timingPointAt(state.SongTime).Bpm))
     pulseVars.pulsedThisFrame = false
     if ((timeSinceLastBar < pulseVars.previousBar)) then
         pulseVars.pulseStatus = 1
         pulseVars.pulsedThisFrame = true
     else
-        pulseVars.pulseStatus = (pulseVars.pulseStatus - state.DeltaTime / (60000 / game.getTimingPointAt(state.SongTime).Bpm) * 1.2)
+        pulseVars.pulseStatus = (pulseVars.pulseStatus - state.DeltaTime / (60000 / game.get.timingPointAt(state.SongTime).Bpm) * 1.2)
     end
     pulseVars.previousBar = timeSinceLastBar
     local futureTime = state.SongTime + state.DeltaTime * 2 + timeOffset
-    if ((futureTime - game.getTimingPointAt(futureTime).StartTime) < 0) then
+    if ((futureTime - game.get.timingPointAt(futureTime).StartTime) < 0) then
         pulseVars.pulseStatus = 0
     end
     outputPulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
@@ -6006,7 +6031,7 @@ function setPluginAppearance()
     setPluginAppearanceColors(colorTheme)
 end
 function setPluginAppearanceStyles(styleTheme)
-    local cornerRoundnessValue = (styleTheme == "Boxed" or
+    local cornerRoundnessvalue = (styleTheme == "Boxed" or
         styleTheme == "Boxed + Border") and 0 or 5
     local borderSize = tn(styleTheme == "Rounded + Border" or
         styleTheme == "Boxed + Border")
@@ -6015,12 +6040,12 @@ function setPluginAppearanceStyles(styleTheme)
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushStyleVar(imgui_style_var.ItemSpacing, vector.New(DEFAULT_WIDGET_HEIGHT * 0.5 - 1, 4))
     imgui.PushStyleVar(imgui_style_var.ItemInnerSpacing, vector.New(SAMELINE_SPACING, 6))
-    imgui.PushStyleVar(imgui_style_var.WindowRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.ChildRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.FrameRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.GrabRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.ScrollbarRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessValue)
+    imgui.PushStyleVar(imgui_style_var.WindowRounding, cornerRoundnessvalue)
+    imgui.PushStyleVar(imgui_style_var.ChildRounding, cornerRoundnessvalue)
+    imgui.PushStyleVar(imgui_style_var.FrameRounding, cornerRoundnessvalue)
+    imgui.PushStyleVar(imgui_style_var.GrabRounding, cornerRoundnessvalue)
+    imgui.PushStyleVar(imgui_style_var.ScrollbarRounding, cornerRoundnessvalue)
+    imgui.PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessvalue)
 end
 function setPluginAppearanceColors(colorTheme, hideBorder)
     local borderColor = vctr4(1)
@@ -6936,7 +6961,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     return newListIndex
 end
 function ComputableInputFloat(label, value, decimalPlaces, suffix)
-    local previousValue = value
+    local previousvalue = value
     local output = value
     local fmt = table.concat({"%.", decimalPlaces, "f"})
     if suffix then fmt = fmt .. suffix end
@@ -6949,7 +6974,7 @@ function ComputableInputFloat(label, value, decimalPlaces, suffix)
         if (output == nil) then output = value end
     end
     return tn(tostring(output):match("[%-]?%d+[%.]?%d+") or tostring(output):match("[%-]?%d+")),
-        previousValue ~= output
+        previousvalue ~= output
 end
 function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
     local oldValue = value
@@ -8205,7 +8230,7 @@ function copyNPasteSettingsMenu(menuVars, actionable)
     return copiedItemCount
 end
 function updateDirectEdit()
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets) and not truthy(state.GetValue("lists.directSVList"))) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
@@ -8213,7 +8238,7 @@ function updateDirectEdit()
         state.SetValue("lists.directSVList", {})
         return
     end
-    state.SetValue("lists.directSVList", game.getSVsBetweenOffsets(firstOffset - 50, lastOffset + 50))
+    state.SetValue("lists.directSVList", game.get.svsBetweenOffsets(firstOffset - 50, lastOffset + 50))
 end
 function directSVMenu()
     local menuVars = getMenuVars("directSV")
@@ -8380,7 +8405,7 @@ function lintMapMenu()
         "(DOESN'T VISUALLY AFFECT MAP) If two consecutive SVs have the same multiplier, removes the second SV. If three consecutive SSFs have the same multiplier, removes the middle SSF.")
     simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, false, true)
     HoverToolTip("Removes stacked notes.")
-    simpleActionMenu("Remove all hitsounds", 0, removeAllHitSounds, nil, true, true)
+    simpleActionMenu("Remove all hitsounds in selection", 0, removeAllHitSounds, nil, true, true)
     HoverToolTip("Self-explanatory.")
 end
 EDIT_SV_TOOLS = {
@@ -10707,8 +10732,8 @@ function showAppearanceSettings()
     if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
         setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
         local customStyle = {}
-        for k41 = 1, #customStyleIds do
-            local id = customStyleIds[k41]
+        for k42 = 1, #customStyleIds do
+            local id = customStyleIds[k42]
             local query = id:capitalize()
             if (query:match("%u%l+") == "Loadup") then
                 customStyle[id] = loadup[query:sub(7)]
@@ -10912,8 +10937,8 @@ end
 function stringifyCustomStyle(customStyle)
     local keys = table.keys(customStyle)
     local resultStr = "v2 "
-    for k42 = 1, #keys do
-        local key = keys[k42]
+    for k43 = 1, #keys do
+        local key = keys[k43]
         local value = customStyle[key]
         keyId = convertStrToShort(key)
         if (key:sub(1, 6) == "loadup") then keyId = keyId .. key:sub(-1):upper() end
@@ -11917,7 +11942,7 @@ function renderMeasureDataWidget()
     local endOffset = uniqueDict[2] or uniqueDict[1]
     if (math.abs(endOffset - startOffset) < 1e-10 and not state.GetValue("boolean.changeOccurred") and state.SelectedScrollGroupId == widgetVars.tgName) then return end
     if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or state.GetValue("boolean.changeOccurred") or state.SelectedScrollGroupId ~= widgetVars.tgName) then
-        svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+        svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset) or 0
@@ -12653,7 +12678,7 @@ function getUsableDisplacementMultiplier(offset)
 end
 function prepareDisplacingSV(svsToAdd, svTimeIsAdded, svTime, displacement, displacementMultiplier, hypothetical, svs)
     svTimeIsAdded[svTime] = true
-    local currentSVMultiplier = game.getSVMultiplierAt(svTime)
+    local currentSVMultiplier = game.get.svMultiplierAt(svTime)
     if hypothetical == true then
         currentSVMultiplier = getHypotheticalSVMultiplierAt(svs, svTime)
     end
@@ -13117,11 +13142,11 @@ function triggerListeners()
     listenForGeneralChanges()
 end
 function listenForTimingGroupCount()
-    state.SetValue("tgList", game.getTimingGroupList())
+    state.SetValue("tgList", game.get.timingGroupList())
     listen(function(action, type, fromLua)
         local actionIndex = tonumber(action.Type)
         if (actionIndex < action_type.CreateTimingGroup and actionIndex ~= action_type.Batch) then return end
-        state.SetValue("tgList", game.getTimingGroupList())
+        state.SetValue("tgList", game.get.timingGroupList())
     end)
 end
 ---Returns true if the number of notes in the given [HitObject](lua://HitObject) list contains at least `requiredLNCount` long notes. If `requiredLNCount` isn't given, the default value 1 is used.
@@ -13180,7 +13205,7 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
     local tolerance = 0.035
     if not truthy(svsToAdd) then return end
     for idx, sv in pairs(svsToRemove) do
-        local baseSV = game.getSVStartTimeAt(sv.StartTime)
+        local baseSV = game.get.svStartTimeAt(sv.StartTime)
         if (math.abs(baseSV - sv.StartTime) > tolerance) then
             table.remove(svsToRemove, idx)
         end
@@ -13222,7 +13247,7 @@ function addInitialSSF(ssfsToAdd, startOffset)
 end
 function addStartSVIfMissing(svs, startOffset)
     if #svs ~= 0 and svs[1].StartTime == startOffset then return end
-    addSVToList(svs, startOffset, game.getSVMultiplierAt(startOffset), false)
+    addSVToList(svs, startOffset, game.get.svMultiplierAt(startOffset), false)
 end
 function addSVToList(svList, offset, multiplier, endOfList)
     local newSV = createSV(offset, multiplier)
@@ -13279,8 +13304,8 @@ end
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for k43 = 1, #svs do
-        local sv = svs[k43]
+    for k44 = 1, #svs do
+        local sv = svs[k44]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
         if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
     end
@@ -13475,7 +13500,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
         local ctx = imgui.GetWindowDrawList()
         local topLeft = imgui.GetWindowPos()
         local dim = imgui.GetWindowSize()
-        local simTime = math.expoClamp(120000 / game.getTimingPointAt(state.SongTime).Bpm, 600, 1200, 2)
+        local simTime = math.expoClamp(120000 / game.get.timingPointAt(state.SongTime).Bpm, 600, 1200, 2)
         local curTime = state.UnixTime % simTime
         local progress = curTime / simTime
         local maxDist = math.max(table.unpack(svDistances))

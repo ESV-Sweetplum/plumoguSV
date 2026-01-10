@@ -29,7 +29,7 @@ function alignTimingLines()
         end
     end
     for _, time in ipairs(times) do
-        local initialTl = game.getTimingPointAt(time)
+        local initialTl = game.get.timingPointAt(time)
         if (initialTl.StartTime == time) then
             table.insert(tpsToRemove, initialTl)
         end
@@ -56,7 +56,7 @@ function fixFlippedLNEnds()
     for _, ho in ipairs(map.HitObjects) do
         local lnEndTime = ho.EndTime
         local isLN = lnEndTime ~= 0
-        local endHasNegativeSV = (game.getSVMultiplierAt(lnEndTime) <= 0)
+        local endHasNegativeSV = (game.get.svMultiplierAt(lnEndTime) <= 0)
         local hasntAlreadyBeenFixed = lnEndTimeFixed[lnEndTime] == nil
         if isLN and endHasNegativeSV and hasntAlreadyBeenFixed then
             lnEndTimeFixed[lnEndTime] = true
@@ -68,9 +68,9 @@ function fixFlippedLNEnds()
             svTimeIsAdded[timeAt] = true
             svTimeIsAdded[timeAfter] = true
             svTimeIsAdded[timeAfterAfter] = true
-            local svMultiplierAt = game.getSVMultiplierAt(timeAt)
-            local svMultiplierAfter = game.getSVMultiplierAt(timeAfter)
-            local svMultiplierAfterAfter = game.getSVMultiplierAt(timeAfterAfter)
+            local svMultiplierAt = game.get.svMultiplierAt(timeAt)
+            local svMultiplierAfter = game.get.svMultiplierAt(timeAfter)
+            local svMultiplierAfterAfter = game.get.svMultiplierAt(timeAfterAfter)
             local newMultiplierAt = 0.001
             local newMultiplierAfter = svMultiplierAt + svMultiplierAfter
             local newMultiplierAfterAfter = svMultiplierAfterAfter
@@ -192,7 +192,12 @@ end
 function removeAllHitSounds()
     local hitsoundActions = {}
     local objs = {}
-    for _, ho in ipairs(map.HitObjects) do
+    if (not truthy(#state.SelectedHitObjects)) then
+        print("e!", "You are not currently selecting anything.")
+        return
+    end
+    local hos = game.get.uniqueNotesBetweenSelected()
+    for _, ho in ipairs(hos) do
         local hs = tonumber(ho.HitSound)
         if hs > 1 then
             table.insert(hitsoundActions, createEA(action_type.RemoveHitsound, { ho }, hs))

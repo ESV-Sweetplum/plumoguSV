@@ -1,10 +1,10 @@
 function measureSVs(menuVars)
     local roundingDecimalPlaces = 5
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
 
     menuVars.roundedNSVDistance = endOffset - startOffset
@@ -21,8 +21,8 @@ function measureSVs(menuVars)
     local durationStart = 1 / getUsableDisplacementMultiplier(startOffset)
     local timeAt = startOffset
     local timeAfter = startOffset + durationStart
-    local multiplierAt = game.getSVMultiplierAt(timeAt)
-    local multiplierAfter = game.getSVMultiplierAt(timeAfter)
+    local multiplierAt = game.get.svMultiplierAt(timeAt)
+    local multiplierAfter = game.get.svMultiplierAt(timeAfter)
     local startDisplacement = -(multiplierAt - multiplierAfter) * durationStart
     menuVars.roundedStartDisplacement = math.round(startDisplacement, roundingDecimalPlaces)
     menuVars.startDisplacement = tostring(startDisplacement)
@@ -30,8 +30,8 @@ function measureSVs(menuVars)
     local durationEnd = 1 / getUsableDisplacementMultiplier(startOffset)
     local timeBefore = endOffset - durationEnd
     local timeBeforeBefore = timeBefore - durationEnd
-    local multiplierBefore = game.getSVMultiplierAt(timeBefore)
-    local multiplierBeforeBefore = game.getSVMultiplierAt(timeBeforeBefore)
+    local multiplierBefore = game.get.svMultiplierAt(timeBefore)
+    local multiplierBeforeBefore = game.get.svMultiplierAt(timeBeforeBefore)
     local endDisplacement = (multiplierBefore - multiplierBeforeBefore) * durationEnd
     menuVars.roundedEndDisplacement = math.round(endDisplacement, roundingDecimalPlaces)
     menuVars.endDisplacement = tostring(endDisplacement)

@@ -1,11 +1,11 @@
 function placeSSFs(menuVars)
     local numMultipliers = #menuVars.svMultipliers
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local ssfsToAdd = {}
-    local ssfsToRemove = game.getSSFsBetweenOffsets(firstOffset, lastOffset)
+    local ssfsToRemove = game.get.ssfsBetweenOffsets(firstOffset, lastOffset)
     if globalVars.dontReplaceSV then
         ssfsToRemove = {}
     end

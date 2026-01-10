@@ -1,10 +1,10 @@
 function automateCopySVs(settingVars)
     settingVars.copiedSVs = {}
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local svs = game.getSVsBetweenOffsets(startOffset, endOffset)
+    local svs = game.get.svsBetweenOffsets(startOffset, endOffset)
     if (not truthy(svs)) then
         toggleablePrint("w!", "No SVs found within the copiable region.")
         return

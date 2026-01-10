@@ -2,20 +2,20 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
     local finalSVType = FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex]
     local placingStillSVs = menuVars.noteSpacing ~= nil
     local numMultipliers = #menuVars.svMultipliers
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     if placingStillSVs then
-        offsets = game.uniqueNoteOffsetsBetweenSelected()
+        offsets = game.get.uniqueNoteOffsetsBetweenSelected()
         if (not truthy(offsets)) then return end
         if place == false then
-            offsets = game.uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
+            offsets = game.get.uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
         end
     end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     if placingStillSVs then offsets = { firstOffset, lastOffset } end
     local svsToAdd = {}
-    local svsToRemove = game.getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
     if (not placingStillSVs) and globalVars.dontReplaceSV then
         svsToRemove = {}
     end

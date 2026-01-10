@@ -1,6 +1,6 @@
 function ssfVibrato(menuVars, func1, func2)
     printLegacyLNMessage()
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startTime = offsets[1]
     local endTime = offsets[#offsets]
@@ -8,7 +8,7 @@ function ssfVibrato(menuVars, func1, func2)
     local delta = 1000 / fps
     local time = startTime
     local ssfs = { createSSF(startTime - 1 / getUsableDisplacementMultiplier(startTime),
-        game.getSSFMultiplierAt(time)) }
+        game.get.ssfMultiplierAt(time)) }
     while time < endTime do
         local x = math.inverseLerp(time, startTime, endTime)
         local y = math.inverseLerp(time + delta, startTime, endTime)
@@ -24,7 +24,7 @@ function ssfVibrato(menuVars, func1, func2)
         time = time + 2 * delta
     end
 
-    addFinalSSF(ssfs, endTime, game.getSSFMultiplierAt(endTime))
+    addFinalSSF(ssfs, endTime, game.get.ssfMultiplierAt(endTime))
 
     actions.PerformBatch({
         createEA(action_type.AddScrollSpeedFactorBatch, ssfs)

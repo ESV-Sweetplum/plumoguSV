@@ -1,12 +1,12 @@
 function deleteItems(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local linesToRemove = game.getLinesBetweenOffsets(startOffset, endOffset)
-    local svsToRemove = game.getSVsBetweenOffsets(startOffset, endOffset)
-    local ssfsToRemove = game.getSSFsBetweenOffsets(startOffset, endOffset)
-    local bmsToRemove = game.getBookmarksBetweenOffsets(startOffset, endOffset)
+    local linesToRemove = game.get.linesBetweenOffsets(startOffset, endOffset)
+    local svsToRemove = game.get.svsBetweenOffsets(startOffset, endOffset)
+    local ssfsToRemove = game.get.ssfsBetweenOffsets(startOffset, endOffset)
+    local bmsToRemove = game.get.bookmarksBetweenOffsets(startOffset, endOffset)
     if (not menuVars.deleteTable[1]) then linesToRemove = {} end
     if (not menuVars.deleteTable[2]) then svsToRemove = {} end
     if (not menuVars.deleteTable[3]) then ssfsToRemove = {} end

@@ -7,7 +7,7 @@ function setPluginAppearance()
 end
 
 function setPluginAppearanceStyles(styleTheme)
-    local cornerRoundnessValue = (styleTheme == "Boxed" or
+    local cornerRoundnessvalue = (styleTheme == "Boxed" or
         styleTheme == "Boxed + Border") and 0 or 5 -- up to 12, 14 for WindowRounding and 16 for ChildRounding
 
     local borderSize = tn(styleTheme == "Rounded + Border" or
@@ -18,12 +18,12 @@ function setPluginAppearanceStyles(styleTheme)
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushStyleVar(imgui_style_var.ItemSpacing, vector.New(DEFAULT_WIDGET_HEIGHT * 0.5 - 1, 4))
     imgui.PushStyleVar(imgui_style_var.ItemInnerSpacing, vector.New(SAMELINE_SPACING, 6))
-    imgui.PushStyleVar(imgui_style_var.WindowRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.ChildRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.FrameRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.GrabRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.ScrollbarRounding, cornerRoundnessValue)
-    imgui.PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessValue)
+    imgui.PushStyleVar(imgui_style_var.WindowRounding, cornerRoundnessvalue)
+    imgui.PushStyleVar(imgui_style_var.ChildRounding, cornerRoundnessvalue)
+    imgui.PushStyleVar(imgui_style_var.FrameRounding, cornerRoundnessvalue)
+    imgui.PushStyleVar(imgui_style_var.GrabRounding, cornerRoundnessvalue)
+    imgui.PushStyleVar(imgui_style_var.ScrollbarRounding, cornerRoundnessvalue)
+    imgui.PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessvalue)
 
     -- Doesn't work even though TabBorderSize is changeable in the style editor demo
     -- imgui.PushStyleVar( imgui_style_var.TabBorderSize,      borderSize           )

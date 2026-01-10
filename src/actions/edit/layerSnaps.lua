@@ -29,7 +29,7 @@ function layerSnaps()
     local layerNames = table.duplicate(originalLayerNames)
     local notes = map.HitObjects
     for _, ho in ipairs(notes) do
-        local color = COLOR_MAP[game.getSnapAt(ho.StartTime)]
+        local color = COLOR_MAP[game.get.snapAt(ho.StartTime)]
         if (ho.EditorLayer == 0) then
             layer = { Name = "Default", ColorRgb = "255,255,255", Hidden = false }
         else
@@ -88,7 +88,7 @@ function collapseSnaps()
         do
             local color = hoLayer.Name:match("-([a-zA-Z]+)$")
             local snap = REVERSE_COLOR_MAP[color]
-            local mostRecentTP = game.getTimingPointAt(ho.StartTime)
+            local mostRecentTP = game.get.timingPointAt(ho.StartTime)
             if snap == 1 then
                 table.insert(snapTpsToAdd,
                     utils.CreateTimingPoint(ho.StartTime, mostRecentTP.Bpm, mostRecentTP.Signature, true))

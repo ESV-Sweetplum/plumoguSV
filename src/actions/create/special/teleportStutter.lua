@@ -7,12 +7,12 @@ function placeTeleportStutterSVs(settingVars)
         lastSVPercent = settingVars.svPercent2 * 0.01
         lastMainSV = settingVars.mainSV2
     end
-    local offsets = game.uniqueNoteOffsetsBetweenSelected()
+    local offsets = game.get.uniqueNoteOffsetsBetweenSelected()
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local numTeleportSets = #offsets - 1
     local svsToAdd = {}
-    local svsToRemove = game.getSVsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
     local svPercents = generateLinearSet(svPercent, lastSVPercent, numTeleportSets)
     local mainSVs = generateLinearSet(settingVars.mainSV, lastMainSV, numTeleportSets)
 

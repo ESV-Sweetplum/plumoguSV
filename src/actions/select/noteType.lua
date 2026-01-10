@@ -1,11 +1,11 @@
 ---@diagnostic disable: undefined-field
 function selectByNoteType(menuVars)
-    local offsets = game.uniqueSelectedNoteOffsets()
+    local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
 
-    local totalNotes = game.getNotesBetweenOffsets(startOffset, endOffset)
+    local totalNotes = game.get.notesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then totalNotes = state.SelectedHitObjects end
 
     local notesToSelect = {}

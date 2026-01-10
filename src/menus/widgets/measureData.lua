@@ -13,7 +13,7 @@ function renderMeasureDataWidget()
     cache.loadTable("measureWidget", widgetVars)
 
     local uniqueDict = {}
-    for _, ho in ipairs(state.SelectedHitObjects) do -- game.uniqueSelectedNoteOffsets was not used here because this approach exits the function faster
+    for _, ho in ipairs(state.SelectedHitObjects) do -- game.get.uniqueSelectedNoteOffsets was not used here because this approach exits the function faster
         if (not table.contains(uniqueDict, ho.StartTime)) then
             table.insert(uniqueDict, ho.StartTime)
         end
@@ -30,7 +30,7 @@ function renderMeasureDataWidget()
     local endOffset = uniqueDict[2] or uniqueDict[1]
     if (math.abs(endOffset - startOffset) < 1e-10 and not cache.boolean.changeOccurred and state.SelectedScrollGroupId == widgetVars.tgName) then return end
     if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or cache.boolean.changeOccurred or state.SelectedScrollGroupId ~= widgetVars.tgName) then
-        svsBetweenOffsets = game.getSVsBetweenOffsets(startOffset, endOffset)
+        svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset) or 0
