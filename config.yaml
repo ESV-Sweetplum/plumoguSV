@@ -646,7 +646,7 @@ drawCapybara: true
 drawCapybara2: false
 drawCapybara312: false
 dynamicBackgroundIndex: 1
-editToolIndex: 3
+editToolIndex: 1
 effectFPS: 100
 equalizeLinear: true
 hideAutomatic: true
@@ -665,9 +665,9 @@ hotkeyList:
 - Ctrl+Alt+E
 - O
 ignoreNotesOutsideTg: false
-maxDisplacementMultiplierExponent: -2
+maxDisplacementMultiplierExponent: 0
 performanceMode: false
-placeTypeIndex: 1
+placeTypeIndex: 4
 presets:
 - 
 printLegacyLNMessage: true

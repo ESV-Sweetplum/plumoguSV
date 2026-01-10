@@ -11326,9 +11326,9 @@ end
 SETTING_TYPES = {
     "General",
     "Advanced",
-    "Default Properties",
     "Appearance",
     "Custom Theme",
+    "Default Properties",
     "Windows + Widgets",
     "Keybinds",
 }
