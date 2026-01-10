@@ -4,6 +4,7 @@ end
 
 function ComputableInputFloat(label, var, decimalPlaces, suffix)
     local previousValue = var
+    local output = var
 
     local fmt = "%." .. decimalPlaces .. "f"
     if suffix then fmt = fmt .. suffix end
@@ -13,13 +14,14 @@ function ComputableInputFloat(label, var, decimalPlaces, suffix)
             tn(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")) or 0),
         4096,
         imgui_input_text_flags.AutoSelectAll)
-    if (imgui.IsItemDeactivatedAfterEdit()) then
-        local desiredComp = tostring(var):gsub(" ", "")
-        var = expr(desiredComp)
+    if (imgui.IsItemEdited()) then
+        local desiredComp = tostring(var):gsub("[^%d%+%-%*%/%.]", "")
+        output = expr(desiredComp)
+        if (output == nil) then output = var end
     end
 
-    return tn(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")),
-        previousValue ~= var
+    return tn(tostring(output):match("%d*[%-]?%d+[%.]?%d+") or tostring(output):match("%d*[%-]?%d+")),
+        previousValue ~= output
 end
 
 function NegatableComputableInputFloat(label, var, decimalPlaces, suffix)
