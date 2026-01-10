@@ -32,14 +32,14 @@ function directSVMenu()
 
     if (menuVars.selectableIndex > #svs) then menuVars.selectableIndex = #svs end
 
-    _, menuVars.startTime = imgui.InputFloat("Start Time", svs[menuVars.selectableIndex].StartTime)
+    menuVars.startTime = ComputableInputFloat("Start Time", svs[menuVars.selectableIndex].StartTime, 10)
 
     if (imgui.IsItemDeactivatedAfterEdit()) then
         actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
             createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime or 0, menuVars.multiplier)) })
     end
 
-    _, menuVars.multiplier = imgui.InputFloat("Multiplier", svs[menuVars.selectableIndex].Multiplier)
+    menuVars.multiplier = ComputableInputFloat("Multiplier", svs[menuVars.selectableIndex].Multiplier, 10)
 
     if (imgui.IsItemDeactivatedAfterEdit()) then
         actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),

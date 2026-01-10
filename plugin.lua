@@ -6941,16 +6941,14 @@ function ComputableInputFloat(label, var, decimalPlaces, suffix)
     local fmt = table.concat({"%.", decimalPlaces, "f"})
     if suffix then fmt = fmt .. suffix end
     _, var = imgui.InputText(label,
-        string.format(fmt,
-            tn(tostring(var):match("%d*[%-]?%d+[%.]?%d+") or tostring(var):match("%d*[%-]?%d+")) or 0),
-        4096,
+        string.format(fmt, var), 4096,
         imgui_input_text_flags.AutoSelectAll)
     if (imgui.IsItemEdited()) then
-        local desiredComp = tostring(var):gsub("[^%d%+%-%*%/%.]", "")
+        local desiredComp = tostring(var):gsub("[^%d%+%-%*%/%.]", ""):gsub(suffix, "")
         output = expr(desiredComp)
         if (output == nil) then output = var end
     end
-    return tn(tostring(output):match("%d*[%-]?%d+[%.]?%d+") or tostring(output):match("%d*[%-]?%d+")),
+    return tn(tostring(output):match("%-?%d+%.?%d+")),
         previousValue ~= output
 end
 function NegatableComputableInputFloat(label, var, decimalPlaces, suffix)
@@ -8211,12 +8209,12 @@ function directSVMenu()
         return
     end
     if (menuVars.selectableIndex > #svs) then menuVars.selectableIndex = #svs end
-    _, menuVars.startTime = imgui.InputFloat("Start Time", svs[menuVars.selectableIndex].StartTime)
+    menuVars.startTime = ComputableInputFloat("Start Time", svs[menuVars.selectableIndex].StartTime, 10)
     if (imgui.IsItemDeactivatedAfterEdit()) then
         actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
             createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime or 0, menuVars.multiplier)) })
     end
-    _, menuVars.multiplier = imgui.InputFloat("Multiplier", svs[menuVars.selectableIndex].Multiplier)
+    menuVars.multiplier = ComputableInputFloat("Multiplier", svs[menuVars.selectableIndex].Multiplier, 10)
     if (imgui.IsItemDeactivatedAfterEdit()) then
         actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
             createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime, menuVars.multiplier or 1)) })
