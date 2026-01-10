@@ -6935,36 +6935,59 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     imgui.EndCombo()
     return newListIndex
 end
-function ComputableInputFloat(label, var, decimalPlaces, suffix)
-    local previousValue = var
-    local output = var
+function ComputableInputFloat(label, value, decimalPlaces, suffix)
+    local previousValue = value
+    local output = value
     local fmt = table.concat({"%.", decimalPlaces, "f"})
     if suffix then fmt = fmt .. suffix end
-    _, var = imgui.InputText(label,
-        string.format(fmt, var), 4096,
+    _, value = imgui.InputText(label,
+        string.format(fmt, value), 4096,
         imgui_input_text_flags.AutoSelectAll)
     if (imgui.IsItemEdited()) then
-        local desiredComp = tostring(var):gsub("[^%d%+%-%*%/%.]", ""):gsub(suffix, "")
+        local desiredComp = tostring(value):gsub("[^%d%+%-%*%/%.]", ""):gsub(suffix, "")
         output = expr(desiredComp)
-        if (output == nil) then output = var end
+        if (output == nil) then output = value end
     end
-    return tn(tostring(output):match("%-?%d+%.?%d+")),
+    return tn(tostring(output):match("[%-]?%d+[%.]?%d+") or tostring(output):match("[%-]?%d+")),
         previousValue ~= output
 end
-function NegatableComputableInputFloat(label, var, decimalPlaces, suffix)
-    local oldValue = var
+function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
+    local oldValue = value
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
     local negateButtonPressed = imgui.Button("Neg.", SECONDARY_BUTTON_SIZE)
-    HoverToolTip("Negate SV value")
+    HoverToolTip("Negate this value.")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
-    local newValue = ComputableInputFloat(label, var, decimalPlaces, suffix)
+    local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
     imgui.PopItemWidth()
     if ((negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary])) and newValue ~= 0) then
         newValue = -newValue
     end
     imgui.PopStyleVar(2)
+    return newValue, oldValue ~= newValue
+end
+function ResettableNegatableComputableInputFloat(label, value, defaultValue, decimalPlaces, suffix)
+    local oldValue = value
+    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
+    local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
+    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary])) then
+        value = defaultValue
+    end
+    HoverToolTip("Reset to the initial value.")
+    KeepSameLine()
+    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
+    local negateButtonPressed = imgui.Button("N", TERTIARY_BUTTON_SIZE)
+    if negateButtonPressed and value ~= 0 then
+        value = -value
+    end
+    HoverToolTip("Negate this value.")
+    KeepSameLine()
+    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
+    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
+    local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
+    imgui.PopItemWidth()
+    imgui.PopStyleVar(3)
     return newValue, oldValue ~= newValue
 end
 function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, suffix, digits, widthFactor)
@@ -12056,52 +12079,18 @@ function chooseComboSVOption(settingVars, maxComboPhase)
     return (oldIndex ~= settingVars.comboTypeIndex) or addTypeChanged
 end
 function chooseConstantShift(settingVars, defaultShift)
-    local oldShift = settingVars.verticalShift
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
-    local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary])) then
-        settingVars.verticalShift = defaultShift
-    end
-    HoverToolTip("Reset vertical shift to initial values")
-    KeepSameLine()
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
-    local negateButtonPressed = imgui.Button("N", TERTIARY_BUTTON_SIZE)
-    if negateButtonPressed and settingVars.verticalShift ~= 0 then
-        settingVars.verticalShift = -settingVars.verticalShift
-    end
-    HoverToolTip("Negate vertical shift")
-    KeepSameLine()
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
-    local inputText = "Vertical Shift"
-    _, settingVars.verticalShift = imgui.InputFloat(inputText, settingVars.verticalShift, 0, 0, "%.3fx")
-    imgui.PopItemWidth()
-    imgui.PopStyleVar(3)
-    return oldShift ~= settingVars.verticalShift
+    local changed = false
+    settingVars.verticalShift, changed = ResettableNegatableComputableInputFloat("Vertical Shift",
+        settingVars.verticalShift, 0, 3,
+        "x")
+    return changed
 end
 function chooseMsxVerticalShift(settingVars, defaultShift)
-    local oldShift = settingVars.verticalShift
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
-    local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary])) then
-        settingVars.verticalShift = defaultShift or 0
-    end
-    HoverToolTip("Reset vertical shift to initial values")
-    KeepSameLine()
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
-    local negateButtonPressed = imgui.Button("N", TERTIARY_BUTTON_SIZE)
-    if negateButtonPressed and settingVars.verticalShift ~= 0 then
-        settingVars.verticalShift = -settingVars.verticalShift
-    end
-    HoverToolTip("Negate vertical shift")
-    KeepSameLine()
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
-    local inputText = "Vertical Shift"
-    _, settingVars.verticalShift = imgui.InputFloat(inputText, settingVars.verticalShift, 0, 0, "%.0f msx")
-    imgui.PopItemWidth()
-    imgui.PopStyleVar(3)
-    return oldShift ~= settingVars.verticalShift
+    local changed = false
+    settingVars.verticalShift, changed = ResettableNegatableComputableInputFloat("Vertical Shift",
+        settingVars.verticalShift, 0, 0,
+        " msx")
+    return changed
 end
 function chooseControlSecondSV(settingVars)
     local oldChoice = settingVars.controlLastSV

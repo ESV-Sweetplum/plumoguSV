@@ -158,65 +158,19 @@ function chooseComboSVOption(settingVars, maxComboPhase)
 end
 
 function chooseConstantShift(settingVars, defaultShift)
-    local oldShift = settingVars.verticalShift
-
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
-    local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary])) then
-        settingVars.verticalShift = defaultShift
-    end
-    HoverToolTip("Reset vertical shift to initial values")
-    KeepSameLine()
-
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
-    local negateButtonPressed = imgui.Button("N", TERTIARY_BUTTON_SIZE)
-
-    if negateButtonPressed and settingVars.verticalShift ~= 0 then
-        settingVars.verticalShift = -settingVars.verticalShift
-    end
-    HoverToolTip("Negate vertical shift")
-
-    KeepSameLine()
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
-    local inputText = "Vertical Shift"
-    _, settingVars.verticalShift = imgui.InputFloat(inputText, settingVars.verticalShift, 0, 0, "%.3fx")
-    imgui.PopItemWidth()
-
-    imgui.PopStyleVar(3)
-    return oldShift ~= settingVars.verticalShift
+    local changed = false
+    settingVars.verticalShift, changed = ResettableNegatableComputableInputFloat("Vertical Shift",
+        settingVars.verticalShift, 0, 3,
+        "x")
+    return changed
 end
 
 function chooseMsxVerticalShift(settingVars, defaultShift)
-    local oldShift = settingVars.verticalShift
-
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
-    local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary])) then
-        settingVars.verticalShift = defaultShift or 0
-    end
-    HoverToolTip("Reset vertical shift to initial values")
-    KeepSameLine()
-
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
-    local negateButtonPressed = imgui.Button("N", TERTIARY_BUTTON_SIZE)
-
-    if negateButtonPressed and settingVars.verticalShift ~= 0 then
-        settingVars.verticalShift = -settingVars.verticalShift
-    end
-    HoverToolTip("Negate vertical shift")
-
-    KeepSameLine()
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
-    local inputText = "Vertical Shift"
-    _, settingVars.verticalShift = imgui.InputFloat(inputText, settingVars.verticalShift, 0, 0, "%.0f msx")
-    imgui.PopItemWidth()
-
-    imgui.PopStyleVar(3)
-    return oldShift ~= settingVars.verticalShift
+    local changed = false
+    settingVars.verticalShift, changed = ResettableNegatableComputableInputFloat("Vertical Shift",
+        settingVars.verticalShift, 0, 0,
+        " msx")
+    return changed
 end
 
 function chooseControlSecondSV(settingVars)
