@@ -36,7 +36,7 @@ customStyle:
   - 0
   - 0
   - 0
-  - 0.51764708757400513
+  - 0.7607843279838562
   titleBgActive:
   - 0.11764705926179886
   - 0.015686275437474251
@@ -51,7 +51,7 @@ customStyle:
   - 0.88627451658248901
   - 0
   - 1
-  - 0.36862745881080627
+  - 0.64705884456634521
   sliderGrab:
   - 0.30980393290519714
   - 0.3803921639919281
@@ -73,9 +73,9 @@ customStyle:
   - 0.40392157435417175
   - 1
   buttonActive:
-  - 0.43529412150382996
-  - 0.28235295414924622
-  - 0.60000002384185791
+  - 0.49341201782226562
+  - 0.19443789124488831
+  - 0.8153846263885498
   - 1
   tab:
   - 0.39215686917304993
@@ -645,8 +645,8 @@ dontReplaceSV: false
 drawCapybara: true
 drawCapybara2: false
 drawCapybara312: false
-dynamicBackgroundIndex: 1
-editToolIndex: 1
+dynamicBackgroundIndex: 2
+editToolIndex: 4
 effectFPS: 100
 equalizeLinear: true
 hideAutomatic: true
@@ -667,7 +667,7 @@ hotkeyList:
 ignoreNotesOutsideTg: false
 maxDisplacementMultiplierExponent: 0
 performanceMode: false
-placeTypeIndex: 4
+placeTypeIndex: 1
 presets:
 - 
 printLegacyLNMessage: true

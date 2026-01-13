@@ -107,6 +107,9 @@ For more information, please refer to <https://unlicense.org>
 ---##### (READ-ONLY)
 ---#### The id of the [timing group](lua://ScrollGroup) that this note belongs to.
 ---@field TimingGroup string
+---##### (READ-ONLY)
+---#### The type of note - returns 0 if normal, returns 1 if mine.
+---@field Type HitObjectType
 
 ---@class (exact) TimingPoint
 ---##### (READ-ONLY)
@@ -955,7 +958,7 @@ map.ScrollSpeedFactors    = {} ---@type ScrollSpeedFactor[]
 
 ---##### (READ-ONLY)
 ---#### A table of all [timing groups](lua://ScrollGroup) in the map, where the keys are the identifiers of the scroll group.
-map.TimingGroups          = {} ---@type { [string]: ScrollGroup}
+map.TimingGroups          = {} ---@type { [string]: ScrollGroup }
 
 ---##### (READ-ONLY)
 ---#### The default [scroll group](lua://ScrollGroup).

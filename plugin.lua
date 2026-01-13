@@ -10551,8 +10551,8 @@ function drawV100(ctx, location, scale, col, thickness)
 end
 function selectAlternatingMenu()
     local menuVars = getMenuVars("selectAlternating")
-    BasicInputInt(menuVars, "every", "Every __ notes", { 1, MAX_SV_POINTS })
-    BasicInputInt(menuVars, "offset", "From note #__", { 1, menuVars.every })
+    BasicInputInt(menuVars, "every", "Note Period", { 1, MAX_SV_POINTS })
+    BasicInputInt(menuVars, "offset", "Note Offset", { 1, menuVars.every })
     cache.saveTable("selectAlternatingMenu", menuVars)
     simpleActionMenu(
         "Select a note every " ..
@@ -10662,7 +10662,7 @@ function chooseSelectTool()
         "Select rice/ln notes."
     }
     imgui.AlignTextToFramePadding()
-    imgui.Text("Current Type:")
+    imgui.Text("  Current Type:")
     KeepSameLine()
     local oldSelectTypeIndex = globalVars.selectTypeIndex
     globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, oldSelectTypeIndex, nil, nil, tooltipList)

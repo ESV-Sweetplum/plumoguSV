@@ -1,7 +1,7 @@
 function selectAlternatingMenu()
     local menuVars = getMenuVars("selectAlternating")
-    BasicInputInt(menuVars, "every", "Every __ notes", { 1, MAX_SV_POINTS })
-    BasicInputInt(menuVars, "offset", "From note #__", { 1, menuVars.every })
+    BasicInputInt(menuVars, "every", "Note Period", { 1, MAX_SV_POINTS })
+    BasicInputInt(menuVars, "offset", "Note Offset", { 1, menuVars.every })
     cache.saveTable("selectAlternatingMenu", menuVars)
 
     simpleActionMenu(

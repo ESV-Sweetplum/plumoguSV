@@ -30,7 +30,7 @@ function chooseSelectTool()
         "Select rice/ln notes."
     }
     imgui.AlignTextToFramePadding()
-    imgui.Text("Current Type:")
+    imgui.Text("  Current Type:")
     KeepSameLine()
     local oldSelectTypeIndex = globalVars.selectTypeIndex
     globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, oldSelectTypeIndex, nil, nil, tooltipList)
