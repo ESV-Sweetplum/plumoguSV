@@ -5939,7 +5939,7 @@ function generateParticle(x, y, xRange, yRange, endTime, showParticle)
     return particle
 end
 function checkIfMouseMoved(currentMousePosition)
-    oldMousePosition = state.GetValue("oldMousePosition", vctr2(0))
+    oldMousePosition = state.GetValue("oldMousePosition") or vctr2(0)
     local mousePositionChanged = currentMousePosition ~= oldMousePosition
     state.SetValue("oldMousePosition", currentMousePosition)
     return mousePositionChanged
@@ -11137,9 +11137,9 @@ function showAppearanceSettings()
     if (not globalVars.useCustomPulseColor) then imgui.BeginDisabled() end
     KeepSameLine()
     if (imgui.Button("Edit Color")) then
-        state.SetValue("showColorPicker", not state.GetValue("showColorPicker", false))
+        state.SetValue("windows.showColorPicker", not state.GetValue("windows.showColorPicker"))
     end
-    if (state.GetValue("showColorPicker")) then
+    if (state.GetValue("windows.showColorPicker")) then
         choosePulseColor()
     end
     if (not globalVars.useCustomPulseColor) then

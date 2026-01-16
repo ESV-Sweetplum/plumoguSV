@@ -312,9 +312,9 @@ end
 -- Parameters
 --    currentMousePosition : current (x, y) coordinates of the mouse [Table]
 function checkIfMouseMoved(currentMousePosition)
-    oldMousePosition = state.GetValue("oldMousePosition", vctr2(0))
+    oldMousePosition = cache.oldMousePosition or vctr2(0)
     local mousePositionChanged = currentMousePosition ~= oldMousePosition
-    state.SetValue("oldMousePosition", currentMousePosition)
+    cache.oldMousePosition = currentMousePosition
     return mousePositionChanged
 end
 
