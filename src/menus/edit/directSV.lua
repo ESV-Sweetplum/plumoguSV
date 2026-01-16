@@ -1,10 +1,10 @@
 function updateDirectEdit()
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets) and not truthy(cache.lists.directSVList)) then return end
+    if (not isTruthy(offsets) and not isTruthy(cache.lists.directSVList)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
 
-    if (not truthy(offsets)) then
+    if (not isTruthy(offsets)) then
         cache.lists.directSVList = {}
         return
     end
@@ -19,9 +19,9 @@ function directSVMenu()
         updateDirectEdit()
     end
     local svs = cache.lists.directSVList or {}
-    if (not truthy(svs)) then
+    if (not isTruthy(svs)) then
         menuVars.selectableIndex = 1
-        if (not truthy(state.SelectedHitObjects)) then
+        if (not isTruthy(state.SelectedHitObjects)) then
             imgui.TextWrapped("Select a note to view local SVs.")
         else
             imgui

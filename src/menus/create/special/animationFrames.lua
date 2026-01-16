@@ -31,7 +31,7 @@ function animationFramesSetupMenu(settingVars)
         KeepSameLine()
         imgui.Text("Place SVs")
         AddSeparator()
-        if not truthy(settingVars.frameTimes) then
+        if not isTruthy(settingVars.frameTimes) then
             imgui.Text("No notes added in Step 2, so can't place SVs yet")
             return
         end
@@ -45,7 +45,7 @@ function animationFramesSetupMenu(settingVars)
 end
 
 function removeSelectedFrameTimeButton(settingVars)
-    if not truthy(settingVars.frameTimes) then return end
+    if not isTruthy(settingVars.frameTimes) then return end
     if not imgui.Button("Removed currently selected time", BEEG_BUTTON_SIZE) then return end
     table.remove(settingVars.frameTimes, settingVars.selectedTimeIndex)
     local maxIndex = math.max(1, #settingVars.frameTimes)
@@ -94,7 +94,7 @@ function addFrameTimes(settingVars)
 end
 
 function displayFrameTimes(settingVars)
-    if not truthy(settingVars.frameTimes) then
+    if not isTruthy(settingVars.frameTimes) then
         imgui.Text("Add notes to fill the selection box below")
     else
         imgui.Text("time | lanes | frame # | position")

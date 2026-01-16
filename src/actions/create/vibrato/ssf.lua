@@ -1,7 +1,7 @@
 function ssfVibrato(menuVars, func1, func2)
     printLegacyLNMessage()
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startTime = offsets[1]
     local endTime = offsets[#offsets]
     local fps = VIBRATO_FRAME_RATES[menuVars.vibratoQuality]

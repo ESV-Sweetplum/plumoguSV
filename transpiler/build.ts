@@ -33,8 +33,6 @@ pluginLines.forEach((line, idx) => {
     }
 });
 
-fs.writeFileSync('plugin.lua', pluginLines.join('\n'));
-
 console.log(
     chalk.blueBright(chalk.bold(`Updating ${chalk.redBright('README.md')}...`))
 );
@@ -100,10 +98,15 @@ try {
     fs.mkdirSync(`temp-build-github/${packageName}`);
     fs.mkdirSync(`temp-build-steam/${packageName}`);
 
+    fs.writeFileSync(
+        'plugin.lua',
+        `DISTRO="github"\n${pluginLines.join('\n')}`
+    );
     fs.copyFileSync(
         'plugin.lua',
         `temp-build-github/${packageName}/plugin.lua`
     );
+    fs.writeFileSync('plugin.lua', `DISTRO="steam"\n${pluginLines.join('\n')}`);
     fs.copyFileSync('plugin.lua', `temp-build-steam/${packageName}/plugin.lua`);
     fs.copyFileSync(
         'assets/steam_workshop_preview.png',

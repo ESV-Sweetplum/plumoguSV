@@ -22,12 +22,11 @@ export function getCounterAndIncrement() {
 export default async function transpiler(
     devMode = false,
     lint = true,
-    environment: 'production' | 'development' = 'production',
-    distro: 'steam' | 'github' = 'github'
+    environment: 'production' | 'development' = 'production'
 ) {
     counter = 0;
     let fileCount = 0;
-    let output = `ENVIRONMENT = "${environment}"\nDISTRO = "${distro}"`;
+    let output = `ENVIRONMENT = "${environment}"`;
 
     const entryPoints = ['_draw.lua', '_awake.lua'];
     const ignoredFiles = ['intellisense.lua', join('packages', 'tests')];

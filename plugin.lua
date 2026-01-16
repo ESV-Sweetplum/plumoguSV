@@ -1,5 +1,5 @@
-ENVIRONMENT = "development"
-DISTRO = "github"
+DISTRO="steam"
+ENVIRONMENT = "production"
 cache = {
     boolean = {},
     windows = {},
@@ -13820,7 +13820,7 @@ end
 function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
-    PLUGIN_NAME = "plumoguSV-dev"
+    PLUGIN_NAME = "plumoguSV v2.0.2"
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed(PLUGIN_NAME)
     imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
@@ -13876,13 +13876,13 @@ function awake()
     local tempGlobalVars = read()
     if (not tempGlobalVars) then
         write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
-        print("w!",
-            'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.')
         ---@diagnostic disable-next-line: undefined-global
         if (DISTRO == "steam") then
             print("w!",
                 "Additionally, Steam Workshop will reset your settings when the plugin is updated. To prevent this, please save your 'config.yaml' file after you're finished configuring settings, and drop it back in when an update comes around.")
         end
+        print("w!",
+            'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.')
         setPresets({})
     else
         setGlobalVars(tempGlobalVars)
@@ -13908,7 +13908,7 @@ end
 function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
-    PLUGIN_NAME = "plumoguSV-dev"
+    PLUGIN_NAME = "plumoguSV v2.0.2"
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed(PLUGIN_NAME)
     imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))

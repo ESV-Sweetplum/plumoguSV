@@ -11,7 +11,7 @@ function placeStillSVsParent(menuVars)
         return
     end
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     for i = 1, (#offsets - 1) do
         if (STANDARD_SVS[menuVars.svTypeIndex] == "Exponential" and menuVars.settingVars.distanceMode == 2) then
             tbl = placeSVs(menuVars, false, offsets[i], offsets[i + 1], menuVars.settingVars.distance, svsToAdd)
@@ -33,7 +33,7 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
     if (not noteOffsets) then return { svsToRemove = {}, svsToAdd = {} } end
     local firstOffset = noteOffsets[1]
     local lastOffset = noteOffsets[#noteOffsets]
-    local svMultFn = truthy(queuedSVs) and function(t) return getHypotheticalSVMultiplierAt(queuedSVs, t) end or
+    local svMultFn = isTruthy(queuedSVs) and function(t) return getHypotheticalSVMultiplierAt(queuedSVs, t) end or
         game.get.svMultiplierAt
     if stillType == "Auto" then
         local multiplier = getUsableDisplacementMultiplier(firstOffset)

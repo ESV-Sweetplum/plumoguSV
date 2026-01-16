@@ -1,11 +1,11 @@
 function automateCopySVs(settingVars)
     settingVars.copiedSVs = {}
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svs = game.get.svsBetweenOffsets(startOffset, endOffset)
-    if (not truthy(svs)) then
+    if (not isTruthy(svs)) then
         toggleablePrint("w!", "No SVs found within the copiable region.")
         return
     end
@@ -39,8 +39,8 @@ function automateSVs(settingVars)
     for idx, ho in pairs(selected) do
         if (not settingVars.maintainMs and idx == 1) then goto nextSelected end
         do -- avoid jumping over local scope error
-            local thisTime = truthy(ho.EndTime) and ho.EndTime or ho.StartTime
-            local prevTime = truthy(selected[math.max(1, idx - 1)].EndTime) and selected[math.max(1, idx - 1)].EndTime or
+            local thisTime = isTruthy(ho.EndTime) and ho.EndTime or ho.StartTime
+            local prevTime = isTruthy(selected[math.max(1, idx - 1)].EndTime) and selected[math.max(1, idx - 1)].EndTime or
                 selected[math.max(1, idx - 1)].StartTime
 
             timeSinceLastObject = timeSinceLastObject + thisTime - prevTime
@@ -55,10 +55,10 @@ function automateSVs(settingVars)
                 neededIds[idName] = { hos = {}, svs = {} }
             end
             table.insert(neededIds[idName].hos, ho)
-            local startTime = truthy(selected[1].EndTime) and selected[1].EndTime or selected[1].StartTime
-            local secondaryTime = truthy(selected[2].EndTime) and selected[2].EndTime or selected[2].StartTime
+            local startTime = isTruthy(selected[1].EndTime) and selected[1].EndTime or selected[1].StartTime
+            local secondaryTime = isTruthy(selected[2].EndTime) and selected[2].EndTime or selected[2].StartTime
             for _, sv in ipairs(settingVars.copiedSVs) do
-                local currentTime = truthy(ho.EndTime) and ho.EndTime or ho.StartTime
+                local currentTime = isTruthy(ho.EndTime) and ho.EndTime or ho.StartTime
                 local maxRelativeOffset = settingVars.copiedSVs[#settingVars.copiedSVs].relativeOffset
                 local progress = 1 - sv.relativeOffset / maxRelativeOffset
                 local tempMultiplier = sv.multiplier

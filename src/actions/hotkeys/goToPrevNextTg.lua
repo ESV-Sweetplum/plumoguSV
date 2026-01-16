@@ -1,7 +1,7 @@
 function changeTGIndex(diff)
     local groups = cache.tgList
     local selectedTgDict = {}
-    if (not truthy(state.SelectedHitObjects)) then
+    if (not isTruthy(state.SelectedHitObjects)) then
         globalVars.scrollGroupIndex = math.wrap(globalVars.scrollGroupIndex + diff, 1, #groups, true)
         state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
         return

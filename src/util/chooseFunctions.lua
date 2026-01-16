@@ -332,7 +332,7 @@ function chooseFrameSpacing(settingVars)
 end
 
 function chooseFrameTimeData(settingVars)
-    if not truthy(settingVars.frameTimes) then return end
+    if not isTruthy(settingVars.frameTimes) then return end
     local frameTime = settingVars.frameTimes[settingVars.selectedTimeIndex]
     _, frameTime.frame = imgui.InputInt("Frame #", math.floor(frameTime.frame))
     frameTime.frame = math.clamp(frameTime.frame, 1, settingVars.numFrames)

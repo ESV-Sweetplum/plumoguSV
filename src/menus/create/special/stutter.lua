@@ -1,5 +1,5 @@
 function stutterMenu(settingVars)
-    local settingsChanged = not truthy(settingVars.svMultipliers)
+    local settingsChanged = not isTruthy(settingVars.svMultipliers)
     settingsChanged = stutterSettingsMenu(settingVars) or settingsChanged
     if settingsChanged then updateStutterMenuSVs(settingVars) end
     displayStutterSVWindows(settingVars)

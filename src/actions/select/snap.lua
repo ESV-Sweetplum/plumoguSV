@@ -1,6 +1,6 @@
 function selectBySnap(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local notes = game.get.notesBetweenOffsets(startOffset, endOffset)
@@ -13,5 +13,5 @@ function selectBySnap(menuVars)
     end
 
     actions.SetHitObjectSelection(notesToSelect)
-    print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
+    print(isTruthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end

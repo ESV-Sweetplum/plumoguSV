@@ -1,7 +1,7 @@
 function copyItems(menuVars)
     clearCopiedItems(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local lines = game.get.linesBetweenOffsets(startOffset, endOffset)
@@ -87,7 +87,7 @@ end
 
 function pasteItems(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local lastCopiedLine = menuVars.copied.lines[menuVars.curSlot][#menuVars.copied.lines[menuVars.curSlot]]
@@ -166,38 +166,38 @@ function pasteItems(menuVars)
         createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
         createEA(action_type.AddBookmarkBatch, bmsToAdd),
     })
-    if (truthy(linesToRemove)) then
+    if (isTruthy(linesToRemove)) then
         toggleablePrint("e!", "Deleted " .. #linesToRemove .. pluralize(" timing point.", #linesToRemove, -2))
     end
-    if (truthy(svsToRemove)) then
+    if (isTruthy(svsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #svsToRemove .. pluralize(" scroll velocity.", #svsToRemove, -2))
     end
-    if (truthy(ssfsToRemove)) then
+    if (isTruthy(ssfsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #ssfsToRemove .. pluralize(" scroll speed factor.", #ssfsToRemove, -2))
     end
-    if (truthy(bmsToRemove)) then
+    if (isTruthy(bmsToRemove)) then
         toggleablePrint("e!", "Deleted " .. #bmsToRemove .. pluralize(" bookmark.", #bmsToRemove, -2))
     end
-    if (truthy(linesToAdd)) then
+    if (isTruthy(linesToAdd)) then
         toggleablePrint("s!", "Created " .. #linesToAdd .. pluralize(" timing point.", #linesToAdd, -2))
     end
-    if (truthy(svsToAdd)) then
+    if (isTruthy(svsToAdd)) then
         toggleablePrint("s!",
             "Created " .. #svsToAdd .. pluralize(" scroll velocity.", #svsToAdd, -2))
     end
-    if (truthy(ssfsToAdd)) then
+    if (isTruthy(ssfsToAdd)) then
         toggleablePrint("s!",
             "Created " .. #ssfsToAdd .. pluralize(" scroll speed factor.", #ssfsToAdd, -2))
     end
-    if (truthy(bmsToAdd)) then
+    if (isTruthy(bmsToAdd)) then
         toggleablePrint("s!", "Created " .. #bmsToAdd .. pluralize(" bookmark.", #bmsToAdd, -2))
     end
 end
 
 function tryAlignToHitObjects(time, hitObjectTimes, alignWindow)
-    if not truthy(hitObjectTimes) then
+    if not isTruthy(hitObjectTimes) then
         return time
     end
 

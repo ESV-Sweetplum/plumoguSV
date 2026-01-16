@@ -13,7 +13,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     local rgb = {}
     hiddenGroups = hiddenGroups or {}
 
-    if (colorList and truthy(colorList)) then
+    if (colorList and isTruthy(colorList)) then
         colorList[newListIndex]:gsub("(%d+)", function(c)
             table.insert(rgb, c)
         end)
@@ -23,14 +23,14 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     end
 
     if not imgui.BeginCombo(label, currentComboItem, comboFlag) then
-        if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
+        if (colorList and isTruthy(colorList)) then imgui.PopStyleColor() end
         return newListIndex
     end
-    if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
+    if (colorList and isTruthy(colorList)) then imgui.PopStyleColor() end
 
     for i = 1, #list do
         rgb = {}
-        if (colorList and truthy(colorList)) then
+        if (colorList and isTruthy(colorList)) then
             colorList[i]:gsub("(%d+)", function(c)
                 table.insert(rgb, c)
             end)
@@ -41,11 +41,11 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
         if imgui.Selectable(listItem) then
             newListIndex = i
         end
-        if (tooltipList and truthy(tooltipList)) then
+        if (tooltipList and isTruthy(tooltipList)) then
             HoverToolTip(tooltipList[i])
         end
         ::skipRender::
-        if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
+        if (colorList and isTruthy(colorList)) then imgui.PopStyleColor() end
     end
     imgui.EndCombo()
     return newListIndex

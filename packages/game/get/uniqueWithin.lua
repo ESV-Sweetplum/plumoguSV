@@ -30,7 +30,7 @@ function game.get.uniqueSelectedNoteOffsets()
         table.insert(offsets, ho.StartTime)
         if (ho.EndTime ~= 0 and globalVars.useEndTimeOffsets) then table.insert(offsets, ho.EndTime) end
     end
-    if (not truthy(offsets)) then return {} end
+    if (not isTruthy(offsets)) then return {} end
     offsets = table.dedupe(offsets)
     offsets = sort(offsets, sortAscending)
     return offsets

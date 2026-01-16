@@ -3,7 +3,7 @@ function scaleDisplaceSVs(menuVars)
     local svsToRemove = {}
     local svTimeIsAdded = {}
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local isStartDisplace = DISPLACE_SCALE_SPOTS[menuVars.scaleSpotIndex] == "Start"
@@ -40,7 +40,7 @@ end
 
 function scaleMultiplySVs(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local svsToAdd = {}
     local svsToRemove = game.get.svsBetweenOffsets(offsets[1], offsets[#offsets])
     for i = 1, (#offsets - 1) do

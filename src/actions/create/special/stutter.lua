@@ -7,7 +7,7 @@ function placeStutterSVs(settingVars)
         lastMultiplier = settingVars.svMultipliers2[3]
     end
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local totalNumStutters = (#offsets - 1) * settingVars.stuttersPerSection

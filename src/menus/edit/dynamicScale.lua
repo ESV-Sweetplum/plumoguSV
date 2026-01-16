@@ -18,7 +18,7 @@ function dynamicScaleMenu()
         return
     end
     local numSVPoints = numNoteTimes - 1
-    local needSVUpdate = not truthy(menuVars.svMultipliers) or (#menuVars.svMultipliers ~= numSVPoints)
+    local needSVUpdate = not isTruthy(menuVars.svMultipliers) or (#menuVars.svMultipliers ~= numSVPoints)
     imgui.AlignTextToFramePadding()
     imgui.Text("Shape:")
     KeepSameLine()

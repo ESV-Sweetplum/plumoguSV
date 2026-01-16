@@ -3,7 +3,7 @@
 ---@param svsToAdd ScrollVelocity[]
 function removeAndAddSVs(svsToRemove, svsToAdd)
     local tolerance = 0.035
-    if not truthy(svsToAdd) then return end
+    if not isTruthy(svsToAdd) then return end
     for idx, sv in pairs(svsToRemove) do
         local baseSV = game.get.svStartTimeAt(sv.StartTime)
         if (math.abs(baseSV - sv.StartTime) > tolerance) then
@@ -19,7 +19,7 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
 end
 
 function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
-    if not truthy(ssfsToAdd) then return end
+    if not isTruthy(ssfsToAdd) then return end
     local editorActions = {
         createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
         createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)

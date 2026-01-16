@@ -4,7 +4,7 @@ function swapNoteSVs()
     local svsToRemove = {}
     local svTimeIsAdded = {}
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)

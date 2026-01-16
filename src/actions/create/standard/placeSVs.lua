@@ -3,10 +3,10 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
     local placingStillSVs = menuVars.noteSpacing ~= nil
     local numMultipliers = #menuVars.svMultipliers
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     if placingStillSVs then
         offsets = game.get.uniqueNoteOffsetsBetweenSelected()
-        if (not truthy(offsets)) then return end
+        if (not isTruthy(offsets)) then return end
         if place == false then
             offsets = game.get.uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
         end
