@@ -14,6 +14,8 @@
 -   Try to either have all variables necessary assigned at the top of a function, or have their first assignment be as close to their next call as possible.
 -   Use the existing conventions within the repository if they're not listed here.
 -   When printing a particular type of message, the format that should be used is `i!`, `w!`, `s!`, or `e!`.
+-   Any function that will be solely used in an `if` statement should be of the "question" variety (such as `isTruthy`).
+-   Do not use temporary variables to swap other variables; use destructuring instead.
 
 ## Creating a new window/feature steps
 
