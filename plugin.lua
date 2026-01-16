@@ -1,5 +1,4 @@
-DISTRO="steam"
-ENVIRONMENT = "production"
+ENVIRONMENT = "development"
 cache = {
     boolean = {},
     windows = {},
@@ -375,7 +374,7 @@ function game.get.uniqueSelectedNoteOffsets()
         offsets[#offsets + 1] = ho.StartTime
         if (ho.EndTime ~= 0 and globalVars.useEndTimeOffsets) then offsets[#offsets + 1] = ho.EndTime end
     end
-    if (not truthy(offsets)) then return {} end
+    if (not isTruthy(offsets)) then return {} end
     offsets = table.dedupe(offsets)
     offsets = sort(offsets, sortAscending)
     return offsets
@@ -811,7 +810,7 @@ end
 ---@param includeLastValue? boolean Whether or not to include the last value in the table.
 ---@return number avg The arithmetic mean of the table.
 function table.average(values, includeLastValue)
-    if not truthy(values) then return 0 end
+    if not isTruthy(values) then return 0 end
     local sum = 0
     for k2 = 1, #values do
         local value = values[k2]
@@ -1137,7 +1136,7 @@ function table.stringify(var)
         end
         return str:sub(1, -2) .. "]"
     end
-    if (not truthy(table.keys(var))) then return "[]" end
+    if (not isTruthy(table.keys(var))) then return "[]" end
     local str = "{"
     for k, v in pairs(var) do
         str = str .. k .. table.concat({"=", table.stringify(v), ","})
@@ -1213,7 +1212,7 @@ end
 ---@param param any The parameter to truthify.
 ---@param assumeTrue? boolean If the item is nil, will return true if this is true.
 ---@return boolean truthy The truthy value of the parameter.
-function truthy(param, assumeTrue)
+function isTruthy(param, assumeTrue)
     local t = type(param)
     if t == "string" then
         return param:lower() == "true"
@@ -1583,7 +1582,7 @@ function parseDefaultProperty(v, default)
         return tn(v)
     end
     if (type(default) == "boolean") then
-        return truthy(v)
+        return isTruthy(v)
     end
     if (type(default) == "string") then
         return v
@@ -1640,45 +1639,45 @@ globalVars = {
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 function setGlobalVars(tempGlobalVars)
-    globalVars.advancedMode = truthy(tempGlobalVars.advancedMode)
+    globalVars.advancedMode = isTruthy(tempGlobalVars.advancedMode)
     globalVars.colorThemeIndex = tn(tempGlobalVars.colorThemeIndex)
-    globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
-    globalVars.cursorTrailGhost = truthy(tempGlobalVars.cursorTrailGhost)
+    globalVars.comboizeSelect = isTruthy(tempGlobalVars.comboizeSelect)
+    globalVars.cursorTrailGhost = isTruthy(tempGlobalVars.cursorTrailGhost)
     globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
     globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
     globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
     globalVars.customStyle = tempGlobalVars.customStyle or {}
-    globalVars.disableLoadup = truthy(tempGlobalVars.disableLoadup)
-    globalVars.dontPrintCreation = truthy(tempGlobalVars.dontPrintCreation)
-    globalVars.dontReplaceSV = truthy(tempGlobalVars.dontReplaceSV)
-    globalVars.drawCapybara = truthy(tempGlobalVars.drawCapybara)
-    globalVars.drawCapybara2 = truthy(tempGlobalVars.drawCapybara2)
-    globalVars.drawCapybara312 = truthy(tempGlobalVars.drawCapybara312)
+    globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
+    globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)
+    globalVars.dontReplaceSV = isTruthy(tempGlobalVars.dontReplaceSV)
+    globalVars.drawCapybara = isTruthy(tempGlobalVars.drawCapybara)
+    globalVars.drawCapybara2 = isTruthy(tempGlobalVars.drawCapybara2)
+    globalVars.drawCapybara312 = isTruthy(tempGlobalVars.drawCapybara312)
     globalVars.dynamicBackgroundIndex = tn(tempGlobalVars.dynamicBackgroundIndex)
     globalVars.effectFPS = tn(tempGlobalVars.effectFPS)
-    globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
-    globalVars.hideAutomatic = truthy(tempGlobalVars.hideAutomatic)
-    globalVars.hideSVInfo = truthy(tempGlobalVars.hideSVInfo)
+    globalVars.equalizeLinear = isTruthy(tempGlobalVars.equalizeLinear, true)
+    globalVars.hideAutomatic = isTruthy(tempGlobalVars.hideAutomatic)
+    globalVars.hideSVInfo = isTruthy(tempGlobalVars.hideSVInfo)
     globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
-    globalVars.ignoreNotes = truthy(tempGlobalVars.ignoreNotesOutsideTg)
+    globalVars.ignoreNotes = isTruthy(tempGlobalVars.ignoreNotesOutsideTg)
     globalVars.maxDisplacementMultiplierExponent = tn(tempGlobalVars.maxDisplacementMultiplierExponent)
-    globalVars.performanceMode = truthy(tempGlobalVars.performanceMode)
-    globalVars.printLegacyLNMessage = truthy(tempGlobalVars.printLegacyLNMessage, true)
+    globalVars.performanceMode = isTruthy(tempGlobalVars.performanceMode)
+    globalVars.printLegacyLNMessage = isTruthy(tempGlobalVars.printLegacyLNMessage, true)
     globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
     globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
-    globalVars.restrictSinusoidalPeriod = truthy(tempGlobalVars.restrictSinusoidalPeriod, true)
+    globalVars.restrictSinusoidalPeriod = isTruthy(tempGlobalVars.restrictSinusoidalPeriod, true)
     globalVars.rgbPeriod = tn(tempGlobalVars.rgbPeriod)
-    globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
-    globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
-    globalVars.showSVInfoVisualizer = truthy(tempGlobalVars.showSVInfoVisualizer, true)
-    globalVars.showVibratoWidget = truthy(tempGlobalVars.showVibratoWidget)
+    globalVars.showMeasureDataWidget = isTruthy(tempGlobalVars.showMeasureDataWidget)
+    globalVars.showNoteDataWidget = isTruthy(tempGlobalVars.showNoteDataWidget)
+    globalVars.showSVInfoVisualizer = isTruthy(tempGlobalVars.showSVInfoVisualizer, true)
+    globalVars.showVibratoWidget = isTruthy(tempGlobalVars.showVibratoWidget)
     globalVars.snakeSpringConstant = tn(tempGlobalVars.snakeSpringConstant)
     globalVars.stepSize = tn(tempGlobalVars.stepSize)
     globalVars.styleThemeIndex = tn(tempGlobalVars.styleThemeIndex)
-    globalVars.upscroll = truthy(tempGlobalVars.upscroll)
-    globalVars.useCustomPulseColor = truthy(tempGlobalVars.useCustomPulseColor)
-    globalVars.useEndTimeOffsets = truthy(tempGlobalVars.useEndTimeOffsets)
+    globalVars.upscroll = isTruthy(tempGlobalVars.upscroll)
+    globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
+    globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
     local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
         "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
     for k12 = 1, #forceVectorizeList do
@@ -1904,7 +1903,7 @@ function checkPresetValidity(preset)
     if (preset.type == "Vibrato") then
         validMenus = table.duplicate(VIBRATO_SVS)
     end
-    if (not truthy(validMenus)) then return false, nil end
+    if (not isTruthy(validMenus)) then return false, nil end
     if (not table.includes(validMenus, preset.menu)) then return false, nil end
     local realType = "place" .. preset.type
     return true, preset.data
@@ -2210,11 +2209,11 @@ end
 function automateCopySVs(settingVars)
     settingVars.copiedSVs = {}
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svs = game.get.svsBetweenOffsets(startOffset, endOffset)
-    if (not truthy(svs)) then
+    if (not isTruthy(svs)) then
         toggleablePrint("w!", "No SVs found within the copiable region.")
         return
     end
@@ -2246,8 +2245,8 @@ function automateSVs(settingVars)
     for idx, ho in pairs(selected) do
         if (not settingVars.maintainMs and idx == 1) then goto nextSelected end
         do
-            local thisTime = truthy(ho.EndTime) and ho.EndTime or ho.StartTime
-            local prevTime = truthy(selected[math.max(1, idx - 1)].EndTime) and selected[math.max(1, idx - 1)].EndTime or
+            local thisTime = isTruthy(ho.EndTime) and ho.EndTime or ho.StartTime
+            local prevTime = isTruthy(selected[math.max(1, idx - 1)].EndTime) and selected[math.max(1, idx - 1)].EndTime or
                 selected[math.max(1, idx - 1)].StartTime
             timeSinceLastObject = timeSinceLastObject + thisTime - prevTime
             if (timeSinceLastObject - 10 > settingVars.ms and settingVars.maintainMs and settingVars.optimizeTGs) then
@@ -2261,10 +2260,10 @@ function automateSVs(settingVars)
                 neededIds[idName] = { hos = {}, svs = {} }
             end
             table.insert(neededIds[idName].hos, ho)
-            local startTime = truthy(selected[1].EndTime) and selected[1].EndTime or selected[1].StartTime
-            local secondaryTime = truthy(selected[2].EndTime) and selected[2].EndTime or selected[2].StartTime
+            local startTime = isTruthy(selected[1].EndTime) and selected[1].EndTime or selected[1].StartTime
+            local secondaryTime = isTruthy(selected[2].EndTime) and selected[2].EndTime or selected[2].StartTime
             for _, sv in ipairs(settingVars.copiedSVs) do
-                local currentTime = truthy(ho.EndTime) and ho.EndTime or ho.StartTime
+                local currentTime = isTruthy(ho.EndTime) and ho.EndTime or ho.StartTime
                 local maxRelativeOffset = settingVars.copiedSVs[#settingVars.copiedSVs].relativeOffset
                 local progress = 1 - sv.relativeOffset / maxRelativeOffset
                 local tempMultiplier = sv.multiplier
@@ -2323,7 +2322,7 @@ function placeStutterSVs(settingVars)
         lastMultiplier = settingVars.svMultipliers2[3]
     end
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local totalNumStutters = (#offsets - 1) * settingVars.stuttersPerSection
@@ -2424,7 +2423,7 @@ end
 function placeSSFs(menuVars)
     local numMultipliers = #menuVars.svMultipliers
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local ssfsToAdd = {}
@@ -2452,10 +2451,10 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
     local placingStillSVs = menuVars.noteSpacing ~= nil
     local numMultipliers = #menuVars.svMultipliers
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     if placingStillSVs then
         offsets = game.get.uniqueNoteOffsetsBetweenSelected()
-        if (not truthy(offsets)) then return end
+        if (not isTruthy(offsets)) then return end
         if place == false then
             offsets = game.get.uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
         end
@@ -2510,7 +2509,7 @@ function placeStillSVsParent(menuVars)
         return
     end
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     for i = 1, (#offsets - 1) do
         if (STANDARD_SVS[menuVars.svTypeIndex] == "Exponential" and menuVars.settingVars.distanceMode == 2) then
             tbl = placeSVs(menuVars, false, offsets[i], offsets[i + 1], menuVars.settingVars.distance, svsToAdd)
@@ -2531,7 +2530,7 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
     if (not noteOffsets) then return { svsToRemove = {}, svsToAdd = {} } end
     local firstOffset = noteOffsets[1]
     local lastOffset = noteOffsets[#noteOffsets]
-    local svMultFn = truthy(queuedSVs) and function(t) return getHypotheticalSVMultiplierAt(queuedSVs, t) end or
+    local svMultFn = isTruthy(queuedSVs) and function(t) return getHypotheticalSVMultiplierAt(queuedSVs, t) end or
         game.get.svMultiplierAt
     if stillType == "Auto" then
         local multiplier = getUsableDisplacementMultiplier(firstOffset)
@@ -2579,7 +2578,7 @@ end
 function ssfVibrato(menuVars, func1, func2)
     printLegacyLNMessage()
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startTime = offsets[1]
     local endTime = offsets[#offsets]
     local fps = VIBRATO_FRAME_RATES[menuVars.vibratoQuality]
@@ -2692,7 +2691,7 @@ function svVibrato(menuVars, heightFn)
 end
 function deleteItems(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local linesToRemove = game.get.linesBetweenOffsets(startOffset, endOffset)
@@ -2703,7 +2702,7 @@ function deleteItems(menuVars)
     if (not menuVars.deleteTable[2]) then svsToRemove = {} end
     if (not menuVars.deleteTable[3]) then ssfsToRemove = {} end
     if (not menuVars.deleteTable[4]) then bmsToRemove = {} end
-    if (truthy(linesToRemove) or truthy(svsToRemove) or truthy(ssfsToRemove) or truthy(bmsToRemove)) then
+    if (isTruthy(linesToRemove) or isTruthy(svsToRemove) or isTruthy(ssfsToRemove) or isTruthy(bmsToRemove)) then
         actions.PerformBatch({
             createEA(
                 action_type.RemoveTimingPointBatch, linesToRemove),
@@ -2714,18 +2713,18 @@ function deleteItems(menuVars)
             createEA(
                 action_type.RemoveBookmarkBatch, bmsToRemove) })
     end
-    if (truthy(linesToRemove)) then
+    if (isTruthy(linesToRemove)) then
         toggleablePrint("e!", table.concat({"Deleted ", #linesToRemove, pluralize(" timing point.", #linesToRemove, -2)}))
     end
-    if (truthy(svsToRemove)) then
+    if (isTruthy(svsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #svsToRemove .. pluralize(" scroll velocity.", #svsToRemove, -2))
     end
-    if (truthy(ssfsToRemove)) then
+    if (isTruthy(ssfsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #ssfsToRemove .. pluralize(" scroll speed factor.", #ssfsToRemove, -2))
     end
-    if (truthy(bmsToRemove)) then
+    if (isTruthy(bmsToRemove)) then
         toggleablePrint("e!", table.concat({"Deleted ", #bmsToRemove, pluralize(" bookmark.", #bmsToRemove, -2)}))
     end
 end
@@ -2734,7 +2733,7 @@ function addTeleportSVs(menuVars)
     local svsToRemove = {}
     local svTimeIsAdded = {}
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local displaceAmount = menuVars.distance
@@ -2793,7 +2792,7 @@ function changeGroups(menuVars)
         state.SelectedScrollGroupId = menuVars.designatedTimingGroup
         table.insert(actionList, createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd))
     end
-    if (not truthy(actionList)) then
+    if (not isTruthy(actionList)) then
         state.SelectedScrollGroupId = oldGroup
         return
     end
@@ -2966,7 +2965,7 @@ end
 function copyItems(menuVars)
     clearCopiedItems(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local lines = game.get.linesBetweenOffsets(startOffset, endOffset)
@@ -3054,7 +3053,7 @@ function clearCopiedItems(menuVars)
 end
 function pasteItems(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local lastCopiedLine = menuVars.copied.lines[menuVars.curSlot][#menuVars.copied.lines[menuVars.curSlot]]
@@ -3131,37 +3130,37 @@ function pasteItems(menuVars)
         createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
         createEA(action_type.AddBookmarkBatch, bmsToAdd),
     })
-    if (truthy(linesToRemove)) then
+    if (isTruthy(linesToRemove)) then
         toggleablePrint("e!", table.concat({"Deleted ", #linesToRemove, pluralize(" timing point.", #linesToRemove, -2)}))
     end
-    if (truthy(svsToRemove)) then
+    if (isTruthy(svsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #svsToRemove .. pluralize(" scroll velocity.", #svsToRemove, -2))
     end
-    if (truthy(ssfsToRemove)) then
+    if (isTruthy(ssfsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #ssfsToRemove .. pluralize(" scroll speed factor.", #ssfsToRemove, -2))
     end
-    if (truthy(bmsToRemove)) then
+    if (isTruthy(bmsToRemove)) then
         toggleablePrint("e!", table.concat({"Deleted ", #bmsToRemove, pluralize(" bookmark.", #bmsToRemove, -2)}))
     end
-    if (truthy(linesToAdd)) then
+    if (isTruthy(linesToAdd)) then
         toggleablePrint("s!", table.concat({"Created ", #linesToAdd, pluralize(" timing point.", #linesToAdd, -2)}))
     end
-    if (truthy(svsToAdd)) then
+    if (isTruthy(svsToAdd)) then
         toggleablePrint("s!",
             "Created " .. #svsToAdd .. pluralize(" scroll velocity.", #svsToAdd, -2))
     end
-    if (truthy(ssfsToAdd)) then
+    if (isTruthy(ssfsToAdd)) then
         toggleablePrint("s!",
             "Created " .. #ssfsToAdd .. pluralize(" scroll speed factor.", #ssfsToAdd, -2))
     end
-    if (truthy(bmsToAdd)) then
+    if (isTruthy(bmsToAdd)) then
         toggleablePrint("s!", table.concat({"Created ", #bmsToAdd, pluralize(" bookmark.", #bmsToAdd, -2)}))
     end
 end
 function tryAlignToHitObjects(time, hitObjectTimes, alignWindow)
-    if not truthy(hitObjectTimes) then
+    if not isTruthy(hitObjectTimes) then
         return time
     end
     local closestTime = table.searchClosest(hitObjectTimes, time)
@@ -3181,7 +3180,7 @@ function displaceNoteSVsParent(menuVars)
         return
     end
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local svsToRemove = {}
     local svsToAdd = {}
     for k23 = 1, #offsets do
@@ -3202,7 +3201,7 @@ function displaceNoteSVs(menuVars, place, optionalOffset)
     local svsToRemove = {}
     local svTimeIsAdded = {}
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return { svsToRemove = {}, svsToAdd = {} } end
+    if (not isTruthy(offsets)) then return { svsToRemove = {}, svsToAdd = {} } end
     if place == false then offsets = { optionalOffset } end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -3276,7 +3275,7 @@ function flickerSVs(menuVars)
     local svsToRemove = {}
     local svTimeIsAdded = {}
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local numTeleports = 2 * menuVars.numFlickers
@@ -3422,7 +3421,7 @@ function collapseSnaps()
         ::nextLayer::
     end
     actions.PerformBatch(moveNoteActions)
-    if (not truthy(#normalTpsToAdd + #snapTpsToAdd + #tpsToRemove)) then
+    if (not isTruthy(#normalTpsToAdd + #snapTpsToAdd + #tpsToRemove)) then
         print("w!", "There were no generated layers you nonce")
         return
     end
@@ -3439,7 +3438,7 @@ function clearSnappedLayers()
             table.insert(removeLayerActions, createEA(action_type.RemoveLayer, layer))
         end
     end
-    if (not truthy(removeLayerActions)) then
+    if (not isTruthy(removeLayerActions)) then
         print("w!", "There were no generated layers you nonce")
         return
     end
@@ -3460,10 +3459,10 @@ function alignTimingLines()
     local tpsToAdd = {}
     for time = starttime, endtime, msptl do
         local originalTime = math.floor(time)
-        while (truthy(noteTimes) and (noteTimes[1] < originalTime - 5)) do
+        while (isTruthy(noteTimes) and (noteTimes[1] < originalTime - 5)) do
             table.remove(noteTimes, 1)
         end
-        if (not truthy(noteTimes)) then
+        if (not isTruthy(noteTimes)) then
             times[#times + 1] = originalTime
         elseif (math.abs(noteTimes[1] - originalTime) <= 5) then
             times[#times + 1] = noteTimes[1]
@@ -3484,7 +3483,7 @@ function alignTimingLines()
         createEA(action_type.RemoveTimingPointBatch, tpsToRemove)
     })
     toggleablePrint("s!", table.concat({"Created ", #tpsToAdd, pluralize(" timing point.", #tpsToAdd, -2)}))
-    if (truthy(tpsToRemove)) then
+    if (isTruthy(tpsToRemove)) then
         toggleablePrint("e!",
             "Deleted " .. #tpsToRemove .. pluralize(" timing point.", #tpsToRemove, -2))
     end
@@ -3527,7 +3526,7 @@ function fixFlippedLNEnds()
     if endOffset == 0 then endOffset = map.HitObjects[#map.HitObjects].StartTime end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
-    local type = truthy(fixedLNEndsCount) and "s!" or "w!"
+    local type = isTruthy(fixedLNEndsCount) and "s!" or "w!"
     print(type, "Fixed " .. fixedLNEndsCount .. pluralize(" flipped LN end.", fixedLNEndsCount, -2))
 end
 function mergeSVsAndSSFs()
@@ -3549,13 +3548,13 @@ function mergeSVsAndSSFs()
             ssfTimeDict[ssf.StartTime] = true
         end
     end
-    if (truthy(#svsToRemove + #ssfsToRemove)) then
+    if (isTruthy(#svsToRemove + #ssfsToRemove)) then
         actions.PerformBatch({
             utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
             utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove)
         })
     end
-    local type = truthy(#svsToRemove + #ssfsToRemove) and "s!" or "w!"
+    local type = isTruthy(#svsToRemove + #ssfsToRemove) and "s!" or "w!"
     print(type,
         table.concat({ "Removed ", #svsToRemove, pluralize(" SV", #svsToRemove), " and ", #ssfsToRemove, pluralize(
             " SSF.", #ssfsToRemove, -2) }))
@@ -3574,8 +3573,8 @@ function mergeNotes()
             end
         end
     end
-    if (truthy(notesToRemove)) then actions.RemoveHitObjectBatch(notesToRemove) end
-    local type = truthy(notesToRemove) and "s!" or "w!"
+    if (isTruthy(notesToRemove)) then actions.RemoveHitObjectBatch(notesToRemove) end
+    local type = isTruthy(notesToRemove) and "s!" or "w!"
     print(type, "Removed " .. #notesToRemove .. pluralize(" note.", #notesToRemove, -2))
 end
 function removeUnnecessarySVsAndSSFs()
@@ -3612,8 +3611,8 @@ function removeUnnecessarySVsAndSSFs()
         table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove, tg))
         ssfSum = ssfSum + #ssfsToRemove
     end
-    if (truthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
-    local type = truthy(svSum + ssfSum) and "s!" or "w!"
+    if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = isTruthy(svSum + ssfSum) and "s!" or "w!"
     print(type,
         table.concat({ "Removed ", svSum, pluralize(" SV", svSum), " and ", ssfSum, pluralize(" SSF.", ssfSum, -2) }))
     state.SelectedScrollGroupId = ogTG
@@ -3621,7 +3620,7 @@ end
 function removeAllHitSounds()
     local hitsoundActions = {}
     local objs = {}
-    if (not truthy(#state.SelectedHitObjects)) then
+    if (not isTruthy(#state.SelectedHitObjects)) then
         print("e!", "You are not currently selecting anything.")
         return
     end
@@ -3634,7 +3633,7 @@ function removeAllHitSounds()
             objs[#objs + 1] = ho.StartTime .. "|" .. ho.Lane
         end
     end
-    local type = truthy(hitsoundActions) and "s!" or "w!"
+    local type = isTruthy(hitsoundActions) and "s!" or "w!"
     print(type,
         "Removed " ..
         #hitsoundActions .. pluralize(" hitsound.", #hitsoundActions, -2))
@@ -3645,7 +3644,7 @@ end
 function measureSVs(menuVars)
     local roundingDecimalPlaces = 5
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
@@ -3729,7 +3728,7 @@ function scaleDisplaceSVs(menuVars)
     local svsToRemove = {}
     local svTimeIsAdded = {}
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local isStartDisplace = DISPLACE_SCALE_SPOTS[menuVars.scaleSpotIndex] == "Start"
@@ -3765,7 +3764,7 @@ function scaleDisplaceSVs(menuVars)
 end
 function scaleMultiplySVs(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local svsToAdd = {}
     local svsToRemove = game.get.svsBetweenOffsets(offsets[1], offsets[#offsets])
     for i = 1, (#offsets - 1) do
@@ -3852,7 +3851,7 @@ function swapNoteSVs()
     local svsToRemove = {}
     local svTimeIsAdded = {}
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
@@ -3874,7 +3873,7 @@ function swapNoteSVs()
 end
 function verticalShiftSVs(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsToAdd = {}
@@ -3948,7 +3947,7 @@ end
 function changeTGIndex(diff)
     local groups = state.GetValue("tgList")
     local selectedTgDict = {}
-    if (not truthy(state.SelectedHitObjects)) then
+    if (not isTruthy(state.SelectedHitObjects)) then
         globalVars.scrollGroupIndex = math.wrap(globalVars.scrollGroupIndex + diff, 1, #groups, true)
         state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
         return
@@ -3976,7 +3975,7 @@ function goToNextTg()
     changeTGIndex(1)
 end
 function jumpToTg()
-    if (not truthy(state.SelectedHitObjects)) then return end
+    if (not isTruthy(state.SelectedHitObjects)) then return end
     local tgId = game.get.uniqueNotesBetweenSelected()[1].TimingGroup
     for _, ho in pairs(state.SelectedHitObjects) do
         if (ho.TimingGroup ~= tgId) then return end
@@ -4032,7 +4031,7 @@ function getMapStats()
 end
 function selectAlternating(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local notes = game.get.notesBetweenOffsets(startOffset, endOffset)
@@ -4063,11 +4062,11 @@ function selectAlternating(menuVars)
         end
     end
     actions.SetHitObjectSelection(notesToSelect)
-    print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
+    print(isTruthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
 function selectByChordSizes(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local notes = game.get.notesBetweenOffsets(startOffset, endOffset)
@@ -4105,12 +4104,12 @@ function selectByChordSizes(menuVars)
         end
     end
     actions.SetHitObjectSelection(notesToSelect)
-    print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
+    print(isTruthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
 ---@diagnostic disable: undefined-field
 function selectByNoteType(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local totalNotes = game.get.notesBetweenOffsets(startOffset, endOffset)
@@ -4134,11 +4133,11 @@ function selectByNoteType(menuVars)
         end
     end
     actions.SetHitObjectSelection(notesToSelect)
-    print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
+    print(isTruthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
 function selectBySnap(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local notes = game.get.notesBetweenOffsets(startOffset, endOffset)
@@ -4149,11 +4148,11 @@ function selectBySnap(menuVars)
         if (snap == menuVars.snap) then notesToSelect[#notesToSelect + 1] = note end
     end
     actions.SetHitObjectSelection(notesToSelect)
-    print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
+    print(isTruthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
 function selectByTimingGroup(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local notesToSelect = {}
@@ -4166,7 +4165,7 @@ function selectByTimingGroup(menuVars)
         end
     end
     actions.SetHitObjectSelection(notesToSelect)
-    print(truthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
+    print(isTruthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
 end
 function addGradient()
     local ctx = imgui.GetWindowDrawList()
@@ -6925,7 +6924,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     local comboFlag = imgui_combo_flags.HeightLarge
     local rgb = {}
     hiddenGroups = hiddenGroups or {}
-    if (colorList and truthy(colorList)) then
+    if (colorList and isTruthy(colorList)) then
         colorList[newListIndex]:gsub("(%d+)", function(c)
             rgb[#rgb + 1] = c
         end)
@@ -6934,13 +6933,13 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
             vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, alpha))
     end
     if not imgui.BeginCombo(label, currentComboItem, comboFlag) then
-        if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
+        if (colorList and isTruthy(colorList)) then imgui.PopStyleColor() end
         return newListIndex
     end
-    if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
+    if (colorList and isTruthy(colorList)) then imgui.PopStyleColor() end
     for i = 1, #list do
         rgb = {}
-        if (colorList and truthy(colorList)) then
+        if (colorList and isTruthy(colorList)) then
             colorList[i]:gsub("(%d+)", function(c)
                 rgb[#rgb + 1] = c
             end)
@@ -6951,11 +6950,11 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
         if imgui.Selectable(listItem) then
             newListIndex = i
         end
-        if (tooltipList and truthy(tooltipList)) then
+        if (tooltipList and isTruthy(tooltipList)) then
             HoverToolTip(tooltipList[i])
         end
         ::skipRender::
-        if (colorList and truthy(colorList)) then imgui.PopStyleColor() end
+        if (colorList and isTruthy(colorList)) then imgui.PopStyleColor() end
     end
     imgui.EndCombo()
     return newListIndex
@@ -7101,17 +7100,17 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
     if gridSize ~= 1 then
         for i = 0, size.x, gridSize do
             local lineCol = gray
-            if (truthy(i % 4)) then
+            if (isTruthy(i % 4)) then
                 lineCol = color.rgbaToUint(40, 40, 40, 255)
             end
             ctx.AddLine(vector.New(topLeft.x + i, topLeft.y), vector.New(topLeft.x + i, topLeft.y + dim.y), lineCol, 1)
         end
         for i = 0, size.y, gridSize do
             local lineCol = gray
-            if (truthy(i % 4)) then
+            if (isTruthy(i % 4)) then
                 lineCol = color.rgbaToUint(40, 40, 40, 255)
             end
-            if (yScale and not truthy(i % 4)) then
+            if (yScale and not isTruthy(i % 4)) then
                 local number = (yScale.y - yScale.x) * (size.y - i) / size.y + yScale.x
                 local textSize = imgui.CalcTextSize(tostring(number))
                 ctx.AddText(
@@ -7467,7 +7466,7 @@ function animationFramesSetupMenu(settingVars)
         KeepSameLine()
         imgui.Text("Place SVs")
         AddSeparator()
-        if not truthy(settingVars.frameTimes) then
+        if not isTruthy(settingVars.frameTimes) then
             imgui.Text("No notes added in Step 2, so can't place SVs yet")
             return
         end
@@ -7480,7 +7479,7 @@ function animationFramesSetupMenu(settingVars)
     end
 end
 function removeSelectedFrameTimeButton(settingVars)
-    if not truthy(settingVars.frameTimes) then return end
+    if not isTruthy(settingVars.frameTimes) then return end
     if not imgui.Button("Removed currently selected time", BEEG_BUTTON_SIZE) then return end
     table.remove(settingVars.frameTimes, settingVars.selectedTimeIndex)
     local maxIndex = math.max(1, #settingVars.frameTimes)
@@ -7526,7 +7525,7 @@ function addFrameTimes(settingVars)
     settingVars.frameTimes = sort(settingVars.frameTimes, sortAscendingTime)
 end
 function displayFrameTimes(settingVars)
-    if not truthy(settingVars.frameTimes) then
+    if not isTruthy(settingVars.frameTimes) then
         imgui.Text("Add notes to fill the selection box below")
     else
         imgui.Text("time | lanes | frame # | position")
@@ -7665,7 +7664,7 @@ function penisSettingsMenu(settingVars)
         settingVars.bCurvature .. "%%")
 end
 function stutterMenu(settingVars)
-    local settingsChanged = not truthy(settingVars.svMultipliers)
+    local settingsChanged = not isTruthy(settingVars.svMultipliers)
     settingsChanged = stutterSettingsMenu(settingVars) or settingsChanged
     if settingsChanged then updateStutterMenuSVs(settingVars) end
     displayStutterSVWindows(settingVars)
@@ -7727,7 +7726,7 @@ STANDARD_SVS = {
 function placeStandardSVMenu()
     PresetButton()
     local menuVars = getMenuVars("placeStandard")
-    local needSVUpdate = not truthy(menuVars.svMultipliers)
+    local needSVUpdate = not isTruthy(menuVars.svMultipliers)
     needSVUpdate = chooseStandardSVType(menuVars, false) or needSVUpdate
     AddSeparator()
     local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
@@ -7756,7 +7755,7 @@ end
 function placeStillSVMenu()
     PresetButton()
     local menuVars = getMenuVars("placeStill")
-    local needSVUpdate = not truthy(menuVars.svMultipliers)
+    local needSVUpdate = not isTruthy(menuVars.svMultipliers)
     needSVUpdate = chooseStandardSVType(menuVars, false) or needSVUpdate
     AddSeparator()
     local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
@@ -7952,7 +7951,7 @@ function PolynomialEditor(size, settingVars, separateWindow)
     local ctx, changedPoints = renderGraph("Polynomial Vibrato Menu" .. tostring(separateWindow), vctr2(size),
         pointList, false, 11,
         vector.New(settingVars.startMsx, settingVars.endMsx))
-    changedPoints = not truthy(settingVars.plotPoints) or changedPoints
+    changedPoints = not isTruthy(settingVars.plotPoints) or changedPoints
     for i = 1, settingVars.controlPointCount do
         settingVars.controlPoints[i] = vector.Clamp(pointList[i].pos, vctr2(0), vctr2(size)) / vctr2(size)
     end
@@ -8188,7 +8187,7 @@ function copyNPasteMenu()
     local menuVars = getMenuVars("copyPaste")
     local copiedItemCount = copyNPasteSettingsMenu(menuVars, true)
     cache.saveTable("copyPasteMenu", menuVars)
-    if not truthy(copiedItemCount) then return end
+    if not isTruthy(copiedItemCount) then return end
     simpleActionMenu("Paste items at selected notes", 1, pasteItems, menuVars)
 end
 function copyNPasteSettingsMenu(menuVars, actionable)
@@ -8214,13 +8213,13 @@ function copyNPasteSettingsMenu(menuVars, actionable)
     local copiedItemCount = #menuVars.copied.lines[menuVars.curSlot] + #menuVars.copied.SVs[menuVars.curSlot] +
         #menuVars.copied.SSFs[menuVars.curSlot] + #menuVars.copied.BMs[menuVars.curSlot]
     if actionable then
-        if not truthy(copiedItemCount) then
+        if not isTruthy(copiedItemCount) then
             simpleActionMenu("Copy items between selected notes", 2, copyItems, menuVars)
         else
             FunctionButton("Clear copied items", ACTION_BUTTON_SIZE, clearCopiedItems, menuVars)
         end
     end
-    if (not truthy(copiedItemCount) and actionable) then return copiedItemCount end
+    if (not isTruthy(copiedItemCount) and actionable) then return copiedItemCount end
     if actionable then AddSeparator() end
     _, menuVars.tryAlign = imgui.Checkbox("Try to fix misalignments", menuVars.tryAlign)
     imgui.PushItemWidth(100)
@@ -8231,10 +8230,10 @@ function copyNPasteSettingsMenu(menuVars, actionable)
 end
 function updateDirectEdit()
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets) and not truthy(state.GetValue("lists.directSVList"))) then return end
+    if (not isTruthy(offsets) and not isTruthy(state.GetValue("lists.directSVList"))) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
-    if (not truthy(offsets)) then
+    if (not isTruthy(offsets)) then
         state.SetValue("lists.directSVList", {})
         return
     end
@@ -8246,9 +8245,9 @@ function directSVMenu()
         updateDirectEdit()
     end
     local svs = state.GetValue("lists.directSVList") or {}
-    if (not truthy(svs)) then
+    if (not isTruthy(svs)) then
         menuVars.selectableIndex = 1
-        if (not truthy(state.SelectedHitObjects)) then
+        if (not isTruthy(state.SelectedHitObjects)) then
             imgui.TextWrapped("Select a note to view local SVs.")
         else
             imgui
@@ -8345,7 +8344,7 @@ function dynamicScaleMenu()
         return
     end
     local numSVPoints = numNoteTimes - 1
-    local needSVUpdate = not truthy(menuVars.svMultipliers) or (#menuVars.svMultipliers ~= numSVPoints)
+    local needSVUpdate = not isTruthy(menuVars.svMultipliers) or (#menuVars.svMultipliers ~= numSVPoints)
     imgui.AlignTextToFramePadding()
     imgui.Text("Shape:")
     KeepSameLine()
@@ -8658,6 +8657,34 @@ function showPatchNotesWindow()
     if (not patchNotesOpened) then
         state.SetValue("windows.showPatchNotesWindow", false)
     end
+    imgui.BeginChild("v2.0.2Bezier", vector.New(486, 48), 2, 3)
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    if (topLeft.y - maxHeight > 0) then goto skip202 end
+    if (topLeft.y - minHeight < -50) then goto skip202 end
+    drawV202(ctx, topLeft + vector.New(243, 17), 1, color.int.white, 1)
+    ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 147 / 2 - 10, 28), color.int.white)
+    ctx.AddRect(topLeft + vector.New(243 + 147 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
+    ::skip202::
+    imgui.EndChild()
+    imgui.SeparatorText("Bug Fixes / Minor Changes")
+    imgui.BulletText("Fixed individual combo settings being able to be saved.")
+    imgui.BulletText("Fixed loadup text color not being properly used in the custom theme.")
+    imgui.BulletText("Changed the barbie theme to be less obnoxious.")
+    imgui.BulletText("Fixed themes not exporting loadup parameters correctly.")
+    imgui.BulletText("Changed some backend features to prevent bugs in the future.")
+    imgui.BulletText('Moved some settings to the new "Advanced" section.')
+    imgui.BulletText('Fixed performance mode not delaying HitObject refresh.')
+    imgui.BulletText('Fixed stutter linear interpolation crashing the plugin.')
+    imgui.BulletText('Now successfully hot-reloads menu data.')
+    imgui.BulletText('Fixed Select > Alternating offset bug.')
+    imgui.BulletText('Fixed loadup animation playing after delay even when it was disabled.')
+    imgui.SeparatorText("New Features")
+    imgui.BulletText('Now allows you to change the default displacement exponential multiplier.')
+    imgui.BulletText('Added a setting which unrestricts sinusoidal period.')
+    imgui.BulletText('Added mines to the Select > Note Type feature (canary only).')
+    imgui.BulletText('Added a small gradient in the background to enhance appearance.')
     imgui.BeginChild("v2.0.1Bezier", vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
@@ -8887,6 +8914,346 @@ function showPatchNotesWindow()
         "Added the Select tab, which allows users to quickly select desired notes based on\na variety of conditions. Currently, there is the Alternate option and the Snap option.")
     imgui.PopStyleColor()
     imgui.End()
+end
+---Draws v202 on screen, with dimensions = scale * [142,37].
+---@param ctx ImDrawListPtr
+---@param location Vector2
+---@param scale number
+---@param col integer
+---@param thickness integer
+function drawV202(ctx, location, scale, col, thickness)
+    location = location - vector.New(71, 18.5) * scale
+    ctx.AddBezierCubic(location + scale * vector.New(24.43, 21.16), location + scale * vector.New(24.43, 21.16),
+        location + scale * vector.New(14.35, 48.44), location + scale * vector.New(14.35, 48.44), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(14.35, 48.44), location + scale * vector.New(14.35, 48.44),
+        location + scale * vector.New(10.09, 48.44), location + scale * vector.New(10.09, 48.44), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(10.09, 48.44), location + scale * vector.New(10.09, 48.44),
+        location + scale * vector.New(0, 21.16), location + scale * vector.New(0, 21.16), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(0, 21.16), location + scale * vector.New(0, 21.16),
+        location + scale * vector.New(4.55, 21.16), location + scale * vector.New(4.55, 21.16), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(4.55, 21.16), location + scale * vector.New(4.55, 21.16),
+        location + scale * vector.New(12.07, 42.9), location + scale * vector.New(12.07, 42.9), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(12.07, 42.9), location + scale * vector.New(12.07, 42.9),
+        location + scale * vector.New(12.36, 42.9), location + scale * vector.New(12.36, 42.9), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(12.36, 42.9), location + scale * vector.New(12.36, 42.9),
+        location + scale * vector.New(19.89, 21.16), location + scale * vector.New(19.89, 21.16), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(19.89, 21.16), location + scale * vector.New(19.89, 21.16),
+        location + scale * vector.New(24.43, 21.16), location + scale * vector.New(24.43, 21.16), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(29.9, 48.44), location + scale * vector.New(29.9, 48.44),
+        location + scale * vector.New(29.9, 45.24), location + scale * vector.New(29.9, 45.24), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(29.9, 45.24), location + scale * vector.New(29.9, 45.24),
+        location + scale * vector.New(41.9, 32.1), location + scale * vector.New(41.9, 32.1), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(41.9, 32.1), location + scale * vector.New(43.31333333333333, 30.56),
+        location + scale * vector.New(44.473333333333336, 29.22), location + scale * vector.New(45.38, 28.08), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(45.38, 28.08),
+        location + scale * vector.New(46.29333333333333, 26.939999999999998),
+        location + scale * vector.New(46.97333333333333, 25.86333333333333), location + scale * vector.New(47.42, 24.85),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(47.42, 24.85),
+        location + scale * vector.New(47.85999999999999, 23.836666666666666),
+        location + scale * vector.New(48.07999999999999, 22.77333333333333), location + scale * vector.New(48.08, 21.66),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(48.08, 21.66),
+        location + scale * vector.New(48.07999999999999, 20.38),
+        location + scale * vector.New(47.77666666666666, 19.273333333333333), location + scale * vector.New(47.17, 18.34),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(47.17, 18.34),
+        location + scale * vector.New(46.556666666666665, 17.406666666666666),
+        location + scale * vector.New(45.72333333333333, 16.686666666666667), location + scale * vector.New(44.67, 16.18),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(44.67, 16.18),
+        location + scale * vector.New(43.61666666666667, 15.666666666666666),
+        location + scale * vector.New(42.43333333333333, 15.41), location + scale * vector.New(41.12, 15.41), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(41.12, 15.41),
+        location + scale * vector.New(39.72666666666667, 15.41), location + scale * vector.New(38.51, 15.696666666666665),
+        location + scale * vector.New(37.47, 16.27), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(37.47, 16.27),
+        location + scale * vector.New(36.43666666666667, 16.84333333333333),
+        location + scale * vector.New(35.64, 17.646666666666665), location + scale * vector.New(35.08, 18.68), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(35.08, 18.68),
+        location + scale * vector.New(34.51333333333333, 19.706666666666663),
+        location + scale * vector.New(34.23, 20.913333333333334), location + scale * vector.New(34.23, 22.3), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(34.23, 22.3), location + scale * vector.New(34.23, 22.3),
+        location + scale * vector.New(30.04, 22.3), location + scale * vector.New(30.04, 22.3), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(30.04, 22.3),
+        location + scale * vector.New(30.039999999999996, 20.173333333333332),
+        location + scale * vector.New(30.53333333333333, 18.30333333333333), location + scale * vector.New(31.52, 16.69),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(31.52, 16.69),
+        location + scale * vector.New(32.5, 15.083333333333332),
+        location + scale * vector.New(33.839999999999996, 13.829999999999998),
+        location + scale * vector.New(35.54, 12.93), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(35.54, 12.93), location + scale * vector.New(37.24, 12.03),
+        location + scale * vector.New(39.14666666666667, 11.58), location + scale * vector.New(41.26, 11.58), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(41.26, 11.58),
+        location + scale * vector.New(43.39333333333333, 11.58), location + scale * vector.New(45.28333333333333, 12.03),
+        location + scale * vector.New(46.93, 12.93), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(46.93, 12.93),
+        location + scale * vector.New(48.57666666666666, 13.829999999999998),
+        location + scale * vector.New(49.86666666666666, 15.043333333333333), location + scale * vector.New(50.8, 16.57),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(50.8, 16.57),
+        location + scale * vector.New(51.73333333333333, 18.096666666666664),
+        location + scale * vector.New(52.199999999999996, 19.793333333333333), location + scale * vector.New(52.2, 21.66),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(52.2, 21.66), location + scale * vector.New(52.199999999999996, 23),
+        location + scale * vector.New(51.959999999999994, 24.306666666666665),
+        location + scale * vector.New(51.48, 25.58), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(51.48, 25.58),
+        location + scale * vector.New(50.99999999999999, 26.85333333333333),
+        location + scale * vector.New(50.17333333333333, 28.266666666666666), location + scale * vector.New(49, 29.82),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(49, 29.82),
+        location + scale * vector.New(47.81999999999999, 31.379999999999995),
+        location + scale * vector.New(46.19, 33.276666666666664), location + scale * vector.New(44.11, 35.51), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(44.11, 35.51), location + scale * vector.New(44.11, 35.51),
+        location + scale * vector.New(35.94, 44.25), location + scale * vector.New(35.94, 44.25), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(35.94, 44.25), location + scale * vector.New(35.94, 44.25),
+        location + scale * vector.New(35.94, 44.53), location + scale * vector.New(35.94, 44.53), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(35.94, 44.53), location + scale * vector.New(35.94, 44.53),
+        location + scale * vector.New(52.84, 44.53), location + scale * vector.New(52.84, 44.53), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(52.84, 44.53), location + scale * vector.New(52.84, 44.53),
+        location + scale * vector.New(52.84, 48.44), location + scale * vector.New(52.84, 48.44), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(52.84, 48.44), location + scale * vector.New(52.84, 48.44),
+        location + scale * vector.New(29.9, 48.44), location + scale * vector.New(29.9, 48.44), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(63.28, 48.72),
+        location + scale * vector.New(62.406666666666666, 48.72),
+        location + scale * vector.New(61.656666666666666, 48.406666666666666),
+        location + scale * vector.New(61.03, 47.78), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(61.03, 47.78),
+        location + scale * vector.New(60.403333333333336, 47.153333333333336),
+        location + scale * vector.New(60.09, 46.403333333333336), location + scale * vector.New(60.09, 45.53), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(60.09, 45.53), location + scale * vector.New(60.09, 44.65),
+        location + scale * vector.New(60.403333333333336, 43.89666666666667), location + scale * vector.New(61.03, 43.27),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(61.03, 43.27),
+        location + scale * vector.New(61.656666666666666, 42.64333333333333),
+        location + scale * vector.New(62.406666666666666, 42.33), location + scale * vector.New(63.28, 42.33), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(63.28, 42.33), location + scale * vector.New(64.16, 42.33),
+        location + scale * vector.New(64.91333333333333, 42.64333333333333), location + scale * vector.New(65.54, 43.27),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(65.54, 43.27),
+        location + scale * vector.New(66.16666666666667, 43.89666666666667), location + scale * vector.New(66.48, 44.65),
+        location + scale * vector.New(66.48, 45.53), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(66.48, 45.53), location + scale * vector.New(66.48, 46.11),
+        location + scale * vector.New(66.33333333333334, 46.63999999999999), location + scale * vector.New(66.04, 47.12),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(66.04, 47.12),
+        location + scale * vector.New(65.75333333333333, 47.60666666666666),
+        location + scale * vector.New(65.36999999999999, 47.99666666666666), location + scale * vector.New(64.89, 48.29),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(64.89, 48.29),
+        location + scale * vector.New(64.41, 48.57666666666666), location + scale * vector.New(63.873333333333335, 48.72),
+        location + scale * vector.New(63.28, 48.72), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(85.8, 48.93),
+        location + scale * vector.New(83.11999999999999, 48.92999999999999),
+        location + scale * vector.New(80.83999999999999, 48.199999999999996), location + scale * vector.New(78.96, 46.74),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(78.96, 46.74),
+        location + scale * vector.New(77.08, 45.279999999999994), location + scale * vector.New(75.64, 43.15666666666666),
+        location + scale * vector.New(74.64, 40.37), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(74.64, 40.37),
+        location + scale * vector.New(73.64666666666666, 37.58333333333333),
+        location + scale * vector.New(73.15, 34.21333333333333), location + scale * vector.New(73.15, 30.26), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(73.15, 30.26),
+        location + scale * vector.New(73.15, 26.326666666666664),
+        location + scale * vector.New(73.65, 22.966666666666665), location + scale * vector.New(74.65, 20.18), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(74.65, 20.18),
+        location + scale * vector.New(75.65, 17.39333333333333),
+        location + scale * vector.New(77.09666666666666, 15.263333333333332), location + scale * vector.New(78.99, 13.79),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(78.99, 13.79),
+        location + scale * vector.New(80.87666666666667, 12.316666666666666),
+        location + scale * vector.New(83.14666666666666, 11.58), location + scale * vector.New(85.8, 11.58), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(85.8, 11.58),
+        location + scale * vector.New(88.44666666666666, 11.58),
+        location + scale * vector.New(90.71333333333332, 12.316666666666666), location + scale * vector.New(92.6, 13.79),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(92.6, 13.79),
+        location + scale * vector.New(94.49333333333333, 15.263333333333332),
+        location + scale * vector.New(95.94, 17.39333333333333), location + scale * vector.New(96.94, 20.18), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(96.94, 20.18),
+        location + scale * vector.New(97.94, 22.966666666666665),
+        location + scale * vector.New(98.44, 26.326666666666664), location + scale * vector.New(98.44, 30.26), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(98.44, 30.26),
+        location + scale * vector.New(98.44, 34.21333333333333),
+        location + scale * vector.New(97.94333333333333, 37.58333333333333), location + scale * vector.New(96.95, 40.37),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(96.95, 40.37),
+        location + scale * vector.New(95.94999999999999, 43.15666666666666),
+        location + scale * vector.New(94.50999999999999, 45.279999999999994), location + scale * vector.New(92.63, 46.74),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(92.63, 46.74),
+        location + scale * vector.New(90.75, 48.199999999999996),
+        location + scale * vector.New(88.47333333333333, 48.92999999999999), location + scale * vector.New(85.8, 48.93),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(85.8, 45.03),
+        location + scale * vector.New(88.44666666666666, 45.03), location + scale * vector.New(90.50333333333333, 43.75),
+        location + scale * vector.New(91.97, 41.19), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(91.97, 41.19),
+        location + scale * vector.New(93.44333333333333, 38.63666666666666),
+        location + scale * vector.New(94.18, 34.99333333333333), location + scale * vector.New(94.18, 30.26), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(94.18, 30.26),
+        location + scale * vector.New(94.18, 27.106666666666666),
+        location + scale * vector.New(93.84333333333333, 24.423333333333332), location + scale * vector.New(93.17, 22.21),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(93.17, 22.21),
+        location + scale * vector.New(92.50333333333333, 19.996666666666666),
+        location + scale * vector.New(91.54666666666667, 18.31), location + scale * vector.New(90.3, 17.15), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(90.3, 17.15),
+        location + scale * vector.New(89.04666666666667, 15.989999999999998),
+        location + scale * vector.New(87.54666666666667, 15.41), location + scale * vector.New(85.8, 15.41), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(85.8, 15.41),
+        location + scale * vector.New(83.16666666666666, 15.41),
+        location + scale * vector.New(81.10999999999999, 16.703333333333333), location + scale * vector.New(79.63, 19.29),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(79.63, 19.29),
+        location + scale * vector.New(78.14999999999999, 21.876666666666665),
+        location + scale * vector.New(77.41, 25.53333333333333), location + scale * vector.New(77.41, 30.26), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(77.41, 30.26),
+        location + scale * vector.New(77.41, 33.406666666666666), location + scale * vector.New(77.74333333333333, 36.08),
+        location + scale * vector.New(78.41, 38.28), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(78.41, 38.28), location + scale * vector.New(79.07, 40.48),
+        location + scale * vector.New(80.02666666666667, 42.156666666666666), location + scale * vector.New(81.28, 43.31),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(81.28, 43.31),
+        location + scale * vector.New(82.52666666666667, 44.45666666666666),
+        location + scale * vector.New(84.03333333333333, 45.03), location + scale * vector.New(85.8, 45.03), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(108.31, 48.72),
+        location + scale * vector.New(107.43666666666667, 48.72),
+        location + scale * vector.New(106.68333333333332, 48.406666666666666),
+        location + scale * vector.New(106.05, 47.78), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(106.05, 47.78),
+        location + scale * vector.New(105.42333333333332, 47.153333333333336),
+        location + scale * vector.New(105.10999999999999, 46.403333333333336),
+        location + scale * vector.New(105.11, 45.53), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(105.11, 45.53),
+        location + scale * vector.New(105.10999999999999, 44.65),
+        location + scale * vector.New(105.42333333333332, 43.89666666666667),
+        location + scale * vector.New(106.05, 43.27), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(106.05, 43.27),
+        location + scale * vector.New(106.68333333333332, 42.64333333333333),
+        location + scale * vector.New(107.43666666666667, 42.33), location + scale * vector.New(108.31, 42.33), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(108.31, 42.33),
+        location + scale * vector.New(109.18333333333334, 42.33),
+        location + scale * vector.New(109.93333333333334, 42.64333333333333),
+        location + scale * vector.New(110.56, 43.27), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(110.56, 43.27),
+        location + scale * vector.New(111.19333333333333, 43.89666666666667),
+        location + scale * vector.New(111.51, 44.65), location + scale * vector.New(111.51, 45.53), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(111.51, 45.53), location + scale * vector.New(111.51, 46.11),
+        location + scale * vector.New(111.36333333333333, 46.63999999999999),
+        location + scale * vector.New(111.07, 47.12), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(111.07, 47.12),
+        location + scale * vector.New(110.78333333333332, 47.60666666666666),
+        location + scale * vector.New(110.39999999999999, 47.99666666666666),
+        location + scale * vector.New(109.92, 48.29), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(109.92, 48.29),
+        location + scale * vector.New(109.44, 48.57666666666666),
+        location + scale * vector.New(108.90333333333334, 48.72), location + scale * vector.New(108.31, 48.72), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(118.96, 48.44), location + scale * vector.New(118.96, 48.44),
+        location + scale * vector.New(118.96, 45.24), location + scale * vector.New(118.96, 45.24), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(118.96, 45.24), location + scale * vector.New(118.96, 45.24),
+        location + scale * vector.New(130.97, 32.1), location + scale * vector.New(130.97, 32.1), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(130.97, 32.1),
+        location + scale * vector.New(132.37666666666667, 30.56),
+        location + scale * vector.New(133.53666666666666, 29.22), location + scale * vector.New(134.45, 28.08), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(134.45, 28.08),
+        location + scale * vector.New(135.35666666666665, 26.939999999999998),
+        location + scale * vector.New(136.0333333333333, 25.86333333333333), location + scale * vector.New(136.48, 24.85),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(136.48, 24.85),
+        location + scale * vector.New(136.91999999999996, 23.836666666666666),
+        location + scale * vector.New(137.14, 22.77333333333333), location + scale * vector.New(137.14, 21.66), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(137.14, 21.66), location + scale * vector.New(137.14, 20.38),
+        location + scale * vector.New(136.83666666666664, 19.273333333333333),
+        location + scale * vector.New(136.23, 18.34), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(136.23, 18.34),
+        location + scale * vector.New(135.62333333333333, 17.406666666666666),
+        location + scale * vector.New(134.79333333333332, 16.686666666666667),
+        location + scale * vector.New(133.74, 16.18), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(133.74, 16.18),
+        location + scale * vector.New(132.68666666666667, 15.666666666666666),
+        location + scale * vector.New(131.5, 15.41), location + scale * vector.New(130.18, 15.41), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(130.18, 15.41),
+        location + scale * vector.New(128.78666666666666, 15.41),
+        location + scale * vector.New(127.57333333333332, 15.696666666666665),
+        location + scale * vector.New(126.54, 16.27), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(126.54, 16.27),
+        location + scale * vector.New(125.5, 16.84333333333333),
+        location + scale * vector.New(124.69999999999999, 17.646666666666665),
+        location + scale * vector.New(124.14, 18.68), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(124.14, 18.68),
+        location + scale * vector.New(123.57999999999998, 19.706666666666663),
+        location + scale * vector.New(123.29999999999998, 20.913333333333334), location + scale * vector.New(123.3, 22.3),
+        col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(123.3, 22.3), location + scale * vector.New(123.3, 22.3),
+        location + scale * vector.New(119.11, 22.3), location + scale * vector.New(119.11, 22.3), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(119.11, 22.3),
+        location + scale * vector.New(119.11, 20.173333333333332),
+        location + scale * vector.New(119.6, 18.30333333333333), location + scale * vector.New(120.58, 16.69), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(120.58, 16.69),
+        location + scale * vector.New(121.55999999999999, 15.083333333333332),
+        location + scale * vector.New(122.89999999999999, 13.829999999999998),
+        location + scale * vector.New(124.6, 12.93), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(124.6, 12.93), location + scale * vector.New(126.3, 12.03),
+        location + scale * vector.New(128.21, 11.58), location + scale * vector.New(130.33, 11.58), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(130.33, 11.58),
+        location + scale * vector.New(132.45666666666668, 11.58),
+        location + scale * vector.New(134.34333333333333, 12.03), location + scale * vector.New(135.99, 12.93), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(135.99, 12.93),
+        location + scale * vector.New(137.63666666666666, 13.829999999999998),
+        location + scale * vector.New(138.92666666666668, 15.043333333333333),
+        location + scale * vector.New(139.86, 16.57), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(139.86, 16.57),
+        location + scale * vector.New(140.79333333333332, 18.096666666666664),
+        location + scale * vector.New(141.26, 19.793333333333333), location + scale * vector.New(141.26, 21.66), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(141.26, 21.66), location + scale * vector.New(141.26, 23),
+        location + scale * vector.New(141.0233333333333, 24.306666666666665),
+        location + scale * vector.New(140.55, 25.58), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(140.55, 25.58),
+        location + scale * vector.New(140.07, 26.85333333333333),
+        location + scale * vector.New(139.24, 28.266666666666666), location + scale * vector.New(138.06, 29.82), col,
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(138.06, 29.82),
+        location + scale * vector.New(136.88, 31.379999999999995),
+        location + scale * vector.New(135.24999999999997, 33.276666666666664),
+        location + scale * vector.New(133.17, 35.51), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(133.17, 35.51), location + scale * vector.New(133.17, 35.51),
+        location + scale * vector.New(125, 44.25), location + scale * vector.New(125, 44.25), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(125, 44.25), location + scale * vector.New(125, 44.25),
+        location + scale * vector.New(125, 44.53), location + scale * vector.New(125, 44.53), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(125, 44.53), location + scale * vector.New(125, 44.53),
+        location + scale * vector.New(141.9, 44.53), location + scale * vector.New(141.9, 44.53), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(141.9, 44.53), location + scale * vector.New(141.9, 44.53),
+        location + scale * vector.New(141.9, 48.44), location + scale * vector.New(141.9, 48.44), col, thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(141.9, 48.44), location + scale * vector.New(141.9, 48.44),
+        location + scale * vector.New(118.96, 48.44), location + scale * vector.New(118.96, 48.44), col, thickness)
 end
 ---Draws v201 on screen, with dimensions = scale * [132,37].
 ---@param ctx ImDrawListPtr
@@ -10564,7 +10931,7 @@ function selectBookmarkMenu()
     local bookmarks = map.Bookmarks
     local menuVars = getMenuVars("selectBookmark")
     local times = {}
-    if (not truthy(bookmarks)) then
+    if (not isTruthy(bookmarks)) then
         imgui.TextWrapped("There are no bookmarks! Add one to navigate.")
     else
         imgui.PushItemWidth(70)
@@ -11318,7 +11685,7 @@ function showKeybindSettings()
     local prefixes, key = kbm.listenForAnyKeyPressed()
     if (key == -1) then return end
     globalVars.hotkeyList[awaitingIndex] = table.concat(prefixes, "+") ..
-        (truthy(prefixes) and "+" or "") .. kbm.numToKey(key)
+        (isTruthy(prefixes) and "+" or "") .. kbm.numToKey(key)
     awaitingIndex = 0
     write(globalVars)
     state.SetValue("hotkey_awaitingIndex", awaitingIndex)
@@ -11914,7 +12281,7 @@ function showTutorialWindow()
     imgui.PopStyleColor(2)
 end
 function renderMeasureDataWidget()
-    if not truthy(state.SelectedHitObjects) then return end
+    if not isTruthy(state.SelectedHitObjects) then return end
     local widgetVars = {
         oldStartOffset = -69,
         oldEndOffset = -69,
@@ -12258,7 +12625,7 @@ function chooseFrameSpacing(settingVars)
     settingVars.frameDistance = math.clamp(settingVars.frameDistance, 2000, 100000)
 end
 function chooseFrameTimeData(settingVars)
-    if not truthy(settingVars.frameTimes) then return end
+    if not isTruthy(settingVars.frameTimes) then return end
     local frameTime = settingVars.frameTimes[settingVars.selectedTimeIndex]
     _, frameTime.frame = imgui.InputInt("Frame #", math.floor(frameTime.frame))
     frameTime.frame = math.clamp(frameTime.frame, 1, settingVars.numFrames)
@@ -12887,7 +13254,7 @@ function generateComboSet(values1, values2, comboPhase, comboType, comboMultipli
         for i = startIndex2, #values1 do
             comboValues[#comboValues + 1] = values1[i]
         end
-        if not truthy(comboValues) then comboValues[#comboValues + 1] = 1 end
+        if not isTruthy(comboValues) then comboValues[#comboValues + 1] = 1 end
         if (comboPhase - #values2 >= 0) then
             comboValues[#comboValues + 1] = lastValue1
         else
@@ -13072,7 +13439,7 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
             settingVars.verticalShift, settingVars.svPoints + 1,
             settingVars.dontNormalize)
     elseif svType == "Random" then
-        if not truthy(settingVars.svMultipliers) then
+        if not isTruthy(settingVars.svMultipliers) then
             generateRandomSetMenuSVs(settingVars)
         end
         multipliers = getRandomSet(settingVars.svMultipliers, settingVars.avgSV,
@@ -13203,7 +13570,7 @@ end
 ---@param svsToAdd ScrollVelocity[]
 function removeAndAddSVs(svsToRemove, svsToAdd)
     local tolerance = 0.035
-    if not truthy(svsToAdd) then return end
+    if not isTruthy(svsToAdd) then return end
     for idx, sv in pairs(svsToRemove) do
         local baseSV = game.get.svStartTimeAt(sv.StartTime)
         if (math.abs(baseSV - sv.StartTime) > tolerance) then
@@ -13218,7 +13585,7 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
     toggleablePrint("s!", table.concat({"Created ", #svsToAdd, pluralize(" SV.", #svsToAdd, -2)}))
 end
 function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
-    if not truthy(ssfsToAdd) then return end
+    if not isTruthy(ssfsToAdd) then return end
     local editorActions = {
         createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
         createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)
@@ -13820,7 +14187,7 @@ end
 function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
-    PLUGIN_NAME = "plumoguSV v2.0.2"
+    PLUGIN_NAME = "plumoguSV-dev"
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed(PLUGIN_NAME)
     imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
@@ -13893,7 +14260,7 @@ function awake()
     triggerListeners()
     setPluginAppearance()
     state.SelectedScrollGroupId = "$Default" or map.GetTimingGroupIds()[1]
-    if (not truthy(map.TimingPoints)) then
+    if (not isTruthy(map.TimingPoints)) then
         print("e!", "Please place a timing point before attempting to use plumoguSV.")
     end
     if (state.Scale ~= 1) then
@@ -13908,7 +14275,7 @@ end
 function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
-    PLUGIN_NAME = "plumoguSV v2.0.2"
+    PLUGIN_NAME = "plumoguSV-dev"
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed(PLUGIN_NAME)
     imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
