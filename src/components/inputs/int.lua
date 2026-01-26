@@ -20,10 +20,12 @@ function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipTex
     if (imgui.Button("x2##" .. label)) then
         oldValue = oldValue * 2
     end
+    HoverToolTip("Double this value.")
     KeepSameLine()
     if (imgui.Button("/2##" .. label)) then
         oldValue = oldValue / 2
     end
+    HoverToolTip("Half this value.")
     KeepSameLine()
     imgui.PushItemWidth(91.5)
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)

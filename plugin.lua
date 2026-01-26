@@ -7020,12 +7020,12 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     widthFactor = widthFactor or 0.7
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local swapButtonPressed = imgui.Button("S##" .. lowerName, TERTIARY_BUTTON_SIZE)
-    HoverToolTip("Swap start/end values")
+    HoverToolTip("Swap the two values.")
     local oldValues = vector.New(varsTable[lowerName], varsTable[higherName])
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
     local negateButtonPressed = imgui.Button("N##" .. higherName, TERTIARY_BUTTON_SIZE)
-    HoverToolTip("Negate start/end values")
+    HoverToolTip("Negate the two values.")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * widthFactor - SAMELINE_SPACING)
@@ -7157,10 +7157,12 @@ function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipTex
     if (imgui.Button("x2##" .. label)) then
         oldValue = oldValue * 2
     end
+    HoverToolTip("Double this value.")
     KeepSameLine()
     if (imgui.Button("/2##" .. label)) then
         oldValue = oldValue / 2
     end
+    HoverToolTip("Half this value.")
     KeepSameLine()
     imgui.PushItemWidth(91.5)
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)
