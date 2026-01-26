@@ -92,10 +92,19 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
 
         imgui.EndChild()
     else
-        imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
-        _, normalizedPos1 = imgui.SliderFloat2("Point 1", pos1 / 150, 0, 1)
-        imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
-        _, normalizedPos2 = imgui.SliderFloat2("Point 2", pos2 / 150, 0, 1)
+        if (settingVars.freeMode) then
+            imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
+            _, normalizedPos1 = imgui.InputFloat2("Point 1", pos1 / 150)
+            imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
+            _, normalizedPos2 = imgui.InputFloat2("Point 2", pos2 / 150)
+        else
+            imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
+            _, normalizedPos1 = imgui.SliderFloat2("Point 1", pos1 / 150, 0, 1)
+            imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
+            _, normalizedPos2 = imgui.SliderFloat2("Point 2", pos2 / 150, 0, 1)
+        end
+        _, settingVars.freeMode = imgui.Checkbox("Free Mode##Bezier", settingVars.freeMode)
+        KeepSameLine()
         _, settingVars.manualMode = imgui.Checkbox("Manual Edit##Bezier", settingVars.manualMode)
         HoverToolTip(
             "Disable this to edit the bezier points with an interactive graph.")

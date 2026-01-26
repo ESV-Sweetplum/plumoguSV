@@ -645,8 +645,8 @@ dontReplaceSV: false
 drawCapybara: true
 drawCapybara2: false
 drawCapybara312: false
-dynamicBackgroundIndex: 2
-editToolIndex: 4
+dynamicBackgroundIndex: 1
+editToolIndex: 10
 effectFPS: 100
 equalizeLinear: true
 hideAutomatic: true
@@ -665,9 +665,9 @@ hotkeyList:
 - Ctrl+Alt+E
 - O
 ignoreNotesOutsideTg: false
-maxDisplacementMultiplierExponent: 0
+maxDisplacementMultiplierExponent: 6
 performanceMode: false
-placeTypeIndex: 1
+placeTypeIndex: 4
 presets:
 - 
 printLegacyLNMessage: true
@@ -679,7 +679,7 @@ pulseColor:
 - 1
 restrictSinusoidalPeriod: false
 rgbPeriod: 3
-scrollGroupIndex: 1
+scrollGroupIndex: 3
 selectTypeIndex: 1
 showMeasureDataWidget: true
 showNoteDataWidget: true
