@@ -14,3 +14,23 @@ function BasicInputInt(varsTable, parameterName, label, bounds, tooltipText)
     end
     return oldValue ~= varsTable[parameterName]
 end
+
+function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipText)
+    local oldValue = varsTable[parameterName]
+    if (imgui.Button("x2##" .. label)) then
+        oldValue = oldValue * 2
+    end
+    KeepSameLine()
+    if (imgui.Button("/2##" .. label)) then
+        oldValue = oldValue / 2
+    end
+    KeepSameLine()
+    imgui.PushItemWidth(91.5)
+    _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)
+    imgui.PopItemWidth()
+    if tooltipText then HelpMarker(tooltipText) end
+    if (bounds and bounds[1] and bounds[2]) then
+        varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
+    end
+    return oldValue ~= varsTable[parameterName]
+end

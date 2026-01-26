@@ -1262,7 +1262,7 @@ BEEG_BUTTON_SIZE = vector.New(253, 24)
 MIN_RGB_CYCLE_TIME = 0.1
 MAX_RGB_CYCLE_TIME = 300
 MAX_CURSOR_TRAIL_POINTS = 100
-MAX_SV_POINTS = 1000
+MAX_SV_POINTS = 1024
 MAX_ANIMATION_FRAMES = 999
 MAX_IMPORT_CHARACTER_LIMIT = 999999
 CHINCHILLA_TYPES = {
@@ -6982,7 +6982,7 @@ function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
     HoverToolTip("Negate this value.")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
+    imgui.PushItemWidth(107)
     local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
     imgui.PopItemWidth()
     if ((negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary])) and newValue ~= 0) then
@@ -7008,7 +7008,7 @@ function ResettableNegatableComputableInputFloat(label, value, defaultValue, dec
     HoverToolTip("Negate this value.")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
+    imgui.PushItemWidth(107)
     local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
     imgui.PopItemWidth()
     imgui.PopStyleVar(3)
@@ -7146,6 +7146,25 @@ end
 function BasicInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 1, 1)
+    if tooltipText then HelpMarker(tooltipText) end
+    if (bounds and bounds[1] and bounds[2]) then
+        varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
+    end
+    return oldValue ~= varsTable[parameterName]
+end
+function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipText)
+    local oldValue = varsTable[parameterName]
+    if (imgui.Button("x2##" .. label)) then
+        oldValue = oldValue * 2
+    end
+    KeepSameLine()
+    if (imgui.Button("/2##" .. label)) then
+        oldValue = oldValue / 2
+    end
+    KeepSameLine()
+    imgui.PushItemWidth(91.5)
+    _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)
+    imgui.PopItemWidth()
     if tooltipText then HelpMarker(tooltipText) end
     if (bounds and bounds[1] and bounds[2]) then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
@@ -12560,7 +12579,7 @@ function chooseCurveSharpness(settingVars)
         settingVars.curveSharpness = 50
     end
     KeepSameLine()
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
+    imgui.PushItemWidth(107)
     local _, newSharpness = imgui.SliderInt("Curve Sharpness", settingVars.curveSharpness, 1, 100, "%d%%")
     imgui.PopItemWidth()
     settingVars.curveSharpness = newSharpness
@@ -12920,7 +12939,7 @@ function chooseSVBehavior(settingVars)
     HoverToolTip("Switch between slow down/speed up")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
+    imgui.PushItemWidth(107)
     local oldBehaviorIndex = settingVars.behaviorIndex
     settingVars.behaviorIndex = Combo("Behavior", SV_BEHAVIORS, oldBehaviorIndex)
     imgui.PopItemWidth()
@@ -12944,7 +12963,7 @@ function chooseSVPoints(settingVars, svPointsForce)
         settingVars.svPoints = svPointsForce
         return false
     end
-    return BasicInputInt(settingVars, "svPoints", "SV Points##regular", { 1, MAX_SV_POINTS })
+    return ExponentialInputInt(settingVars, "svPoints", "SV Points##regular", { 1, MAX_SV_POINTS })
 end
 function chooseDistanceMode(menuVars)
     local oldMode = menuVars.distanceMode

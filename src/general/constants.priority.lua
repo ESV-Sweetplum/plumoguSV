@@ -16,7 +16,7 @@ BEEG_BUTTON_SIZE = vector.New(253, 24)                                 -- beeg b
 MIN_RGB_CYCLE_TIME = 0.1                                               -- minimum seconds for one complete RGB color cycle
 MAX_RGB_CYCLE_TIME = 300                                               -- maximum seconds for one complete RGB color cycle
 MAX_CURSOR_TRAIL_POINTS = 100                                          -- maximum number of points for cursor trail effects
-MAX_SV_POINTS = 1000                                                   -- maximum number of SV points allowed
+MAX_SV_POINTS = 1024                                                   -- maximum number of SV points allowed
 MAX_ANIMATION_FRAMES = 999                                             -- maximum number of animation frames allowed
 MAX_IMPORT_CHARACTER_LIMIT = 999999                                    -- maximum number of characters allowed for import text
 

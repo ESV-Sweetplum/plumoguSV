@@ -263,7 +263,7 @@ function chooseCurveSharpness(settingVars)
         settingVars.curveSharpness = 50
     end
     KeepSameLine()
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
+    imgui.PushItemWidth(107)
     local _, newSharpness = imgui.SliderInt("Curve Sharpness", settingVars.curveSharpness, 1, 100, "%d%%")
     imgui.PopItemWidth()
     settingVars.curveSharpness = newSharpness
@@ -673,7 +673,7 @@ function chooseSVBehavior(settingVars)
     HoverToolTip("Switch between slow down/speed up")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
+    imgui.PushItemWidth(107)
     local oldBehaviorIndex = settingVars.behaviorIndex
     settingVars.behaviorIndex = Combo("Behavior", SV_BEHAVIORS, oldBehaviorIndex)
     imgui.PopItemWidth()
@@ -700,7 +700,7 @@ function chooseSVPoints(settingVars, svPointsForce)
         return false
     end
 
-    return BasicInputInt(settingVars, "svPoints", "SV Points##regular", { 1, MAX_SV_POINTS })
+    return ExponentialInputInt(settingVars, "svPoints", "SV Points##regular", { 1, MAX_SV_POINTS })
 end
 
 function chooseDistanceMode(menuVars)
