@@ -11130,8 +11130,10 @@ function showAppearanceSettings()
         globalVars.colorThemeIndex = table.indexOf(COLOR_THEMES, "CUSTOM")
         setPluginAppearanceColors("CUSTOM")
     end
-    HoverToolTip(
-        "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
+    if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM") then
+        HoverToolTip(
+            "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
+    end
     AddSeparator()
     chooseCursorTrail()
     chooseCursorTrailShape()
