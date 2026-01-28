@@ -11353,7 +11353,7 @@ function parseCustomStyleV2(str, keyIdDict)
         local keyValue = kvPair:sub(-5)
         local key = table.indexOf(keyIdDict, keyId)
         if (not keyId or key == -1) then goto nextPair end
-        customStyle[key] = color.nduaToRgba(keyValue) / 255
+        customStyle[key] = color.nduaToRgba(keyValue)
         ::nextPair::
     end
     globalVars.customStyle = table.duplicate(customStyle)
