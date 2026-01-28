@@ -203,7 +203,7 @@ function parseCustomStyleV1(str, keyIdDict)
         local keyId = kvPair:match("[a-zA-Z]+:"):sub(1, -2)
         local hexa = kvPair:match(":[a-f0-9]+"):sub(2)
         local key = table.indexOf(keyIdDict, keyId)
-        if (key ~= -1) then customStyle[key] = color.hexaToRgba(hexa) / 255 end
+        if (key ~= -1) then customStyle[key] = color.hexaToRgba(hexa) end
     end
 
     globalVars.customStyle = table.duplicate(customStyle)
