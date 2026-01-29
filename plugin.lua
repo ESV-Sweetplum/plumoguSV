@@ -2483,17 +2483,17 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
     local lastMultiplier = menuVars.svMultipliers[numMultipliers]
     if (place == nil or place == true) then
         if placingStillSVs then
-            local tbl = getStillSVs(menuVars, firstOffset, lastOffset,
+            local stillSVResult = getStillSVs(menuVars, firstOffset, lastOffset,
                 sort(svsToAdd, sortAscendingStartTime), svsToAdd)
-            svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
+            svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
         end
         addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == "Override")
         removeAndAddSVs(svsToRemove, svsToAdd)
         return
     end
-    local tbl = getStillSVs(menuVars, firstOffset, lastOffset,
+    local stillSVResult = getStillSVs(menuVars, firstOffset, lastOffset,
         sort(svsToAdd, sortAscendingStartTime), svsToAdd, queuedSVs)
-    svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
+    svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
     return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
 end
 function placeStillSVsParent(menuVars)
@@ -3185,14 +3185,14 @@ function displaceNoteSVsParent(menuVars)
     local svsToAdd = {}
     for k23 = 1, #offsets do
         local offset = offsets[k23]
-        local tbl = displaceNoteSVs(
+        local displaceNoteResults = displaceNoteSVs(
             {
                 distance = (offset - offsets[1]) / (offsets[#offsets] - offsets[1]) *
                     (menuVars.distance2 - menuVars.distance1) + menuVars.distance1
             },
             false, offset)
-        svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
-        svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
+        svsToRemove = table.combine(svsToRemove, displaceNoteResults.svsToRemove)
+        svsToAdd = table.combine(svsToAdd, displaceNoteResults.svsToAdd)
     end
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
@@ -6968,7 +6968,7 @@ function ComputableInputFloat(label, value, decimalPlaces, suffix)
         string.format(fmt, value), 4096,
         imgui_input_text_flags.AutoSelectAll)
     if (imgui.IsItemEdited()) then
-        local desiredComp = tostring(value):gsub("[^%d%+%-%*%/%.]", ""):gsub(suffix, "")
+        local desiredComp = tostring(value):gsub("[^%d%+%-%*%/%.]", ""):gsub(suffix or "", "")
         output = expr(desiredComp)
         if (output == nil) then output = value end
     end
@@ -8281,11 +8281,23 @@ function directSVMenu()
     if (imgui.IsItemDeactivatedAfterEdit()) then
         actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
             createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime or 0, menuVars.multiplier)) })
+        updateDirectEdit()
     end
     menuVars.multiplier = ComputableInputFloat("Multiplier", svs[menuVars.selectableIndex].Multiplier, 10)
     if (imgui.IsItemDeactivatedAfterEdit()) then
         actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
             createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime, menuVars.multiplier or 1)) })
+        updateDirectEdit()
+    end
+    if (imgui.Button("Duplicate this SV")) then
+        local existingSV = svs[menuVars.selectableIndex]
+        actions.PlaceScrollVelocity(createSV(existingSV.StartTime + 0.67, existingSV.Multiplier))
+        updateDirectEdit()
+    end
+    KeepSameLine()
+    if (imgui.Button("Delete this SV")) then
+        actions.RemoveScrollVelocity(svs[menuVars.selectableIndex])
+        updateDirectEdit()
     end
     imgui.Separator()
     if (imgui.ArrowButton("##DirectSVLeft", imgui_dir.Left)) then
@@ -8307,6 +8319,7 @@ function directSVMenu()
     KeepSameLine()
     imgui.SetCursorPosX(150)
     imgui.Text("Multiplier")
+    KeepSameLine()
     imgui.Separator()
     local startingPoint = 10 * menuVars.pageNumber - 10
     imgui.BeginTable("Test", 2)
@@ -8314,14 +8327,14 @@ function directSVMenu()
         imgui.PushID(idx)
         imgui.TableNextRow()
         imgui.TableSetColumnIndex(0)
-        imgui.Selectable(tostring(math.round(v.StartTime, 2)), menuVars.selectableIndex == idx,
+        imgui.Selectable(string.format("%.2f", v.StartTime), menuVars.selectableIndex == idx,
             imgui_selectable_flags.SpanAllColumns)
         if (imgui.IsItemClicked()) then
             menuVars.selectableIndex = idx + startingPoint
         end
         imgui.TableSetColumnIndex(1)
         imgui.SetCursorPosX(150)
-        imgui.Text(tostring(math.round(v.Multiplier, 2)));
+        imgui.Text(string.format("%.2f", v.Multiplier));
         imgui.PopID()
     end
     imgui.EndTable()

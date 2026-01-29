@@ -13,7 +13,7 @@ function ComputableInputFloat(label, value, decimalPlaces, suffix)
         string.format(fmt, value), 4096,
         imgui_input_text_flags.AutoSelectAll)
     if (imgui.IsItemEdited()) then
-        local desiredComp = tostring(value):gsub("[^%d%+%-%*%/%.]", ""):gsub(suffix, "")
+        local desiredComp = tostring(value):gsub("[^%d%+%-%*%/%.]", ""):gsub(suffix or "", "")
         output = expr(desiredComp)
         if (output == nil) then output = value end
     end

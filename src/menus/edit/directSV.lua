@@ -37,6 +37,7 @@ function directSVMenu()
     if (imgui.IsItemDeactivatedAfterEdit()) then
         actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
             createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime or 0, menuVars.multiplier)) })
+        updateDirectEdit()
     end
 
     menuVars.multiplier = ComputableInputFloat("Multiplier", svs[menuVars.selectableIndex].Multiplier, 10)
@@ -44,6 +45,18 @@ function directSVMenu()
     if (imgui.IsItemDeactivatedAfterEdit()) then
         actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
             createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime, menuVars.multiplier or 1)) })
+        updateDirectEdit()
+    end
+
+    if (imgui.Button("Duplicate this SV")) then
+        local existingSV = svs[menuVars.selectableIndex]
+        actions.PlaceScrollVelocity(createSV(existingSV.StartTime + 0.67, existingSV.Multiplier))
+        updateDirectEdit()
+    end
+    KeepSameLine()
+    if (imgui.Button("Delete this SV")) then
+        actions.RemoveScrollVelocity(svs[menuVars.selectableIndex])
+        updateDirectEdit()
     end
 
     imgui.Separator()
@@ -69,6 +82,7 @@ function directSVMenu()
     KeepSameLine()
     imgui.SetCursorPosX(150)
     imgui.Text("Multiplier")
+    KeepSameLine()
     imgui.Separator()
 
     local startingPoint = 10 * menuVars.pageNumber - 10
@@ -78,14 +92,14 @@ function directSVMenu()
         imgui.PushID(idx)
         imgui.TableNextRow()
         imgui.TableSetColumnIndex(0)
-        imgui.Selectable(tostring(math.round(v.StartTime, 2)), menuVars.selectableIndex == idx,
+        imgui.Selectable(string.format("%.2f", v.StartTime), menuVars.selectableIndex == idx,
             imgui_selectable_flags.SpanAllColumns)
         if (imgui.IsItemClicked()) then
             menuVars.selectableIndex = idx + startingPoint
         end
         imgui.TableSetColumnIndex(1)
         imgui.SetCursorPosX(150)
-        imgui.Text(tostring(math.round(v.Multiplier, 2)));
+        imgui.Text(string.format("%.2f", v.Multiplier));
         imgui.PopID()
     end
 

@@ -10,14 +10,14 @@ function displaceNoteSVsParent(menuVars)
     local svsToAdd = {}
 
     for _, offset in ipairs(offsets) do
-        local tbl = displaceNoteSVs(
+        local displaceNoteResults = displaceNoteSVs(
             {
                 distance = (offset - offsets[1]) / (offsets[#offsets] - offsets[1]) *
                     (menuVars.distance2 - menuVars.distance1) + menuVars.distance1
             },
             false, offset)
-        svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
-        svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
+        svsToRemove = table.combine(svsToRemove, displaceNoteResults.svsToRemove)
+        svsToAdd = table.combine(svsToAdd, displaceNoteResults.svsToAdd)
     end
 
     removeAndAddSVs(svsToRemove, svsToAdd)

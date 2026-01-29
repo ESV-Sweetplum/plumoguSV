@@ -35,16 +35,16 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
     local lastMultiplier = menuVars.svMultipliers[numMultipliers]
     if (place == nil or place == true) then
         if placingStillSVs then
-            local tbl = getStillSVs(menuVars, firstOffset, lastOffset,
+            local stillSVResult = getStillSVs(menuVars, firstOffset, lastOffset,
                 sort(svsToAdd, sortAscendingStartTime), svsToAdd)
-            svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
+            svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
         end
         addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == "Override")
         removeAndAddSVs(svsToRemove, svsToAdd)
         return
     end
-    local tbl = getStillSVs(menuVars, firstOffset, lastOffset,
+    local stillSVResult = getStillSVs(menuVars, firstOffset, lastOffset,
         sort(svsToAdd, sortAscendingStartTime), svsToAdd, queuedSVs)
-    svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
+    svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
     return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
 end
