@@ -3494,7 +3494,9 @@ function fixFlippedLNEnds()
     local svTimeIsAdded = {}
     local lnEndTimeFixed = {}
     local fixedLNEndsCount = 0
+    local ogTg = state.SelectedScrollGroupId
     for _, ho in ipairs(map.HitObjects) do
+        state.SelectedScrollGroupId = ho.TimingGroup
         local lnEndTime = ho.EndTime
         local isLN = lnEndTime ~= 0
         local endHasNegativeSV = (game.get.svMultiplierAt(lnEndTime) <= 0)
@@ -3528,6 +3530,7 @@ function fixFlippedLNEnds()
     removeAndAddSVs(svsToRemove, svsToAdd)
     local type = isTruthy(fixedLNEndsCount) and "s!" or "w!"
     print(type, "Fixed " .. fixedLNEndsCount .. pluralize(" flipped LN end.", fixedLNEndsCount, -2))
+    state.SelectedScrollGroupId = ogTg
 end
 function mergeSVsAndSSFs()
     local editorActions = {}
