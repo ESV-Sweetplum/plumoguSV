@@ -11,6 +11,9 @@ function lintMapMenu()
     simpleActionMenu("Remove unnecessary SVs/SSFs", 0, removeUnnecessarySVsAndSSFs, nil, false, true)
     HoverToolTip(
         "(DOESN'T VISUALLY AFFECT MAP) If two consecutive SVs have the same multiplier, removes the second SV. If three consecutive SSFs have the same multiplier, removes the middle SSF.")
+    simpleActionMenu("Remove SVs/SSFs after all TG notes", 0, removePostTGSVsAndSSFs, nil, false, true)
+    HoverToolTip(
+        "(DOESN'T VISUALLY AFFECT MAP) (ONLY APPLY AFTER MAP IS FINISHED) For all TGs, removes all SVs/SSFs after the last note and places a teleport in their place (except for the default and global groups).")
     simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, false, true)
     HoverToolTip("Removes stacked notes.")
     simpleActionMenu("Remove all hitsounds in selection", 0, removeAllHitSounds, nil, true, true)

@@ -91,41 +91,47 @@ function fixFlippedLNEnds()
 end
 
 function mergeSVsAndSSFs()
-    local svTimeDict = {}
-    local svsToRemove = {}
-    local ssfTimeDict = {}
-    local ssfsToRemove = {}
+    local editorActions = {}
+    local svSum = 0
+    local ssfSum = 0
+    local ogTg = state.SelectedScrollGroupId
 
-    for _, sv in ipairs(table.reverse(map.ScrollVelocities)) do -- reverse to prioritize second sv in list
-        if (svTimeDict[sv.StartTime]) then
-            table.insert(svsToRemove, sv)
-        else
-            svTimeDict[sv.StartTime] = true
+    for tgId, tg in pairs(map.TimingGroups) do
+        state.SelectedScrollGroupId = tgId
+        local svTimeDict = {}
+        local svsToRemove = {}
+        local ssfTimeDict = {}
+        local ssfsToRemove = {}
+
+        for _, sv in ipairs(table.reverse(map.ScrollVelocities)) do -- reverse to prioritize second sv in list
+            if (svTimeDict[sv.StartTime]) then
+                table.insert(svsToRemove, sv)
+            else
+                svTimeDict[sv.StartTime] = true
+            end
         end
-    end
 
-    for _, ssf in ipairs(table.reverse(map.ScrollSpeedFactors)) do -- reverse to prioritize second sv in list
-        if (ssfTimeDict[ssf.StartTime]) then
-            table.insert(ssfsToRemove, ssf)
-        else
-            ssfTimeDict[ssf.StartTime] = true
+        for _, ssf in ipairs(table.reverse(map.ScrollSpeedFactors)) do -- reverse to prioritize second sv in list
+            if (ssfTimeDict[ssf.StartTime]) then
+                table.insert(ssfsToRemove, ssf)
+            else
+                ssfTimeDict[ssf.StartTime] = true
+            end
         end
+        table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
+        table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
+
+        svSum = svSum + #svsToRemove
+        ssfSum = ssfSum + #ssfsToRemove
     end
 
-    if (isTruthy(#svsToRemove + #ssfsToRemove)) then
-        actions.PerformBatch({
-            utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
-            utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove)
-        })
-    end
-    local type = isTruthy(#svsToRemove + #ssfsToRemove) and "s!" or "w!"
+    if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = isTruthy(svSum + ssfSum) and "s!" or "w!"
     print(type,
-        table.concat({ "Removed ", #svsToRemove, pluralize(" SV", #svsToRemove), " and ", #ssfsToRemove, pluralize(
-            " SSF.", #ssfsToRemove, -2) }))
-end
+        table.concat({ "Removed ", svSum, pluralize(" SV", svSum), " and ", ssfSum, pluralize(
+            " SSF.", ssfSum, -2) }))
 
-function mergeSSFs()
-
+    state.SelectedScrollGroupId = ogTg
 end
 
 function mergeNotes()
@@ -211,4 +217,51 @@ function removeAllHitSounds()
     print("w!", "Note that the Quaver hitsound system is funky and some hitsounds exist that aren't audible.")
     imgui.SetClipboardText(table.concat(objs, ","))
     actions.PerformBatch(hitsoundActions)
+end
+
+function removePostTGSVsAndSSFs()
+    local editorActions = {}
+    local ogTG = state.SelectedScrollGroupId
+    local svSum = 0
+    local ssfSum = 0
+    local lastHoDict = {}
+    for _, ho in pairs(map.HitObjects) do
+        local maxTime = math.max(ho.StartTime, ho.EndTime)
+        if (not lastHoDict[ho.TimingGroup] or lastHoDict[ho.TimingGroup] < maxTime) then
+            lastHoDict[ho.TimingGroup] = maxTime
+        end
+    end
+    for tgId, tg in pairs(map.TimingGroups) do
+        if (tg == map.DefaultScrollGroup or tg == map.GlobalScrollGroup) then goto nextTG end
+        do
+            state.SelectedScrollGroupId = tgId
+            local maxTime = lastHoDict[tgId]
+            local svsToAdd = {}
+            local svsToRemove = {}
+            local ssfsToRemove = {}
+            for _, sv in pairs(map.ScrollVelocities) do
+                if (sv.StartTime > maxTime + 1) then
+                    table.insert(svsToRemove, sv)
+                end
+            end
+            for _, ssf in pairs(map.ScrollSpeedFactors) do
+                if (ssf.StartTime > maxTime + 1) then
+                    table.insert(ssfsToRemove, ssf)
+                end
+            end
+            prepareDisplacingSVs(maxTime, svsToAdd, {}, nil,
+                100000, 0)
+            table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
+            table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
+            table.insert(editorActions, createEA(action_type.AddScrollVelocityBatch, svsToAdd))
+            svSum = svSum + #svsToRemove
+            ssfSum = ssfSum + #ssfsToRemove
+        end
+        ::nextTG::
+    end
+    if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = isTruthy(svSum + ssfSum) and "s!" or "w!"
+    print(type,
+        table.concat({ "Removed ", svSum, pluralize(" SV", svSum), " and ", ssfSum, pluralize(" SSF.", ssfSum, -2) }))
+    state.SelectedScrollGroupId = ogTG
 end

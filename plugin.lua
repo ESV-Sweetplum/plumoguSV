@@ -2825,7 +2825,7 @@ function storeDuplicateItems(menuVars)
     for _, bm in pairs(bms) do
         table.insert(objects, { type = "bm", data = bm })
     end
-    local ogId = state.SelectedScrollGroupId
+    local ogTg = state.SelectedScrollGroupId
     local svTbl = {}
     local ssfTbl = {}
     for tgId, tg in pairs(map.TimingGroups) do
@@ -2841,7 +2841,7 @@ function storeDuplicateItems(menuVars)
             ssfTbl[tgId][#ssfTbl[tgId] + 1] = ssf
         end
     end
-    state.SelectedScrollGroupId = ogId
+    state.SelectedScrollGroupId = ogTg
     menuVars.objects = objects
     menuVars.svTbl = svTbl
     menuVars.ssfTbl = ssfTbl
@@ -3530,34 +3530,41 @@ function fixFlippedLNEnds()
     print(type, "Fixed " .. fixedLNEndsCount .. pluralize(" flipped LN end.", fixedLNEndsCount, -2))
 end
 function mergeSVsAndSSFs()
-    local svTimeDict = {}
-    local svsToRemove = {}
-    local ssfTimeDict = {}
-    local ssfsToRemove = {}
-    for _, sv in ipairs(table.reverse(map.ScrollVelocities)) do
-        if (svTimeDict[sv.StartTime]) then
-            svsToRemove[#svsToRemove + 1] = sv
-        else
-            svTimeDict[sv.StartTime] = true
+    local editorActions = {}
+    local svSum = 0
+    local ssfSum = 0
+    local ogTg = state.SelectedScrollGroupId
+    for tgId, tg in pairs(map.TimingGroups) do
+        state.SelectedScrollGroupId = tgId
+        local svTimeDict = {}
+        local svsToRemove = {}
+        local ssfTimeDict = {}
+        local ssfsToRemove = {}
+        for _, sv in ipairs(table.reverse(map.ScrollVelocities)) do
+            if (svTimeDict[sv.StartTime]) then
+                svsToRemove[#svsToRemove + 1] = sv
+            else
+                svTimeDict[sv.StartTime] = true
+            end
         end
-    end
-    for _, ssf in ipairs(table.reverse(map.ScrollSpeedFactors)) do
-        if (ssfTimeDict[ssf.StartTime]) then
-            ssfsToRemove[#ssfsToRemove + 1] = ssf
-        else
-            ssfTimeDict[ssf.StartTime] = true
+        for _, ssf in ipairs(table.reverse(map.ScrollSpeedFactors)) do
+            if (ssfTimeDict[ssf.StartTime]) then
+                ssfsToRemove[#ssfsToRemove + 1] = ssf
+            else
+                ssfTimeDict[ssf.StartTime] = true
+            end
         end
+        table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
+        table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
+        svSum = svSum + #svsToRemove
+        ssfSum = ssfSum + #ssfsToRemove
     end
-    if (isTruthy(#svsToRemove + #ssfsToRemove)) then
-        actions.PerformBatch({
-            utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
-            utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove)
-        })
-    end
-    local type = isTruthy(#svsToRemove + #ssfsToRemove) and "s!" or "w!"
+    if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = isTruthy(svSum + ssfSum) and "s!" or "w!"
     print(type,
-        table.concat({ "Removed ", #svsToRemove, pluralize(" SV", #svsToRemove), " and ", #ssfsToRemove, pluralize(
-            " SSF.", #ssfsToRemove, -2) }))
+        table.concat({ "Removed ", svSum, pluralize(" SV", svSum), " and ", ssfSum, pluralize(
+            " SSF.", ssfSum, -2) }))
+    state.SelectedScrollGroupId = ogTg
 end
 function mergeNotes()
     local noteDict = {}
@@ -3640,6 +3647,52 @@ function removeAllHitSounds()
     print("w!", "Note that the Quaver hitsound system is funky and some hitsounds exist that aren't audible.")
     imgui.SetClipboardText(table.concat(objs, ","))
     actions.PerformBatch(hitsoundActions)
+end
+function removePostTGSVsAndSSFs()
+    local editorActions = {}
+    local ogTG = state.SelectedScrollGroupId
+    local svSum = 0
+    local ssfSum = 0
+    local lastHoDict = {}
+    for _, ho in pairs(map.HitObjects) do
+        local maxTime = math.max(ho.StartTime, ho.EndTime)
+        if (not lastHoDict[ho.TimingGroup] or lastHoDict[ho.TimingGroup] < maxTime) then
+            lastHoDict[ho.TimingGroup] = maxTime
+        end
+    end
+    for tgId, tg in pairs(map.TimingGroups) do
+        if (tg == map.DefaultScrollGroup or tg == map.GlobalScrollGroup) then goto nextTG end
+        do
+            state.SelectedScrollGroupId = tgId
+            local maxTime = lastHoDict[tgId]
+            local svsToAdd = {}
+            local svsToRemove = {}
+            local ssfsToRemove = {}
+            for _, sv in pairs(map.ScrollVelocities) do
+                if (sv.StartTime > maxTime + 1) then
+                    svsToRemove[#svsToRemove + 1] = sv
+                end
+            end
+            for _, ssf in pairs(map.ScrollSpeedFactors) do
+                if (ssf.StartTime > maxTime + 1) then
+                    ssfsToRemove[#ssfsToRemove + 1] = ssf
+                end
+            end
+            prepareDisplacingSVs(maxTime, svsToAdd, {}, nil,
+                100000, 0)
+            table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
+            table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
+            table.insert(editorActions, createEA(action_type.AddScrollVelocityBatch, svsToAdd))
+            svSum = svSum + #svsToRemove
+            ssfSum = ssfSum + #ssfsToRemove
+        end
+        ::nextTG::
+    end
+    if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = isTruthy(svSum + ssfSum) and "s!" or "w!"
+    print(type,
+        table.concat({ "Removed ", svSum, pluralize(" SV", svSum), " and ", ssfSum, pluralize(" SSF.", ssfSum, -2) }))
+    state.SelectedScrollGroupId = ogTG
 end
 function measureSVs(menuVars)
     local roundingDecimalPlaces = 5
@@ -8436,6 +8489,9 @@ function lintMapMenu()
     simpleActionMenu("Remove unnecessary SVs/SSFs", 0, removeUnnecessarySVsAndSSFs, nil, false, true)
     HoverToolTip(
         "(DOESN'T VISUALLY AFFECT MAP) If two consecutive SVs have the same multiplier, removes the second SV. If three consecutive SSFs have the same multiplier, removes the middle SSF.")
+    simpleActionMenu("Remove SVs/SSFs after all TG notes", 0, removePostTGSVsAndSSFs, nil, false, true)
+    HoverToolTip(
+        "(DOESN'T VISUALLY AFFECT MAP) (ONLY APPLY AFTER MAP IS FINISHED) For all TGs, removes all SVs/SSFs after the last note and places a teleport in their place (except for the default and global groups).")
     simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, false, true)
     HoverToolTip("Removes stacked notes.")
     simpleActionMenu("Remove all hitsounds in selection", 0, removeAllHitSounds, nil, true, true)

@@ -17,7 +17,7 @@ function storeDuplicateItems(menuVars)
         table.insert(objects, { type = "bm", data = bm })
     end
 
-    local ogId = state.SelectedScrollGroupId
+    local ogTg = state.SelectedScrollGroupId
     local svTbl = {}
     local ssfTbl = {}
     for tgId, tg in pairs(map.TimingGroups) do
@@ -34,7 +34,7 @@ function storeDuplicateItems(menuVars)
         end
     end
 
-    state.SelectedScrollGroupId = ogId
+    state.SelectedScrollGroupId = ogTg
 
     menuVars.objects = objects
     menuVars.svTbl = svTbl
