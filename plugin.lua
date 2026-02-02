@@ -2046,7 +2046,7 @@ end]]
     },
     exponential = {
         behaviorIndex = 1,
-        intensity = 30,
+        intensity = 20,
         verticalShift = 0,
         distance = 100,
         startSV = 0.01,
@@ -12637,18 +12637,16 @@ function chooseColorTheme()
                         local col2 = vector.New(item.textColor[currentSubdivision + 1][1] / 255,
                             item.textColor[currentSubdivision + 1][2] / 255,
                             item.textColor[currentSubdivision + 1][3] / 255, 1)
-                        imgui.PushStyleColor(imgui_col.Text,
-                            col1 * (1 - progress) +
-                            col2 * progress)
-                        imgui.Text(char)
-                        imgui.PopStyleColor()
+                        imgui.TextColored(col1 * (1 - progress) +
+                            col2 * progress, char)
                         imgui.SameLine(0, 0)
                         charProgress = charProgress + 1
                     end
                 else
-                    imgui.PushStyleColor(imgui_col.Text, vector.New(col[1] / 255, col[2] / 255, col[3] / 255, 1))
-                    imgui.Text(item.id)
-                    imgui.PopStyleColor()
+                    for char in item.id:gmatch(".") do
+                        imgui.TextColored(vector.New(col[1] / 255, col[2] / 255, col[3] / 255, 1), char)
+                        imgui.SameLine(0, 0)
+                    end
                 end
                 imgui.EndChild()
                 if (imgui.IsItemClicked("Left")) then
