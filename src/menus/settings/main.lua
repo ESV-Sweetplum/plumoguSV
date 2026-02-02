@@ -37,7 +37,7 @@ function showPluginSettingsWindow()
     --- Key is name of setting. If value with respect to key is true, will hide setting at the left
     local hideSettingDict = {
         ["Advanced"] = not globalVars.advancedMode,
-        ["Custom Theme"] = (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)
+        ["Custom Theme"] = (globalVars.colorThemeName ~= "CUSTOM" or globalVars.performanceMode)
     }
 
     for idx, v in pairs(SETTING_TYPES) do
@@ -98,7 +98,7 @@ function showPluginSettingsWindow()
     if (not globalVars.performanceMode) then
         imgui.PopStyleColor(41)
         pulseController()
-        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex], true)
+        setPluginAppearanceColors(globalVars.colorThemeName, true)
         setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
     end
     imgui.End()

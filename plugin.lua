@@ -41,6 +41,8 @@ function cache.saveTable(listName, variables)
         state.SetValue(listName .. key, value)
     end
 end
+---Returns the number of milliseconds the plugin has been active.
+---@return number lifetime
 function clock.getTime()
     return (state.UnixTime - clock.prevTime) / 1000
 end
@@ -204,32 +206,33 @@ local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---@param dontPrintInaccuracy? boolean If set to true, will not print warning messages on unconfident guesses.
 ---@return SnapNumber
 function game.get.snapAt(time, dontPrintInaccuracy)
+    local MAX_SNAP = 48
     local previousBar = math.floor(map.GetNearestSnapTimeFromTime(false, 1, time + 6) or 0)
     local barLength = 60000 / game.get.timingPointAt(state.SongTime).Bpm
     local distanceAbovePrev = time - previousBar
     if (distanceAbovePrev <= 5 or distanceAbovePrev >= barLength - 5) then return 1 end
-    local snap48 = barLength / 48
+    local minSnapTime = barLength / MAX_SNAP
     local checkingTime = 0
     local index = -1
-    for _ = 1, 48 do
+    for _ = 1, MAX_SNAP do
         if checkingTime > distanceAbovePrev then break end
-        checkingTime = checkingTime + snap48
+        checkingTime = checkingTime + minSnapTime
         index = index + 1
     end
-    if (math.abs(snap48 * (index + 1) - distanceAbovePrev) < math.abs(snap48 * index - distanceAbovePrev)) then
+    if (math.abs(minSnapTime * (index + 1) - distanceAbovePrev) < math.abs(minSnapTime * index - distanceAbovePrev)) then
         index = index + 1
     end
-    local v = 48
+    local divisor = MAX_SNAP
     local div = index
-    local r = -1
-    while (r ~= 0) do
-        r = v % div
-        v = div
-        div = r
+    local remainder = -1
+    while (remainder ~= 0) do
+        remainder = divisor % div
+        divisor = div
+        div = remainder
     end
-    if (math.floor(48 / v) ~= 48 / v) then return 5 end
-    if (48 / v > 16) then return 5 end
-    return 48 / v
+    if (math.floor(MAX_SNAP / divisor) ~= MAX_SNAP / divisor) then return 5 end
+    if (MAX_SNAP / divisor > 16) then return 5 end
+    return MAX_SNAP / divisor
 end
 ---Gets the multiplier of the most recent SSF, or returns 1 if there is no SSF before the given offset.
 ---@param offset number
@@ -335,6 +338,8 @@ function game.get.svsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort
     if dontSort then return svsBetweenOffsets end
     return sort(svsBetweenOffsets, sortAscendingStartTime)
 end
+---Returns an array of all timing group ids, including `$DEFAULT` and `$GLOBAL`.
+---@return string[]
 function game.get.timingGroupList()
     local baseList = table.keys(map.TimingGroups)
     local defaultIndex = table.indexOf(baseList, "$Default")
@@ -427,6 +432,8 @@ function game.get.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     noteOffsetsBetween = sort(noteOffsetsBetween, sortAscending)
     return noteOffsetsBetween
 end
+---Returns the center of the window (in pixels).
+---@return Vector2 center
 function game.window.getCenter()
     local windowDim = state.WindowSize
     return vector.New(state.WindowSize[1] / 2, state.WindowSize[2] / 2)
@@ -516,6 +523,10 @@ function math.clamp(number, lowerBound, upperBound)
     if number > upperBound then return upperBound end
     return number
 end
+---Evaluates a polynomial (specified by the coefficient array) at a value `x`.
+---@param ceff number[] The coefficients of the polynomial in descending order; for example, the polynomial x^3+3x^2-3x+4 is represented as `{1, 3, -3, 4}`.
+---@param x number
+---@return number y
 function math.evaluatePolynomial(ceff, x)
     local sum = 0
     local degree = #ceff - 1
@@ -574,6 +585,9 @@ end
 function math.inverseLerp(num, lowerBound, upperBound)
     return (num - lowerBound) / (upperBound - lowerBound)
 end
+---Returns the index of a zero row, or `nil` if none are found.
+---@param mtrx number[][]
+---@return integer?
 function matrix.findZeroRow(mtrx)
     for idx, row in pairs(mtrx) do
         local zeroRow = true
@@ -586,7 +600,7 @@ function matrix.findZeroRow(mtrx)
         end
         if zeroRow then return idx end
     end
-    return -1
+    return nil
 end
 function matrix.rowLinComb(mtrx, rowIdx1, rowIdx2, row2Factor)
     for k, v in pairs(mtrx[rowIdx1]) do
@@ -601,8 +615,10 @@ end
 ---Given a square matrix A and equally-sized vector B, returns a vector x such that Ax=B.
 ---@param mtrx number[][]
 ---@param vctr number[]
+---@return number[]? sln The solution vector, given that it exists. Will return `nil` if no such vector exists.
+---@return number? errType If no such vector exists, returns positive infinity if the system has infinite solutions, zero if the system has zero solutions, and negative infinity if the matrix and vector are not compatible.
 function matrix.solve(mtrx, vctr)
-    if (#vctr ~= #mtrx) then return -1 / 0 end
+    if (#vctr ~= #mtrx) then return nil, -1 / 0 end
     local augMtrx = table.duplicate(mtrx)
     for i, n in pairs(vctr) do
         augMtrx[i][#augMtrx[i] + 1] = n
@@ -611,8 +627,9 @@ function matrix.solve(mtrx, vctr)
         matrix.scaleRow(augMtrx, i, 1 / augMtrx[i][i])
         for j = i + 1, #mtrx do
             matrix.rowLinComb(augMtrx, j, i, -augMtrx[j][i]) -- Triangular Downward Sweep
-            if (matrix.findZeroRow(augMtrx) ~= -1) then
-                return augMtrx[matrix.findZeroRow(augMtrx)][#mtrx + 1] == 0 and 1 / 0 or 0
+            local zeroRowIdx = matrix.findZeroRow(augMtrx)
+            if zeroRowIdx then
+                return nil, augMtrx[zeroRowIdx][#mtrx + 1] == 0 and 1 / 0 or 0
             end
         end
     end
@@ -1274,41 +1291,79 @@ CHINCHILLA_TYPES = {
     "Inverse Power",
     "Peter Stock"
 }
-COLOR_THEMES = {
-    "Classic",
-    "Strawberry",
-    "Amethyst",
-    "Tree",
-    "Barbie",
-    "Incognito",
-    "Incognito + RGB",
-    "Tobi's Glass",
-    "Tobi's RGB Glass",
-    "Glass",
-    "Glass + RGB",
-    "RGB Gamer Mode",
-    "edom remag BGR",
-    "otingocnI",
-    "BGR + otingocnI",
-    "CUSTOM"
-}
-COLOR_THEME_COLORS = {
-    "255,255,255",
-    "251,41,67",
-    "153,102,204",
-    "150,111,51",
-    "227,5,173",
-    "150,150,150",
-    "255,0,0",
-    "200,200,200",
-    "0,255,0",
-    "220,220,220",
-    "0,0,255",
-    "255,100,100",
-    "100,255,100",
-    "255,255,255",
-    "100,100,255",
-    "0,0,0",
+THEME_TREE = {
+    Classic = {
+        {
+            id = "Original",
+            textColor = { 170, 170, 255 }
+        },
+        {
+            id = "Strawberry",
+            textColor = { 251, 41, 67 }
+        },
+        {
+            id = "Amethyst",
+            textColor = { 153, 102, 204 }
+        },
+        {
+            id = "Tree",
+            textColor = { 150, 111, 51 }
+        },
+        {
+            id = "Barbie",
+            textColor = { 227, 5, 173 }
+        }
+    },
+    Modern = {
+        {
+            id = "Incognito",
+            textColor = { 150, 150, 150 }
+        },
+        {
+            id = "Incognito + RGB",
+            textColor = { { 150, 50, 50 }, { 50, 150, 50 }, { 50, 50, 150 } }
+        },
+        {
+            id = "otingocnI",
+            textColor = { 255, 255, 255 }
+        },
+        {
+            id = "BGR + otingocnI",
+            textColor = { { 255, 150, 150 }, { 150, 255, 150 }, { 150, 150, 255 } }
+        },
+        {
+            id = "Glass",
+            textColor = { 220, 220, 220 }
+        },
+        {
+            id = "Glass + RGB",
+            textColor = { { 150, 255, 255 }, { 255, 150, 255 }, { 255, 255, 150 } }
+        },
+        {
+            id = "RGB Gamer Mode",
+            textColor = { { 255, 0, 0 }, { 0, 255, 0 }, { 0, 0, 255 } }
+        },
+        {
+            id = "edom remag BGR",
+            textColor = { { 255, 100, 0 }, { 0, 255, 100 }, { 100, 0, 255 } }
+        }
+    },
+    ["Mappers' Picks"] = {
+        {
+            id = "7xbi's Glass",
+            textColor = { 200, 200, 200 }
+        },
+        {
+            id = "7xbi's RGB Glass",
+            textColor = { { 255, 100, 255 }, { 255, 255, 100 }, { 100, 255, 255 } }
+        }
+    },
+    Custom = {
+        {
+            id = "CUSTOM",
+            textColor = { 0, 0, 0 }
+        }
+    }
 }
 DYNAMIC_BACKGROUND_TYPES = {
     "None",
@@ -1591,6 +1646,7 @@ function parseDefaultProperty(v, default)
 end
 globalVars = {
     advancedMode = false,
+    colorThemeName = "Original",
     colorThemeIndex = 1,
     comboizeSelect = false,
     cursorTrailGhost = false,
@@ -1640,7 +1696,7 @@ globalVars = {
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 function setGlobalVars(tempGlobalVars)
     globalVars.advancedMode = isTruthy(tempGlobalVars.advancedMode)
-    globalVars.colorThemeIndex = tn(tempGlobalVars.colorThemeIndex)
+    globalVars.colorThemeName = tempGlobalVars.colorThemeName or "Original"
     globalVars.comboizeSelect = isTruthy(tempGlobalVars.comboizeSelect)
     globalVars.cursorTrailGhost = isTruthy(tempGlobalVars.cursorTrailGhost)
     globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
@@ -6080,7 +6136,7 @@ function renderBackground()
     end
 end
 function setPluginAppearance()
-    local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
+    local colorTheme = globalVars.colorThemeName
     local styleTheme = STYLE_THEMES[globalVars.styleThemeIndex]
     setPluginAppearanceStyles(styleTheme)
     setPluginAppearanceColors(colorTheme)
@@ -6104,15 +6160,15 @@ function setPluginAppearanceStyles(styleTheme)
 end
 function setPluginAppearanceColors(colorTheme, hideBorder)
     local borderColor = vctr4(1)
-    if colorTheme == "Classic" or not colorTheme then borderColor = setClassicColors() end
+    if colorTheme == "Original" or not colorTheme then borderColor = setOriginalColors() end
     if colorTheme == "Strawberry" then borderColor = setStrawberryColors() end
     if colorTheme == "Amethyst" then borderColor = setAmethystColors() end
     if colorTheme == "Tree" then borderColor = setTreeColors() end
     if colorTheme == "Barbie" then borderColor = setBarbieColors() end
     if colorTheme == "Incognito" then borderColor = setIncognitoColors() end
     if colorTheme == "Incognito + RGB" then borderColor = setIncognitoRGBColors(globalVars.rgbPeriod) end
-    if colorTheme == "Tobi's Glass" then borderColor = setTobiGlassColors() end
-    if colorTheme == "Tobi's RGB Glass" then borderColor = setTobiRGBGlassColors(globalVars.rgbPeriod) end
+    if colorTheme == "7xbi's Glass" then borderColor = set7xbiGlassColors() end
+    if colorTheme == "7xbi's RGB Glass" then borderColor = set7xbiRGBGlassColors(globalVars.rgbPeriod) end
     if colorTheme == "Glass" then borderColor = setGlassColors() end
     if colorTheme == "Glass + RGB" then borderColor = setGlassRGBColors(globalVars.rgbPeriod) end
     if colorTheme == "RGB Gamer Mode" then borderColor = setRGBGamerColors(globalVars.rgbPeriod) end
@@ -6123,7 +6179,7 @@ function setPluginAppearanceColors(colorTheme, hideBorder)
     if hideBorder then return end
     state.SetValue("borderColor", borderColor)
 end
-function setClassicColors()
+function setOriginalColors()
     local borderColor = vector.New(0.81, 0.88, 1.00, 0.30)
     imgui.PushStyleColor(imgui_col.WindowBg, vector.New(0.00, 0.00, 0.00, 1.00))
     imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.08, 0.08, 0.08, 0.94))
@@ -6422,7 +6478,7 @@ function setIncognitoRGBColors(rgbPeriod)
     loadup.BgBr = white
     return rgbColor
 end
-function setTobiGlassColors()
+function set7xbiGlassColors()
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.70)
     local transparentWhite = vector.New(0.30, 0.30, 0.30, 0.50)
     local whiteTint = vector.New(1.00, 1.00, 1.00, 0.30)
@@ -6468,7 +6524,7 @@ function setTobiGlassColors()
     loadup.BgBr = buttonColor / 2 + color.vctr.white / 2
     return frameColor
 end
-function setTobiRGBGlassColors(rgbPeriod)
+function set7xbiRGBGlassColors(rgbPeriod)
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.85)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     local currentRGB = getCurrentRGBColors(rgbPeriod)
@@ -6788,7 +6844,7 @@ function setInvertedIncognitoRGBColors(rgbPeriod)
 end
 function setCustomColors()
     if (globalVars.customStyle == nil) then
-        return setClassicColors()
+        return setOriginalColors()
     end
     local borderColor = globalVars.customStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
     imgui.PushStyleColor(imgui_col.WindowBg, globalVars.customStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00))
@@ -11185,8 +11241,8 @@ function showAppearanceSettings()
     end
     chooseStyleTheme()
     chooseColorTheme()
-    if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
-        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
+    if (globalVars.colorThemeName ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
+        setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
         for k42 = 1, #customStyleIds do
             local id = customStyleIds[k42]
@@ -11199,10 +11255,10 @@ function showAppearanceSettings()
             ::nextCustomStyle::
         end
         globalVars.customStyle = customStyle
-        globalVars.colorThemeIndex = table.indexOf(COLOR_THEMES, "CUSTOM")
+        globalVars.colorThemeName = "CUSTOM"
         setPluginAppearanceColors("CUSTOM")
     end
-    if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM") then
+    if (globalVars.colorThemeName ~= "CUSTOM") then
         HoverToolTip(
             "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
     end
@@ -11814,7 +11870,7 @@ function showPluginSettingsWindow()
     --- Key is name of setting. If value with respect to key is true, will hide setting at the left
     local hideSettingDict = {
         ["Advanced"] = not globalVars.advancedMode,
-        ["Custom Theme"] = (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)
+        ["Custom Theme"] = (globalVars.colorThemeName ~= "CUSTOM" or globalVars.performanceMode)
     }
     for idx, v in pairs(SETTING_TYPES) do
         if (hideSettingDict[v]) then goto nextSetting end
@@ -11869,7 +11925,7 @@ function showPluginSettingsWindow()
     if (not globalVars.performanceMode) then
         imgui.PopStyleColor(41)
         pulseController()
-        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex], true)
+        setPluginAppearanceColors(globalVars.colorThemeName, true)
         setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
     end
     imgui.End()
@@ -12547,13 +12603,74 @@ function chooseChinchillaType(settingVars)
     return oldIndex ~= settingVars.chinchillaTypeIndex
 end
 function chooseColorTheme()
-    local oldColorThemeIndex = globalVars.colorThemeIndex
-    globalVars.colorThemeIndex = Combo("Color Theme", COLOR_THEMES, globalVars.colorThemeIndex, COLOR_THEME_COLORS)
-    if (oldColorThemeIndex ~= globalVars.colorThemeIndex) then
-        write(globalVars)
+    local function renderThemeTree(tree)
+        local padding = 10
+        if (tree[1]) then
+            local maxItemSize = 0
+            for k44 = 1, #tree do
+                local item = tree[k44]
+                if (imgui.CalcTextSize(item.id).x > maxItemSize) then
+                    maxItemSize = imgui.CalcTextSize(item.id).x
+                end
+            end
+            for k45 = 1, #tree do
+                local item = tree[k45]
+                local col = item.textColor
+                local sz = vector.New(maxItemSize, imgui.CalcTextSize(item.id).y) + vector.New(padding, 0)
+                imgui.BeginChild("themetree" .. item.id, sz)
+                local topLeft = imgui.GetWindowPos()
+                local dim = imgui.GetWindowSize()
+                local pos = imgui.GetMousePos()
+                if (pos.x > topLeft.x and pos.x < topLeft.x + dim.x and pos.y > topLeft.y and pos.y < topLeft.y + dim.y) then
+                    local ctx = imgui.GetWindowDrawList()
+                    ctx.AddRectFilled(topLeft, topLeft + dim, color.int.white - color.int.alphaMask * 200)
+                end
+                if (item.id:find("RGB") or item.id:find("BGR")) then
+                    local strLen = item.id:len()
+                    local charProgress = 0
+                    local subdivisionLength = #item.textColor - 1
+                    for char in item.id:gmatch(".") do
+                        local progress = charProgress / (strLen - 1) * subdivisionLength % (1 + 1 / 10000)
+                        local currentSubdivision = 1 + math.floor(charProgress / (strLen - 0.999) * subdivisionLength)
+                        local col1 = vector.New(item.textColor[currentSubdivision][1] / 255,
+                            item.textColor[currentSubdivision][2] / 255, item.textColor[currentSubdivision][3] / 255, 1)
+                        local col2 = vector.New(item.textColor[currentSubdivision + 1][1] / 255,
+                            item.textColor[currentSubdivision + 1][2] / 255,
+                            item.textColor[currentSubdivision + 1][3] / 255, 1)
+                        imgui.PushStyleColor(imgui_col.Text,
+                            col1 * (1 - progress) +
+                            col2 * progress)
+                        imgui.Text(char)
+                        imgui.PopStyleColor()
+                        imgui.SameLine(0, 0)
+                        charProgress = charProgress + 1
+                    end
+                else
+                    imgui.PushStyleColor(imgui_col.Text, vector.New(col[1] / 255, col[2] / 255, col[3] / 255, 1))
+                    imgui.Text(item.id)
+                    imgui.PopStyleColor()
+                end
+                imgui.EndChild()
+                if (imgui.IsItemClicked("Left")) then
+                    globalVars.colorThemeName = item.id
+                    write(globalVars)
+                    imgui.CloseCurrentPopup()
+                end
+            end
+        else
+            for k, v in pairs(tree) do
+                if (imgui.BeginMenu(k)) then
+                    renderThemeTree(v)
+                    imgui.EndMenu()
+                end
+            end
+        end
     end
-    local currentTheme = COLOR_THEMES[globalVars.colorThemeIndex]
-    local isRGBColorTheme = currentTheme:find("RGB") or currentTheme:find("BGR")
+    if (imgui.BeginCombo("Color Theme", "Penis")) then
+        renderThemeTree(THEME_TREE)
+        imgui.EndCombo()
+    end
+    local isRGBColorTheme = globalVars.colorThemeName:find("RGB") or globalVars.colorThemeName:find("BGR")
     if not isRGBColorTheme then return end
     chooseRGBPeriod()
 end
@@ -13771,8 +13888,8 @@ end
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for k44 = 1, #svs do
-        local sv = svs[k44]
+    for k46 = 1, #svs do
+        local sv = svs[k46]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
         if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
     end

@@ -22,8 +22,8 @@ export default function checkMissingAnnotations(file: string[]) {
         if (index < 0) {
             console.log(
                 `The function ${chalk.red(functionName)} ${chalk.magenta(
-                    'does not have an annotated return value.'
-                )}`
+                    'does not have an annotated return value.',
+                )}`,
             );
             failedTests++;
             fnDict[fnLine] = [];
@@ -48,8 +48,8 @@ export default function checkMissingAnnotations(file: string[]) {
         if (!returnAnnotated && returningValue) {
             console.log(
                 `The function ${chalk.red(functionName)} ${chalk.magenta(
-                    'does not have an annotated return value.'
-                )}`
+                    'does not have an annotated return value.',
+                )}`,
             );
             failedTests++;
         }
@@ -69,14 +69,14 @@ export default function checkMissingAnnotations(file: string[]) {
             parameters.map((s) => s.trim()).filter((s) => s).length
         ) {
             const missingParams = parameters.filter(
-                (param) => !annoParams.includes(param)
+                (param) => !annoParams.includes(param) && param !== '_',
             );
             console.log(
                 `The function ${chalk.red(
-                    chalk.bold(functionName)
+                    chalk.bold(functionName),
                 )} is missing the following parameters in its annotation: ${chalk.red(
-                    missingParams.join(', ')
-                )}`
+                    missingParams.join(', '),
+                )}`,
             );
             failedTests++;
         }

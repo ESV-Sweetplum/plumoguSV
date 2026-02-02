@@ -1,5 +1,6 @@
 advancedMode: true
-colorThemeIndex: 16
+colorThemeName: CUSTOM
+colorThemeIndex: 1
 comboizeSelect: true
 cursorTrailGhost: false
 cursorTrailIndex: 1
@@ -639,7 +640,7 @@ defaultProperties:
       mine: false
     selectBySnap:
       snap: 1
-disableLoadup: false
+disableLoadup: true
 dontPrintCreation: true
 dontReplaceSV: false
 drawCapybara: true
@@ -691,5 +692,5 @@ stepSize: 5
 styleThemeIndex: 1
 upscroll: false
 useCustomPulseColor: true
-useEndTimeOffsets: true
+useEndTimeOffsets: false
 ignoreNotes: false

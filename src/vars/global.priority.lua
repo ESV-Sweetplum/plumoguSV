@@ -1,5 +1,6 @@
 globalVars = {
     advancedMode = false,
+    colorThemeName = "Original",
     colorThemeIndex = 1,
     comboizeSelect = false,
     cursorTrailGhost = false,
@@ -51,7 +52,7 @@ DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 
 function setGlobalVars(tempGlobalVars)
     globalVars.advancedMode = isTruthy(tempGlobalVars.advancedMode)
-    globalVars.colorThemeIndex = tn(tempGlobalVars.colorThemeIndex)
+    globalVars.colorThemeName = tempGlobalVars.colorThemeName or "Original"
     globalVars.comboizeSelect = isTruthy(tempGlobalVars.comboizeSelect)
     globalVars.cursorTrailGhost = isTruthy(tempGlobalVars.cursorTrailGhost)
     globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)

@@ -30,42 +30,79 @@ CHINCHILLA_TYPES = {
     "Peter Stock"
 }
 
-COLOR_THEMES = {
-    "Classic",
-    "Strawberry",
-    "Amethyst",
-    "Tree",
-    "Barbie",
-    "Incognito",
-    "Incognito + RGB",
-    "Tobi's Glass",
-    "Tobi's RGB Glass",
-    "Glass",
-    "Glass + RGB",
-    "RGB Gamer Mode",
-    "edom remag BGR",
-    "otingocnI",
-    "BGR + otingocnI",
-    "CUSTOM"
-}
-
-COLOR_THEME_COLORS = {
-    "255,255,255",
-    "251,41,67",
-    "153,102,204",
-    "150,111,51",
-    "227,5,173",
-    "150,150,150",
-    "255,0,0",
-    "200,200,200",
-    "0,255,0",
-    "220,220,220",
-    "0,0,255",
-    "255,100,100",
-    "100,255,100",
-    "255,255,255",
-    "100,100,255",
-    "0,0,0",
+THEME_TREE = {
+    Classic = {
+        {
+            id = "Original",
+            textColor = { 170, 170, 255 }
+        },
+        {
+            id = "Strawberry",
+            textColor = { 251, 41, 67 }
+        },
+        {
+            id = "Amethyst",
+            textColor = { 153, 102, 204 }
+        },
+        {
+            id = "Tree",
+            textColor = { 150, 111, 51 }
+        },
+        {
+            id = "Barbie",
+            textColor = { 227, 5, 173 }
+        }
+    },
+    Modern = {
+        {
+            id = "Incognito",
+            textColor = { 150, 150, 150 }
+        },
+        {
+            id = "Incognito + RGB",
+            textColor = { { 150, 50, 50 }, { 50, 150, 50 }, { 50, 50, 150 } }
+        },
+        {
+            id = "otingocnI",
+            textColor = { 255, 255, 255 }
+        },
+        {
+            id = "BGR + otingocnI",
+            textColor = { { 255, 150, 150 }, { 150, 255, 150 }, { 150, 150, 255 } }
+        },
+        {
+            id = "Glass",
+            textColor = { 220, 220, 220 }
+        },
+        {
+            id = "Glass + RGB",
+            textColor = { { 150, 255, 255 }, { 255, 150, 255 }, { 255, 255, 150 } }
+        },
+        {
+            id = "RGB Gamer Mode",
+            textColor = { { 255, 0, 0 }, { 0, 255, 0 }, { 0, 0, 255 } }
+        },
+        {
+            id = "edom remag BGR",
+            textColor = { { 255, 100, 0 }, { 0, 255, 100 }, { 100, 0, 255 } }
+        }
+    },
+    ["Mappers' Picks"] = {
+        {
+            id = "7xbi's Glass",
+            textColor = { 200, 200, 200 }
+        },
+        {
+            id = "7xbi's RGB Glass",
+            textColor = { { 255, 100, 255 }, { 255, 255, 100 }, { 100, 255, 255 } }
+        }
+    },
+    Custom = {
+        {
+            id = "CUSTOM",
+            textColor = { 0, 0, 0 }
+        }
+    }
 }
 
 DYNAMIC_BACKGROUND_TYPES = {

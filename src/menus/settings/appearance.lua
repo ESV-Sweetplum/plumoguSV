@@ -6,8 +6,8 @@ function showAppearanceSettings()
     end
     chooseStyleTheme()
     chooseColorTheme()
-    if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
-        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
+    if (globalVars.colorThemeName ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
+        setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
         for _, id in ipairs(customStyleIds) do
             local query = id:capitalize()
@@ -19,10 +19,10 @@ function showAppearanceSettings()
             ::nextCustomStyle::
         end
         globalVars.customStyle = customStyle
-        globalVars.colorThemeIndex = table.indexOf(COLOR_THEMES, "CUSTOM")
+        globalVars.colorThemeName = "CUSTOM"
         setPluginAppearanceColors("CUSTOM")
     end
-    if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM") then
+    if (globalVars.colorThemeName ~= "CUSTOM") then
         HoverToolTip(
             "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
     end

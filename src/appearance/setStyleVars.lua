@@ -1,5 +1,5 @@
 function setPluginAppearance()
-    local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
+    local colorTheme = globalVars.colorThemeName
     local styleTheme = STYLE_THEMES[globalVars.styleThemeIndex]
 
     setPluginAppearanceStyles(styleTheme)
@@ -36,15 +36,15 @@ end
 function setPluginAppearanceColors(colorTheme, hideBorder)
     local borderColor = vctr4(1)
 
-    if colorTheme == "Classic" or not colorTheme then borderColor = setClassicColors() end
+    if colorTheme == "Original" or not colorTheme then borderColor = setOriginalColors() end
     if colorTheme == "Strawberry" then borderColor = setStrawberryColors() end
     if colorTheme == "Amethyst" then borderColor = setAmethystColors() end
     if colorTheme == "Tree" then borderColor = setTreeColors() end
     if colorTheme == "Barbie" then borderColor = setBarbieColors() end
     if colorTheme == "Incognito" then borderColor = setIncognitoColors() end
     if colorTheme == "Incognito + RGB" then borderColor = setIncognitoRGBColors(globalVars.rgbPeriod) end
-    if colorTheme == "Tobi's Glass" then borderColor = setTobiGlassColors() end
-    if colorTheme == "Tobi's RGB Glass" then borderColor = setTobiRGBGlassColors(globalVars.rgbPeriod) end
+    if colorTheme == "7xbi's Glass" then borderColor = set7xbiGlassColors() end
+    if colorTheme == "7xbi's RGB Glass" then borderColor = set7xbiRGBGlassColors(globalVars.rgbPeriod) end
     if colorTheme == "Glass" then borderColor = setGlassColors() end
     if colorTheme == "Glass + RGB" then borderColor = setGlassRGBColors(globalVars.rgbPeriod) end
     if colorTheme == "RGB Gamer Mode" then borderColor = setRGBGamerColors(globalVars.rgbPeriod) end
@@ -58,7 +58,7 @@ function setPluginAppearanceColors(colorTheme, hideBorder)
     cache.borderColor = borderColor
 end
 
-function setClassicColors()
+function setOriginalColors()
     local borderColor = vector.New(0.81, 0.88, 1.00, 0.30)
     imgui.PushStyleColor(imgui_col.WindowBg, vector.New(0.00, 0.00, 0.00, 1.00))
     imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.08, 0.08, 0.08, 0.94))
@@ -386,7 +386,7 @@ function setIncognitoRGBColors(rgbPeriod)
     return rgbColor
 end
 
-function setTobiGlassColors()
+function set7xbiGlassColors()
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.70)
     local transparentWhite = vector.New(0.30, 0.30, 0.30, 0.50)
     local whiteTint = vector.New(1.00, 1.00, 1.00, 0.30)
@@ -436,10 +436,10 @@ function setTobiGlassColors()
     return frameColor
 end
 
--- Sets plugin colors to the "Tobi's RGB Glass" theme
+-- Sets plugin colors to the "7xbi's RGB Glass" theme
 -- Parameters
 --    rgbPeriod : length in seconds of one RGB color cycle [Int/Float]
-function setTobiRGBGlassColors(rgbPeriod)
+function set7xbiRGBGlassColors(rgbPeriod)
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.85)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     local currentRGB = getCurrentRGBColors(rgbPeriod)
@@ -799,7 +799,7 @@ end
 
 function setCustomColors()
     if (globalVars.customStyle == nil) then
-        return setClassicColors()
+        return setOriginalColors()
     end
     local borderColor = globalVars.customStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
     imgui.PushStyleColor(imgui_col.WindowBg, globalVars.customStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00))

@@ -19,6 +19,9 @@ function vctr2(n)
     return vector.New(n, n)
 end
 
+---Creates a unit vector in the direction of `theta`.
+---@param theta number The angle in radians.
+---@return Vector2
 function unit2(theta)
     return vector.New(math.cos(theta), math.sin(theta))
 end

@@ -137,16 +137,75 @@ function chooseChinchillaType(settingVars)
 end
 
 function chooseColorTheme()
-    local oldColorThemeIndex = globalVars.colorThemeIndex
-    globalVars.colorThemeIndex = Combo("Color Theme", COLOR_THEMES, globalVars.colorThemeIndex, COLOR_THEME_COLORS)
+    local function renderThemeTree(tree)
+        local padding = 10
 
-    if (oldColorThemeIndex ~= globalVars.colorThemeIndex) then
-        write(globalVars)
+        if (tree[1]) then
+            local maxItemSize = 0
+            for _, item in ipairs(tree) do
+                if (imgui.CalcTextSize(item.id).x > maxItemSize) then
+                    maxItemSize = imgui.CalcTextSize(item.id).x
+                end
+            end
+            for _, item in ipairs(tree) do
+                local col = item.textColor
+                local sz = vector.New(maxItemSize, imgui.CalcTextSize(item.id).y) + vector.New(padding, 0)
+                imgui.BeginChild("themetree" .. item.id, sz)
+                local topLeft = imgui.GetWindowPos()
+                local dim = imgui.GetWindowSize()
+                local pos = imgui.GetMousePos()
+                if (pos.x > topLeft.x and pos.x < topLeft.x + dim.x and pos.y > topLeft.y and pos.y < topLeft.y + dim.y) then
+                    local ctx = imgui.GetWindowDrawList()
+                    ctx.AddRectFilled(topLeft, topLeft + dim, color.int.white - color.int.alphaMask * 200)
+                end
+                if (item.id:find("RGB") or item.id:find("BGR")) then
+                    local strLen = item.id:len()
+                    local charProgress = 0
+                    local subdivisionLength = #item.textColor - 1
+                    for char in item.id:gmatch(".") do
+                        local progress = charProgress / (strLen - 1) * subdivisionLength % (1 + 1 / 10000)
+                        local currentSubdivision = 1 + math.floor(charProgress / (strLen - 0.999) * subdivisionLength)
+                        local col1 = vector.New(item.textColor[currentSubdivision][1] / 255,
+                            item.textColor[currentSubdivision][2] / 255, item.textColor[currentSubdivision][3] / 255, 1)
+                        local col2 = vector.New(item.textColor[currentSubdivision + 1][1] / 255,
+                            item.textColor[currentSubdivision + 1][2] / 255,
+                            item.textColor[currentSubdivision + 1][3] / 255, 1)
+                        imgui.PushStyleColor(imgui_col.Text,
+                            col1 * (1 - progress) +
+                            col2 * progress)
+                        imgui.Text(char)
+                        imgui.PopStyleColor()
+                        imgui.SameLine(0, 0)
+                        charProgress = charProgress + 1
+                    end
+                else
+                    imgui.PushStyleColor(imgui_col.Text, vector.New(col[1] / 255, col[2] / 255, col[3] / 255, 1))
+                    imgui.Text(item.id)
+                    imgui.PopStyleColor()
+                end
+                imgui.EndChild()
+                if (imgui.IsItemClicked("Left")) then
+                    globalVars.colorThemeName = item.id
+                    write(globalVars)
+                    imgui.CloseCurrentPopup()
+                end
+            end
+        else
+            for k, v in pairs(tree) do
+                if (imgui.BeginMenu(k)) then
+                    renderThemeTree(v)
+                    imgui.EndMenu()
+                end
+            end
+        end
     end
 
-    local currentTheme = COLOR_THEMES[globalVars.colorThemeIndex]
-    local isRGBColorTheme = currentTheme:find("RGB") or currentTheme:find("BGR")
+    if (imgui.BeginCombo("Color Theme", "Penis")) then
+        renderThemeTree(THEME_TREE)
+        imgui.EndCombo()
+    end
 
+    local isRGBColorTheme = globalVars.colorThemeName:find("RGB") or globalVars.colorThemeName:find("BGR")
     if not isRGBColorTheme then return end
 
     chooseRGBPeriod()
