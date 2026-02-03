@@ -167,7 +167,7 @@ function stringifyCustomStyle(customStyle)
     return resultStr:sub(1, -2)
 end
 
-function setCustomStyleString(str)
+function setCustomStyleString(str, exportInstead)
     local keyIdDict = {}
     for _, key in ipairs(table.keys(DEFAULT_STYLE)) do
         keyIdDict[key] = convertStrToShort(key)
@@ -175,13 +175,13 @@ function setCustomStyleString(str)
     end
 
     if (str:sub(1, 3) == "v2 ") then
-        parseCustomStyleV2(str:sub(4), keyIdDict)
+        parseCustomStyleV2(str:sub(4), keyIdDict, exportInstead)
     else
         parseCustomStyleV1(str, keyIdDict)
     end
 end
 
-function parseCustomStyleV2(str, keyIdDict)
+function parseCustomStyleV2(str, keyIdDict, exportInstead)
     local customStyle = {}
 
     for kvPair in str:gmatch("[^ ]+") do
@@ -193,7 +193,31 @@ function parseCustomStyleV2(str, keyIdDict)
         ::nextPair::
     end
 
-    globalVars.customStyle = table.duplicate(customStyle)
+    if (not exportInstead) then
+        globalVars.customStyle = table.duplicate(customStyle)
+        return
+    end
+
+    local outStr = ""
+
+    for k, v in pairs(customStyle) do
+        if (k:find("loadup")) then
+            outStr = outStr ..
+                "loadup." ..
+                k:gsub("loadup", "") ..
+                " = vector.New(" ..
+                math.round(v.x, 2) ..
+                ", " .. math.round(v.y, 2) .. ", " .. math.round(v.z, 2) .. ", " .. math.round(v.w, 2) .. ")\n"
+        else
+            outStr = outStr .. "imgui.PushStyleColor(imgui_col." ..
+                k:capitalize() ..
+                ", vector.New(" ..
+                math.round(v.x, 2) ..
+                ", " .. math.round(v.y, 2) .. ", " .. math.round(v.z, 2) .. ", " .. math.round(v.w, 2) .. "))\n"
+        end
+    end
+
+    imgui.SetClipboardText(outStr)
 end
 
 function parseCustomStyleV1(str, keyIdDict)

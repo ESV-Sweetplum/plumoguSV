@@ -16,5 +16,8 @@
     ],
     "codeLens.enable": true,
     "workspace.ignoreSubmodules": true,
-    "workspace.useGitIgnore": true
+    "workspace.useGitIgnore": true,
+    "diagnostics.globals": [
+        "devMode"
+    ]
 }

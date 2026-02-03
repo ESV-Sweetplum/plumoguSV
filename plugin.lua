@@ -1,4 +1,5 @@
 ENVIRONMENT = "development"
+devMode = true
 cache = {
     boolean = {},
     windows = {},
@@ -1299,11 +1300,11 @@ THEME_TREE = {
         },
         {
             id = "Strawberry",
-            textColor = { 251, 41, 67 }
+            textColor = { { 251, 41, 67 }, { 255, 100, 150 } }
         },
         {
             id = "Amethyst",
-            textColor = { 153, 102, 204 }
+            textColor = { { 153, 102, 204 }, { 170, 120, 255 } }
         },
         {
             id = "Tree",
@@ -1311,13 +1312,13 @@ THEME_TREE = {
         },
         {
             id = "Barbie",
-            textColor = { 227, 5, 173 }
+            textColor = { { 227, 5, 173 }, { 100, 255, 255 } }
         }
     },
     Modern = {
         {
             id = "Incognito",
-            textColor = { 150, 150, 150 }
+            textColor = { { 150, 150, 150 }, { 200, 200, 200 } }
         },
         {
             id = "Incognito + RGB",
@@ -1325,7 +1326,7 @@ THEME_TREE = {
         },
         {
             id = "otingocnI",
-            textColor = { 255, 255, 255 }
+            textColor = { { 255, 255, 255 }, { 200, 200, 200 } }
         },
         {
             id = "BGR + otingocnI",
@@ -1333,7 +1334,7 @@ THEME_TREE = {
         },
         {
             id = "Glass",
-            textColor = { 220, 220, 220 }
+            textColor = { { 200, 200, 200 }, { 255, 255, 255 }, { 200, 200, 200 } }
         },
         {
             id = "Glass + RGB",
@@ -1351,11 +1352,19 @@ THEME_TREE = {
     ["Mappers' Picks"] = {
         {
             id = "7xbi's Glass",
-            textColor = { 200, 200, 200 }
+            textColor = { { 150, 150, 150 }, { 200, 200, 200 } }
         },
         {
             id = "7xbi's RGB Glass",
             textColor = { { 255, 100, 255 }, { 255, 255, 100 }, { 100, 255, 255 } }
+        },
+        {
+            id = "aster's catppuccin",
+            textColor = { { 136, 57, 239 }, { 186, 187, 241 }, { 203, 166, 247 } }
+        },
+        {
+            id = "plum's purple palace",
+            textColor = { { 100, 0, 255 }, { 255, 0, 255 } }
         }
     },
     Custom = {
@@ -6167,14 +6176,16 @@ function setPluginAppearanceColors(colorTheme, hideBorder)
     if colorTheme == "Barbie" then borderColor = setBarbieColors() end
     if colorTheme == "Incognito" then borderColor = setIncognitoColors() end
     if colorTheme == "Incognito + RGB" then borderColor = setIncognitoRGBColors(globalVars.rgbPeriod) end
-    if colorTheme == "7xbi's Glass" then borderColor = set7xbiGlassColors() end
-    if colorTheme == "7xbi's RGB Glass" then borderColor = set7xbiRGBGlassColors(globalVars.rgbPeriod) end
+    if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
+    if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
     if colorTheme == "Glass" then borderColor = setGlassColors() end
     if colorTheme == "Glass + RGB" then borderColor = setGlassRGBColors(globalVars.rgbPeriod) end
     if colorTheme == "RGB Gamer Mode" then borderColor = setRGBGamerColors(globalVars.rgbPeriod) end
     if colorTheme == "edom remag BGR" then borderColor = setInvertedRGBGamerColors(globalVars.rgbPeriod) end
-    if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
-    if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
+    if colorTheme == "7xbi's Glass" then borderColor = set7xbiGlassColors() end
+    if colorTheme == "7xbi's RGB Glass" then borderColor = set7xbiRGBGlassColors(globalVars.rgbPeriod) end
+    if colorTheme == "aster's catppuccin" then borderColor = setAsterCatppuccinColors() end
+    if colorTheme == "plum's purple palace" then borderColor = setPlumPurplePalaceColors() end
     if colorTheme == "CUSTOM" then borderColor = setCustomColors() end
     if hideBorder then return end
     state.SetValue("borderColor", borderColor)
@@ -6841,6 +6852,84 @@ function setInvertedIncognitoRGBColors(rgbPeriod)
     loadup.BgBl = grey
     loadup.BgBr = white
     return rgbColor
+end
+function setAsterCatppuccinColors()
+    imgui.PushStyleColor(imgui_col.WindowBg, vector.New(0.07, 0.07, 0.11, 1))
+    imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.12, 0.12, 0.18, 1))
+    imgui.PushStyleColor(imgui_col.FrameBg, vector.New(0.12, 0.12, 0.18, 1))
+    imgui.PushStyleColor(imgui_col.FrameBgHovered, vector.New(0.35, 0.36, 0.44, 1))
+    imgui.PushStyleColor(imgui_col.FrameBgActive, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.TitleBg, vector.New(0.12, 0.12, 0.18, 1))
+    imgui.PushStyleColor(imgui_col.TitleBgActive, vector.New(0.07, 0.07, 0.11, 1))
+    imgui.PushStyleColor(imgui_col.TitleBgCollapsed, vector.New(0.12, 0.12, 0.18, 0.4))
+    imgui.PushStyleColor(imgui_col.CheckMark, vector.New(0.89, 0, 1, 0.37))
+    imgui.PushStyleColor(imgui_col.SliderGrab, vector.New(0.12, 0.12, 0.18, 1))
+    imgui.PushStyleColor(imgui_col.SliderGrabActive, vector.New(0.35, 0.36, 0.44, 1))
+    imgui.PushStyleColor(imgui_col.Button, vector.New(0.19, 0.2, 0.27, 1))
+    imgui.PushStyleColor(imgui_col.ButtonHovered, vector.New(0.35, 0.36, 0.44, 1))
+    imgui.PushStyleColor(imgui_col.ButtonActive, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.Tab, vector.New(0.19, 0.2, 0.27, 1))
+    imgui.PushStyleColor(imgui_col.TabHovered, vector.New(0.35, 0.36, 0.44, 1))
+    imgui.PushStyleColor(imgui_col.TabActive, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.Header, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.HeaderHovered, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.HeaderActive, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.Separator, vector.New(0.35, 0.36, 0.44, 1))
+    imgui.PushStyleColor(imgui_col.Text, vector.New(0.8, 0.84, 0.96, 1))
+    imgui.PushStyleColor(imgui_col.TextSelectedBg, vector.New(0.8, 0.65, 0.97, 0.4))
+    imgui.PushStyleColor(imgui_col.ScrollbarGrabHovered, vector.New(0.19, 0.2, 0.27, 1))
+    imgui.PushStyleColor(imgui_col.PlotLines, vector.New(0.95, 0.55, 0.66, 1))
+    imgui.PushStyleColor(imgui_col.PlotLinesHovered, vector.New(0.82, 0.06, 0.22, 1))
+    imgui.PushStyleColor(imgui_col.PlotHistogram, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.PlotHistogramHovered, vector.New(0.53, 0.22, 0.94, 1))
+    imgui.PushStyleColor(imgui_col.Border, vector.New(0.42, 0.44, 0.53, 1))
+    loadup.OpeningTextColor = vector.New(0.19, 0.2, 0.27, 1)
+    loadup.PulseTextColorLeft = vector.New(0.8, 0.65, 0.97, 1)
+    loadup.PulseTextColorRight = vector.New(0.96, 0.76, 0.91, 1)
+    loadup.BgTl = vector.New(0.07, 0.07, 0.11, 0.6)
+    loadup.BgTr = vector.New(0.11, 0.05, 0.2, 0.6)
+    loadup.BgBl = vector.New(0.2, 0.1, 0.17, 0.6)
+    loadup.BgBr = vector.New(0.12, 0.12, 0.18, 0.6)
+    return vector.New(0.42352941632270813, 0.43921568989753723, 0.5254902243614197, 1)
+end
+function setPlumPurplePalaceColors()
+    imgui.PushStyleColor(imgui_col.WindowBg, vector.New(0, 0, 0, 0.52))
+    imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.17, 0.11, 0.24, 0.69))
+    imgui.PushStyleColor(imgui_col.FrameBg, vector.New(0.16, 0.03, 0.27, 0.51))
+    imgui.PushStyleColor(imgui_col.FrameBgHovered, vector.New(0.3, 0.07, 0.49, 0.52))
+    imgui.PushStyleColor(imgui_col.FrameBgActive, vector.New(0.69, 0.5, 0.94, 1))
+    imgui.PushStyleColor(imgui_col.TitleBg, vector.New(0, 0, 0, 0.76))
+    imgui.PushStyleColor(imgui_col.TitleBgActive, vector.New(0.12, 0.02, 0.27, 1))
+    imgui.PushStyleColor(imgui_col.TitleBgCollapsed, vector.New(0.6, 0.51, 0.75, 0.39))
+    imgui.PushStyleColor(imgui_col.CheckMark, vector.New(0.89, 0, 1, 0.65))
+    imgui.PushStyleColor(imgui_col.SliderGrab, vector.New(0.31, 0.38, 0.5, 1))
+    imgui.PushStyleColor(imgui_col.SliderGrabActive, vector.New(0.51, 0.58, 0.7, 1))
+    imgui.PushStyleColor(imgui_col.Button, vector.New(0.18, 0.03, 0.37, 0.8))
+    imgui.PushStyleColor(imgui_col.ButtonHovered, vector.New(0.24, 0.02, 0.4, 1))
+    imgui.PushStyleColor(imgui_col.ButtonActive, vector.New(0.49, 0.2, 0.82, 1))
+    imgui.PushStyleColor(imgui_col.Tab, vector.New(0.39, 0.12, 0.73, 0.39))
+    imgui.PushStyleColor(imgui_col.TabHovered, vector.New(0.25, 0.02, 0.41, 1))
+    imgui.PushStyleColor(imgui_col.TabActive, vector.New(0.4, 0, 0.69, 1))
+    imgui.PushStyleColor(imgui_col.Header, vector.New(0.69, 0.44, 1, 0.4))
+    imgui.PushStyleColor(imgui_col.HeaderHovered, vector.New(0.69, 0.44, 1, 0.4))
+    imgui.PushStyleColor(imgui_col.HeaderActive, vector.New(0.69, 0.44, 1, 0.4))
+    imgui.PushStyleColor(imgui_col.Separator, vector.New(0.53, 0, 1, 0.3))
+    imgui.PushStyleColor(imgui_col.Text, vector.New(1, 1, 1, 1))
+    imgui.PushStyleColor(imgui_col.TextSelectedBg, vector.New(0.96, 0.51, 1, 0.4))
+    imgui.PushStyleColor(imgui_col.ScrollbarGrabHovered, vector.New(0.41, 0.48, 0.6, 1))
+    imgui.PushStyleColor(imgui_col.PlotLines, vector.New(1, 0.44, 0.44, 1))
+    imgui.PushStyleColor(imgui_col.PlotLinesHovered, vector.New(1, 0.12, 0, 1))
+    imgui.PushStyleColor(imgui_col.PlotHistogram, vector.New(0.28, 0, 0.9, 1))
+    imgui.PushStyleColor(imgui_col.PlotHistogramHovered, vector.New(0.58, 0, 1, 1))
+    imgui.PushStyleColor(imgui_col.Border, vector.New(0, 0, 0, 1))
+    loadup.OpeningTextColor = vector.New(0, 0, 0, 1)
+    loadup.PulseTextColorLeft = vector.New(0.5, 0, 1, 1)
+    loadup.PulseTextColorRight = vector.New(0.75, 0.25, 1, 1)
+    loadup.BgTl = vector.New(0.08, 0, 0.08, 0.39)
+    loadup.BgTr = vector.New(0.16, 0, 0.16, 0.67)
+    loadup.BgBl = vector.New(0.16, 0, 0.16, 0.67)
+    loadup.BgBr = vector.New(0.25, 0, 0.25, 1)
+    return vector.New(0, 0, 0, 1)
 end
 function setCustomColors()
     if (globalVars.customStyle == nil) then
@@ -11464,19 +11553,19 @@ function stringifyCustomStyle(customStyle)
     end
     return resultStr:sub(1, -2)
 end
-function setCustomStyleString(str)
+function setCustomStyleString(str, exportInstead)
     local keyIdDict = {}
     for _, key in ipairs(table.keys(DEFAULT_STYLE)) do
         keyIdDict[key] = convertStrToShort(key)
         if (key:sub(1, 6) == "loadup") then keyIdDict[key] = keyIdDict[key] .. key:sub(-1):upper() end
     end
     if (str:sub(1, 3) == "v2 ") then
-        parseCustomStyleV2(str:sub(4), keyIdDict)
+        parseCustomStyleV2(str:sub(4), keyIdDict, exportInstead)
     else
         parseCustomStyleV1(str, keyIdDict)
     end
 end
-function parseCustomStyleV2(str, keyIdDict)
+function parseCustomStyleV2(str, keyIdDict, exportInstead)
     local customStyle = {}
     for kvPair in str:gmatch("[^ ]+") do
         local keyId = kvPair:sub(1, kvPair:len() - 5)
@@ -11486,7 +11575,28 @@ function parseCustomStyleV2(str, keyIdDict)
         customStyle[key] = color.nduaToRgba(keyValue)
         ::nextPair::
     end
-    globalVars.customStyle = table.duplicate(customStyle)
+    if (not exportInstead) then
+        globalVars.customStyle = table.duplicate(customStyle)
+        return
+    end
+    local outStr = ""
+    for k, v in pairs(customStyle) do
+        if (k:find("loadup")) then
+            outStr = outStr ..
+                "loadup." ..
+                k:gsub("loadup", "") ..
+                " = vector.New(" ..
+                math.round(v.x, 2) ..
+                table.concat({", ", math.round(v.y, 2) .. ", " .. math.round(v.z, 2) .. ", " .. math.round(v.w, 2), ")\n"})
+        else
+            outStr = outStr .. "imgui.PushStyleColor(imgui_col." ..
+                k:capitalize() ..
+                ", vector.New(" ..
+                math.round(v.x, 2) ..
+                table.concat({", ", math.round(v.y, 2) .. ", " .. math.round(v.z, 2) .. ", " .. math.round(v.w, 2), "))\n"})
+        end
+    end
+    imgui.SetClipboardText(outStr)
 end
 function parseCustomStyleV1(str, keyIdDict)
     local customStyle = {}
@@ -12625,7 +12735,7 @@ function chooseColorTheme()
                     local ctx = imgui.GetWindowDrawList()
                     ctx.AddRectFilled(topLeft, topLeft + dim, color.int.white - color.int.alphaMask * 200)
                 end
-                if (item.id:find("RGB") or item.id:find("BGR")) then
+                if (type(item.textColor[1]) == "table") then
                     local strLen = item.id:len()
                     local charProgress = 0
                     local subdivisionLength = #item.textColor - 1
@@ -14445,6 +14555,11 @@ function draw()
     if (state.GetValue("windows.showPatchNotesWindow")) then
         showPatchNotesWindow()
     end
+    if (devMode and imgui.Button("bruh")) then
+        setCustomStyleString(
+            "v2 wB@w!Kg pBKPZ31 fB@g3%& fBHA:)){ fBA^y9_S tBOInyJ tBA^j~Cu tBC9C-30 cMHsM%@ sG^ov;E sGA^t-|8 bnR*g'E bH^miz< bA^v[<y tb9X-t: tH^mqb^ tA^so:( hr:-.jN hH:-.jN hA:-.jN sr4$wSM tt^z^I- tSB:-/=T sGH^r#Yw pL^nN*A pLH^e,5- pH^xDDQ pHH^zUcE br^e+8* lOTCR^e+8* lPTCLT^zUc2 lPTCRT^zW]z lBTL94b4N lBTRJ)f// lBBLJ)f// lBBR^jNl& sG^ov;E sGA^t-|8",
+            true)
+    end
     imgui.End()
     logoThread()
     state.SetValue("boolean.changeOccurred", false)
@@ -14532,6 +14647,11 @@ function draw()
     end
     if (state.GetValue("windows.showPatchNotesWindow")) then
         showPatchNotesWindow()
+    end
+    if (devMode and imgui.Button("bruh")) then
+        setCustomStyleString(
+            "v2 wB@w!Kg pBKPZ31 fB@g3%& fBHA:)){ fBA^y9_S tBOInyJ tBA^j~Cu tBC9C-30 cMHsM%@ sG^ov;E sGA^t-|8 bnR*g'E bH^miz< bA^v[<y tb9X-t: tH^mqb^ tA^so:( hr:-.jN hH:-.jN hA:-.jN sr4$wSM tt^z^I- tSB:-/=T sGH^r#Yw pL^nN*A pLH^e,5- pH^xDDQ pHH^zUcE br^e+8* lOTCR^e+8* lPTCLT^zUc2 lPTCRT^zW]z lBTL94b4N lBTRJ)f// lBBLJ)f// lBBR^jNl& sG^ov;E sGA^t-|8",
+            true)
     end
     imgui.End()
     logoThread()

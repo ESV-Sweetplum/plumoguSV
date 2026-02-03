@@ -5,11 +5,11 @@ import { performance } from 'perf_hooks';
 
 console.log(
     chalk.blueBright(
-        chalk.bold('Watcher initialized. Make a change to a file to transpile.')
-    )
+        chalk.bold(
+            'Watcher initialized. Make a change to a file to transpile.',
+        ),
+    ),
 );
-
-let devMode = false;
 
 const debounce = (fn: Function, ms = 300) => {
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -24,26 +24,25 @@ chokidar.watch(['src', 'packages'], { ignoreInitial: true }).on(
     debounce(
         (event: keyof chokidar.FSWatcherEventMap, path: string) =>
             main(event, path),
-        100
-    )
+        100,
+    ),
 );
 
 async function main(event: keyof chokidar.FSWatcherEventMap, path: string) {
     const startTime = performance.now();
     console.log(
         `\nEvent ${chalk.red(event)} detected on file ${chalk.red(
-            path
-        )}. Now retranspiling...`
+            path,
+        )}. Now retranspiling...`,
     );
 
-    const devMode = path.includes('src\\dev\\unlock');
-    const fileCount = await transpiler(devMode, true, 'development');
+    const fileCount = await transpiler(true, true, 'development');
     const endTime = performance.now();
     console.log(
         `Successfully transpiled ${chalk.green(
-            fileCount
+            fileCount,
         )} files in ${chalk.green(
-            `${Math.round((endTime - startTime) * 100) / 100}ms`
-        )}.\n`
+            `${Math.round((endTime - startTime) * 100) / 100}ms`,
+        )}.\n`,
     );
 }

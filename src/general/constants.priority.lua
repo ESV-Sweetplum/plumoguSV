@@ -38,11 +38,11 @@ THEME_TREE = {
         },
         {
             id = "Strawberry",
-            textColor = { 251, 41, 67 }
+            textColor = { { 251, 41, 67 }, { 255, 100, 150 } }
         },
         {
             id = "Amethyst",
-            textColor = { 153, 102, 204 }
+            textColor = { { 153, 102, 204 }, { 170, 120, 255 } }
         },
         {
             id = "Tree",
@@ -50,13 +50,13 @@ THEME_TREE = {
         },
         {
             id = "Barbie",
-            textColor = { 227, 5, 173 }
+            textColor = { { 227, 5, 173 }, { 100, 255, 255 } }
         }
     },
     Modern = {
         {
             id = "Incognito",
-            textColor = { 150, 150, 150 }
+            textColor = { { 150, 150, 150 }, { 200, 200, 200 } }
         },
         {
             id = "Incognito + RGB",
@@ -64,7 +64,7 @@ THEME_TREE = {
         },
         {
             id = "otingocnI",
-            textColor = { 255, 255, 255 }
+            textColor = { { 255, 255, 255 }, { 200, 200, 200 } }
         },
         {
             id = "BGR + otingocnI",
@@ -72,7 +72,7 @@ THEME_TREE = {
         },
         {
             id = "Glass",
-            textColor = { 220, 220, 220 }
+            textColor = { { 200, 200, 200 }, { 255, 255, 255 }, { 200, 200, 200 } }
         },
         {
             id = "Glass + RGB",
@@ -90,11 +90,19 @@ THEME_TREE = {
     ["Mappers' Picks"] = {
         {
             id = "7xbi's Glass",
-            textColor = { 200, 200, 200 }
+            textColor = { { 150, 150, 150 }, { 200, 200, 200 } }
         },
         {
             id = "7xbi's RGB Glass",
             textColor = { { 255, 100, 255 }, { 255, 255, 100 }, { 100, 255, 255 } }
+        },
+        {
+            id = "aster's catppuccin",
+            textColor = { { 136, 57, 239 }, { 186, 187, 241 }, { 203, 166, 247 } }
+        },
+        {
+            id = "plum's purple palace",
+            textColor = { { 100, 0, 255 }, { 255, 0, 255 } }
         }
     },
     Custom = {

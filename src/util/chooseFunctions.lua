@@ -158,7 +158,7 @@ function chooseColorTheme()
                     local ctx = imgui.GetWindowDrawList()
                     ctx.AddRectFilled(topLeft, topLeft + dim, color.int.white - color.int.alphaMask * 200)
                 end
-                if (item.id:find("RGB") or item.id:find("BGR")) then
+                if (type(item.textColor[1]) == "table") then
                     local strLen = item.id:len()
                     local charProgress = 0
                     local subdivisionLength = #item.textColor - 1
