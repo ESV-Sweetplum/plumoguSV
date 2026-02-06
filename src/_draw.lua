@@ -50,11 +50,6 @@ function draw()
     if (cache.windows.showPatchNotesWindow) then
         showPatchNotesWindow()
     end
-    if (devMode and imgui.Button("bruh")) then
-        setCustomStyleString(
-            "v2 wB@w!Kg pBKPZ31 fB@g3%& fBHA:)){ fBA^y9_S tBOInyJ tBA^j~Cu tBC9C-30 cMHsM%@ sG^ov;E sGA^t-|8 bnR*g'E bH^miz< bA^v[<y tb9X-t: tH^mqb^ tA^so:( hr:-.jN hH:-.jN hA:-.jN sr4$wSM tt^z^I- tSB:-/=T sGH^r#Yw pL^nN*A pLH^e,5- pH^xDDQ pHH^zUcE br^e+8* lOTCR^e+8* lPTCLT^zUc2 lPTCRT^zW]z lBTL94b4N lBTRJ)f// lBBLJ)f// lBBR^jNl& sG^ov;E sGA^t-|8",
-            true)
-    end
 
     imgui.End()
 
