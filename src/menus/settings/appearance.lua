@@ -19,8 +19,11 @@ function showAppearanceSettings()
             ::nextCustomStyle::
         end
         globalCustomStyle = customStyle
-        globalVars.colorThemeName = "CUSTOM"
-        setPluginAppearanceColors("CUSTOM")
+        local newName = "Copy of " .. globalVars.colorThemeName
+        globalVars.colorThemeName = newName
+        globalVars.customStyles[newName] = globalCustomStyle
+        setPluginAppearanceColors(newName)
+        write(globalVars)
     end
     if (globalVars.colorThemeName ~= "CUSTOM") then
         HoverToolTip(
