@@ -1712,7 +1712,6 @@ function setGlobalVars(tempGlobalVars)
     globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
     globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
-    globalVars.customStyle = tempGlobalVars.customStyle or {}
     globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
     globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)
     globalVars.dontReplaceSV = isTruthy(tempGlobalVars.dontReplaceSV)
@@ -1743,12 +1742,13 @@ function setGlobalVars(tempGlobalVars)
     globalVars.upscroll = isTruthy(tempGlobalVars.upscroll)
     globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
     globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
+    customStyle = tempGlobalVars.customStyle or {}
     local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
         "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
     for k12 = 1, #forceVectorizeList do
         local key = forceVectorizeList[k12]
-        if (globalVars.customStyle[key]) then
-            globalVars.customStyle[key] = table.vectorize4(globalVars.customStyle[key])
+        if (customStyle[key]) then
+            customStyle[key] = table.vectorize4(customStyle[key])
         end
     end
     globalVars.placeTypeIndex = state.GetValue("global.placeTypeIndex", globalVars.placeTypeIndex)
@@ -2546,7 +2546,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
         end
     end
     local lastMultiplier = menuVars.svMultipliers[numMultipliers]
-    if (place == nil or place == true) then
+    if (place == nil or place) then
         if placingStillSVs then
             local stillSVResult = getStillSVs(menuVars, firstOffset, lastOffset,
                 sort(svsToAdd, sortAscendingStartTime), svsToAdd)
@@ -6932,63 +6932,63 @@ function setPlumPurplePalaceColors()
     return vector.New(0, 0, 0, 1)
 end
 function setCustomColors()
-    if (globalVars.customStyle == nil) then
+    if (customStyle == nil) then
         return setOriginalColors()
     end
-    local borderColor = globalVars.customStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
-    imgui.PushStyleColor(imgui_col.WindowBg, globalVars.customStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00))
-    imgui.PushStyleColor(imgui_col.PopupBg, globalVars.customStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94))
-    imgui.PushStyleColor(imgui_col.FrameBg, globalVars.customStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00))
+    local borderColor = customStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
+    imgui.PushStyleColor(imgui_col.WindowBg, customStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00))
+    imgui.PushStyleColor(imgui_col.PopupBg, customStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94))
+    imgui.PushStyleColor(imgui_col.FrameBg, customStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00))
     imgui.PushStyleColor(imgui_col.FrameBgHovered,
-        globalVars.customStyle.frameBgHovered or vector.New(0.24, 0.34, 0.38, 1.00))
+        customStyle.frameBgHovered or vector.New(0.24, 0.34, 0.38, 1.00))
     imgui.PushStyleColor(imgui_col.FrameBgActive,
-        globalVars.customStyle.frameBgActive or vector.New(0.29, 0.39, 0.43, 1.00))
-    imgui.PushStyleColor(imgui_col.TitleBg, globalVars.customStyle.titleBg or vector.New(0.41, 0.48, 0.65, 1.00))
+        customStyle.frameBgActive or vector.New(0.29, 0.39, 0.43, 1.00))
+    imgui.PushStyleColor(imgui_col.TitleBg, customStyle.titleBg or vector.New(0.41, 0.48, 0.65, 1.00))
     imgui.PushStyleColor(imgui_col.TitleBgActive,
-        globalVars.customStyle.titleBgActive or vector.New(0.51, 0.58, 0.75, 1.00))
+        customStyle.titleBgActive or vector.New(0.51, 0.58, 0.75, 1.00))
     imgui.PushStyleColor(imgui_col.TitleBgCollapsed,
-        globalVars.customStyle.titleBgCollapsed or vector.New(0.51, 0.58, 0.75, 0.50))
-    imgui.PushStyleColor(imgui_col.CheckMark, globalVars.customStyle.checkMark or vector.New(0.81, 0.88, 1.00, 1.00))
-    imgui.PushStyleColor(imgui_col.SliderGrab, globalVars.customStyle.sliderGrab or vector.New(0.56, 0.63, 0.75, 1.00))
+        customStyle.titleBgCollapsed or vector.New(0.51, 0.58, 0.75, 0.50))
+    imgui.PushStyleColor(imgui_col.CheckMark, customStyle.checkMark or vector.New(0.81, 0.88, 1.00, 1.00))
+    imgui.PushStyleColor(imgui_col.SliderGrab, customStyle.sliderGrab or vector.New(0.56, 0.63, 0.75, 1.00))
     imgui.PushStyleColor(imgui_col.SliderGrabActive,
-        globalVars.customStyle.sliderGrabActive or vector.New(0.61, 0.68, 0.80, 1.00))
-    imgui.PushStyleColor(imgui_col.Button, globalVars.customStyle.button or vector.New(0.31, 0.38, 0.50, 1.00))
+        customStyle.sliderGrabActive or vector.New(0.61, 0.68, 0.80, 1.00))
+    imgui.PushStyleColor(imgui_col.Button, customStyle.button or vector.New(0.31, 0.38, 0.50, 1.00))
     imgui.PushStyleColor(imgui_col.ButtonHovered,
-        globalVars.customStyle.buttonHovered or vector.New(0.41, 0.48, 0.60, 1.00))
+        customStyle.buttonHovered or vector.New(0.41, 0.48, 0.60, 1.00))
     imgui.PushStyleColor(imgui_col.ButtonActive,
-        globalVars.customStyle.buttonActive or vector.New(0.51, 0.58, 0.70, 1.00))
-    imgui.PushStyleColor(imgui_col.Tab, globalVars.customStyle.tab or vector.New(0.31, 0.38, 0.50, 1.00))
-    imgui.PushStyleColor(imgui_col.TabHovered, globalVars.customStyle.tabHovered or vector.New(0.51, 0.58, 0.75, 1.00))
-    imgui.PushStyleColor(imgui_col.TabActive, globalVars.customStyle.tabActive or vector.New(0.51, 0.58, 0.75, 1.00))
-    imgui.PushStyleColor(imgui_col.Header, globalVars.customStyle.header or vector.New(0.81, 0.88, 1.00, 0.40))
+        customStyle.buttonActive or vector.New(0.51, 0.58, 0.70, 1.00))
+    imgui.PushStyleColor(imgui_col.Tab, customStyle.tab or vector.New(0.31, 0.38, 0.50, 1.00))
+    imgui.PushStyleColor(imgui_col.TabHovered, customStyle.tabHovered or vector.New(0.51, 0.58, 0.75, 1.00))
+    imgui.PushStyleColor(imgui_col.TabActive, customStyle.tabActive or vector.New(0.51, 0.58, 0.75, 1.00))
+    imgui.PushStyleColor(imgui_col.Header, customStyle.header or vector.New(0.81, 0.88, 1.00, 0.40))
     imgui.PushStyleColor(imgui_col.HeaderHovered,
-        globalVars.customStyle.headerHovered or vector.New(0.81, 0.88, 1.00, 0.50))
+        customStyle.headerHovered or vector.New(0.81, 0.88, 1.00, 0.50))
     imgui.PushStyleColor(imgui_col.HeaderActive,
-        globalVars.customStyle.headerActive or vector.New(0.81, 0.88, 1.00, 0.54))
-    imgui.PushStyleColor(imgui_col.Separator, globalVars.customStyle.separator or vector.New(0.81, 0.88, 1.00, 0.30))
-    imgui.PushStyleColor(imgui_col.Text, globalVars.customStyle.text or vector.New(1.00, 1.00, 1.00, 1.00))
+        customStyle.headerActive or vector.New(0.81, 0.88, 1.00, 0.54))
+    imgui.PushStyleColor(imgui_col.Separator, customStyle.separator or vector.New(0.81, 0.88, 1.00, 0.30))
+    imgui.PushStyleColor(imgui_col.Text, customStyle.text or vector.New(1.00, 1.00, 1.00, 1.00))
     imgui.PushStyleColor(imgui_col.TextSelectedBg,
-        globalVars.customStyle.textSelectedBg or vector.New(0.81, 0.88, 1.00, 0.40))
+        customStyle.textSelectedBg or vector.New(0.81, 0.88, 1.00, 0.40))
     imgui.PushStyleColor(imgui_col.ScrollbarGrab,
-        globalVars.customStyle.scrollbarGrab or vector.New(0.31, 0.38, 0.50, 1.00))
+        customStyle.scrollbarGrab or vector.New(0.31, 0.38, 0.50, 1.00))
     imgui.PushStyleColor(imgui_col.ScrollbarGrabHovered,
-        globalVars.customStyle.scrollbarGrabHovered or vector.New(0.41, 0.48, 0.60, 1.00))
+        customStyle.scrollbarGrabHovered or vector.New(0.41, 0.48, 0.60, 1.00))
     imgui.PushStyleColor(imgui_col.ScrollbarGrabActive,
-        globalVars.customStyle.scrollbarGrabActive or vector.New(0.51, 0.58, 0.70, 1.00))
-    imgui.PushStyleColor(imgui_col.PlotLines, globalVars.customStyle.plotLines or vector.New(0.61, 0.61, 0.61, 1.00))
+        customStyle.scrollbarGrabActive or vector.New(0.51, 0.58, 0.70, 1.00))
+    imgui.PushStyleColor(imgui_col.PlotLines, customStyle.plotLines or vector.New(0.61, 0.61, 0.61, 1.00))
     imgui.PushStyleColor(imgui_col.PlotLinesHovered,
-        globalVars.customStyle.plotLinesHovered or vector.New(1.00, 0.43, 0.35, 1.00))
+        customStyle.plotLinesHovered or vector.New(1.00, 0.43, 0.35, 1.00))
     imgui.PushStyleColor(imgui_col.PlotHistogram,
-        globalVars.customStyle.plotHistogram or vector.New(0.90, 0.70, 0.00, 1.00))
+        customStyle.plotHistogram or vector.New(0.90, 0.70, 0.00, 1.00))
     imgui.PushStyleColor(imgui_col.PlotHistogramHovered,
-        globalVars.customStyle.plotHistogramHovered or vector.New(1.00, 0.60, 0.00, 1.00))
-    loadup.OpeningTextColor = globalVars.customStyle.loadupOpeningTextColor
-    loadup.PulseTextColorLeft = globalVars.customStyle.loadupPulseTextColorLeft
-    loadup.PulseTextColorRight = globalVars.customStyle.loadupPulseTextColorRight
-    loadup.BgTl = globalVars.customStyle.loadupBgTl
-    loadup.BgTr = globalVars.customStyle.loadupBgTr
-    loadup.BgBl = globalVars.customStyle.loadupBgBl
-    loadup.BgBr = globalVars.customStyle.loadupBgBr
+        customStyle.plotHistogramHovered or vector.New(1.00, 0.60, 0.00, 1.00))
+    loadup.OpeningTextColor = customStyle.loadupOpeningTextColor
+    loadup.PulseTextColorLeft = customStyle.loadupPulseTextColorLeft
+    loadup.PulseTextColorRight = customStyle.loadupPulseTextColorRight
+    loadup.BgTl = customStyle.loadupBgTl
+    loadup.BgTr = customStyle.loadupBgTr
+    loadup.BgBl = customStyle.loadupBgBl
+    loadup.BgBr = customStyle.loadupBgBr
     return borderColor
 end
 function getCurrentRGBColors(rgbPeriod)
@@ -11343,7 +11343,7 @@ function showAppearanceSettings()
             customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[query]))
             ::nextCustomStyle::
         end
-        globalVars.customStyle = customStyle
+        customStyle = customStyle
         globalVars.colorThemeName = "CUSTOM"
         setPluginAppearanceColors("CUSTOM")
     end
@@ -11480,7 +11480,7 @@ function showCustomThemeSettings()
     local settingsChanged = false
     imgui.SeparatorText("Custom Theme Actions")
     if (imgui.Button("Reset")) then
-        globalVars.customStyle = table.duplicate(DEFAULT_STYLE)
+        customStyle = table.duplicate(DEFAULT_STYLE)
         write()
     end
     KeepSameLine()
@@ -11489,7 +11489,7 @@ function showCustomThemeSettings()
     end
     KeepSameLine()
     if (imgui.Button("Export")) then
-        local str = stringifyCustomStyle(globalVars.customStyle)
+        local str = stringifyCustomStyle(customStyle)
         imgui.SetClipboardText(str)
         print("i!", "Exported custom theme to your clipboard.")
     end
@@ -11519,7 +11519,7 @@ function showCustomThemeSettings()
     for idx, id in ipairs(customStyleIds) do
         local name = customStyleNames[idx]
         if (not name:lower():find(searchText:lower())) then goto nextId end
-        settingsChanged = ColorInput(globalVars.customStyle, id, name) or settingsChanged
+        settingsChanged = ColorInput(customStyle, id, name) or settingsChanged
         ::nextId::
     end
     if settingsChanged then
@@ -11576,7 +11576,7 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
         ::nextPair::
     end
     if (not exportInstead) then
-        globalVars.customStyle = table.duplicate(customStyle)
+        customStyle = table.duplicate(customStyle)
         return
     end
     local outStr = ""
@@ -11606,7 +11606,7 @@ function parseCustomStyleV1(str, keyIdDict)
         local key = table.indexOf(keyIdDict, keyId)
         if (key ~= -1) then customStyle[key] = color.hexaToRgba(hexa) end
     end
-    globalVars.customStyle = table.duplicate(customStyle)
+    customStyle = table.duplicate(customStyle)
 end
 function saveSettingPropertiesButton(settingVars, label)
     local saveButtonClicked = imgui.Button("Save##setting" .. label)
@@ -13371,7 +13371,7 @@ end
 function prepareDisplacingSV(svsToAdd, svTimeIsAdded, svTime, displacement, displacementMultiplier, hypothetical, svs)
     svTimeIsAdded[svTime] = true
     local currentSVMultiplier = game.get.svMultiplierAt(svTime)
-    if hypothetical == true then
+    if hypothetical then
         currentSVMultiplier = getHypotheticalSVMultiplierAt(svs, svTime)
     end
     local newSVMultiplier = displacementMultiplier * displacement + currentSVMultiplier
@@ -14512,6 +14512,10 @@ end
 function awake()
     loadup = {} -- later inserted to via setStyleVars.lua
     local tempGlobalVars = read()
+    if (tempGlobalVars.colorThemeIndex) then
+        print("w!",
+            "Due to an internal change, your selected theme may have been reset. Please reselect the theme in the plugin settings")
+    end
     if (not tempGlobalVars) then
         write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
         ---@diagnostic disable-next-line: undefined-global

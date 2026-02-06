@@ -18,7 +18,7 @@ function showAppearanceSettings()
             customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[query]))
             ::nextCustomStyle::
         end
-        globalVars.customStyle = customStyle
+        customStyle = customStyle
         globalVars.colorThemeName = "CUSTOM"
         setPluginAppearanceColors("CUSTOM")
     end

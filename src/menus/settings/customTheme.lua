@@ -85,7 +85,7 @@ function showCustomThemeSettings()
     imgui.SeparatorText("Custom Theme Actions")
 
     if (imgui.Button("Reset")) then
-        globalVars.customStyle = table.duplicate(DEFAULT_STYLE)
+        customStyle = table.duplicate(DEFAULT_STYLE)
         write()
     end
     KeepSameLine()
@@ -96,7 +96,7 @@ function showCustomThemeSettings()
     KeepSameLine()
 
     if (imgui.Button("Export")) then
-        local str = stringifyCustomStyle(globalVars.customStyle)
+        local str = stringifyCustomStyle(customStyle)
         imgui.SetClipboardText(str)
         print("i!", "Exported custom theme to your clipboard.")
     end
@@ -129,7 +129,7 @@ function showCustomThemeSettings()
     for idx, id in ipairs(customStyleIds) do
         local name = customStyleNames[idx]
         if (not name:lower():find(searchText:lower())) then goto nextId end
-        settingsChanged = ColorInput(globalVars.customStyle, id, name) or settingsChanged
+        settingsChanged = ColorInput(customStyle, id, name) or settingsChanged
         ::nextId::
     end
     if settingsChanged then
@@ -194,7 +194,7 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
     end
 
     if (not exportInstead) then
-        globalVars.customStyle = table.duplicate(customStyle)
+        customStyle = table.duplicate(customStyle)
         return
     end
 
@@ -230,5 +230,5 @@ function parseCustomStyleV1(str, keyIdDict)
         if (key ~= -1) then customStyle[key] = color.hexaToRgba(hexa) end
     end
 
-    globalVars.customStyle = table.duplicate(customStyle)
+    customStyle = table.duplicate(customStyle)
 end

@@ -33,7 +33,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
         end
     end
     local lastMultiplier = menuVars.svMultipliers[numMultipliers]
-    if (place == nil or place == true) then
+    if (place == nil or place) then
         if placingStillSVs then
             local stillSVResult = getStillSVs(menuVars, firstOffset, lastOffset,
                 sort(svsToAdd, sortAscendingStartTime), svsToAdd)
