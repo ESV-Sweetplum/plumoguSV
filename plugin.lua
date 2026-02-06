@@ -1663,7 +1663,7 @@ globalVars = {
     cursorTrailPoints = 10,
     cursorTrailShapeIndex = 1,
     cursorTrailSize = 5,
-    customStyle = {},
+    customStyles = {},
     defaultProperties = { settings = {}, menu = {} },
     disableLoadup = false,
     dontPrintCreation = false,
@@ -1742,7 +1742,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.upscroll = isTruthy(tempGlobalVars.upscroll)
     globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
     globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
-    customStyle = tempGlobalVars.customStyle or {}
+    customStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
     local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
         "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
     for k12 = 1, #forceVectorizeList do
