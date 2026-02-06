@@ -190,9 +190,19 @@ function chooseColorTheme()
             end
         else
             for k, v in pairs(tree) do
-                if (imgui.BeginMenu(k)) then
-                    renderThemeTree(v)
-                    imgui.EndMenu()
+                if (k == "Custom") then
+                    renderThemeTree(table.map(table.keys(globalVars.customStyles), function(s)
+                        return {
+                            id = s,
+                            textColor = ""
+                        }
+                    end))
+                else
+                    ---@diagnostic disable-next-line: param-type-mismatch
+                    if (imgui.BeginMenu(k)) then
+                        renderThemeTree(v)
+                        imgui.EndMenu()
+                    end
                 end
             end
         end

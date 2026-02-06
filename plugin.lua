@@ -1742,7 +1742,11 @@ function setGlobalVars(tempGlobalVars)
     globalVars.upscroll = isTruthy(tempGlobalVars.upscroll)
     globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
     globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
-    customStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
+    if (tempGlobalVars.customStyles) then
+        customStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
+    else
+        customStyle = {}
+    end
     local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
         "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
     for k12 = 1, #forceVectorizeList do
@@ -11577,6 +11581,8 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
     end
     if (not exportInstead) then
         customStyle = table.duplicate(customStyle)
+        if (not globalVars.customStyles) then globalVars.customStyles = {} end
+        globalVars.customStyles["Import_" .. state.UnixTime] = customStyle
         return
     end
     local outStr = ""
@@ -12767,9 +12773,19 @@ function chooseColorTheme()
             end
         else
             for k, v in pairs(tree) do
-                if (imgui.BeginMenu(k)) then
-                    renderThemeTree(v)
-                    imgui.EndMenu()
+                if (k == "Custom") then
+                    renderThemeTree(table.map(table.keys(globalVars.customStyles), function(s)
+                        return {
+                            id = s,
+                            textColor = ""
+                        }
+                    end))
+                else
+                    ---@diagnostic disable-next-line: param-type-mismatch
+                    if (imgui.BeginMenu(k)) then
+                        renderThemeTree(v)
+                        imgui.EndMenu()
+                    end
                 end
             end
         end

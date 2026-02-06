@@ -195,6 +195,8 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
 
     if (not exportInstead) then
         customStyle = table.duplicate(customStyle)
+        if (not globalVars.customStyles) then globalVars.customStyles = {} end
+        globalVars.customStyles["Import_" .. state.UnixTime] = customStyle
         return
     end
 

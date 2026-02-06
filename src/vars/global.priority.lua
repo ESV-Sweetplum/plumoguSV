@@ -90,7 +90,11 @@ function setGlobalVars(tempGlobalVars)
     globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
     globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
 
-    customStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
+    if (tempGlobalVars.customStyles) then
+        customStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
+    else
+        customStyle = {}
+    end
 
     -- All fields below are colors that must be vectorized to properly perform color arithmetic.
     local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
