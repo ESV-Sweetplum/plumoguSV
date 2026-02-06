@@ -9,7 +9,7 @@ import {
 import { getFilesRecursively } from './lib/getFilesRecursively.js';
 import getFunctionList from './lib/getFunctionList.js';
 import getUnusedFunctions from './lib/getUnusedFunctions.js';
-import { join } from 'path';
+import { join, sep } from 'path';
 import readAndLintLua from './lib/readAndLintLua.js';
 
 let counter = 0;
@@ -22,7 +22,7 @@ export function getCounterAndIncrement() {
 export default async function transpiler(
     devMode = false,
     lint = true,
-    environment: 'production' | 'development' = 'production',
+    environment: 'production' | 'development' = 'production'
 ) {
     counter = 0;
     let fileCount = 0;
@@ -33,47 +33,52 @@ export default async function transpiler(
     if (devMode) output = `${output}\ndevMode = true`;
 
     const files = getFilesRecursively('packages').sort(
-        (a, b) => +b.includes('.priority.') - +a.includes('.priority.'),
+        (a, b) => +b.includes('.priority.') - +a.includes('.priority.')
     );
 
     files.push(
         ...getFilesRecursively('src').sort(
-            (a, b) => +b.includes('.priority.') - +a.includes('.priority.'),
-        ),
+            (a, b) => +b.includes('.priority.') - +a.includes('.priority.')
+        )
     ); // Force priority functions towards the top to avoid hot-reload error.
+
+    let splicedFileCount = 0;
 
     const entryFiles: string[] = [...files].reduce((arr, cur, idx) => {
         if (entryPoints.some((e) => cur.includes(e))) {
-            files.splice(idx, 1);
+            files.splice(idx - splicedFileCount, 1);
             arr.push(cur);
+            splicedFileCount++;
         }
         return arr;
     }, []);
 
     const entryFileData = entryFiles.reduce((obj, f) => {
-        obj[f.split('\\').slice(-1)[0].slice(1)] = readAndLintLua(f);
+        obj[f.split(sep).slice(-1)[0].slice(1)] = readAndLintLua(f);
         return obj;
     }, {});
 
     files.forEach((file: string) => {
         if (
-            ignoredFiles.some((f) => file.includes(f)) ||
+            [...ignoredFiles, ...entryPoints].some((f) => file.includes(f)) ||
             !file.endsWith('.lua')
         )
             return;
         let fileData = readAndLintLua(file).map((l) => {
             l = l.replaceAll(
                 /^([^\-\r\n]*)[\-]{2}([\-]{2,})?[^\-\r\n].+[ \r\n]*/g,
-                '$1',
+                '$1'
             ); // Removes <const> tag, removes --[[ --]] comments, removes double dash comments (not triple dash) from lines with code
             l = l.replaceAll(
                 /table\.insert\(([a-zA-Z0-9\[\]_]+), ([^,\r\n]+)\)( end)?$/g,
-                '$1[#$1 + 1] = $2$3',
+                '$1[#$1 + 1] = $2$3'
             ); // Replace table insert for performance (only on tables of 1ply)
             return l;
         });
 
         let fileIsInsert = false;
+
+        // Insert whitespace for nested functions
 
         Object.entries(entryFileData).forEach(
             ([path, data]: [string, string[]]) => {
@@ -83,10 +88,10 @@ export default async function transpiler(
                 entryFileData[path].splice(
                     data.length - 1,
                     0,
-                    ...fileData.map((d) => `${whitespace}${d}`),
+                    ...fileData.map((d) => `${whitespace}${d}`)
                 );
                 fileIsInsert = true;
-            },
+            }
         );
 
         if (fileIsInsert) return;
@@ -106,34 +111,34 @@ export default async function transpiler(
 
     output = output.replaceAll(
         /"([^"]+?)" \.\. (.+) \.\. "([^"]+?)"/g,
-        'table.concat({"$1", $2, "$3"})',
+        'table.concat({"$1", $2, "$3"})'
     ); // Remove double string concats with table
 
     output = output.replaceAll(
-        /\(("[a-z]{1,7}!"), "([^"]+?)" \.\. (.+) \.\. (.+)\)/g,
-        '($1, table.concat({"$2", $3, $4}))',
-    ); // Same as above, but with notification type parameter
+        /(p|P)rint\(("[a-z]{1,7}!"), "([^"]+?)" \.\. (.+) \.\. (.+)\)/g,
+        '$1rint($2, table.concat({"$3", $4, $5}))'
+    ); // Same as above, but with notification type parameter for print statements
 
     const ipairMatches = [
         ...output.matchAll(
-            /for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_, ]+)\) do\n( *)/g,
+            /for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_, ]+)\) do\n( *)/g
         ),
     ];
     ipairMatches.forEach((match) => {
         const idx = getCounterAndIncrement();
         output = output.replace(
             match[0],
-            `for k${idx} = 1, #${match[2]} do\n${match[3]}local ${match[1]} = ${match[2]}[k${idx}]\n${match[3]}`,
+            `for k${idx} = 1, #${match[2]} do\n${match[3]}local ${match[1]} = ${match[2]}[k${idx}]\n${match[3]}`
         );
     }); // Reduce function overhead by removing ipairs (only for static tables)
 
-    for (let i = 2; i <= 9; i++) {
+    for (let i = 2; i <= 5; i++) {
         const regex = new RegExp(` ([^\\)]) \\^ ${i}`, 'g');
         output = output.replaceAll(
             regex,
             ` $1${Array(i - 1)
                 .fill(' * $1')
-                .join('')}`,
+                .join('')}`
         );
     } // Remove integer exponentiation and replace with repeated multiplication
 
@@ -142,29 +147,29 @@ export default async function transpiler(
     for (let i = 9; i >= 1; i--) {
         const obtainmentRegex = new RegExp(
             `(?<!; )cache\\.(?!saveTable|loadTable|[a-zA-Z0-9_\\.]+\\[)([a-zA-Z0-9_]+)${'\\.([a-zA-Z0-9_]+)'.repeat(
-                i - 1,
+                i - 1
             )}`,
-            'g',
+            'g'
         );
         const assignmentRegex = new RegExp(
             `(?<!; )cache${'\\.([a-zA-Z0-9_]+)'.repeat(
-                i,
+                i
             )} = ([a-z ]{0,4}(?:[^ \n,]|, | [\\+\\-\\*\\/\\%\\^] )+)`,
-            'g',
+            'g'
         );
         output = output.replaceAll(
             assignmentRegex,
             `state.SetValue("${Array(i)
                 .fill(0)
                 .map((_, idx) => `$${idx + 1}`)
-                .join('.')}", $${i + 1})`,
+                .join('.')}", $${i + 1})`
         );
         output = output.replaceAll(
             obtainmentRegex,
             `state.GetValue("${Array(i)
                 .fill(0)
                 .map((_, idx) => `$${idx + 1}`)
-                .join('.')}")`,
+                .join('.')}")`
         );
     } // Change all cache assignments and cache calls to use state instead
 
@@ -193,7 +198,7 @@ export default async function transpiler(
             const [_, unusedIndexes] = getUnusedFunctions(
                 splitOutput,
                 functions,
-                fnIndices,
+                fnIndices
             );
 
             const listLength = unusedIndexes.length;

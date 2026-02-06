@@ -6,9 +6,9 @@ import { performance } from 'perf_hooks';
 console.log(
     chalk.blueBright(
         chalk.bold(
-            'Watcher initialized. Make a change to a file to transpile.',
-        ),
-    ),
+            'Watcher initialized and plugin transpiled. Make a change to a file to re-transpile.'
+        )
+    )
 );
 
 const debounce = (fn: Function, ms = 300) => {
@@ -24,25 +24,27 @@ chokidar.watch(['src', 'packages'], { ignoreInitial: true }).on(
     debounce(
         (event: keyof chokidar.FSWatcherEventMap, path: string) =>
             main(event, path),
-        100,
-    ),
+        100
+    )
 );
 
 async function main(event: keyof chokidar.FSWatcherEventMap, path: string) {
     const startTime = performance.now();
     console.log(
         `\nEvent ${chalk.red(event)} detected on file ${chalk.red(
-            path,
-        )}. Now retranspiling...`,
+            path
+        )}. Now retranspiling...`
     );
 
     const fileCount = await transpiler(true, true, 'development');
     const endTime = performance.now();
     console.log(
         `Successfully transpiled ${chalk.green(
-            fileCount,
+            fileCount
         )} files in ${chalk.green(
-            `${Math.round((endTime - startTime) * 100) / 100}ms`,
-        )}.\n`,
+            `${Math.round((endTime - startTime) * 100) / 100}ms`
+        )}.\n`
     );
 }
+
+transpiler(true, true, 'development');
