@@ -8,7 +8,7 @@
 function prepareDisplacingSV(svsToAdd, svTimeIsAdded, svTime, displacement, displacementMultiplier, hypothetical, svs)
     svTimeIsAdded[svTime] = true
     local currentSVMultiplier = game.get.svMultiplierAt(svTime)
-    if hypothetical then
+    if hypothetical == true then
         currentSVMultiplier = getHypotheticalSVMultiplierAt(svs, svTime)
     end
     local newSVMultiplier = displacementMultiplier * displacement + currentSVMultiplier

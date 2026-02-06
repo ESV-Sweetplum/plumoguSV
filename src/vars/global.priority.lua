@@ -59,6 +59,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
     globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
+    globalVars.customStyle = tempGlobalVars.customStyle or {}
     globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
     globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)
     globalVars.dontReplaceSV = isTruthy(tempGlobalVars.dontReplaceSV)
@@ -91,17 +92,17 @@ function setGlobalVars(tempGlobalVars)
     globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
 
     if (tempGlobalVars.customStyles) then
-        customStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
+        globalCustomStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
     else
-        customStyle = {}
+        globalCustomStyle = {}
     end
 
     -- All fields below are colors that must be vectorized to properly perform color arithmetic.
     local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
         "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
     for _, key in ipairs(forceVectorizeList) do
-        if (customStyle[key]) then
-            customStyle[key] = table.vectorize4(customStyle[key])
+        if (globalVars.customStyle[key]) then
+            globalVars.customStyle[key] = table.vectorize4(globalVars.customStyle[key])
         end
     end
 

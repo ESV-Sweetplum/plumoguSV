@@ -883,64 +883,64 @@ function setPlumPurplePalaceColors()
 end
 
 function setCustomColors()
-    if (customStyle == nil) then
+    if (globalVars.customStyle == nil) then
         return setOriginalColors()
     end
-    local borderColor = customStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
-    imgui.PushStyleColor(imgui_col.WindowBg, customStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00))
-    imgui.PushStyleColor(imgui_col.PopupBg, customStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94))
-    imgui.PushStyleColor(imgui_col.FrameBg, customStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00))
+    local borderColor = globalVars.customStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
+    imgui.PushStyleColor(imgui_col.WindowBg, globalVars.customStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00))
+    imgui.PushStyleColor(imgui_col.PopupBg, globalVars.customStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94))
+    imgui.PushStyleColor(imgui_col.FrameBg, globalVars.customStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00))
     imgui.PushStyleColor(imgui_col.FrameBgHovered,
-        customStyle.frameBgHovered or vector.New(0.24, 0.34, 0.38, 1.00))
+        globalVars.customStyle.frameBgHovered or vector.New(0.24, 0.34, 0.38, 1.00))
     imgui.PushStyleColor(imgui_col.FrameBgActive,
-        customStyle.frameBgActive or vector.New(0.29, 0.39, 0.43, 1.00))
-    imgui.PushStyleColor(imgui_col.TitleBg, customStyle.titleBg or vector.New(0.41, 0.48, 0.65, 1.00))
+        globalVars.customStyle.frameBgActive or vector.New(0.29, 0.39, 0.43, 1.00))
+    imgui.PushStyleColor(imgui_col.TitleBg, globalVars.customStyle.titleBg or vector.New(0.41, 0.48, 0.65, 1.00))
     imgui.PushStyleColor(imgui_col.TitleBgActive,
-        customStyle.titleBgActive or vector.New(0.51, 0.58, 0.75, 1.00))
+        globalVars.customStyle.titleBgActive or vector.New(0.51, 0.58, 0.75, 1.00))
     imgui.PushStyleColor(imgui_col.TitleBgCollapsed,
-        customStyle.titleBgCollapsed or vector.New(0.51, 0.58, 0.75, 0.50))
-    imgui.PushStyleColor(imgui_col.CheckMark, customStyle.checkMark or vector.New(0.81, 0.88, 1.00, 1.00))
-    imgui.PushStyleColor(imgui_col.SliderGrab, customStyle.sliderGrab or vector.New(0.56, 0.63, 0.75, 1.00))
+        globalVars.customStyle.titleBgCollapsed or vector.New(0.51, 0.58, 0.75, 0.50))
+    imgui.PushStyleColor(imgui_col.CheckMark, globalVars.customStyle.checkMark or vector.New(0.81, 0.88, 1.00, 1.00))
+    imgui.PushStyleColor(imgui_col.SliderGrab, globalVars.customStyle.sliderGrab or vector.New(0.56, 0.63, 0.75, 1.00))
     imgui.PushStyleColor(imgui_col.SliderGrabActive,
-        customStyle.sliderGrabActive or vector.New(0.61, 0.68, 0.80, 1.00))
-    imgui.PushStyleColor(imgui_col.Button, customStyle.button or vector.New(0.31, 0.38, 0.50, 1.00))
+        globalVars.customStyle.sliderGrabActive or vector.New(0.61, 0.68, 0.80, 1.00))
+    imgui.PushStyleColor(imgui_col.Button, globalVars.customStyle.button or vector.New(0.31, 0.38, 0.50, 1.00))
     imgui.PushStyleColor(imgui_col.ButtonHovered,
-        customStyle.buttonHovered or vector.New(0.41, 0.48, 0.60, 1.00))
+        globalVars.customStyle.buttonHovered or vector.New(0.41, 0.48, 0.60, 1.00))
     imgui.PushStyleColor(imgui_col.ButtonActive,
-        customStyle.buttonActive or vector.New(0.51, 0.58, 0.70, 1.00))
-    imgui.PushStyleColor(imgui_col.Tab, customStyle.tab or vector.New(0.31, 0.38, 0.50, 1.00))
-    imgui.PushStyleColor(imgui_col.TabHovered, customStyle.tabHovered or vector.New(0.51, 0.58, 0.75, 1.00))
-    imgui.PushStyleColor(imgui_col.TabActive, customStyle.tabActive or vector.New(0.51, 0.58, 0.75, 1.00))
-    imgui.PushStyleColor(imgui_col.Header, customStyle.header or vector.New(0.81, 0.88, 1.00, 0.40))
+        globalVars.customStyle.buttonActive or vector.New(0.51, 0.58, 0.70, 1.00))
+    imgui.PushStyleColor(imgui_col.Tab, globalVars.customStyle.tab or vector.New(0.31, 0.38, 0.50, 1.00))
+    imgui.PushStyleColor(imgui_col.TabHovered, globalVars.customStyle.tabHovered or vector.New(0.51, 0.58, 0.75, 1.00))
+    imgui.PushStyleColor(imgui_col.TabActive, globalVars.customStyle.tabActive or vector.New(0.51, 0.58, 0.75, 1.00))
+    imgui.PushStyleColor(imgui_col.Header, globalVars.customStyle.header or vector.New(0.81, 0.88, 1.00, 0.40))
     imgui.PushStyleColor(imgui_col.HeaderHovered,
-        customStyle.headerHovered or vector.New(0.81, 0.88, 1.00, 0.50))
+        globalVars.customStyle.headerHovered or vector.New(0.81, 0.88, 1.00, 0.50))
     imgui.PushStyleColor(imgui_col.HeaderActive,
-        customStyle.headerActive or vector.New(0.81, 0.88, 1.00, 0.54))
-    imgui.PushStyleColor(imgui_col.Separator, customStyle.separator or vector.New(0.81, 0.88, 1.00, 0.30))
-    imgui.PushStyleColor(imgui_col.Text, customStyle.text or vector.New(1.00, 1.00, 1.00, 1.00))
+        globalVars.customStyle.headerActive or vector.New(0.81, 0.88, 1.00, 0.54))
+    imgui.PushStyleColor(imgui_col.Separator, globalVars.customStyle.separator or vector.New(0.81, 0.88, 1.00, 0.30))
+    imgui.PushStyleColor(imgui_col.Text, globalVars.customStyle.text or vector.New(1.00, 1.00, 1.00, 1.00))
     imgui.PushStyleColor(imgui_col.TextSelectedBg,
-        customStyle.textSelectedBg or vector.New(0.81, 0.88, 1.00, 0.40))
+        globalVars.customStyle.textSelectedBg or vector.New(0.81, 0.88, 1.00, 0.40))
     imgui.PushStyleColor(imgui_col.ScrollbarGrab,
-        customStyle.scrollbarGrab or vector.New(0.31, 0.38, 0.50, 1.00))
+        globalVars.customStyle.scrollbarGrab or vector.New(0.31, 0.38, 0.50, 1.00))
     imgui.PushStyleColor(imgui_col.ScrollbarGrabHovered,
-        customStyle.scrollbarGrabHovered or vector.New(0.41, 0.48, 0.60, 1.00))
+        globalVars.customStyle.scrollbarGrabHovered or vector.New(0.41, 0.48, 0.60, 1.00))
     imgui.PushStyleColor(imgui_col.ScrollbarGrabActive,
-        customStyle.scrollbarGrabActive or vector.New(0.51, 0.58, 0.70, 1.00))
-    imgui.PushStyleColor(imgui_col.PlotLines, customStyle.plotLines or vector.New(0.61, 0.61, 0.61, 1.00))
+        globalVars.customStyle.scrollbarGrabActive or vector.New(0.51, 0.58, 0.70, 1.00))
+    imgui.PushStyleColor(imgui_col.PlotLines, globalVars.customStyle.plotLines or vector.New(0.61, 0.61, 0.61, 1.00))
     imgui.PushStyleColor(imgui_col.PlotLinesHovered,
-        customStyle.plotLinesHovered or vector.New(1.00, 0.43, 0.35, 1.00))
+        globalVars.customStyle.plotLinesHovered or vector.New(1.00, 0.43, 0.35, 1.00))
     imgui.PushStyleColor(imgui_col.PlotHistogram,
-        customStyle.plotHistogram or vector.New(0.90, 0.70, 0.00, 1.00))
+        globalVars.customStyle.plotHistogram or vector.New(0.90, 0.70, 0.00, 1.00))
     imgui.PushStyleColor(imgui_col.PlotHistogramHovered,
-        customStyle.plotHistogramHovered or vector.New(1.00, 0.60, 0.00, 1.00))
+        globalVars.customStyle.plotHistogramHovered or vector.New(1.00, 0.60, 0.00, 1.00))
 
-    loadup.OpeningTextColor = customStyle.loadupOpeningTextColor
-    loadup.PulseTextColorLeft = customStyle.loadupPulseTextColorLeft
-    loadup.PulseTextColorRight = customStyle.loadupPulseTextColorRight
-    loadup.BgTl = customStyle.loadupBgTl
-    loadup.BgTr = customStyle.loadupBgTr
-    loadup.BgBl = customStyle.loadupBgBl
-    loadup.BgBr = customStyle.loadupBgBr
+    loadup.OpeningTextColor = globalVars.customStyle.loadupOpeningTextColor
+    loadup.PulseTextColorLeft = globalVars.customStyle.loadupPulseTextColorLeft
+    loadup.PulseTextColorRight = globalVars.customStyle.loadupPulseTextColorRight
+    loadup.BgTl = globalVars.customStyle.loadupBgTl
+    loadup.BgTr = globalVars.customStyle.loadupBgTr
+    loadup.BgBl = globalVars.customStyle.loadupBgBl
+    loadup.BgBr = globalVars.customStyle.loadupBgBr
 
     return borderColor
 end
