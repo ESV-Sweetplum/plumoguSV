@@ -49,7 +49,7 @@ location = location - vector.New(${dim[0] / 2}, ${dim[1] / 2}) * scale
                 currentLocation,
                 matches[0],
                 matches[1],
-                matches[2],
+                matches[2]
             ]);
             currentLocation = matches[2];
         }

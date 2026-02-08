@@ -15,13 +15,15 @@ function infoTab()
     imgui.BulletText("Emik + William for plugin help.")
     imgui.BulletText("ESV members for constant support.")
     imgui.Dummy(vctr2(10))
-    imgui.SetCursorPosX((imgui.GetWindowWidth() - 153) / 2)
-    imgui.Text("If you enjoy using this plugin,")
-    imgui.SetCursorPosX((imgui.GetWindowWidth() - 172) / 2)
-    imgui.Text("consider supporting me on")
-    imgui.SameLine(0, 3)
-    imgui.TextLinkOpenURL("ko-fi!", "https://ko-fi.com/plummyyummy")
-    imgui.Dummy(vctr2(10))
+    if (not globalVars.disableKofiMessage) then
+        imgui.SetCursorPosX((imgui.GetWindowWidth() - 153) / 2)
+        imgui.Text("If you enjoy using this plugin,")
+        imgui.SetCursorPosX((imgui.GetWindowWidth() - 172) / 2)
+        imgui.Text("consider supporting me on")
+        imgui.SameLine(0, 3)
+        imgui.TextLinkOpenURL("ko-fi!", "https://ko-fi.com/plummyyummy")
+        imgui.Dummy(vctr2(10))
+    end
     if (imgui.Button("Edit Settings", HALF_ACTION_BUTTON_SIZE)) then
         cache.windows.showSettingsWindow = not cache.windows.showSettingsWindow
         local coordinatesToCenter = game.window.getCenter() - vector.New(216.5, 200)

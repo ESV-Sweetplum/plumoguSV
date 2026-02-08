@@ -3,6 +3,8 @@ function showGeneralSettings()
         "Disables some visual enhancement to boost performance.")
     GlobalCheckbox("advancedMode", "Enable Advanced Mode",
         "Advanced mode enables a few features that simplify SV creation, at the cost of making the plugin more cluttered.")
+    GlobalCheckbox("disableKofiMessage", "Disable Ko-Fi Message",
+        "Removes the text at the bottom of the 'Info' section requesting a donation.")
     AddSeparator()
     chooseUpscroll()
     AddSeparator()

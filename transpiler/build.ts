@@ -144,7 +144,7 @@ try {
         `builds/${packageName}-steam`,
         {
             recursive: true,
-            force: true,
+            force: true
         }
     );
 

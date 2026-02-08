@@ -3,15 +3,15 @@ export default function getUnusedFunctions(
     functionNames: string[],
     functionIndices: number[]
 ) {
-    const globals = ["awake", "draw"];
+    const globals = ['awake', 'draw'];
 
-    const totalFile = file.join("\n");
+    const totalFile = file.join('\n');
 
     const unusedFunctions = [];
     const unusedIndexes = [];
     functionNames.forEach((fn, idx) => {
         if (
-            totalFile.match(new RegExp(String.raw`${fn}[\(,\)]`, "gd"))
+            totalFile.match(new RegExp(String.raw`${fn}[\(,\)]`, 'gd'))
                 ?.length == 1 &&
             !globals.includes(fn)
         ) {

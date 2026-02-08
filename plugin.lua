@@ -1664,6 +1664,7 @@ globalVars = {
     cursorTrailSize = 5,
     customStyles = {},
     defaultProperties = { settings = {}, menu = {} },
+    disableKofiMessage = false,
     disableLoadup = false,
     dontPrintCreation = false,
     dontReplaceSV = false,
@@ -1712,6 +1713,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
     globalVars.customStyles = tempGlobalVars.customStyles
+    globalVars.disableKofiMessage = isTruthy(tempGlobalVars.disableKofiMessage)
     globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
     globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)
     globalVars.dontReplaceSV = isTruthy(tempGlobalVars.dontReplaceSV)
@@ -8857,13 +8859,15 @@ function infoTab()
     imgui.BulletText("Emik + William for plugin help.")
     imgui.BulletText("ESV members for constant support.")
     imgui.Dummy(vctr2(10))
-    imgui.SetCursorPosX((imgui.GetWindowWidth() - 153) / 2)
-    imgui.Text("If you enjoy using this plugin,")
-    imgui.SetCursorPosX((imgui.GetWindowWidth() - 172) / 2)
-    imgui.Text("consider supporting me on")
-    imgui.SameLine(0, 3)
-    imgui.TextLinkOpenURL("ko-fi!", "https://ko-fi.com/plummyyummy")
-    imgui.Dummy(vctr2(10))
+    if (not globalVars.disableKofiMessage) then
+        imgui.SetCursorPosX((imgui.GetWindowWidth() - 153) / 2)
+        imgui.Text("If you enjoy using this plugin,")
+        imgui.SetCursorPosX((imgui.GetWindowWidth() - 172) / 2)
+        imgui.Text("consider supporting me on")
+        imgui.SameLine(0, 3)
+        imgui.TextLinkOpenURL("ko-fi!", "https://ko-fi.com/plummyyummy")
+        imgui.Dummy(vctr2(10))
+    end
     if (imgui.Button("Edit Settings", HALF_ACTION_BUTTON_SIZE)) then
         state.SetValue("windows.showSettingsWindow", not state.GetValue("windows.showSettingsWindow"))
         local coordinatesToCenter = game.window.getCenter() - vector.New(216.5, 200)
@@ -12017,6 +12021,8 @@ function showGeneralSettings()
         "Disables some visual enhancement to boost performance.")
     GlobalCheckbox("advancedMode", "Enable Advanced Mode",
         "Advanced mode enables a few features that simplify SV creation, at the cost of making the plugin more cluttered.")
+    GlobalCheckbox("disableKofiMessage", "Disable Ko-Fi Message",
+        "Removes the text at the bottom of the 'Info' section requesting a donation.")
     AddSeparator()
     chooseUpscroll()
     AddSeparator()

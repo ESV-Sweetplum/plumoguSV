@@ -450,6 +450,7 @@ defaultProperties:
       mine: false
     selectBySnap:
       snap: 1
+disableKofiMessage: true
 disableLoadup: true
 dontPrintCreation: true
 dontReplaceSV: false

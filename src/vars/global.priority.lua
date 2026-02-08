@@ -9,6 +9,7 @@ globalVars = {
     cursorTrailSize = 5,
     customStyles = {},
     defaultProperties = { settings = {}, menu = {} },
+    disableKofiMessage = false,
     disableLoadup = false,
     dontPrintCreation = false,
     dontReplaceSV = false,
@@ -59,6 +60,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
     globalVars.customStyles = tempGlobalVars.customStyles
+    globalVars.disableKofiMessage = isTruthy(tempGlobalVars.disableKofiMessage)
     globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
     globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)
     globalVars.dontReplaceSV = isTruthy(tempGlobalVars.dontReplaceSV)

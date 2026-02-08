@@ -4,7 +4,7 @@ import {
     rmSync,
     existsSync,
     renameSync,
-    copyFileSync,
+    copyFileSync
 } from 'fs';
 import { getFilesRecursively } from './lib/getFilesRecursively.js';
 import getFunctionList from './lib/getFunctionList.js';
@@ -122,7 +122,7 @@ export default async function transpiler(
     const ipairMatches = [
         ...output.matchAll(
             /for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_, ]+)\) do\n( *)/g
-        ),
+        )
     ];
     ipairMatches.forEach((match) => {
         const idx = getCounterAndIncrement();
