@@ -34,9 +34,7 @@ function svVibrato(menuVars, heightFn)
                 local offset = nextVibro * x + startVibro * (1 - x)
                 local height = heightFn(math.floor((tp - 1) / 2) * 2 / teleportCount * posDifference +
                     startPos, tp)
-                if (menuVars.deviationFunctionIndex == 2) then
-                    height = height + (math.random() * 2 - 1) * menuVars.deviationDistance
-                end
+                height = deviateVibratoHeight(height, menuVars.deviationFunctionIndex, menuVars.deviationDistance)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     height, 0)
                 x = tp / teleportCount
@@ -49,47 +47,56 @@ function svVibrato(menuVars, heightFn)
             teleportCount = teleportCount + 1
             prepareDisplacingSVs(startVibro, svsToAdd, svTimeIsAdded, nil,
                 -heightFn(startPos, 0), 0)
+            local prevHeight = heightFn(startPos, 0)
             for tp = 1, teleportCount - 2, 2 do
                 local x = tp / teleportCount
                 local offset = nextVibro * x + startVibro * (1 - x)
-                local prevHeight = heightFn((tp - 1) / (teleportCount - 1) * posDifference +
-                    startPos, tp)
                 local newHeight = heightFn((tp + 1) / (teleportCount - 1) * posDifference +
                     startPos, tp + 1)
+                newHeight = deviateVibratoHeight(newHeight, menuVars.deviationFunctionIndex, menuVars.deviationDistance)
+                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
+                    prevHeight + newHeight, 0)
+                x = (tp + 1) / teleportCount
+                offset = nextVibro * x + startVibro * (1 - x)
+                local multiplicativeFactor = tp == teleportCount - 2 and 1 or 2
+                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
+                    -newHeight * multiplicativeFactor, 0)
+                prevHeight = newHeight
+            end
+        else
+            local prevHeight = heightFn(startPos, 1)
+            for tp = 1, teleportCount - 2, 3 do
+                local x = (tp - 1) / teleportCount
+                local offset = nextVibro * x + startVibro * (1 - x)
+                local newHeight = heightFn(startPos + (tp + 2) / teleportCount * posDifference, (tp - 1) / 3 + 2)
+                newHeight = deviateVibratoHeight(newHeight, menuVars.deviationFunctionIndex, menuVars.deviationDistance)
+                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
+                    -prevHeight, 0)
+                x = tp / teleportCount
+                offset = nextVibro * x + startVibro * (1 - x)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     prevHeight + newHeight, 0)
                 x = (tp + 1) / teleportCount
                 offset = nextVibro * x + startVibro * (1 - x)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
-                    -newHeight * 2, 0)
-            end
-            prepareDisplacingSVs(nextVibro * (1 - 2 / teleportCount) + 2 * startVibro / teleportCount, svsToAdd,
-                svTimeIsAdded, nil,
-                heightFn(posDifference * (1 - 2 / (teleportCount - 1)) + startPos, teleportCount - 2) +
-                heightFn(endPos, teleportCount - 1), 0)
-            prepareDisplacingSVs(nextVibro * (1 - 1 / teleportCount) + startVibro / teleportCount, svsToAdd,
-                svTimeIsAdded, nil,
-                -heightFn(endPos, teleportCount), 0)
-        else
-            for tp = 1, teleportCount - 2, 3 do
-                local x = (tp - 1) / teleportCount
-                local offset = nextVibro * x + startVibro * (1 - x)
-                local height = heightFn(startPos + (tp - 1) / teleportCount * posDifference, (tp - 1) / 3 + 1)
-                local newHeight = heightFn(startPos + (tp + 2) / teleportCount * posDifference, (tp - 1) / 3 + 2)
-                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
-                    -height, 0)
-                x = tp / teleportCount
-                offset = nextVibro * x + startVibro * (1 - x)
-                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
-                    height + newHeight, 0)
-                x = (tp + 1) / teleportCount
-                offset = nextVibro * x + startVibro * (1 - x)
-                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     -newHeight, 0)
+                prevHeight = newHeight
             end
         end
     end
 
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
+end
+
+function deviateVibratoHeight(initHeight, deviationIndex, deviationDistance)
+    if (deviationIndex == 1) then return initHeight end
+    if (deviationIndex == 2) then
+        return initHeight + (math.random() * 2 - 1) * deviationDistance
+    end
+    if (deviationIndex == 3) then
+        local stdDevTolerance = 2
+        return initHeight + math.gaussianRandom(0, deviationDistance / stdDevTolerance, stdDevTolerance)
+    end
+    return initHeight
 end

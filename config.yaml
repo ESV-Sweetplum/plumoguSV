@@ -308,6 +308,8 @@ defaultProperties:
       vibratoMode: 1
       vibratoQuality: 3
       sides: 2
+      deviationFunctionIndex: 1
+      deviationDistance: 0
     delete:
       deleteTable:
       - true
@@ -479,7 +481,7 @@ hotkeyList:
 ignoreNotesOutsideTg: false
 maxDisplacementMultiplierExponent: 6
 performanceMode: false
-placeTypeIndex: 1
+placeTypeIndex: 4
 presets:
 - 
 printLegacyLNMessage: true
