@@ -1,14 +1,15 @@
 globalVars = {
     advancedMode = false,
-    colorThemeIndex = 1,
+    colorThemeName = "Original",
     comboizeSelect = false,
     cursorTrailGhost = false,
     cursorTrailIndex = 1,
     cursorTrailPoints = 10,
     cursorTrailShapeIndex = 1,
     cursorTrailSize = 5,
-    customStyle = {},
+    customStyles = {},
     defaultProperties = { settings = {}, menu = {} },
+    disableKofiMessage = false,
     disableLoadup = false,
     dontPrintCreation = false,
     dontReplaceSV = false,
@@ -51,14 +52,15 @@ DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 
 function setGlobalVars(tempGlobalVars)
     globalVars.advancedMode = isTruthy(tempGlobalVars.advancedMode)
-    globalVars.colorThemeIndex = tn(tempGlobalVars.colorThemeIndex)
+    globalVars.colorThemeName = tempGlobalVars.colorThemeName or "Original"
     globalVars.comboizeSelect = isTruthy(tempGlobalVars.comboizeSelect)
     globalVars.cursorTrailGhost = isTruthy(tempGlobalVars.cursorTrailGhost)
     globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
     globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
     globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
-    globalVars.customStyle = tempGlobalVars.customStyle or {}
+    globalVars.customStyles = tempGlobalVars.customStyles
+    globalVars.disableKofiMessage = isTruthy(tempGlobalVars.disableKofiMessage)
     globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
     globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)
     globalVars.dontReplaceSV = isTruthy(tempGlobalVars.dontReplaceSV)
@@ -93,10 +95,18 @@ function setGlobalVars(tempGlobalVars)
     -- All fields below are colors that must be vectorized to properly perform color arithmetic.
     local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
         "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
-    for _, key in ipairs(forceVectorizeList) do
-        if (globalVars.customStyle[key]) then
-            globalVars.customStyle[key] = table.vectorize4(globalVars.customStyle[key])
+
+    if (tempGlobalVars.customStyles) then
+        for themeName, themeData in pairs(globalVars.customStyles) do
+            for _, key in ipairs(forceVectorizeList) do
+                if (themeData[key]) then
+                    globalVars.customStyles[themeName][key] = table.vectorize4(themeData[key])
+                end
+            end
         end
+        globalCustomStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
+    else
+        globalCustomStyle = {}
     end
 
     -- All fields below are not settings, but menu operators that need to be kept on hot-reload.

@@ -1,202 +1,13 @@
 advancedMode: true
-colorThemeIndex: 16
+colorThemeName: plum's purple palace
 comboizeSelect: true
 cursorTrailGhost: false
 cursorTrailIndex: 1
 cursorTrailPoints: 20
 cursorTrailShapeIndex: 2
 cursorTrailSize: 10
-customStyle:
-  windowBg:
-  - 0
-  - 0
-  - 0
-  - 0.51764708757400513
-  popupBg:
-  - 0.16862745583057404
-  - 0.10588235408067703
-  - 0.23529411852359772
-  - 0.69411766529083252
-  frameBg:
-  - 0.15686275064945221
-  - 0.031372550874948502
-  - 0.26666668057441711
-  - 0.51372551918029785
-  frameBgHovered:
-  - 0.29803922772407532
-  - 0.074509806931018829
-  - 0.49019607901573181
-  - 0.5215686559677124
-  frameBgActive:
-  - 0.69411766529083252
-  - 0.49803921580314636
-  - 0.93725490570068359
-  - 1
-  titleBg:
-  - 0
-  - 0
-  - 0
-  - 0.7607843279838562
-  titleBgActive:
-  - 0.11764705926179886
-  - 0.015686275437474251
-  - 0.27450981736183167
-  - 1
-  titleBgCollapsed:
-  - 0.60392159223556519
-  - 0.50980395078659058
-  - 0.74901962280273438
-  - 0.38823530077934265
-  checkMark:
-  - 0.88627451658248901
-  - 0
-  - 1
-  - 0.64705884456634521
-  sliderGrab:
-  - 0.30980393290519714
-  - 0.3803921639919281
-  - 0.50196081399917603
-  - 1
-  sliderGrabActive:
-  - 0.50980395078659058
-  - 0.58039218187332153
-  - 0.69803923368453979
-  - 1
-  button:
-  - 0.18431372940540314
-  - 0.031372550874948502
-  - 0.36862745881080627
-  - 0.80392158031463623
-  buttonHovered:
-  - 0.24313725531101227
-  - 0.023529412224888802
-  - 0.40392157435417175
-  - 1
-  buttonActive:
-  - 0.49341201782226562
-  - 0.19443789124488831
-  - 0.8153846263885498
-  - 1
-  tab:
-  - 0.39215686917304993
-  - 0.11764705926179886
-  - 0.72549021244049072
-  - 0.39215686917304993
-  tabHovered:
-  - 0.24705882370471954
-  - 0.023529412224888802
-  - 0.40784314274787903
-  - 1
-  tabActive:
-  - 0.40000000596046448
-  - 0
-  - 0.68627452850341797
-  - 1
-  header:
-  - 0.69019609689712524
-  - 0.44313725829124451
-  - 1
-  - 0.40000000596046448
-  headerHovered:
-  - 0.69019609689712524
-  - 0.44313725829124451
-  - 1
-  - 0.40000000596046448
-  headerActive:
-  - 0.69019609689712524
-  - 0.44313725829124451
-  - 1
-  - 0.40000000596046448
-  separator:
-  - 0.52941179275512695
-  - 0
-  - 1
-  - 0.29803922772407532
-  text:
-  - 1
-  - 1
-  - 1
-  - 1
-  textSelectedBg:
-  - 0.96470588445663452
-  - 0.50980395078659058
-  - 1
-  - 0.40000000596046448
-  scrollbarGrabHovered:
-  - 0.40784314274787903
-  - 0.47843137383460999
-  - 0.60000002384185791
-  - 1
-  plotLines:
-  - 1
-  - 0.43529412150382996
-  - 0.43529412150382996
-  - 1
-  plotLinesHovered:
-  - 1
-  - 0.12156862765550613
-  - 0
-  - 1
-  plotHistogram:
-  - 0.27843138575553894
-  - 0
-  - 0.89803922176361084
-  - 1
-  plotHistogramHovered:
-  - 0.57647061347961426
-  - 0
-  - 1
-  - 1
-  border:
-  - 0
-  - 0
-  - 0
-  - 1
-  loadupOpeningTextColor:
-  - 0
-  - 0
-  - 0
-  - 1
-  loadupPulseTextColorLeft:
-  - 0.50196081399917603
-  - 0
-  - 1
-  - 1
-  loadupPulseTextColorRight:
-  - 0.74901962280273438
-  - 0.25098040699958801
-  - 1
-  - 1
-  loadupBgTl:
-  - 0.078431375324726105
-  - 0
-  - 0.078431375324726105
-  - 0.38823530077934265
-  loadupBgTr:
-  - 0.16078431904315948
-  - 0
-  - 0.16078431904315948
-  - 0.67058825492858887
-  loadupBgBl:
-  - 0.16078431904315948
-  - 0
-  - 0.16078431904315948
-  - 0.67058825492858887
-  loadupBgBr:
-  - 0.25098040699958801
-  - 0
-  - 0.25098040699958801
-  - 1
-  scrollbarGrab:
-  - 0.31000000238418579
-  - 0.37999999523162842
-  - 0.5
-  - 1
-  scrollbarGrabActive:
-  - 0.50999999046325684
-  - 0.57999998331069946
-  - 0.69999998807907104
-  - 1
+customStyles:
+  custom_penit 1: 
 defaultProperties:
   settings:
     linearVibratoSV:
@@ -497,6 +308,8 @@ defaultProperties:
       vibratoMode: 1
       vibratoQuality: 3
       sides: 2
+      deviationFunctionIndex: 1
+      deviationDistance: 0
     delete:
       deleteTable:
       - true
@@ -639,7 +452,8 @@ defaultProperties:
       mine: false
     selectBySnap:
       snap: 1
-disableLoadup: false
+disableKofiMessage: true
+disableLoadup: true
 dontPrintCreation: true
 dontReplaceSV: false
 drawCapybara: true
@@ -667,7 +481,7 @@ hotkeyList:
 ignoreNotesOutsideTg: false
 maxDisplacementMultiplierExponent: 6
 performanceMode: false
-placeTypeIndex: 1
+placeTypeIndex: 4
 presets:
 - 
 printLegacyLNMessage: true
@@ -691,5 +505,5 @@ stepSize: 5
 styleThemeIndex: 1
 upscroll: false
 useCustomPulseColor: true
-useEndTimeOffsets: true
+useEndTimeOffsets: false
 ignoreNotes: false

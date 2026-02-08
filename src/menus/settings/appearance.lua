@@ -6,8 +6,8 @@ function showAppearanceSettings()
     end
     chooseStyleTheme()
     chooseColorTheme()
-    if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
-        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
+    if (globalVars.colorThemeName:sub(1, 7) ~= "custom_" and imgui.Button("Load Theme to Custom")) then
+        setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
         for _, id in ipairs(customStyleIds) do
             local query = id:capitalize()
@@ -18,11 +18,16 @@ function showAppearanceSettings()
             customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[query]))
             ::nextCustomStyle::
         end
-        globalVars.customStyle = customStyle
-        globalVars.colorThemeIndex = table.indexOf(COLOR_THEMES, "CUSTOM")
-        setPluginAppearanceColors("CUSTOM")
+        globalCustomStyle = customStyle
+        globalCustomStyle.border = cache.borderColor
+        local newName = "custom_Copy of " .. globalVars.colorThemeName
+        globalVars.colorThemeName = newName
+        if (not globalVars.customStyles) then globalVars.customStyles = {} end
+        globalVars.customStyles[newName] = globalCustomStyle
+        setPluginAppearanceColors(newName)
+        write(globalVars)
     end
-    if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM") then
+    if (globalVars.colorThemeName:sub(1, 7) ~= "custom_") then
         HoverToolTip(
             "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
     end
@@ -70,4 +75,98 @@ function showAppearanceSettings()
     if (globalVars.performanceMode) then
         imgui.EndDisabled()
     end
+end
+
+function chooseColorTheme()
+    local function renderThemeTree(tree)
+        local padding = 10
+
+        if (tree[1]) then
+            local maxItemSize = 0
+            for _, item in ipairs(tree) do
+                if (imgui.CalcTextSize(item.id).x > maxItemSize) then
+                    maxItemSize = imgui.CalcTextSize(item.id).x * 1.03
+                end
+            end
+            for _, item in ipairs(tree) do
+                local col = item.textColor
+                local sz = vector.New(maxItemSize, imgui.CalcTextSize(item.id).y) + vector.New(padding, 0)
+                imgui.BeginChild("themetree" .. item.id, sz)
+                local topLeft = imgui.GetWindowPos()
+                local dim = imgui.GetWindowSize()
+                local pos = imgui.GetMousePos()
+                if (pos.x > topLeft.x and pos.x < topLeft.x + dim.x and pos.y > topLeft.y and pos.y < topLeft.y + dim.y) then
+                    local ctx = imgui.GetWindowDrawList()
+                    ctx.AddRectFilled(topLeft, topLeft + dim, color.int.white - color.int.alphaMask * 200)
+                end
+                if (type(item.textColor[1]) == "table") then
+                    local strLen = item.id:len()
+                    local charProgress = 0
+                    local subdivisionLength = #item.textColor - 1
+                    for char in item.id:gmatch(".") do
+                        local progress = charProgress / (strLen - 1) * subdivisionLength % (1 + 1 / 10000)
+                        local currentSubdivision = 1 + math.floor(charProgress / (strLen - 0.999) * subdivisionLength)
+                        local col1 = vector.New(item.textColor[currentSubdivision][1] / 255,
+                            item.textColor[currentSubdivision][2] / 255, item.textColor[currentSubdivision][3] / 255, 1)
+                        local col2 = vector.New(item.textColor[currentSubdivision + 1][1] / 255,
+                            item.textColor[currentSubdivision + 1][2] / 255,
+                            item.textColor[currentSubdivision + 1][3] / 255, 1)
+                        imgui.TextColored(col1 * (1 - progress) +
+                            col2 * progress, char)
+                        imgui.SameLine(0, 0)
+                        charProgress = charProgress + 1
+                    end
+                else
+                    for char in item.id:gmatch(".") do
+                        imgui.TextColored(vector.New(col[1] / 255, col[2] / 255, col[3] / 255, 1), char)
+                        imgui.SameLine(0, 0)
+                    end
+                end
+                imgui.EndChild()
+                if (imgui.IsItemClicked("Left")) then
+                    globalVars.colorThemeName = item.internalId or item.id
+                    if (item.internalId) then
+                        globalCustomStyle = globalVars.customStyles[globalVars.colorThemeName]
+                    end
+                    write(globalVars)
+                    imgui.CloseCurrentPopup()
+                end
+            end
+        else
+            for k, v in pairs(tree) do
+                if (k == "Custom") then
+                    if (imgui.BeginMenu("Custom Themes")) then
+                        if (not globalVars.customStyles or not next(globalVars.customStyles)) then
+                            imgui.Text("No Custom Themes")
+                        else
+                            renderThemeTree(table.map(table.keys(globalVars.customStyles), function(s)
+                                return {
+                                    id = s:sub(8),
+                                    textColor = { 255, 255, 255 },
+                                    internalId = s
+                                }
+                            end))
+                        end
+                        imgui.EndMenu()
+                    end
+                else
+                    ---@diagnostic disable-next-line: param-type-mismatch
+                    if (imgui.BeginMenu(k)) then
+                        renderThemeTree(v)
+                        imgui.EndMenu()
+                    end
+                end
+            end
+        end
+    end
+
+    if (imgui.BeginCombo("Color Theme", globalVars.colorThemeName:gsub("custom_", ""):fixToSize(130))) then
+        renderThemeTree(THEME_TREE)
+        imgui.EndCombo()
+    end
+
+    local isRGBColorTheme = globalVars.colorThemeName:find("RGB") or globalVars.colorThemeName:find("BGR")
+    if not isRGBColorTheme or globalVars.colorThemeName:find("custom_") then return end
+
+    chooseRGBPeriod()
 end

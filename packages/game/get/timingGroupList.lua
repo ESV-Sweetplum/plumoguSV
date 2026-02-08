@@ -1,3 +1,5 @@
+---Returns an array of all timing group ids, including `$DEFAULT` and `$GLOBAL`.
+---@return string[]
 function game.get.timingGroupList()
     local baseList = table.keys(map.TimingGroups)
     local defaultIndex = table.indexOf(baseList, "$Default")

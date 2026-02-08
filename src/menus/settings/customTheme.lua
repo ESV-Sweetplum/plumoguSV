@@ -82,27 +82,63 @@ local customStyleNames = {
 
 function showCustomThemeSettings()
     local settingsChanged = false
-    imgui.SeparatorText("Custom Theme Actions")
+    imgui.SeparatorText("Editing '" .. globalVars.colorThemeName:gsub("custom_", "") .. "'")
 
     if (imgui.Button("Reset")) then
-        globalVars.customStyle = table.duplicate(DEFAULT_STYLE)
-        write()
+        globalCustomStyle = table.duplicate(DEFAULT_STYLE)
+        globalVars.colorThemeName = "Original"
+        write(globalVars)
     end
     KeepSameLine()
-
-    if (imgui.Button("Import")) then
-        cache.boolean.importingCustomTheme = true
+    if (imgui.Button("Rename")) then
+        cache.boolean.renamingCustomTheme = not cache.boolean.renamingCustomTheme
     end
     KeepSameLine()
-
     if (imgui.Button("Export")) then
-        local str = stringifyCustomStyle(globalVars.customStyle)
+        local str = stringifyCustomStyle(globalCustomStyle)
         imgui.SetClipboardText(str)
         print("i!", "Exported custom theme to your clipboard.")
     end
+    KeepSameLine()
+    if (imgui.Button("Delete")) then
+        print("e!", "Deleted custom theme.")
+        globalVars.customStyles[globalVars.colorThemeName] = nil
+        globalVars.colorThemeName = "Original"
+        cache.settingTypeIndex = table.indexOf(SETTING_TYPES, "Appearance")
+        write(globalVars)
+    end
+    if (cache.boolean.renamingCustomTheme) then
+        local input = state.GetValue("renamingCustomThemeInput", "")
+        imgui.SetNextItemWidth(130)
+        _, input = imgui.InputText("##customThemeStr", input, 69420)
+        state.SetValue("renamingCustomThemeInput", input)
+        KeepSameLine()
+        if (imgui.Button("Send")) then
+            local newName = "custom_" .. input
+            globalVars.customStyles[newName] = globalCustomStyle
+            globalVars.customStyles[globalVars.colorThemeName] = nil
+            globalVars.colorThemeName = newName
+            settingsChanged = true
+            cache.boolean.renamingCustomTheme = false
+            state.SetValue("renamingCustomThemeInput", "")
+        end
+        KeepSameLine()
+        if (imgui.Button("X")) then
+            cache.boolean.renamingCustomTheme = false
+            state.SetValue("renamingCustomThemeInput", "")
+        end
+    end
 
+
+    imgui.SeparatorText("Other Actions")
+
+    if (imgui.Button("Import")) then
+        cache.boolean.importingCustomTheme = not cache.boolean.importingCustomTheme
+    end
     if (cache.boolean.importingCustomTheme) then
+        imgui.SameLine()
         local input = state.GetValue("importingCustomThemeInput", "")
+        imgui.SetNextItemWidth(118)
         _, input = imgui.InputText("##customThemeStr", input, 69420)
         state.SetValue("importingCustomThemeInput", input)
         KeepSameLine()
@@ -112,14 +148,10 @@ function showCustomThemeSettings()
             cache.boolean.importingCustomTheme = false
             state.SetValue("importingCustomThemeInput", "")
         end
-        KeepSameLine()
-        if (imgui.Button("X")) then
-            cache.boolean.importingCustomTheme = false
-            state.SetValue("importingCustomThemeInput", "")
-        end
     end
 
     imgui.SeparatorText("Search")
+
     imgui.PushItemWidth(imgui.GetWindowWidth() - 25)
     local searchText = state.GetValue("customTheme_searchText", "")
     _, searchText = imgui.InputText("##CustomThemeSearch", searchText, 100)
@@ -129,7 +161,7 @@ function showCustomThemeSettings()
     for idx, id in ipairs(customStyleIds) do
         local name = customStyleNames[idx]
         if (not name:lower():find(searchText:lower())) then goto nextId end
-        settingsChanged = ColorInput(globalVars.customStyle, id, name) or settingsChanged
+        settingsChanged = ColorInput(globalCustomStyle, id, name) or settingsChanged
         ::nextId::
     end
     if settingsChanged then
@@ -167,7 +199,7 @@ function stringifyCustomStyle(customStyle)
     return resultStr:sub(1, -2)
 end
 
-function setCustomStyleString(str)
+function setCustomStyleString(str, exportInstead)
     local keyIdDict = {}
     for _, key in ipairs(table.keys(DEFAULT_STYLE)) do
         keyIdDict[key] = convertStrToShort(key)
@@ -175,13 +207,13 @@ function setCustomStyleString(str)
     end
 
     if (str:sub(1, 3) == "v2 ") then
-        parseCustomStyleV2(str:sub(4), keyIdDict)
+        parseCustomStyleV2(str:sub(4), keyIdDict, exportInstead)
     else
         parseCustomStyleV1(str, keyIdDict)
     end
 end
 
-function parseCustomStyleV2(str, keyIdDict)
+function parseCustomStyleV2(str, keyIdDict, exportInstead)
     local customStyle = {}
 
     for kvPair in str:gmatch("[^ ]+") do
@@ -193,7 +225,35 @@ function parseCustomStyleV2(str, keyIdDict)
         ::nextPair::
     end
 
-    globalVars.customStyle = table.duplicate(customStyle)
+    if (not exportInstead) then
+        globalCustomStyle = table.duplicate(customStyle)
+        if (not globalVars.customStyles) then globalVars.customStyles = {} end
+        local newName = "custom_Import " .. state.UnixTime
+        globalVars.customStyles[newName] = globalCustomStyle
+        globalVars.colorThemeName = newName
+        return
+    end
+
+    local outStr = ""
+
+    for k, v in pairs(customStyle) do
+        if (k:find("loadup")) then
+            outStr = outStr ..
+                "loadup." ..
+                k:gsub("loadup", "") ..
+                " = vector.New(" ..
+                math.round(v.x, 2) ..
+                ", " .. math.round(v.y, 2) .. ", " .. math.round(v.z, 2) .. ", " .. math.round(v.w, 2) .. ")\n"
+        else
+            outStr = outStr .. "imgui.PushStyleColor(imgui_col." ..
+                k:capitalize() ..
+                ", vector.New(" ..
+                math.round(v.x, 2) ..
+                ", " .. math.round(v.y, 2) .. ", " .. math.round(v.z, 2) .. ", " .. math.round(v.w, 2) .. "))\n"
+        end
+    end
+
+    imgui.SetClipboardText(outStr)
 end
 
 function parseCustomStyleV1(str, keyIdDict)
@@ -206,5 +266,5 @@ function parseCustomStyleV1(str, keyIdDict)
         if (key ~= -1) then customStyle[key] = color.hexaToRgba(hexa) end
     end
 
-    globalVars.customStyle = table.duplicate(customStyle)
+    globalCustomStyle = table.duplicate(customStyle)
 end

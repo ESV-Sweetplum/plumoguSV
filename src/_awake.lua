@@ -3,6 +3,11 @@ function awake()
 
     local tempGlobalVars = read()
 
+    if (tempGlobalVars.colorThemeIndex) then
+        print("w!",
+            "Due to an internal change, your selected theme may have been reset. Please reselect the theme in the plugin settings")
+    end
+
     if (not tempGlobalVars) then
         write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
         ---@diagnostic disable-next-line: undefined-global

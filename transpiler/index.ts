@@ -4,12 +4,12 @@ import {
     rmSync,
     existsSync,
     renameSync,
-    copyFileSync,
+    copyFileSync
 } from 'fs';
 import { getFilesRecursively } from './lib/getFilesRecursively.js';
 import getFunctionList from './lib/getFunctionList.js';
 import getUnusedFunctions from './lib/getUnusedFunctions.js';
-import { join } from 'path';
+import { join, sep } from 'path';
 import readAndLintLua from './lib/readAndLintLua.js';
 
 let counter = 0;
@@ -30,7 +30,7 @@ export default async function transpiler(
 
     const entryPoints = ['_draw.lua', '_awake.lua'];
     const ignoredFiles = ['intellisense.lua', join('packages', 'tests')];
-    if (!devMode) ignoredFiles.push(join('src', 'dev'));
+    if (devMode) output = `${output}\ndevMode = true`;
 
     const files = getFilesRecursively('packages').sort(
         (a, b) => +b.includes('.priority.') - +a.includes('.priority.')
@@ -42,22 +42,25 @@ export default async function transpiler(
         )
     ); // Force priority functions towards the top to avoid hot-reload error.
 
+    let splicedFileCount = 0;
+
     const entryFiles: string[] = [...files].reduce((arr, cur, idx) => {
         if (entryPoints.some((e) => cur.includes(e))) {
-            files.splice(idx, 1);
+            files.splice(idx - splicedFileCount, 1);
             arr.push(cur);
+            splicedFileCount++;
         }
         return arr;
     }, []);
 
     const entryFileData = entryFiles.reduce((obj, f) => {
-        obj[f.split('\\').slice(-1)[0].slice(1)] = readAndLintLua(f);
+        obj[f.split(sep).slice(-1)[0].slice(1)] = readAndLintLua(f);
         return obj;
     }, {});
 
     files.forEach((file: string) => {
         if (
-            ignoredFiles.some((f) => file.includes(f)) ||
+            [...ignoredFiles, ...entryPoints].some((f) => file.includes(f)) ||
             !file.endsWith('.lua')
         )
             return;
@@ -74,6 +77,8 @@ export default async function transpiler(
         });
 
         let fileIsInsert = false;
+
+        // Insert whitespace for nested functions
 
         Object.entries(entryFileData).forEach(
             ([path, data]: [string, string[]]) => {
@@ -110,14 +115,14 @@ export default async function transpiler(
     ); // Remove double string concats with table
 
     output = output.replaceAll(
-        /\(("[a-z]{1,7}!"), "([^"]+?)" \.\. (.+) \.\. (.+)\)/g,
-        '($1, table.concat({"$2", $3, $4}))'
-    ); // Same as above, but with notification type parameter
+        /(p|P)rint\(("[a-z]{1,7}!"), "([^"]+?)" \.\. (.+) \.\. (.+)\)/g,
+        '$1rint($2, table.concat({"$3", $4, $5}))'
+    ); // Same as above, but with notification type parameter for print statements
 
     const ipairMatches = [
         ...output.matchAll(
             /for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_, ]+)\) do\n( *)/g
-        ),
+        )
     ];
     ipairMatches.forEach((match) => {
         const idx = getCounterAndIncrement();
@@ -127,7 +132,7 @@ export default async function transpiler(
         );
     }); // Reduce function overhead by removing ipairs (only for static tables)
 
-    for (let i = 2; i <= 9; i++) {
+    for (let i = 2; i <= 5; i++) {
         const regex = new RegExp(` ([^\\)]) \\^ ${i}`, 'g');
         output = output.replaceAll(
             regex,

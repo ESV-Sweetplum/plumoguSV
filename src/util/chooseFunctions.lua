@@ -136,22 +136,6 @@ function chooseChinchillaType(settingVars)
     return oldIndex ~= settingVars.chinchillaTypeIndex
 end
 
-function chooseColorTheme()
-    local oldColorThemeIndex = globalVars.colorThemeIndex
-    globalVars.colorThemeIndex = Combo("Color Theme", COLOR_THEMES, globalVars.colorThemeIndex, COLOR_THEME_COLORS)
-
-    if (oldColorThemeIndex ~= globalVars.colorThemeIndex) then
-        write(globalVars)
-    end
-
-    local currentTheme = COLOR_THEMES[globalVars.colorThemeIndex]
-    local isRGBColorTheme = currentTheme:find("RGB") or currentTheme:find("BGR")
-
-    if not isRGBColorTheme then return end
-
-    chooseRGBPeriod()
-end
-
 function chooseComboSVOption(settingVars, maxComboPhase)
     local oldIndex = settingVars.comboTypeIndex
     settingVars.comboTypeIndex = Combo("Combo Type", COMBO_SV_TYPE, settingVars.comboTypeIndex)
@@ -728,15 +712,46 @@ function choosePulseColor()
         write(globalVars)
     end
     if (not colorPickerOpened) then
-        state.SetValue("showColorPicker", false)
+        cache.windows.showColorPicker = false
     end
     imgui.End()
 end
 
 function chooseVibratoSides(menuVars)
-    imgui.Dummy(vector.New(27, 0))
+    imgui.Dummy(vector.New(38, 0))
     KeepSameLine()
     menuVars.sides = RadioButtons("Sides:", menuVars.sides, { "1", "2", "3" }, { 1, 2, 3 })
+end
+
+function chooseVibratoDeviance(menuVars)
+    local tooltipList = {
+        "Don't deviate vibrato at all.",
+        "Deviate vibrato with the given displacement. All displacements are equally likely to be chosen.",
+        "Deviate vibrato with the given displacement. Displacements are chosen via a Gaussian distribution."
+    }
+
+    local deviationType = VIBRATO_DEVIATION_TYPES[menuVars.deviationFunctionIndex]
+    local dontChooseDistance = deviationType == "None"
+    local indentWidth = DEFAULT_WIDGET_WIDTH * 0.37 + 16
+    if dontChooseDistance then
+        imgui.Indent(indentWidth)
+    else
+        imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.47 - 5)
+        menuVars.deviationDistance = ComputableInputFloat("##deviation", menuVars.deviationDistance, 2, " msx")
+        KeepSameLine()
+        imgui.PopItemWidth()
+    end
+    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.53)
+    menuVars.deviationFunctionIndex = Combo("Deviance Type", VIBRATO_DEVIATION_TYPES, menuVars.deviationFunctionIndex, {},
+        {},
+        tooltipList)
+
+    HoverToolTip(tooltipList[menuVars.deviationFunctionIndex])
+
+    if dontChooseDistance then
+        imgui.Unindent(indentWidth)
+    end
+    imgui.PopItemWidth()
 end
 
 function chooseConvertSVSSFDirection(menuVars)

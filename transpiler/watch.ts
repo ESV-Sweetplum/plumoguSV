@@ -5,11 +5,11 @@ import { performance } from 'perf_hooks';
 
 console.log(
     chalk.blueBright(
-        chalk.bold('Watcher initialized. Make a change to a file to transpile.')
+        chalk.bold(
+            'Watcher initialized and plugin transpiled. Make a change to a file to re-transpile.'
+        )
     )
 );
-
-let devMode = false;
 
 const debounce = (fn: Function, ms = 300) => {
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -36,8 +36,7 @@ async function main(event: keyof chokidar.FSWatcherEventMap, path: string) {
         )}. Now retranspiling...`
     );
 
-    const devMode = path.includes('src\\dev\\unlock');
-    const fileCount = await transpiler(devMode, true, 'development');
+    const fileCount = await transpiler(true, true, 'development');
     const endTime = performance.now();
     console.log(
         `Successfully transpiled ${chalk.green(
@@ -47,3 +46,5 @@ async function main(event: keyof chokidar.FSWatcherEventMap, path: string) {
         )}.\n`
     );
 }
+
+transpiler(true, true, 'development');

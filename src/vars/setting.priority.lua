@@ -81,7 +81,7 @@ end]]
     },
     exponential = {
         behaviorIndex = 1,
-        intensity = 30,
+        intensity = 20,
         verticalShift = 0,
         distance = 100,
         startSV = 0.01,

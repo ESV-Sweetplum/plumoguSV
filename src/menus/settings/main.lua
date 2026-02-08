@@ -23,7 +23,7 @@ function showPluginSettingsWindow()
     _, settingsOpened = imgui.Begin("plumoguSV Settings", true, 42)
     imgui.SetWindowSize("plumoguSV Settings", vector.New(433, 400))
 
-    local typeIndex = state.GetValue("settings_typeIndex", 1)
+    local typeIndex = cache.settingTypeIndex or 1
 
     imgui.Columns(2, "settings_columnList", true)
     imgui.SetColumnWidth(0, 150)
@@ -37,7 +37,7 @@ function showPluginSettingsWindow()
     --- Key is name of setting. If value with respect to key is true, will hide setting at the left
     local hideSettingDict = {
         ["Advanced"] = not globalVars.advancedMode,
-        ["Custom Theme"] = (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)
+        ["Custom Theme"] = (globalVars.colorThemeName:sub(1, 7) ~= "custom_" or globalVars.performanceMode)
     }
 
     for idx, v in pairs(SETTING_TYPES) do
@@ -60,6 +60,8 @@ function showPluginSettingsWindow()
 
     imgui.BeginChild("Settings Data")
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
+
+    cache.settingTypeIndex = typeIndex
 
     if (SETTING_TYPES[typeIndex] == "General") then
         showGeneralSettings()
@@ -87,10 +89,9 @@ function showPluginSettingsWindow()
     imgui.EndChild()
 
     imgui.Columns(1)
-    state.SetValue("settings_typeIndex", typeIndex)
     if (not settingsOpened) then
         cache.windows.showSettingsWindow = false
-        state.SetValue("settings_typeIndex", 1)
+        cache.settingTypeIndex = 1
         state.SetValue("crazy", "Crazy?")
         state.SetValue("activateCrazy", false)
         state.SetValue("crazyIdx", 1)
@@ -98,7 +99,7 @@ function showPluginSettingsWindow()
     if (not globalVars.performanceMode) then
         imgui.PopStyleColor(41)
         pulseController()
-        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex], true)
+        setPluginAppearanceColors(globalVars.colorThemeName, true)
         setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
     end
     imgui.End()

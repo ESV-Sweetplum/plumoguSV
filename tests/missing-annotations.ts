@@ -69,7 +69,7 @@ export default function checkMissingAnnotations(file: string[]) {
             parameters.map((s) => s.trim()).filter((s) => s).length
         ) {
             const missingParams = parameters.filter(
-                (param) => !annoParams.includes(param)
+                (param) => !annoParams.includes(param) && param !== '_'
             );
             console.log(
                 `The function ${chalk.red(

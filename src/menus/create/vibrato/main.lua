@@ -18,6 +18,7 @@ function placeVibratoSVMenu(separateWindow)
 
     chooseVibratoQuality(menuVars)
     if (menuVars.vibratoMode ~= 2) then
+        chooseVibratoDeviance(menuVars)
         chooseVibratoSides(menuVars)
     end
 
