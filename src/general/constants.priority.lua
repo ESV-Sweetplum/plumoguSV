@@ -217,6 +217,12 @@ STILL_TYPES = {
     "Otua"
 }
 
+VIBRATO_DEVIATION_TYPES = {
+    "None",
+    "Linear",
+    "Gaussian",
+}
+
 STUTTER_CONTROLS = {
     "First SV",
     "Second SV"

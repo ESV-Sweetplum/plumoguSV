@@ -29,7 +29,9 @@ DEFAULT_STARTING_MENU_VARS = {
         svTypeIndex = 1,
         vibratoMode = 1,
         vibratoQuality = 3,
-        sides = 2
+        sides = 2,
+        deviationFunctionIndex = 1,
+        deviationDistance = 0,
     },
     delete = {
         deleteTable = { true, true, true, true }

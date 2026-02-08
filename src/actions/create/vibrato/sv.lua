@@ -3,6 +3,7 @@
 ---@param heightFn fun(t: number, idx?: integer): number
 function svVibrato(menuVars, heightFn)
     printLegacyLNMessage()
+    local deviance = menuVars.deviationDistance or 0
     local offsets = game.get.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -28,14 +29,19 @@ function svVibrato(menuVars, heightFn)
         end
 
         if (menuVars.sides == 1) then
-            for tp = 1, teleportCount do
+            for tp = 1, teleportCount, 2 do
                 local x = (tp - 1) / teleportCount
                 local offset = nextVibro * x + startVibro * (1 - x)
                 local height = heightFn(math.floor((tp - 1) / 2) * 2 / teleportCount * posDifference +
                     startPos, tp)
-                if (tp % 2 == 1) then
-                    height = -height
+                if (menuVars.deviationFunctionIndex == 2) then
+                    height = height + (math.random() * 2 - 1) * menuVars.deviationDistance
                 end
+                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
+                    height, 0)
+                x = tp / teleportCount
+                offset = nextVibro * x + startVibro * (1 - x)
+                height = -height
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     height, 0)
             end
