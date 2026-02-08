@@ -136,89 +136,6 @@ function chooseChinchillaType(settingVars)
     return oldIndex ~= settingVars.chinchillaTypeIndex
 end
 
-function chooseColorTheme()
-    local function renderThemeTree(tree)
-        local padding = 10
-
-        if (tree[1]) then
-            local maxItemSize = 0
-            for _, item in ipairs(tree) do
-                if (imgui.CalcTextSize(item.id).x > maxItemSize) then
-                    maxItemSize = imgui.CalcTextSize(item.id).x
-                end
-            end
-            for _, item in ipairs(tree) do
-                local col = item.textColor
-                local sz = vector.New(maxItemSize, imgui.CalcTextSize(item.id).y) + vector.New(padding, 0)
-                imgui.BeginChild("themetree" .. item.id, sz)
-                local topLeft = imgui.GetWindowPos()
-                local dim = imgui.GetWindowSize()
-                local pos = imgui.GetMousePos()
-                if (pos.x > topLeft.x and pos.x < topLeft.x + dim.x and pos.y > topLeft.y and pos.y < topLeft.y + dim.y) then
-                    local ctx = imgui.GetWindowDrawList()
-                    ctx.AddRectFilled(topLeft, topLeft + dim, color.int.white - color.int.alphaMask * 200)
-                end
-                if (type(item.textColor[1]) == "table") then
-                    local strLen = item.id:len()
-                    local charProgress = 0
-                    local subdivisionLength = #item.textColor - 1
-                    for char in item.id:gmatch(".") do
-                        local progress = charProgress / (strLen - 1) * subdivisionLength % (1 + 1 / 10000)
-                        local currentSubdivision = 1 + math.floor(charProgress / (strLen - 0.999) * subdivisionLength)
-                        local col1 = vector.New(item.textColor[currentSubdivision][1] / 255,
-                            item.textColor[currentSubdivision][2] / 255, item.textColor[currentSubdivision][3] / 255, 1)
-                        local col2 = vector.New(item.textColor[currentSubdivision + 1][1] / 255,
-                            item.textColor[currentSubdivision + 1][2] / 255,
-                            item.textColor[currentSubdivision + 1][3] / 255, 1)
-                        imgui.TextColored(col1 * (1 - progress) +
-                            col2 * progress, char)
-                        imgui.SameLine(0, 0)
-                        charProgress = charProgress + 1
-                    end
-                else
-                    for char in item.id:gmatch(".") do
-                        imgui.TextColored(vector.New(col[1] / 255, col[2] / 255, col[3] / 255, 1), char)
-                        imgui.SameLine(0, 0)
-                    end
-                end
-                imgui.EndChild()
-                if (imgui.IsItemClicked("Left")) then
-                    globalVars.colorThemeName = item.id
-                    write(globalVars)
-                    imgui.CloseCurrentPopup()
-                end
-            end
-        else
-            for k, v in pairs(tree) do
-                if (k == "Custom") then
-                    renderThemeTree(table.map(table.keys(globalVars.customStyles), function(s)
-                        return {
-                            id = s,
-                            textColor = ""
-                        }
-                    end))
-                else
-                    ---@diagnostic disable-next-line: param-type-mismatch
-                    if (imgui.BeginMenu(k)) then
-                        renderThemeTree(v)
-                        imgui.EndMenu()
-                    end
-                end
-            end
-        end
-    end
-
-    if (imgui.BeginCombo("Color Theme", "Penis")) then
-        renderThemeTree(THEME_TREE)
-        imgui.EndCombo()
-    end
-
-    local isRGBColorTheme = globalVars.colorThemeName:find("RGB") or globalVars.colorThemeName:find("BGR")
-    if not isRGBColorTheme then return end
-
-    chooseRGBPeriod()
-end
-
 function chooseComboSVOption(settingVars, maxComboPhase)
     local oldIndex = settingVars.comboTypeIndex
     settingVars.comboTypeIndex = Combo("Combo Type", COMBO_SV_TYPE, settingVars.comboTypeIndex)
@@ -795,7 +712,7 @@ function choosePulseColor()
         write(globalVars)
     end
     if (not colorPickerOpened) then
-        state.SetValue("showColorPicker", false)
+        cache.windows.showColorPicker = false
     end
     imgui.End()
 end

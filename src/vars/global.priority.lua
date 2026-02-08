@@ -1,7 +1,6 @@
 globalVars = {
     advancedMode = false,
     colorThemeName = "Original",
-    colorThemeIndex = 1,
     comboizeSelect = false,
     cursorTrailGhost = false,
     cursorTrailIndex = 1,
@@ -59,7 +58,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
     globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
-    globalVars.customStyle = tempGlobalVars.customStyle or {}
+    globalVars.customStyles = tempGlobalVars.customStyles
     globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
     globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)
     globalVars.dontReplaceSV = isTruthy(tempGlobalVars.dontReplaceSV)
@@ -91,19 +90,21 @@ function setGlobalVars(tempGlobalVars)
     globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
     globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
 
-    if (tempGlobalVars.customStyles) then
-        globalCustomStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
-    else
-        globalCustomStyle = {}
-    end
-
     -- All fields below are colors that must be vectorized to properly perform color arithmetic.
     local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
         "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
-    for _, key in ipairs(forceVectorizeList) do
-        if (globalVars.customStyle[key]) then
-            globalVars.customStyle[key] = table.vectorize4(globalVars.customStyle[key])
+
+    if (tempGlobalVars.customStyles) then
+        for themeName, themeData in pairs(globalVars.customStyles) do
+            for _, key in ipairs(forceVectorizeList) do
+                if (themeData[key]) then
+                    globalVars.customStyles[themeName][key] = table.vectorize4(themeData[key])
+                end
+            end
         end
+        globalCustomStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
+    else
+        globalCustomStyle = {}
     end
 
     -- All fields below are not settings, but menu operators that need to be kept on hot-reload.

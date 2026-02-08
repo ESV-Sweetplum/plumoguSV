@@ -1656,7 +1656,6 @@ end
 globalVars = {
     advancedMode = false,
     colorThemeName = "Original",
-    colorThemeIndex = 1,
     comboizeSelect = false,
     cursorTrailGhost = false,
     cursorTrailIndex = 1,
@@ -1712,7 +1711,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
     globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
-    globalVars.customStyle = tempGlobalVars.customStyle or {}
+    globalVars.customStyles = tempGlobalVars.customStyles
     globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
     globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)
     globalVars.dontReplaceSV = isTruthy(tempGlobalVars.dontReplaceSV)
@@ -1743,18 +1742,20 @@ function setGlobalVars(tempGlobalVars)
     globalVars.upscroll = isTruthy(tempGlobalVars.upscroll)
     globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
     globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
+    local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
+        "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
     if (tempGlobalVars.customStyles) then
+        for themeName, themeData in pairs(globalVars.customStyles) do
+            for k12 = 1, #forceVectorizeList do
+                local key = forceVectorizeList[k12]
+                if (themeData[key]) then
+                    globalVars.customStyles[themeName][key] = table.vectorize4(themeData[key])
+                end
+            end
+        end
         globalCustomStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
     else
         globalCustomStyle = {}
-    end
-    local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
-        "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
-    for k12 = 1, #forceVectorizeList do
-        local key = forceVectorizeList[k12]
-        if (globalVars.customStyle[key]) then
-            globalVars.customStyle[key] = table.vectorize4(globalVars.customStyle[key])
-        end
     end
     globalVars.placeTypeIndex = state.GetValue("global.placeTypeIndex", globalVars.placeTypeIndex)
     globalVars.editToolIndex = state.GetValue("global.editToolIndex", globalVars.editToolIndex)
@@ -6173,7 +6174,7 @@ function setPluginAppearanceStyles(styleTheme)
     imgui.PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessvalue)
 end
 function setPluginAppearanceColors(colorTheme, hideBorder)
-    local borderColor = vctr4(1)
+    local borderColor = nil
     if colorTheme == "Original" or not colorTheme then borderColor = setOriginalColors() end
     if colorTheme == "Strawberry" then borderColor = setStrawberryColors() end
     if colorTheme == "Amethyst" then borderColor = setAmethystColors() end
@@ -6191,7 +6192,8 @@ function setPluginAppearanceColors(colorTheme, hideBorder)
     if colorTheme == "7xbi's RGB Glass" then borderColor = set7xbiRGBGlassColors(globalVars.rgbPeriod) end
     if colorTheme == "aster's catppuccin" then borderColor = setAsterCatppuccinColors() end
     if colorTheme == "plum's purple palace" then borderColor = setPlumPurplePalaceColors() end
-    if colorTheme == "CUSTOM" then borderColor = setCustomColors() end
+    if colorTheme:sub(1, 7) == "custom_" then borderColor = setCustomColors() end
+    if not borderColor then borderColor = setOriginalColors() end
     if hideBorder then return end
     state.SetValue("borderColor", borderColor)
 end
@@ -6863,11 +6865,11 @@ function setAsterCatppuccinColors()
     imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.12, 0.12, 0.18, 1))
     imgui.PushStyleColor(imgui_col.FrameBg, vector.New(0.12, 0.12, 0.18, 1))
     imgui.PushStyleColor(imgui_col.FrameBgHovered, vector.New(0.35, 0.36, 0.44, 1))
-    imgui.PushStyleColor(imgui_col.FrameBgActive, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.FrameBgActive, vector.New(0.19, 0.2, 0.27, 1))
     imgui.PushStyleColor(imgui_col.TitleBg, vector.New(0.12, 0.12, 0.18, 1))
     imgui.PushStyleColor(imgui_col.TitleBgActive, vector.New(0.07, 0.07, 0.11, 1))
     imgui.PushStyleColor(imgui_col.TitleBgCollapsed, vector.New(0.12, 0.12, 0.18, 0.4))
-    imgui.PushStyleColor(imgui_col.CheckMark, vector.New(0.89, 0, 1, 0.37))
+    imgui.PushStyleColor(imgui_col.CheckMark, vector.New(0.8, 0.65, 0.97, 1))
     imgui.PushStyleColor(imgui_col.SliderGrab, vector.New(0.12, 0.12, 0.18, 1))
     imgui.PushStyleColor(imgui_col.SliderGrabActive, vector.New(0.35, 0.36, 0.44, 1))
     imgui.PushStyleColor(imgui_col.Button, vector.New(0.19, 0.2, 0.27, 1))
@@ -6887,7 +6889,6 @@ function setAsterCatppuccinColors()
     imgui.PushStyleColor(imgui_col.PlotLinesHovered, vector.New(0.82, 0.06, 0.22, 1))
     imgui.PushStyleColor(imgui_col.PlotHistogram, vector.New(0.8, 0.65, 0.97, 1))
     imgui.PushStyleColor(imgui_col.PlotHistogramHovered, vector.New(0.53, 0.22, 0.94, 1))
-    imgui.PushStyleColor(imgui_col.Border, vector.New(0.42, 0.44, 0.53, 1))
     loadup.OpeningTextColor = vector.New(0.19, 0.2, 0.27, 1)
     loadup.PulseTextColorLeft = vector.New(0.8, 0.65, 0.97, 1)
     loadup.PulseTextColorRight = vector.New(0.96, 0.76, 0.91, 1)
@@ -6895,7 +6896,7 @@ function setAsterCatppuccinColors()
     loadup.BgTr = vector.New(0.11, 0.05, 0.2, 0.6)
     loadup.BgBl = vector.New(0.2, 0.1, 0.17, 0.6)
     loadup.BgBr = vector.New(0.12, 0.12, 0.18, 0.6)
-    return vector.New(0.42352941632270813, 0.43921568989753723, 0.5254902243614197, 1)
+    return vector.New(0.42, 0.44, 0.53, 1)
 end
 function setPlumPurplePalaceColors()
     imgui.PushStyleColor(imgui_col.WindowBg, vector.New(0, 0, 0, 0.52))
@@ -6926,7 +6927,6 @@ function setPlumPurplePalaceColors()
     imgui.PushStyleColor(imgui_col.PlotLinesHovered, vector.New(1, 0.12, 0, 1))
     imgui.PushStyleColor(imgui_col.PlotHistogram, vector.New(0.28, 0, 0.9, 1))
     imgui.PushStyleColor(imgui_col.PlotHistogramHovered, vector.New(0.58, 0, 1, 1))
-    imgui.PushStyleColor(imgui_col.Border, vector.New(0, 0, 0, 1))
     loadup.OpeningTextColor = vector.New(0, 0, 0, 1)
     loadup.PulseTextColorLeft = vector.New(0.5, 0, 1, 1)
     loadup.PulseTextColorRight = vector.New(0.75, 0.25, 1, 1)
@@ -6937,63 +6937,63 @@ function setPlumPurplePalaceColors()
     return vector.New(0, 0, 0, 1)
 end
 function setCustomColors()
-    if (globalVars.customStyle == nil) then
+    if (globalCustomStyle == nil) then
         return setOriginalColors()
     end
-    local borderColor = globalVars.customStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
-    imgui.PushStyleColor(imgui_col.WindowBg, globalVars.customStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00))
-    imgui.PushStyleColor(imgui_col.PopupBg, globalVars.customStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94))
-    imgui.PushStyleColor(imgui_col.FrameBg, globalVars.customStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00))
+    local borderColor = globalCustomStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
+    imgui.PushStyleColor(imgui_col.WindowBg, globalCustomStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00))
+    imgui.PushStyleColor(imgui_col.PopupBg, globalCustomStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94))
+    imgui.PushStyleColor(imgui_col.FrameBg, globalCustomStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00))
     imgui.PushStyleColor(imgui_col.FrameBgHovered,
-        globalVars.customStyle.frameBgHovered or vector.New(0.24, 0.34, 0.38, 1.00))
+        globalCustomStyle.frameBgHovered or vector.New(0.24, 0.34, 0.38, 1.00))
     imgui.PushStyleColor(imgui_col.FrameBgActive,
-        globalVars.customStyle.frameBgActive or vector.New(0.29, 0.39, 0.43, 1.00))
-    imgui.PushStyleColor(imgui_col.TitleBg, globalVars.customStyle.titleBg or vector.New(0.41, 0.48, 0.65, 1.00))
+        globalCustomStyle.frameBgActive or vector.New(0.29, 0.39, 0.43, 1.00))
+    imgui.PushStyleColor(imgui_col.TitleBg, globalCustomStyle.titleBg or vector.New(0.41, 0.48, 0.65, 1.00))
     imgui.PushStyleColor(imgui_col.TitleBgActive,
-        globalVars.customStyle.titleBgActive or vector.New(0.51, 0.58, 0.75, 1.00))
+        globalCustomStyle.titleBgActive or vector.New(0.51, 0.58, 0.75, 1.00))
     imgui.PushStyleColor(imgui_col.TitleBgCollapsed,
-        globalVars.customStyle.titleBgCollapsed or vector.New(0.51, 0.58, 0.75, 0.50))
-    imgui.PushStyleColor(imgui_col.CheckMark, globalVars.customStyle.checkMark or vector.New(0.81, 0.88, 1.00, 1.00))
-    imgui.PushStyleColor(imgui_col.SliderGrab, globalVars.customStyle.sliderGrab or vector.New(0.56, 0.63, 0.75, 1.00))
+        globalCustomStyle.titleBgCollapsed or vector.New(0.51, 0.58, 0.75, 0.50))
+    imgui.PushStyleColor(imgui_col.CheckMark, globalCustomStyle.checkMark or vector.New(0.81, 0.88, 1.00, 1.00))
+    imgui.PushStyleColor(imgui_col.SliderGrab, globalCustomStyle.sliderGrab or vector.New(0.56, 0.63, 0.75, 1.00))
     imgui.PushStyleColor(imgui_col.SliderGrabActive,
-        globalVars.customStyle.sliderGrabActive or vector.New(0.61, 0.68, 0.80, 1.00))
-    imgui.PushStyleColor(imgui_col.Button, globalVars.customStyle.button or vector.New(0.31, 0.38, 0.50, 1.00))
+        globalCustomStyle.sliderGrabActive or vector.New(0.61, 0.68, 0.80, 1.00))
+    imgui.PushStyleColor(imgui_col.Button, globalCustomStyle.button or vector.New(0.31, 0.38, 0.50, 1.00))
     imgui.PushStyleColor(imgui_col.ButtonHovered,
-        globalVars.customStyle.buttonHovered or vector.New(0.41, 0.48, 0.60, 1.00))
+        globalCustomStyle.buttonHovered or vector.New(0.41, 0.48, 0.60, 1.00))
     imgui.PushStyleColor(imgui_col.ButtonActive,
-        globalVars.customStyle.buttonActive or vector.New(0.51, 0.58, 0.70, 1.00))
-    imgui.PushStyleColor(imgui_col.Tab, globalVars.customStyle.tab or vector.New(0.31, 0.38, 0.50, 1.00))
-    imgui.PushStyleColor(imgui_col.TabHovered, globalVars.customStyle.tabHovered or vector.New(0.51, 0.58, 0.75, 1.00))
-    imgui.PushStyleColor(imgui_col.TabActive, globalVars.customStyle.tabActive or vector.New(0.51, 0.58, 0.75, 1.00))
-    imgui.PushStyleColor(imgui_col.Header, globalVars.customStyle.header or vector.New(0.81, 0.88, 1.00, 0.40))
+        globalCustomStyle.buttonActive or vector.New(0.51, 0.58, 0.70, 1.00))
+    imgui.PushStyleColor(imgui_col.Tab, globalCustomStyle.tab or vector.New(0.31, 0.38, 0.50, 1.00))
+    imgui.PushStyleColor(imgui_col.TabHovered, globalCustomStyle.tabHovered or vector.New(0.51, 0.58, 0.75, 1.00))
+    imgui.PushStyleColor(imgui_col.TabActive, globalCustomStyle.tabActive or vector.New(0.51, 0.58, 0.75, 1.00))
+    imgui.PushStyleColor(imgui_col.Header, globalCustomStyle.header or vector.New(0.81, 0.88, 1.00, 0.40))
     imgui.PushStyleColor(imgui_col.HeaderHovered,
-        globalVars.customStyle.headerHovered or vector.New(0.81, 0.88, 1.00, 0.50))
+        globalCustomStyle.headerHovered or vector.New(0.81, 0.88, 1.00, 0.50))
     imgui.PushStyleColor(imgui_col.HeaderActive,
-        globalVars.customStyle.headerActive or vector.New(0.81, 0.88, 1.00, 0.54))
-    imgui.PushStyleColor(imgui_col.Separator, globalVars.customStyle.separator or vector.New(0.81, 0.88, 1.00, 0.30))
-    imgui.PushStyleColor(imgui_col.Text, globalVars.customStyle.text or vector.New(1.00, 1.00, 1.00, 1.00))
+        globalCustomStyle.headerActive or vector.New(0.81, 0.88, 1.00, 0.54))
+    imgui.PushStyleColor(imgui_col.Separator, globalCustomStyle.separator or vector.New(0.81, 0.88, 1.00, 0.30))
+    imgui.PushStyleColor(imgui_col.Text, globalCustomStyle.text or vector.New(1.00, 1.00, 1.00, 1.00))
     imgui.PushStyleColor(imgui_col.TextSelectedBg,
-        globalVars.customStyle.textSelectedBg or vector.New(0.81, 0.88, 1.00, 0.40))
+        globalCustomStyle.textSelectedBg or vector.New(0.81, 0.88, 1.00, 0.40))
     imgui.PushStyleColor(imgui_col.ScrollbarGrab,
-        globalVars.customStyle.scrollbarGrab or vector.New(0.31, 0.38, 0.50, 1.00))
+        globalCustomStyle.scrollbarGrab or vector.New(0.31, 0.38, 0.50, 1.00))
     imgui.PushStyleColor(imgui_col.ScrollbarGrabHovered,
-        globalVars.customStyle.scrollbarGrabHovered or vector.New(0.41, 0.48, 0.60, 1.00))
+        globalCustomStyle.scrollbarGrabHovered or vector.New(0.41, 0.48, 0.60, 1.00))
     imgui.PushStyleColor(imgui_col.ScrollbarGrabActive,
-        globalVars.customStyle.scrollbarGrabActive or vector.New(0.51, 0.58, 0.70, 1.00))
-    imgui.PushStyleColor(imgui_col.PlotLines, globalVars.customStyle.plotLines or vector.New(0.61, 0.61, 0.61, 1.00))
+        globalCustomStyle.scrollbarGrabActive or vector.New(0.51, 0.58, 0.70, 1.00))
+    imgui.PushStyleColor(imgui_col.PlotLines, globalCustomStyle.plotLines or vector.New(0.61, 0.61, 0.61, 1.00))
     imgui.PushStyleColor(imgui_col.PlotLinesHovered,
-        globalVars.customStyle.plotLinesHovered or vector.New(1.00, 0.43, 0.35, 1.00))
+        globalCustomStyle.plotLinesHovered or vector.New(1.00, 0.43, 0.35, 1.00))
     imgui.PushStyleColor(imgui_col.PlotHistogram,
-        globalVars.customStyle.plotHistogram or vector.New(0.90, 0.70, 0.00, 1.00))
+        globalCustomStyle.plotHistogram or vector.New(0.90, 0.70, 0.00, 1.00))
     imgui.PushStyleColor(imgui_col.PlotHistogramHovered,
-        globalVars.customStyle.plotHistogramHovered or vector.New(1.00, 0.60, 0.00, 1.00))
-    loadup.OpeningTextColor = globalVars.customStyle.loadupOpeningTextColor
-    loadup.PulseTextColorLeft = globalVars.customStyle.loadupPulseTextColorLeft
-    loadup.PulseTextColorRight = globalVars.customStyle.loadupPulseTextColorRight
-    loadup.BgTl = globalVars.customStyle.loadupBgTl
-    loadup.BgTr = globalVars.customStyle.loadupBgTr
-    loadup.BgBl = globalVars.customStyle.loadupBgBl
-    loadup.BgBr = globalVars.customStyle.loadupBgBr
+        globalCustomStyle.plotHistogramHovered or vector.New(1.00, 0.60, 0.00, 1.00))
+    loadup.OpeningTextColor = globalCustomStyle.loadupOpeningTextColor
+    loadup.PulseTextColorLeft = globalCustomStyle.loadupPulseTextColorLeft
+    loadup.PulseTextColorRight = globalCustomStyle.loadupPulseTextColorRight
+    loadup.BgTl = globalCustomStyle.loadupBgTl
+    loadup.BgTr = globalCustomStyle.loadupBgTr
+    loadup.BgBl = globalCustomStyle.loadupBgBl
+    loadup.BgBr = globalCustomStyle.loadupBgBr
     return borderColor
 end
 function getCurrentRGBColors(rgbPeriod)
@@ -11335,7 +11335,7 @@ function showAppearanceSettings()
     end
     chooseStyleTheme()
     chooseColorTheme()
-    if (globalVars.colorThemeName ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
+    if (globalVars.colorThemeName:sub(1, 7) ~= "custom_" and imgui.Button("Load Theme to Custom")) then
         setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
         for k42 = 1, #customStyleIds do
@@ -11349,13 +11349,15 @@ function showAppearanceSettings()
             ::nextCustomStyle::
         end
         globalCustomStyle = customStyle
-        local newName = "Copy of " .. globalVars.colorThemeName
+        globalCustomStyle.border = state.GetValue("borderColor")
+        local newName = "custom_Copy of " .. globalVars.colorThemeName
         globalVars.colorThemeName = newName
+        if (not globalVars.customStyles) then globalVars.customStyles = {} end
         globalVars.customStyles[newName] = globalCustomStyle
         setPluginAppearanceColors(newName)
         write(globalVars)
     end
-    if (globalVars.colorThemeName ~= "CUSTOM") then
+    if (globalVars.colorThemeName:sub(1, 7) ~= "custom_") then
         HoverToolTip(
             "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
     end
@@ -11403,6 +11405,97 @@ function showAppearanceSettings()
     if (globalVars.performanceMode) then
         imgui.EndDisabled()
     end
+end
+function chooseColorTheme()
+    local function renderThemeTree(tree)
+        local padding = 10
+        if (tree[1]) then
+            local maxItemSize = 0
+            for k43 = 1, #tree do
+                local item = tree[k43]
+                if (imgui.CalcTextSize(item.id).x > maxItemSize) then
+                    maxItemSize = imgui.CalcTextSize(item.id).x * 1.03
+                end
+            end
+            for k44 = 1, #tree do
+                local item = tree[k44]
+                local col = item.textColor
+                local sz = vector.New(maxItemSize, imgui.CalcTextSize(item.id).y) + vector.New(padding, 0)
+                imgui.BeginChild("themetree" .. item.id, sz)
+                local topLeft = imgui.GetWindowPos()
+                local dim = imgui.GetWindowSize()
+                local pos = imgui.GetMousePos()
+                if (pos.x > topLeft.x and pos.x < topLeft.x + dim.x and pos.y > topLeft.y and pos.y < topLeft.y + dim.y) then
+                    local ctx = imgui.GetWindowDrawList()
+                    ctx.AddRectFilled(topLeft, topLeft + dim, color.int.white - color.int.alphaMask * 200)
+                end
+                if (type(item.textColor[1]) == "table") then
+                    local strLen = item.id:len()
+                    local charProgress = 0
+                    local subdivisionLength = #item.textColor - 1
+                    for char in item.id:gmatch(".") do
+                        local progress = charProgress / (strLen - 1) * subdivisionLength % (1 + 1 / 10000)
+                        local currentSubdivision = 1 + math.floor(charProgress / (strLen - 0.999) * subdivisionLength)
+                        local col1 = vector.New(item.textColor[currentSubdivision][1] / 255,
+                            item.textColor[currentSubdivision][2] / 255, item.textColor[currentSubdivision][3] / 255, 1)
+                        local col2 = vector.New(item.textColor[currentSubdivision + 1][1] / 255,
+                            item.textColor[currentSubdivision + 1][2] / 255,
+                            item.textColor[currentSubdivision + 1][3] / 255, 1)
+                        imgui.TextColored(col1 * (1 - progress) +
+                            col2 * progress, char)
+                        imgui.SameLine(0, 0)
+                        charProgress = charProgress + 1
+                    end
+                else
+                    for char in item.id:gmatch(".") do
+                        imgui.TextColored(vector.New(col[1] / 255, col[2] / 255, col[3] / 255, 1), char)
+                        imgui.SameLine(0, 0)
+                    end
+                end
+                imgui.EndChild()
+                if (imgui.IsItemClicked("Left")) then
+                    globalVars.colorThemeName = item.internalId or item.id
+                    if (item.internalId) then
+                        globalCustomStyle = globalVars.customStyles[globalVars.colorThemeName]
+                    end
+                    write(globalVars)
+                    imgui.CloseCurrentPopup()
+                end
+            end
+        else
+            for k, v in pairs(tree) do
+                if (k == "Custom") then
+                    if (imgui.BeginMenu("Custom Themes")) then
+                        if (not globalVars.customStyles or not next(globalVars.customStyles)) then
+                            imgui.Text("No Custom Themes")
+                        else
+                            renderThemeTree(table.map(table.keys(globalVars.customStyles), function(s)
+                                return {
+                                    id = s:sub(8),
+                                    textColor = { 255, 255, 255 },
+                                    internalId = s
+                                }
+                            end))
+                        end
+                        imgui.EndMenu()
+                    end
+                else
+                    ---@diagnostic disable-next-line: param-type-mismatch
+                    if (imgui.BeginMenu(k)) then
+                        renderThemeTree(v)
+                        imgui.EndMenu()
+                    end
+                end
+            end
+        end
+    end
+    if (imgui.BeginCombo("Color Theme", globalVars.colorThemeName:gsub("custom_", ""):fixToSize(130))) then
+        renderThemeTree(THEME_TREE)
+        imgui.EndCombo()
+    end
+    local isRGBColorTheme = globalVars.colorThemeName:find("RGB") or globalVars.colorThemeName:find("BGR")
+    if not isRGBColorTheme or globalVars.colorThemeName:find("custom_") then return end
+    chooseRGBPeriod()
 end
 customStyleIds = {
     "windowBg",
@@ -11486,34 +11579,65 @@ local customStyleNames = {
 }
 function showCustomThemeSettings()
     local settingsChanged = false
-    imgui.SeparatorText("Custom Theme Actions")
+    imgui.SeparatorText(table.concat({"Editing '", globalVars.colorThemeName:gsub("custom_", ""), "'"}))
     if (imgui.Button("Reset")) then
-        globalVars.customStyle = table.duplicate(DEFAULT_STYLE)
-        write()
+        globalCustomStyle = table.duplicate(DEFAULT_STYLE)
+        globalVars.colorThemeName = "Original"
+        write(globalVars)
     end
     KeepSameLine()
-    if (imgui.Button("Import")) then
-        state.SetValue("boolean.importingCustomTheme", true)
+    if (imgui.Button("Rename")) then
+        state.SetValue("boolean.renamingCustomTheme", not state.GetValue("boolean.renamingCustomTheme"))
     end
     KeepSameLine()
     if (imgui.Button("Export")) then
-        local str = stringifyCustomStyle(globalVars.customStyle)
+        local str = stringifyCustomStyle(globalCustomStyle)
         imgui.SetClipboardText(str)
         print("i!", "Exported custom theme to your clipboard.")
     end
+    KeepSameLine()
+    if (imgui.Button("Delete")) then
+        print("e!", "Deleted custom theme.")
+        globalVars.customStyles[globalVars.colorThemeName] = nil
+        globalVars.colorThemeName = "Original"
+        state.SetValue("settingTypeIndex", table.indexOf(SETTING_TYPES, "Appearance"))
+        write(globalVars)
+    end
+    if (state.GetValue("boolean.renamingCustomTheme")) then
+        local input = state.GetValue("renamingCustomThemeInput", "")
+        imgui.SetNextItemWidth(130)
+        _, input = imgui.InputText("##customThemeStr", input, 69420)
+        state.SetValue("renamingCustomThemeInput", input)
+        KeepSameLine()
+        if (imgui.Button("Send")) then
+            local newName = "custom_" .. input
+            globalVars.customStyles[newName] = globalCustomStyle
+            globalVars.customStyles[globalVars.colorThemeName] = nil
+            globalVars.colorThemeName = newName
+            settingsChanged = true
+            state.SetValue("boolean.renamingCustomTheme", false)
+            state.SetValue("renamingCustomThemeInput", "")
+        end
+        KeepSameLine()
+        if (imgui.Button("X")) then
+            state.SetValue("boolean.renamingCustomTheme", false)
+            state.SetValue("renamingCustomThemeInput", "")
+        end
+    end
+    imgui.SeparatorText("Other Actions")
+    if (imgui.Button("Import")) then
+        state.SetValue("boolean.importingCustomTheme", not state.GetValue("boolean.importingCustomTheme"))
+    end
     if (state.GetValue("boolean.importingCustomTheme")) then
+        imgui.SameLine()
         local input = state.GetValue("importingCustomThemeInput", "")
+        imgui.SetNextItemWidth(118)
         _, input = imgui.InputText("##customThemeStr", input, 69420)
         state.SetValue("importingCustomThemeInput", input)
         KeepSameLine()
         if (imgui.Button("Send")) then
             setCustomStyleString(input)
             settingsChanged = true
-            state.SetValue("boolean.importingCustomTheme", false)
-            state.SetValue("importingCustomThemeInput", "")
-        end
-        KeepSameLine()
-        if (imgui.Button("X")) then
             state.SetValue("boolean.importingCustomTheme", false)
             state.SetValue("importingCustomThemeInput", "")
         end
@@ -11527,7 +11651,7 @@ function showCustomThemeSettings()
     for idx, id in ipairs(customStyleIds) do
         local name = customStyleNames[idx]
         if (not name:lower():find(searchText:lower())) then goto nextId end
-        settingsChanged = ColorInput(globalVars.customStyle, id, name) or settingsChanged
+        settingsChanged = ColorInput(globalCustomStyle, id, name) or settingsChanged
         ::nextId::
     end
     if settingsChanged then
@@ -11548,8 +11672,8 @@ end
 function stringifyCustomStyle(customStyle)
     local keys = table.keys(customStyle)
     local resultStr = "v2 "
-    for k43 = 1, #keys do
-        local key = keys[k43]
+    for k45 = 1, #keys do
+        local key = keys[k45]
         local value = customStyle[key]
         keyId = convertStrToShort(key)
         if (key:sub(1, 6) == "loadup") then keyId = keyId .. key:sub(-1):upper() end
@@ -11586,7 +11710,9 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
     if (not exportInstead) then
         globalCustomStyle = table.duplicate(customStyle)
         if (not globalVars.customStyles) then globalVars.customStyles = {} end
-        globalVars.customStyles["Import_" .. state.UnixTime] = globalCustomStyle
+        local newName = "custom_Import " .. state.UnixTime
+        globalVars.customStyles[newName] = globalCustomStyle
+        globalVars.colorThemeName = newName
         return
     end
     local outStr = ""
@@ -11616,7 +11742,7 @@ function parseCustomStyleV1(str, keyIdDict)
         local key = table.indexOf(keyIdDict, keyId)
         if (key ~= -1) then customStyle[key] = color.hexaToRgba(hexa) end
     end
-    globalVars.customStyle = table.duplicate(customStyle)
+    globalCustomStyle = table.duplicate(customStyle)
 end
 function saveSettingPropertiesButton(settingVars, label)
     local saveButtonClicked = imgui.Button("Save##setting" .. label)
@@ -11980,7 +12106,7 @@ function showPluginSettingsWindow()
     startNextWindowNotCollapsed("plumoguSV Settings")
     _, settingsOpened = imgui.Begin("plumoguSV Settings", true, 42)
     imgui.SetWindowSize("plumoguSV Settings", vector.New(433, 400))
-    local typeIndex = state.GetValue("settings_typeIndex", 1)
+    local typeIndex = state.GetValue("settingTypeIndex") or 1
     imgui.Columns(2, "settings_columnList", true)
     imgui.SetColumnWidth(0, 150)
     imgui.SetColumnWidth(1, 283)
@@ -11990,7 +12116,7 @@ function showPluginSettingsWindow()
     --- Key is name of setting. If value with respect to key is true, will hide setting at the left
     local hideSettingDict = {
         ["Advanced"] = not globalVars.advancedMode,
-        ["Custom Theme"] = (globalVars.colorThemeName ~= "CUSTOM" or globalVars.performanceMode)
+        ["Custom Theme"] = (globalVars.colorThemeName:sub(1, 7) ~= "custom_" or globalVars.performanceMode)
     }
     for idx, v in pairs(SETTING_TYPES) do
         if (hideSettingDict[v]) then goto nextSetting end
@@ -12010,6 +12136,7 @@ function showPluginSettingsWindow()
     imgui.NextColumn()
     imgui.BeginChild("Settings Data")
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
+    state.SetValue("settingTypeIndex", typeIndex)
     if (SETTING_TYPES[typeIndex] == "General") then
         showGeneralSettings()
     end
@@ -12034,10 +12161,9 @@ function showPluginSettingsWindow()
     imgui.PopItemWidth()
     imgui.EndChild()
     imgui.Columns(1)
-    state.SetValue("settings_typeIndex", typeIndex)
     if (not settingsOpened) then
         state.SetValue("windows.showSettingsWindow", false)
-        state.SetValue("settings_typeIndex", 1)
+        state.SetValue("settingTypeIndex", 1)
         state.SetValue("crazy", "Crazy?")
         state.SetValue("activateCrazy", false)
         state.SetValue("crazyIdx", 1)
@@ -12722,86 +12848,6 @@ function chooseChinchillaType(settingVars)
     settingVars.chinchillaTypeIndex = Combo("Chinchilla Type", CHINCHILLA_TYPES, oldIndex)
     return oldIndex ~= settingVars.chinchillaTypeIndex
 end
-function chooseColorTheme()
-    local function renderThemeTree(tree)
-        local padding = 10
-        if (tree[1]) then
-            local maxItemSize = 0
-            for k44 = 1, #tree do
-                local item = tree[k44]
-                if (imgui.CalcTextSize(item.id).x > maxItemSize) then
-                    maxItemSize = imgui.CalcTextSize(item.id).x
-                end
-            end
-            for k45 = 1, #tree do
-                local item = tree[k45]
-                local col = item.textColor
-                local sz = vector.New(maxItemSize, imgui.CalcTextSize(item.id).y) + vector.New(padding, 0)
-                imgui.BeginChild("themetree" .. item.id, sz)
-                local topLeft = imgui.GetWindowPos()
-                local dim = imgui.GetWindowSize()
-                local pos = imgui.GetMousePos()
-                if (pos.x > topLeft.x and pos.x < topLeft.x + dim.x and pos.y > topLeft.y and pos.y < topLeft.y + dim.y) then
-                    local ctx = imgui.GetWindowDrawList()
-                    ctx.AddRectFilled(topLeft, topLeft + dim, color.int.white - color.int.alphaMask * 200)
-                end
-                if (type(item.textColor[1]) == "table") then
-                    local strLen = item.id:len()
-                    local charProgress = 0
-                    local subdivisionLength = #item.textColor - 1
-                    for char in item.id:gmatch(".") do
-                        local progress = charProgress / (strLen - 1) * subdivisionLength % (1 + 1 / 10000)
-                        local currentSubdivision = 1 + math.floor(charProgress / (strLen - 0.999) * subdivisionLength)
-                        local col1 = vector.New(item.textColor[currentSubdivision][1] / 255,
-                            item.textColor[currentSubdivision][2] / 255, item.textColor[currentSubdivision][3] / 255, 1)
-                        local col2 = vector.New(item.textColor[currentSubdivision + 1][1] / 255,
-                            item.textColor[currentSubdivision + 1][2] / 255,
-                            item.textColor[currentSubdivision + 1][3] / 255, 1)
-                        imgui.TextColored(col1 * (1 - progress) +
-                            col2 * progress, char)
-                        imgui.SameLine(0, 0)
-                        charProgress = charProgress + 1
-                    end
-                else
-                    for char in item.id:gmatch(".") do
-                        imgui.TextColored(vector.New(col[1] / 255, col[2] / 255, col[3] / 255, 1), char)
-                        imgui.SameLine(0, 0)
-                    end
-                end
-                imgui.EndChild()
-                if (imgui.IsItemClicked("Left")) then
-                    globalVars.colorThemeName = item.id
-                    write(globalVars)
-                    imgui.CloseCurrentPopup()
-                end
-            end
-        else
-            for k, v in pairs(tree) do
-                if (k == "Custom") then
-                    renderThemeTree(table.map(table.keys(globalVars.customStyles), function(s)
-                        return {
-                            id = s,
-                            textColor = ""
-                        }
-                    end))
-                else
-                    ---@diagnostic disable-next-line: param-type-mismatch
-                    if (imgui.BeginMenu(k)) then
-                        renderThemeTree(v)
-                        imgui.EndMenu()
-                    end
-                end
-            end
-        end
-    end
-    if (imgui.BeginCombo("Color Theme", "Penis")) then
-        renderThemeTree(THEME_TREE)
-        imgui.EndCombo()
-    end
-    local isRGBColorTheme = globalVars.colorThemeName:find("RGB") or globalVars.colorThemeName:find("BGR")
-    if not isRGBColorTheme then return end
-    chooseRGBPeriod()
-end
 function chooseComboSVOption(settingVars, maxComboPhase)
     local oldIndex = settingVars.comboTypeIndex
     settingVars.comboTypeIndex = Combo("Combo Type", COMBO_SV_TYPE, settingVars.comboTypeIndex)
@@ -13309,7 +13355,7 @@ function choosePulseColor()
         write(globalVars)
     end
     if (not colorPickerOpened) then
-        state.SetValue("showColorPicker", false)
+        state.SetValue("windows.showColorPicker", false)
     end
     imgui.End()
 end
