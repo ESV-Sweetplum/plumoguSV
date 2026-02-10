@@ -481,7 +481,7 @@ hotkeyList:
 ignoreNotesOutsideTg: false
 maxDisplacementMultiplierExponent: 0
 performanceMode: false
-placeTypeIndex: 3
+placeTypeIndex: 1
 presets:
 - 
 printLegacyLNMessage: true
@@ -506,4 +506,5 @@ styleThemeIndex: 1
 upscroll: false
 useCustomPulseColor: true
 useEndTimeOffsets: false
+useMinDisplacementMultiplier: true
 ignoreNotes: false

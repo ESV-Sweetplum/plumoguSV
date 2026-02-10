@@ -7400,20 +7400,20 @@ function BasicInputInt(varsTable, parameterName, label, bounds, tooltipText)
 end
 function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
-    local mult2Button = imgui.Button("x2##" .. label)
+    local multButtonPressed = imgui.Button("x2##" .. label)
     HoverToolTip("Double this value.")
     KeepSameLine()
-    local div2Button = imgui.Button("/2##" .. label)
+    local divButtonPressed = imgui.Button("/2##" .. label)
     HoverToolTip("Half this value.")
     KeepSameLine()
     imgui.PushItemWidth(91.5)
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)
     imgui.PopItemWidth()
     if tooltipText then HelpMarker(tooltipText) end
-    if (mult2Button) then
+    if (multButtonPressed) then
         oldValue = oldValue * 2
     end
-    if (div2Button) then
+    if (divButtonPressed) then
         oldValue = oldValue / 2
     end
     if (bounds and bounds[1] and bounds[2]) then
