@@ -479,9 +479,9 @@ hotkeyList:
 - Ctrl+Alt+E
 - O
 ignoreNotesOutsideTg: false
-maxDisplacementMultiplierExponent: 6
+maxDisplacementMultiplierExponent: 0
 performanceMode: false
-placeTypeIndex: 4
+placeTypeIndex: 3
 presets:
 - 
 printLegacyLNMessage: true

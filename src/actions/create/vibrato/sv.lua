@@ -90,11 +90,11 @@ function svVibrato(menuVars, heightFn)
 end
 
 function deviateVibratoHeight(initHeight, deviationIndex, deviationDistance)
-    if (deviationIndex == 1) then return initHeight end
-    if (deviationIndex == 2) then
+    if (deviationIndex == 1) then return initHeight end -- None
+    if (deviationIndex == 2) then                       -- Linear
         return initHeight + (math.random() * 2 - 1) * deviationDistance
     end
-    if (deviationIndex == 3) then
+    if (deviationIndex == 3) then -- Gaussian
         local stdDevTolerance = 2
         return initHeight + math.gaussianRandom(0, deviationDistance / stdDevTolerance, stdDevTolerance)
     end

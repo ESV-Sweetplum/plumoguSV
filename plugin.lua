@@ -573,7 +573,7 @@ end
 ---@return number z1 A random number.
 ---@return number x2 Another random number.
 function math.gaussianRandom(mean, stdDev, withinStdDevCount)
-    local output = nil
+    local output, output2 = nil, 0
     while (not output or math.abs(output - mean) / stdDev > withinStdDevCount) do
         local randomRadius = math.random()
         while (randomRadius == 0) do randomRadius = math.random() end
@@ -1723,6 +1723,7 @@ globalVars = {
     upscroll = false,
     useCustomPulseColor = false,
     useEndTimeOffsets = false,
+    useMinDisplacementMultiplier = true
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 function setGlobalVars(tempGlobalVars)
@@ -1766,6 +1767,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.upscroll = isTruthy(tempGlobalVars.upscroll)
     globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
     globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
+    globalVars.useMinDisplacementMultiplier = isTruthy(tempGlobalVars.useMinDisplacementMultiplier, true)
     local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
         "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
     if (tempGlobalVars.customStyles) then
@@ -7398,20 +7400,22 @@ function BasicInputInt(varsTable, parameterName, label, bounds, tooltipText)
 end
 function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
-    if (imgui.Button("x2##" .. label)) then
-        oldValue = oldValue * 2
-    end
+    local mult2Button = imgui.Button("x2##" .. label)
     HoverToolTip("Double this value.")
     KeepSameLine()
-    if (imgui.Button("/2##" .. label)) then
-        oldValue = oldValue / 2
-    end
+    local div2Button = imgui.Button("/2##" .. label)
     HoverToolTip("Half this value.")
     KeepSameLine()
     imgui.PushItemWidth(91.5)
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)
     imgui.PopItemWidth()
     if tooltipText then HelpMarker(tooltipText) end
+    if (mult2Button) then
+        oldValue = oldValue * 2
+    end
+    if (div2Button) then
+        oldValue = oldValue / 2
+    end
     if (bounds and bounds[1] and bounds[2]) then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
     end
@@ -11353,7 +11357,15 @@ function showAdvancedSettings()
         "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets.")
     GlobalCheckbox("ignoreNotesOutsideTg", "Ignore Notes Not In Current Timing Group",
         "Notes that are in a timing group outside of the current one will be ignored by stills, selection checks, etc.")
+    GlobalCheckbox("useMinDisplacementMultiplier", "Use Minimum Displacement Multiplier",
+        "Uses the greatest minimum possible displacement multiplier throughout the whole map to ensure that copy-paste is possible while maintaining consistency.")
+    if (globalVars.useMinDisplacementMultiplier) then
+        imgui.BeginDisabled()
+    end
     chooseMaxDisplacementMultiplierExponent()
+    if (globalVars.useMinDisplacementMultiplier) then
+        imgui.EndDisabled()
+    end
 end
 function chooseMaxDisplacementMultiplierExponent()
     imgui.PushItemWidth(70)

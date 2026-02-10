@@ -17,20 +17,22 @@ end
 
 function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
-    if (imgui.Button("x2##" .. label)) then
-        oldValue = oldValue * 2
-    end
+    local mult2Button = imgui.Button("x2##" .. label)
     HoverToolTip("Double this value.")
     KeepSameLine()
-    if (imgui.Button("/2##" .. label)) then
-        oldValue = oldValue / 2
-    end
+    local div2Button = imgui.Button("/2##" .. label)
     HoverToolTip("Half this value.")
     KeepSameLine()
     imgui.PushItemWidth(91.5)
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)
     imgui.PopItemWidth()
     if tooltipText then HelpMarker(tooltipText) end
+    if (mult2Button) then
+        oldValue = oldValue * 2
+    end
+    if (div2Button) then
+        oldValue = oldValue / 2
+    end
     if (bounds and bounds[1] and bounds[2]) then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
     end
