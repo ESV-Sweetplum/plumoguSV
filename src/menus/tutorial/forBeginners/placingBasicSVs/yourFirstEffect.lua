@@ -1,5 +1,5 @@
 function showYourFirstEffectTutorial()
-    imgui.SeparatorText("Making your first SV effect")
+    imgui.SeparatorText(("Making your first SV effect"):obfuscate())
     imgui.TextWrapped(
         "At the absolute basics of SV are the pulse effects, effects that highlight significant parts of the song, such as a repeating drum. We will apply a very basic stutter SV effect on the drum beat (assuming your song has that), like so:")
 

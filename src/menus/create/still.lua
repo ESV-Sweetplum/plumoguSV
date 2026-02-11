@@ -11,7 +11,7 @@ function placeStillSVMenu()
         renderPresetMenu("Still", menuVars, settingVars)
         return
     end
-    imgui.Text("Still Settings:")
+    imgui.Text(("Still Settings:"):obfuscate())
     menuVars.noteSpacing = ComputableInputFloat("Note Spacing", menuVars.noteSpacing, 2, "x")
     menuVars.stillBehavior = Combo("Still Behavior", STILL_BEHAVIOR_TYPES, menuVars.stillBehavior, nil, nil,
         { "Apply the Still across the entire selected region.", "Apply the Stills across the selected note groups." })

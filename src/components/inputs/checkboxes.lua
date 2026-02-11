@@ -6,7 +6,7 @@
 ---@return boolean changed Whether or not the checkbox has changed this frame.
 function BasicCheckbox(varsTable, parameterName, label, tooltipText)
     local oldValue = varsTable[parameterName]
-    _, varsTable[parameterName] = imgui.Checkbox(label, oldValue)
+    _, varsTable[parameterName] = imgui.Checkbox(label:obfuscate(), oldValue)
     if tooltipText then HelpMarker(tooltipText) end
     return oldValue ~= varsTable[parameterName]
 end
@@ -17,7 +17,7 @@ end
 ---@param tooltipText? string Optional text for a tooltip that is shown when the element is hovered.
 function GlobalCheckbox(parameterName, label, tooltipText)
     local oldValue = globalVars[parameterName] ---@cast oldValue boolean
-    _, globalVars[parameterName] = imgui.Checkbox(label, oldValue)
+    _, globalVars[parameterName] = imgui.Checkbox(label:obfuscate(), oldValue)
     if tooltipText then HoverToolTip(tooltipText) end
     if (oldValue ~= globalVars[parameterName]) then
         write(globalVars)

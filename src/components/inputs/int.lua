@@ -7,7 +7,7 @@
 ---@return boolean changed Whether or not the checkbox has changed this frame.
 function BasicInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
-    _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 1, 1)
+    _, varsTable[parameterName] = imgui.InputInt(label:obfuscate(), oldValue, 1, 1)
     if tooltipText then HelpMarker(tooltipText) end
     if (bounds and bounds[1] and bounds[2]) then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
@@ -17,14 +17,14 @@ end
 
 function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
-    local multButtonPressed = imgui.Button("x2##" .. label)
+    local multButtonPressed = imgui.Button(("x2##" .. label):obfuscate(), LARGER_TERTIARY_BUTTON_SIZE)
     HoverToolTip("Double this value.")
     KeepSameLine()
-    local divButtonPressed = imgui.Button("/2##" .. label)
+    local divButtonPressed = imgui.Button(("/2##" .. label):obfuscate(), LARGER_TERTIARY_BUTTON_SIZE)
     HoverToolTip("Half this value.")
     KeepSameLine()
     imgui.PushItemWidth(91.5)
-    _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)
+    _, varsTable[parameterName] = imgui.InputInt(label:obfuscate(), oldValue, 0, 0)
     imgui.PopItemWidth()
     if tooltipText then HelpMarker(tooltipText) end
     if (multButtonPressed) then

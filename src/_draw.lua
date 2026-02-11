@@ -1,3 +1,5 @@
+direction = { 1, 1 }
+
 function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
@@ -19,6 +21,21 @@ function draw()
         checkForGlobalHotkeys()
         setPluginAppearance()
     end
+
+    if (not direction) then
+        direction = { 1, 1 }
+    end
+
+    local pos = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    if (pos.x + dim.x > state.WindowSize[1] or pos.x < 0) then
+        direction[1] = -direction[1]
+    end
+    if (pos.y + dim.y > state.WindowSize[2] or pos.y < 0) then
+        direction[2] = -direction[2]
+    end
+
+    imgui.SetWindowPos(PLUGIN_NAME, pos + table.vectorize2(direction) * vctr2(state.DeltaTime) / 2)
 
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     imgui.BeginTabBar("SV tabs")

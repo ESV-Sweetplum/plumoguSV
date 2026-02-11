@@ -5,6 +5,6 @@
 ---@param oscillationPeriod? integer The amount of time to switch from color 1 -> 2 -> 1, in milliseconds.
 function GradientText(color1, color2, text, oscillationPeriod)
     PushGradientStyle(color1, color2, imgui_col.Text, oscillationPeriod)
-    imgui.Text(text)
+    imgui.Text(text:obfuscate())
     imgui.PopStyleColor()
 end

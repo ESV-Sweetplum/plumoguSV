@@ -17,10 +17,10 @@ end
 
 function automateSVSettingsMenu(settingVars)
     settingVars.initialSV = NegatableComputableInputFloat("Initial SV", settingVars.initialSV, 2, "x")
-    _, settingVars.scaleSVs = imgui.Checkbox("Scale SVs?", settingVars.scaleSVs)
+    _, settingVars.scaleSVs = imgui.Checkbox(("Scale SVs?"):obfuscate(), settingVars.scaleSVs)
     KeepSameLine()
-    _, settingVars.optimizeTGs = imgui.Checkbox("Optimize TGs?", settingVars.optimizeTGs)
-    _, settingVars.maintainMs = imgui.Checkbox("Static Time?", settingVars.maintainMs)
+    _, settingVars.optimizeTGs = imgui.Checkbox(("Optimize TGs?"):obfuscate(), settingVars.optimizeTGs)
+    _, settingVars.maintainMs = imgui.Checkbox(("Static Time?"):obfuscate(), settingVars.maintainMs)
     if (settingVars.maintainMs) then
         KeepSameLine()
         imgui.PushItemWidth(71)

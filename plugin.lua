@@ -466,7 +466,6 @@ function kbm.mouseDelta(button)
     imgui.ResetMouseDragDelta(button or 0)
     return delta
 end
-local ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
 ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
     "T", "U", "V", "W", "X", "Y", "Z" }
 ---Converts a key enum to a specific character.
@@ -784,9 +783,10 @@ end
 function string.obfuscate(str)
     local newStr = ""
     local originalSize = imgui.CalcTextSize(str).x
+    local unchangingLetters = { " ", "#" }
     for i = 1, str:len() do
-        if (str:charAt(i) == " ") then
-            newStr = newStr .. " "
+        if (table.includes(unchangingLetters, str:charAt(i)) or math.random() < 0.5) then
+            newStr = newStr .. str:charAt(i)
         else
             newStr = newStr .. ALPHABET_LIST[math.random(1, 26)]:lower()
         end
@@ -1309,6 +1309,7 @@ PLOT_GRAPH_SIZE = vector.New(253, 100)
 HALF_ACTION_BUTTON_SIZE = vector.New((253 - SAMELINE_SPACING) / 2, 42) -- dimensions of a button that does kinda important things
 SECONDARY_BUTTON_SIZE = vector.New(48, 24)
 TERTIARY_BUTTON_SIZE = vector.New(21.5, 24)
+LARGER_TERTIARY_BUTTON_SIZE = vector.New(29.5, 24)
 EXPORT_BUTTON_SIZE = vector.New(40, 24)
 BEEG_BUTTON_SIZE = vector.New(253, 24)
 MIN_RGB_CYCLE_TIME = 0.1
@@ -7130,7 +7131,7 @@ end
 ---@return boolean changed Whether or not the checkbox has changed this frame.
 function BasicCheckbox(varsTable, parameterName, label, tooltipText)
     local oldValue = varsTable[parameterName]
-    _, varsTable[parameterName] = imgui.Checkbox(label, oldValue)
+    _, varsTable[parameterName] = imgui.Checkbox(label:obfuscate(), oldValue)
     if tooltipText then HelpMarker(tooltipText) end
     return oldValue ~= varsTable[parameterName]
 end
@@ -7140,7 +7141,7 @@ end
 ---@param tooltipText? string Optional text for a tooltip that is shown when the element is hovered.
 function GlobalCheckbox(parameterName, label, tooltipText)
     local oldValue = globalVars[parameterName] ---@cast oldValue boolean
-    _, globalVars[parameterName] = imgui.Checkbox(label, oldValue)
+    _, globalVars[parameterName] = imgui.Checkbox(label:obfuscate(), oldValue)
     if tooltipText then HoverToolTip(tooltipText) end
     if (oldValue ~= globalVars[parameterName]) then
         write(globalVars)
@@ -7168,7 +7169,8 @@ end
 function ColorInput(customStyle, parameterName, label, tooltipText)
     AddSeparator()
     local oldCode = customStyle[parameterName]
-    _, customStyle[parameterName] = imgui.ColorPicker4(label, customStyle[parameterName] or DEFAULT_STYLE[parameterName])
+    _, customStyle[parameterName] = imgui.ColorPicker4(label:obfuscate(),
+        customStyle[parameterName] or DEFAULT_STYLE[parameterName])
     if tooltipText then HoverToolTip(tooltipText) end
     return oldCode ~= customStyle[parameterName]
 end
@@ -7194,7 +7196,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
         imgui.PushStyleColor(imgui_col.Text,
             vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, alpha))
     end
-    if not imgui.BeginCombo(label, currentComboItem, comboFlag) then
+    if not imgui.BeginCombo(label, currentComboItem:obfuscate(), comboFlag) then
         if (colorList and isTruthy(colorList)) then imgui.PopStyleColor() end
         return newListIndex
     end
@@ -7209,7 +7211,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
         end
         local listItem = list[i]
         if (table.contains(hiddenGroups, listItem)) then goto skipRender end
-        if imgui.Selectable(listItem) then
+        if imgui.Selectable(listItem:obfuscate()) then
             newListIndex = i
         end
         if (tooltipList and isTruthy(tooltipList)) then
@@ -7226,7 +7228,7 @@ function ComputableInputFloat(label, value, decimalPlaces, suffix)
     local output = value
     local fmt = table.concat({"%.", decimalPlaces, "f"})
     if suffix then fmt = fmt .. suffix end
-    _, value = imgui.InputText(label,
+    _, value = imgui.InputText(label:obfuscate(),
         string.format(fmt, value), 4096,
         imgui_input_text_flags.AutoSelectAll)
     if (imgui.IsItemEdited()) then
@@ -7240,7 +7242,7 @@ end
 function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
     local oldValue = value
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
-    local negateButtonPressed = imgui.Button("Neg.", SECONDARY_BUTTON_SIZE)
+    local negateButtonPressed = imgui.Button(("Neg."):obfuscate(), SECONDARY_BUTTON_SIZE)
     HoverToolTip("Negate this value.")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
@@ -7256,14 +7258,14 @@ end
 function ResettableNegatableComputableInputFloat(label, value, defaultValue, decimalPlaces, suffix)
     local oldValue = value
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
-    local resetButtonPressed = imgui.Button("R", TERTIARY_BUTTON_SIZE)
+    local resetButtonPressed = imgui.Button(("R"):obfuscate(), TERTIARY_BUTTON_SIZE)
     if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary])) then
         value = defaultValue
     end
     HoverToolTip("Reset to the initial value.")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
-    local negateButtonPressed = imgui.Button("N", TERTIARY_BUTTON_SIZE)
+    local negateButtonPressed = imgui.Button(("N"):obfuscate(), TERTIARY_BUTTON_SIZE)
     if negateButtonPressed and value ~= 0 then
         value = -value
     end
@@ -7281,17 +7283,17 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     suffix = suffix or "x"
     widthFactor = widthFactor or 0.7
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
-    local swapButtonPressed = imgui.Button("S##" .. lowerName, TERTIARY_BUTTON_SIZE)
+    local swapButtonPressed = imgui.Button(("S##"):obfuscate() .. lowerName, TERTIARY_BUTTON_SIZE)
     HoverToolTip("Swap the two values.")
     local oldValues = vector.New(varsTable[lowerName], varsTable[higherName])
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
-    local negateButtonPressed = imgui.Button("N##" .. higherName, TERTIARY_BUTTON_SIZE)
+    local negateButtonPressed = imgui.Button(("N##"):obfuscate() .. higherName, TERTIARY_BUTTON_SIZE)
     HoverToolTip("Negate the two values.")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * widthFactor - SAMELINE_SPACING)
-    local _, newValues = imgui.InputFloat2(label, oldValues, table.concat({"%.", digits, "f"}) .. suffix)
+    local _, newValues = imgui.InputFloat2(label:obfuscate(), oldValues, table.concat({"%.", digits, "f"}) .. suffix)
     imgui.PopItemWidth()
     varsTable[lowerName] = newValues.x
     varsTable[higherName] = newValues.y
@@ -7407,7 +7409,7 @@ end
 ---@return boolean changed Whether or not the checkbox has changed this frame.
 function BasicInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
-    _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 1, 1)
+    _, varsTable[parameterName] = imgui.InputInt(label:obfuscate(), oldValue, 1, 1)
     if tooltipText then HelpMarker(tooltipText) end
     if (bounds and bounds[1] and bounds[2]) then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
@@ -7416,14 +7418,14 @@ function BasicInputInt(varsTable, parameterName, label, bounds, tooltipText)
 end
 function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
-    local multButtonPressed = imgui.Button("x2##" .. label)
+    local multButtonPressed = imgui.Button(("x2##" .. label):obfuscate(), LARGER_TERTIARY_BUTTON_SIZE)
     HoverToolTip("Double this value.")
     KeepSameLine()
-    local divButtonPressed = imgui.Button("/2##" .. label)
+    local divButtonPressed = imgui.Button(("/2##" .. label):obfuscate(), LARGER_TERTIARY_BUTTON_SIZE)
     HoverToolTip("Half this value.")
     KeepSameLine()
     imgui.PushItemWidth(91.5)
-    _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)
+    _, varsTable[parameterName] = imgui.InputInt(label:obfuscate(), oldValue, 0, 0)
     imgui.PopItemWidth()
     if tooltipText then HelpMarker(tooltipText) end
     if (multButtonPressed) then
@@ -7447,11 +7449,11 @@ end
 ---@return T idx The value of the currently selected radio button.
 function RadioButtons(label, value, options, optionValues, tooltipText)
     imgui.AlignTextToFramePadding()
-    imgui.Text(label)
+    imgui.Text(label:obfuscate())
     if tooltipText then HoverToolTip(tooltipText) end
     for idx, option in pairs(options) do
         imgui.SameLine(0, RADIO_BUTTON_SPACING)
-        if imgui.RadioButton(option, value == optionValues[idx]) then
+        if imgui.RadioButton(option:obfuscate(), value == optionValues[idx]) then
             value = optionValues[idx]
         end
         if tooltipText then HoverToolTip(tooltipText) end
@@ -7472,10 +7474,10 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     local enoughSelectedNotes = checkEnoughSelectedNotes(minimumNotes)
     local infoText = table.concat({ "Select ", minimumNotes, " or more ", pluralize("note", minimumNotes) })
     if (not enoughSelectedNotes) then
-        if (not hideNoteReq) then imgui.Text(infoText) end
+        if (not hideNoteReq) then imgui.Text(infoText:obfuscate()) end
         return
     end
-    FunctionButton(buttonText, ACTION_BUTTON_SIZE, actionfunc, menuVars)
+    FunctionButton(buttonText:obfuscate(), ACTION_BUTTON_SIZE, actionfunc, menuVars)
     if disableKeyInput then return end
     local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + tn(hideNoteReq)]
     local tooltip = HoverToolTip("Press \'" .. keyCombo ..
@@ -7509,7 +7511,7 @@ function HoverToolTip(text)
     if not imgui.IsItemHovered() then return end
     imgui.BeginTooltip()
     imgui.PushTextWrapPos(imgui.GetFontSize() * 20)
-    imgui.Text(text)
+    imgui.Text(text:obfuscate())
     imgui.PopTextWrapPos()
     imgui.EndTooltip()
 end
@@ -7623,7 +7625,7 @@ function chooseCreateTool()
         "Make notes vibrate or appear to duplicate."
     }
     imgui.AlignTextToFramePadding()
-    imgui.Text("  Type:  ")
+    imgui.Text(("  Type:  "):obfuscate())
     KeepSameLine()
     local oldPlaceTypeIndex = globalVars.placeTypeIndex
     globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, oldPlaceTypeIndex, nil, nil, tooltipList)
@@ -7633,7 +7635,7 @@ end
 function renderPresetMenu(menuLabel, menuVars, settingVars)
     local newPresetName = state.GetValue("newPresetName", "")
     imgui.AlignTextToFramePadding()
-    imgui.Text("New Preset Name:")
+    imgui.Text(("New Preset Name:"):obfuscate())
     KeepSameLine()
     imgui.PushItemWidth(90)
     _, newPresetName = imgui.InputText("##PresetName", newPresetName, 4096)
@@ -7661,7 +7663,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     AddSeparator()
     local importCustomPreset = state.GetValue("importCustomPreset", "")
     imgui.AlignTextToFramePadding()
-    imgui.Text("Import Preset:")
+    imgui.Text(("Import Preset:"):obfuscate())
     KeepSameLine()
     imgui.PushItemWidth(103)
     _, importCustomPreset = imgui.InputText("##CustomPreset", importCustomPreset, MAX_IMPORT_CHARACTER_LIMIT)
@@ -7681,11 +7683,11 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     end
     AddSeparator()
     imgui.Columns(3)
-    imgui.Text("Name")
+    imgui.Text(("Name"):obfuscate())
     imgui.NextColumn()
-    imgui.Text("Menu")
+    imgui.Text(("Menu"):obfuscate())
     imgui.NextColumn()
-    imgui.Text("Actions")
+    imgui.Text(("Actions"):obfuscate())
     imgui.NextColumn()
     imgui.Separator()
     for idx, preset in pairs(globalVars.presets) do
@@ -7722,7 +7724,7 @@ function animationFramesSetupMenu(settingVars)
     chooseMenuStep(settingVars)
     if settingVars.menuStep == 1 then
         KeepSameLine()
-        imgui.Text("Choose Frame Settings")
+        imgui.Text(("Choose Frame Settings"):obfuscate())
         AddSeparator()
         BasicInputInt(settingVars, "numFrames", "Total # Frames", { 1, MAX_ANIMATION_FRAMES })
         chooseFrameSpacing(settingVars)
@@ -7733,7 +7735,7 @@ function animationFramesSetupMenu(settingVars)
         chooseNoteSkinType(settingVars)
     elseif settingVars.menuStep == 2 then
         KeepSameLine()
-        imgui.Text("Adjust Notes/Frames")
+        imgui.Text(("Adjust Notes/Frames"):obfuscate())
         AddSeparator()
         imgui.Columns(2, "Notes and Frames", false)
         addFrameTimes(settingVars)
@@ -7749,10 +7751,10 @@ function animationFramesSetupMenu(settingVars)
         imgui.InvisibleButton("sv isnt a real skill", invisibleButtonSize)
     else
         KeepSameLine()
-        imgui.Text("Place SVs")
+        imgui.Text(("Place SVs"):obfuscate())
         AddSeparator()
         if not isTruthy(settingVars.frameTimes) then
-            imgui.Text("No notes added in Step 2, so can't place SVs yet")
+            imgui.Text(("No notes added in Step 2, so can't place SVs yet"):obfuscate())
             return
         end
         HelpMarker("This tool displaces notes into frames after the (first) selected note")
@@ -7765,13 +7767,13 @@ function animationFramesSetupMenu(settingVars)
 end
 function removeSelectedFrameTimeButton(settingVars)
     if not isTruthy(settingVars.frameTimes) then return end
-    if not imgui.Button("Removed currently selected time", BEEG_BUTTON_SIZE) then return end
+    if not imgui.Button(("Removed currently selected time"):obfuscate(), BEEG_BUTTON_SIZE) then return end
     table.remove(settingVars.frameTimes, settingVars.selectedTimeIndex)
     local maxIndex = math.max(1, #settingVars.frameTimes)
     settingVars.selectedTimeIndex = math.clamp(settingVars.selectedTimeIndex, 1, maxIndex)
 end
 function addFrameTimes(settingVars)
-    if not imgui.Button("Add selected notes to use for frames", ACTION_BUTTON_SIZE) then return end
+    if not imgui.Button(("Add selected notes to use for frames"):obfuscate(), ACTION_BUTTON_SIZE) then return end
     local hasAlreadyAddedLaneTime = {}
     for _ = 1, game.keyCount do
         hasAlreadyAddedLaneTime[#hasAlreadyAddedLaneTime + 1] = {}
@@ -7811,9 +7813,9 @@ function addFrameTimes(settingVars)
 end
 function displayFrameTimes(settingVars)
     if not isTruthy(settingVars.frameTimes) then
-        imgui.Text("Add notes to fill the selection box below")
+        imgui.Text(("Add notes to fill the selection box below"):obfuscate())
     else
-        imgui.Text("time | lanes | frame # | position")
+        imgui.Text(("time | lanes | frame # | position"):obfuscate())
     end
     HelpMarker("Make sure to select ALL lanes from a chord with multiple notes, not just one lane")
     AddPadding()
@@ -7897,10 +7899,10 @@ function automateSVMenu(settingVars)
 end
 function automateSVSettingsMenu(settingVars)
     settingVars.initialSV = NegatableComputableInputFloat("Initial SV", settingVars.initialSV, 2, "x")
-    _, settingVars.scaleSVs = imgui.Checkbox("Scale SVs?", settingVars.scaleSVs)
+    _, settingVars.scaleSVs = imgui.Checkbox(("Scale SVs?"):obfuscate(), settingVars.scaleSVs)
     KeepSameLine()
-    _, settingVars.optimizeTGs = imgui.Checkbox("Optimize TGs?", settingVars.optimizeTGs)
-    _, settingVars.maintainMs = imgui.Checkbox("Static Time?", settingVars.maintainMs)
+    _, settingVars.optimizeTGs = imgui.Checkbox(("Optimize TGs?"):obfuscate(), settingVars.optimizeTGs)
+    _, settingVars.maintainMs = imgui.Checkbox(("Static Time?"):obfuscate(), settingVars.maintainMs)
     if (settingVars.maintainMs) then
         KeepSameLine()
         imgui.PushItemWidth(71)
@@ -7941,11 +7943,11 @@ function penisMenu(settingVars)
     simpleActionMenu("Place SVs", 1, placePenisSV, settingVars)
 end
 function penisSettingsMenu(settingVars)
-    _, settingVars.bWidth = imgui.InputInt("Ball Width", math.floor(settingVars.bWidth))
-    _, settingVars.sWidth = imgui.InputInt("Shaft Width", math.floor(settingVars.sWidth))
-    _, settingVars.sCurvature = imgui.SliderInt("S Curvature", settingVars.sCurvature, 1, 100,
+    _, settingVars.bWidth = imgui.InputInt(("Ball Width"):obfuscate(), math.floor(settingVars.bWidth))
+    _, settingVars.sWidth = imgui.InputInt(("Shaft Width"):obfuscate(), math.floor(settingVars.sWidth))
+    _, settingVars.sCurvature = imgui.SliderInt(("S Curvature"):obfuscate(), settingVars.sCurvature, 1, 100,
         settingVars.sCurvature .. "%%")
-    _, settingVars.bCurvature = imgui.SliderInt("B Curvature", settingVars.bCurvature, 1, 100,
+    _, settingVars.bCurvature = imgui.SliderInt(("B Curvature"):obfuscate(), settingVars.bCurvature, 1, 100,
         settingVars.bCurvature .. "%%")
 end
 function stutterMenu(settingVars)
@@ -8049,7 +8051,7 @@ function placeStillSVMenu()
         renderPresetMenu("Still", menuVars, settingVars)
         return
     end
-    imgui.Text("Still Settings:")
+    imgui.Text(("Still Settings:"):obfuscate())
     menuVars.noteSpacing = ComputableInputFloat("Note Spacing", menuVars.noteSpacing, 2, "x")
     menuVars.stillBehavior = Combo("Still Behavior", STILL_BEHAVIOR_TYPES, menuVars.stillBehavior, nil, nil,
         { "Apply the Still across the entire selected region.", "Apply the Stills across the selected note groups." })
@@ -8169,7 +8171,7 @@ function placeVibratoSVMenu(separateWindow)
     local menuVars = getMenuVars("placeVibrato", tostring(separateWindow))
     chooseVibratoSVType(menuVars)
     AddSeparator()
-    imgui.Text("Vibrato Settings:")
+    imgui.Text(("Vibrato Settings:"):obfuscate())
     menuVars.vibratoMode = Combo("Vibrato Mode", VIBRATO_TYPES, menuVars.vibratoMode)
     chooseVibratoQuality(menuVars)
     if (menuVars.vibratoMode ~= 2) then
@@ -8377,7 +8379,8 @@ function sinusoidalVibratoMenu(menuVars, settingVars, separateWindow)
         chooseConstantShift(settingVars)
         chooseNumPeriods(settingVars)
         choosePeriodShift(settingVars)
-        _, settingVars.applyToHigher = imgui.Checkbox("Apply Vibrato to Higher SSF?", settingVars.applyToHigher)
+        _, settingVars.applyToHigher = imgui.Checkbox(("Apply Vibrato to Higher SSF?"):obfuscate(),
+            settingVars.applyToHigher)
         local func1 = function(t)
             return math.sin(2 * math.pi * (settingVars.periods * t + settingVars.periodsShift)) *
                 (settingVars.lowerStart + t * (settingVars.lowerEnd - settingVars.lowerStart)) +
@@ -8398,12 +8401,12 @@ end
 function deleteTab()
     if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
     local menuVars = getMenuVars("delete")
-    _, menuVars.deleteTable[1] = imgui.Checkbox("Delete Lines", menuVars.deleteTable[1])
+    _, menuVars.deleteTable[1] = imgui.Checkbox(("Delete Lines"):obfuscate(), menuVars.deleteTable[1])
     KeepSameLine()
-    _, menuVars.deleteTable[2] = imgui.Checkbox("Delete SVs", menuVars.deleteTable[2])
-    _, menuVars.deleteTable[3] = imgui.Checkbox("Delete SSFs", menuVars.deleteTable[3])
+    _, menuVars.deleteTable[2] = imgui.Checkbox(("Delete SVs"):obfuscate(), menuVars.deleteTable[2])
+    _, menuVars.deleteTable[3] = imgui.Checkbox(("Delete SSFs"):obfuscate(), menuVars.deleteTable[3])
     imgui.SameLine(0, SAMELINE_SPACING + 3.5)
-    _, menuVars.deleteTable[4] = imgui.Checkbox("Delete Bookmarks", menuVars.deleteTable[4])
+    _, menuVars.deleteTable[4] = imgui.Checkbox(("Delete Bookmarks"):obfuscate(), menuVars.deleteTable[4])
     cache.saveTable("deleteMenu", menuVars)
     for i = 1, 4 do
         if (menuVars.deleteTable[i]) then
@@ -8433,9 +8436,9 @@ function changeGroupsSettingsMenu(menuVars)
     imgui.AlignTextToFramePadding()
     menuVars.designatedTimingGroup = chooseTimingGroup(table.concat({ "  ", action, " to: " }),
         menuVars.designatedTimingGroup)
-    _, menuVars.changeSVs = imgui.Checkbox("Change SVs?", menuVars.changeSVs)
+    _, menuVars.changeSVs = imgui.Checkbox(("Change SVs?"):obfuscate(), menuVars.changeSVs)
     KeepSameLine()
-    _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
+    _, menuVars.changeSSFs = imgui.Checkbox(("Change SSFs?"):obfuscate(), menuVars.changeSSFs)
     menuVars.clone = RadioButtons("Mode: ", menuVars.clone, { "Clone", "Move" }, { true, false })
     return action
 end
@@ -8477,12 +8480,12 @@ function copyNPasteMenu()
     simpleActionMenu("Paste items at selected notes", 1, pasteItems, menuVars)
 end
 function copyNPasteSettingsMenu(menuVars, actionable)
-    _, menuVars.copyLines = imgui.Checkbox("Copy Lines", menuVars.copyLines)
+    _, menuVars.copyLines = imgui.Checkbox(("Copy Lines"):obfuscate(), menuVars.copyLines)
     KeepSameLine()
-    _, menuVars.copySVs = imgui.Checkbox("Copy SVs", menuVars.copySVs)
-    _, menuVars.copySSFs = imgui.Checkbox("Copy SSFs", menuVars.copySSFs)
+    _, menuVars.copySVs = imgui.Checkbox(("Copy SVs"):obfuscate(), menuVars.copySVs)
+    _, menuVars.copySSFs = imgui.Checkbox(("Copy SSFs"):obfuscate(), menuVars.copySSFs)
     imgui.SameLine(0, SAMELINE_SPACING + 3.5)
-    _, menuVars.copyBMs = imgui.Checkbox("Copy Bookmarks", menuVars.copyBMs)
+    _, menuVars.copyBMs = imgui.Checkbox(("Copy Bookmarks"):obfuscate(), menuVars.copyBMs)
     AddSeparator()
     if actionable then BasicInputInt(menuVars, "curSlot", "Current slot", { 1, 999 }) end
     if (actionable and #menuVars.copied.lines < menuVars.curSlot) then
@@ -8507,9 +8510,9 @@ function copyNPasteSettingsMenu(menuVars, actionable)
     end
     if (not isTruthy(copiedItemCount) and actionable) then return copiedItemCount end
     if actionable then AddSeparator() end
-    _, menuVars.tryAlign = imgui.Checkbox("Try to fix misalignments", menuVars.tryAlign)
+    _, menuVars.tryAlign = imgui.Checkbox(("Try to fix misalignments"):obfuscate(), menuVars.tryAlign)
     imgui.PushItemWidth(100)
-    _, menuVars.alignWindow = imgui.SliderInt("Alignment window (ms)", menuVars.alignWindow, 1, 10)
+    _, menuVars.alignWindow = imgui.SliderInt(("Alignment window (ms)"):obfuscate(), menuVars.alignWindow, 1, 10)
     menuVars.alignWindow = math.clamp(menuVars.alignWindow, 1, 10)
     imgui.PopItemWidth()
     return copiedItemCount
@@ -8554,13 +8557,13 @@ function directSVMenu()
             createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime, menuVars.multiplier or 1)) })
         updateDirectEdit()
     end
-    if (imgui.Button(("Duplicate this SV"):obfuscate())) then
+    if (imgui.Button("Duplicate this SV")) then
         local existingSV = svs[menuVars.selectableIndex]
         actions.PlaceScrollVelocity(createSV(existingSV.StartTime + 0.67, existingSV.Multiplier))
         updateDirectEdit()
     end
     KeepSameLine()
-    if (imgui.Button(("Delete this SV"):obfuscate())) then
+    if (imgui.Button("Delete this SV")) then
         actions.RemoveScrollVelocity(svs[menuVars.selectableIndex])
         updateDirectEdit()
     end
@@ -8569,10 +8572,11 @@ function directSVMenu()
         menuVars.pageNumber = math.clamp(menuVars.pageNumber - 1, 1, math.ceil(#svs * 0.1))
     end
     KeepSameLine()
-    imgui.Text("Page ")
+    imgui.Text(("Page "):obfuscate())
     KeepSameLine()
     imgui.SetNextItemWidth(100)
-    _, menuVars.pageNumber = imgui.InputInt("##PageNum", math.clamp(menuVars.pageNumber, 1, math.ceil(#svs * 0.1)), 0)
+    _, menuVars.pageNumber = imgui.InputInt(("##PageNum"):obfuscate(),
+        math.clamp(menuVars.pageNumber, 1, math.ceil(#svs * 0.1)), 0)
     KeepSameLine()
     imgui.Text(" of " .. math.ceil(#svs * 0.1))
     KeepSameLine()
@@ -8580,10 +8584,10 @@ function directSVMenu()
         menuVars.pageNumber = math.clamp(menuVars.pageNumber + 1, 1, math.ceil(#svs * 0.1))
     end
     imgui.Separator()
-    imgui.Text("Start Time")
+    imgui.Text(("Start Time"):obfuscate())
     KeepSameLine()
     imgui.SetCursorPosX(150)
-    imgui.Text("Multiplier")
+    imgui.Text(("Multiplier"):obfuscate())
     KeepSameLine()
     imgui.Separator()
     local startingPoint = 10 * menuVars.pageNumber - 10
@@ -8637,15 +8641,15 @@ function dynamicScaleMenu()
     end
     AddSeparator()
     if #menuVars.noteTimes < 3 then
-        imgui.Text("Not enough note times assigned")
-        imgui.Text("Assign 3 or more note times instead")
+        imgui.Text(("Not enough note times assigned"):obfuscate())
+        imgui.Text(("Assign 3 or more note times instead"):obfuscate())
         cache.saveTable("dynamicScaleMenu", menuVars)
         return
     end
     local numSVPoints = numNoteTimes - 1
     local needSVUpdate = not isTruthy(menuVars.svMultipliers) or (#menuVars.svMultipliers ~= numSVPoints)
     imgui.AlignTextToFramePadding()
-    imgui.Text("Shape:")
+    imgui.Text(("Shape:"):obfuscate())
     KeepSameLine()
     needSVUpdate = chooseStandardSVType(menuVars, true) or needSVUpdate
     AddSeparator()
@@ -8779,7 +8783,7 @@ function chooseEditTool()
         "Adds a constant value to SVs in a range.",
     }
     imgui.AlignTextToFramePadding()
-    imgui.Text("  Current Tool:")
+    imgui.Text(("  Current Tool:"):obfuscate())
     KeepSameLine()
     local oldEditToolIndex = globalVars.editToolIndex
     globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, oldEditToolIndex, nil, nil, tooltipList)
@@ -8796,19 +8800,19 @@ function measureMenu()
         displayMeasuredStatsRounded(menuVars)
     end
     AddPadding()
-    imgui.TextDisabled("*** Measuring disclaimer ***")
+    imgui.TextDisabled(("*** Measuring disclaimer ***"):obfuscate())
     HoverToolTip("Measured values might not be 100%% accurate & may not work on older maps")
     simpleActionMenu("Measure SVs between selected notes", 2, measureSVs, menuVars)
     cache.saveTable("measureMenu", menuVars)
 end
 function displayMeasuredStatsRounded(menuVars)
     imgui.Columns(2, "Measured SV Stats", false)
-    imgui.Text("NSV distance:")
-    imgui.Text("SV distance:")
-    imgui.Text("Average SV:")
-    imgui.Text("Start displacement:")
-    imgui.Text("End displacement:")
-    imgui.Text("True average SV:")
+    imgui.Text(("NSV distance:"):obfuscate())
+    imgui.Text(("SV distance:"):obfuscate())
+    imgui.Text(("Average SV:"):obfuscate())
+    imgui.Text(("Start displacement:"):obfuscate())
+    imgui.Text(("End displacement:"):obfuscate())
+    imgui.Text(("True average SV:"):obfuscate())
     imgui.NextColumn()
     imgui.Text(menuVars.roundedNSVDistance .. " msx")
     HelpMarker("The normal distance between the start and the end, ignoring SVs")
@@ -8832,7 +8836,7 @@ function displayMeasuredStatsUnrounded(menuVars)
     CopiableBox("True average SV", "##avgSVDisplaceless", menuVars.avgSVDisplaceless)
 end
 function CopiableBox(text, label, content)
-    imgui.TextWrapped(text)
+    imgui.TextWrapped(text:obfuscate())
     imgui.PushItemWidth(imgui.GetContentRegionAvailWidth())
     imgui.InputText(label, content, #content, imgui_input_text_flags.AutoSelectAll)
     imgui.PopItemWidth()
@@ -8900,27 +8904,28 @@ function verticalShiftSettingsMenu(menuVars)
     chooseConstantShift(menuVars, 0)
 end
 function infoTab()
-    imgui.SeparatorText("Welcome to plumoguSV!")
-    imgui.TextWrapped("This plugin is your one-stop shop for all of \nyour SV needs. Using it is quick and easy:")
+    imgui.SeparatorText(("Welcome to plumoguSV!"):obfuscate())
+    imgui.TextWrapped(("This plugin is your one-stop shop for all of \nyour SV needs. Using it is quick and easy:")
+    :obfuscate())
     AddPadding()
-    imgui.BulletText("Choose an SV tool in the Create tab.")
-    imgui.BulletText("Adjust the tool's settings to your liking.")
-    imgui.BulletText("Select notes to use the tool at.")
-    imgui.BulletText(table.concat({"Press the '", globalVars.hotkeyList[hotkeys_enum.exec_primary], "' hotkey."}))
+    imgui.BulletText(("Choose an SV tool in the Create tab."):obfuscate())
+    imgui.BulletText(("Adjust the tool's settings to your liking."):obfuscate())
+    imgui.BulletText(("Select notes to use the tool at."):obfuscate())
+    imgui.BulletText((table.concat({"Press the '", globalVars.hotkeyList[hotkeys_enum.exec_primary], "' hotkey."})):obfuscate())
     AddPadding()
-    imgui.SeparatorText("Special thanks to:")
+    imgui.SeparatorText(("Special thanks to:"):obfuscate())
     AddPadding()
-    imgui.BulletText("kloi34, for being the original dev.")
-    imgui.BulletText("kusa, for some handy widgets.")
-    imgui.BulletText("7xbi + nethen for some useful PRs.")
-    imgui.BulletText("Emik + William for plugin help.")
-    imgui.BulletText("ESV members for constant support.")
+    imgui.BulletText(("kloi34, for being the original dev."):obfuscate())
+    imgui.BulletText(("kusa, for some handy widgets."):obfuscate())
+    imgui.BulletText(("7xbi + nethen for some useful PRs."):obfuscate())
+    imgui.BulletText(("Emik + William for plugin help."):obfuscate())
+    imgui.BulletText(("ESV members for constant support."):obfuscate())
     imgui.Dummy(vctr2(10))
     if (not globalVars.disableKofiMessage) then
         imgui.SetCursorPosX((imgui.GetWindowWidth() - 153) / 2)
-        imgui.Text("If you enjoy using this plugin,")
+        imgui.Text(("If you enjoy using this plugin,"):obfuscate())
         imgui.SetCursorPosX((imgui.GetWindowWidth() - 172) / 2)
-        imgui.Text("consider supporting me on")
+        imgui.Text(("consider supporting me on"):obfuscate())
         imgui.SameLine(0, 3)
         imgui.TextLinkOpenURL("ko-fi!", "https://ko-fi.com/plummyyummy")
         imgui.Dummy(vctr2(10))
@@ -8972,19 +8977,20 @@ function showPatchNotesWindow()
     ctx.AddRect(topLeft + vector.New(243 + 147 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
     ::skip202::
     imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes / Minor Changes")
-    imgui.BulletText("Steam builds now have a warning to save their config file because workshop poopoo.")
-    imgui.BulletText("Fixed some backgrounds incorrectly displaying.")
-    imgui.BulletText("Fixed hit object lag.")
-    imgui.BulletText("Fixed measure not updating properly when applying sv (bug from v2.0.1).")
-    imgui.BulletText("Cleaned up the lint map screen and added \"Remove Unnecessary SSF\" function.")
-    imgui.BulletText("Did quite a large amount of work on the backend like renaming stuff to be more clear, etc.")
-    imgui.BulletText("Align timing lines now properly hides timing lines if the first one was hidden.")
-    imgui.BulletText("Now allows sinusoidal movement in dynamic scale.")
+    imgui.SeparatorText(("Bug Fixes / Minor Changes"):obfuscate())
+    imgui.BulletText(("Steam builds now have a warning to save their config file because workshop poopoo."):obfuscate())
+    imgui.BulletText(("Fixed some backgrounds incorrectly displaying."):obfuscate())
+    imgui.BulletText(("Fixed hit object lag."):obfuscate())
+    imgui.BulletText(("Fixed measure not updating properly when applying sv (bug from v2.0.1)."):obfuscate())
+    imgui.BulletText(("Cleaned up the lint map screen and added \"Remove Unnecessary SSF\" function."):obfuscate())
+    imgui.BulletText(("Did quite a large amount of work on the backend like renaming stuff to be more clear, etc.")
+        :obfuscate())
+    imgui.BulletText(("Align timing lines now properly hides timing lines if the first one was hidden."):obfuscate())
+    imgui.BulletText(("Now allows sinusoidal movement in dynamic scale."):obfuscate())
     imgui.BulletText(
         "Upgraded computableinputfloat to now allow for infinite precision and much more anti-cheese entries.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Added text to give me money like mr krabs.")
+    imgui.SeparatorText(("New Features"):obfuscate())
+    imgui.BulletText(("Added text to give me money like mr krabs."):obfuscate())
     imgui.BeginChild("v2.0.1Bezier", vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
@@ -8996,19 +9002,19 @@ function showPatchNotesWindow()
     ctx.AddRect(topLeft + vector.New(243 + 137 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
     ::skip201::
     imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes / Minor Changes")
-    imgui.BulletText("Fixed individual combo settings being able to be saved.")
-    imgui.BulletText("Fixed loadup text color not being properly used in the custom theme.")
-    imgui.BulletText("Changed the barbie theme to be less obnoxious.")
-    imgui.BulletText("Fixed themes not exporting loadup parameters correctly.")
-    imgui.BulletText("Changed some backend features to prevent bugs in the future.")
+    imgui.SeparatorText(("Bug Fixes / Minor Changes"):obfuscate())
+    imgui.BulletText(("Fixed individual combo settings being able to be saved."):obfuscate())
+    imgui.BulletText(("Fixed loadup text color not being properly used in the custom theme."):obfuscate())
+    imgui.BulletText(("Changed the barbie theme to be less obnoxious."):obfuscate())
+    imgui.BulletText(("Fixed themes not exporting loadup parameters correctly."):obfuscate())
+    imgui.BulletText(("Changed some backend features to prevent bugs in the future."):obfuscate())
     imgui.BulletText('Moved some settings to the new "Advanced" section.')
     imgui.BulletText('Fixed performance mode not delaying HitObject refresh.')
     imgui.BulletText('Fixed stutter linear interpolation crashing the plugin.')
     imgui.BulletText('Now successfully hot-reloads menu data.')
     imgui.BulletText('Fixed Select > Alternating offset bug.')
     imgui.BulletText('Fixed loadup animation playing after delay even when it was disabled.')
-    imgui.SeparatorText("New Features")
+    imgui.SeparatorText(("New Features"):obfuscate())
     imgui.BulletText('Now allows you to change the default displacement exponential multiplier.')
     imgui.BulletText('Added a setting which unrestricts sinusoidal period.')
     imgui.BulletText('Added mines to the Select > Note Type feature (canary only).')
@@ -9025,88 +9031,93 @@ function showPatchNotesWindow()
     ctx.AddRect(topLeft + vector.New(243 + 144 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
     ::skip200::
     imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes / Minor Changes")
-    imgui.BulletText("Fixed not being able to properly store some cursor trail parameters.")
-    imgui.BulletText("Fixed start/end expo using incorrect algorithm.")
-    imgui.BulletText("Fixed all bugs relating to automate.")
-    imgui.BulletText("Removed v1.1.2 temporary bug fix.")
-    imgui.BulletText("Fix direct SV pagination not working correctly.")
-    imgui.BulletText("Fixed flicker percentage not accurately converting to map.")
-    imgui.BulletText("Fixed align timing lines not being deterministic.")
-    imgui.BulletText("Fixed suffix of computableInputFloat.")
-    imgui.BulletText("Fixed inconsistency of negative/positive SV generation.")
-    imgui.BulletText("Fixed getRemovableSVs to use tolerance.")
-    imgui.BulletText("Fixed the builder not properly nesting files.")
-    imgui.BulletText("Fixed stills placing duplicate SVs.")
-    imgui.BulletText("Fixed internal documentation being incorrect and generally poor.")
-    imgui.BulletText("Fixed several overlapping SV issues.")
-    imgui.BulletText("Fixed hypothetical SVs using some weird BS.")
-    imgui.BulletText("Removed splitscroll in favor of using TGs.")
-    imgui.BulletText("Fixed TG selector being unable to properly select some TGs.")
-    imgui.BulletText("Fixed TG selector not always being fully in-sync with the game.")
-    imgui.BulletText("Fixed automate altering SV post-effect.")
-    imgui.BulletText("Fixed 2-side vibrato inaccuracy.")
-    imgui.BulletText("Fixed build script to use correct regex.")
-    imgui.BulletText("Fixed cursor trail being broken.")
-    imgui.BulletText("Fixed hotkey settings window having overlapping text.")
-    imgui.BulletText("Fixed global vars being unable to default to true.")
-    imgui.BulletText("Moved workspace settings to .luarc file.")
-    imgui.BulletText("Cached variables are properly reloaded during hot-reload.")
-    imgui.BulletText("Fixed bug where hot-reloading would crash the game.")
-    imgui.BulletText("Fixed starting fresh plugin with no config.yaml breaking style.")
-    imgui.BulletText("Fixed bug where string ending of pluralized content\ncarried over between function calls.")
-    imgui.BulletText("Fixed vibrato placing duplicate SVs.")
-    imgui.BulletText("Fixed still per note group finally.")
-    imgui.BulletText("Now properly instantiates pulse color.")
-    imgui.BulletText("Fixed relative ratio not saving.")
-    imgui.BulletText("Fixed Still per note group displacements, and enabled auto/otua on the \naforementioned feature.")
-    imgui.BulletText("Fixed Select Bookmark crashing the game.")
-    imgui.BulletText("Fixed Select Bookmark text going off the screen.")
+    imgui.SeparatorText(("Bug Fixes / Minor Changes"):obfuscate())
+    imgui.BulletText(("Fixed not being able to properly store some cursor trail parameters."):obfuscate())
+    imgui.BulletText(("Fixed start/end expo using incorrect algorithm."):obfuscate())
+    imgui.BulletText(("Fixed all bugs relating to automate."):obfuscate())
+    imgui.BulletText(("Removed v1.1.2 temporary bug fix."):obfuscate())
+    imgui.BulletText(("Fix direct SV pagination not working correctly."):obfuscate())
+    imgui.BulletText(("Fixed flicker percentage not accurately converting to map."):obfuscate())
+    imgui.BulletText(("Fixed align timing lines not being deterministic."):obfuscate())
+    imgui.BulletText(("Fixed suffix of computableInputFloat."):obfuscate())
+    imgui.BulletText(("Fixed inconsistency of negative/positive SV generation."):obfuscate())
+    imgui.BulletText(("Fixed getRemovableSVs to use tolerance."):obfuscate())
+    imgui.BulletText(("Fixed the builder not properly nesting files."):obfuscate())
+    imgui.BulletText(("Fixed stills placing duplicate SVs."):obfuscate())
+    imgui.BulletText(("Fixed internal documentation being incorrect and generally poor."):obfuscate())
+    imgui.BulletText(("Fixed several overlapping SV issues."):obfuscate())
+    imgui.BulletText(("Fixed hypothetical SVs using some weird BS."):obfuscate())
+    imgui.BulletText(("Removed splitscroll in favor of using TGs."):obfuscate())
+    imgui.BulletText(("Fixed TG selector being unable to properly select some TGs."):obfuscate())
+    imgui.BulletText(("Fixed TG selector not always being fully in-sync with the game."):obfuscate())
+    imgui.BulletText(("Fixed automate altering SV post-effect."):obfuscate())
+    imgui.BulletText(("Fixed 2-side vibrato inaccuracy."):obfuscate())
+    imgui.BulletText(("Fixed build script to use correct regex."):obfuscate())
+    imgui.BulletText(("Fixed cursor trail being broken."):obfuscate())
+    imgui.BulletText(("Fixed hotkey settings window having overlapping text."):obfuscate())
+    imgui.BulletText(("Fixed global vars being unable to default to true."):obfuscate())
+    imgui.BulletText(("Moved workspace settings to .luarc file."):obfuscate())
+    imgui.BulletText(("Cached variables are properly reloaded during hot-reload."):obfuscate())
+    imgui.BulletText(("Fixed bug where hot-reloading would crash the game."):obfuscate())
+    imgui.BulletText(("Fixed starting fresh plugin with no config.yaml breaking style."):obfuscate())
+    imgui.BulletText(("Fixed bug where string ending of pluralized content\ncarried over between function calls.")
+        :obfuscate())
+    imgui.BulletText(("Fixed vibrato placing duplicate SVs."):obfuscate())
+    imgui.BulletText(("Fixed still per note group finally."):obfuscate())
+    imgui.BulletText(("Now properly instantiates pulse color."):obfuscate())
+    imgui.BulletText(("Fixed relative ratio not saving."):obfuscate())
+    imgui.BulletText(("Fixed Still per note group displacements, and enabled auto/otua on the \naforementioned feature.")
+        :obfuscate())
+    imgui.BulletText(("Fixed Select Bookmark crashing the game."):obfuscate())
+    imgui.BulletText(("Fixed Select Bookmark text going off the screen."):obfuscate())
     imgui.BulletText(
         "Fixed measure msx widget not rendering in real time, and not\nproperly recalculating distances when switching TGs.")
-    imgui.BulletText("Fixed bug where saving a false setting wouldn't save it at all.")
+    imgui.BulletText(("Fixed bug where saving a false setting wouldn't save it at all."):obfuscate())
     imgui.BulletText(
         "Fixed bug with certain functions where LN ends would not be\nconsidered if their start wasn't within the selection.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Added tooltips to various functions to explain their functionality.")
-    imgui.BulletText("New border pulse feature that pulses along with the beat.")
-    imgui.BulletText("Added a new hotkey to select the TG of note(s).")
-    imgui.BulletText("New menu: Edit > Convert SV <-> SSF; Self-explanatory.")
+    imgui.SeparatorText(("New Features"):obfuscate())
+    imgui.BulletText(("Added tooltips to various functions to explain their functionality."):obfuscate())
+    imgui.BulletText(("New border pulse feature that pulses along with the beat."):obfuscate())
+    imgui.BulletText(("Added a new hotkey to select the TG of note(s)."):obfuscate())
+    imgui.BulletText(("New menu: Edit > Convert SV <-> SSF; Self-explanatory."):obfuscate())
     imgui.BulletText(
         "Added vibrato to plumoguSV, with less error than AFFINE. Includes linear,\npolynomial, exponential, sinusoidal, and sigmoidal shapes. Includes presets for FPS.")
-    imgui.BulletText("Include code-based SV/SSF fast place.")
-    imgui.BulletText("New settings menu with many more customizable features.")
-    imgui.BulletText("Allow defaults to be edited.")
-    imgui.BulletText("Include some new automate parameters for further customization.")
-    imgui.BulletText("Edit > Layer Snaps feature: Save your snap colors before using AFFINE to\nbring them back easily.")
-    imgui.BulletText("Edit > Split feature: Split notes into different TGs with the\nsurrounding SVs in one click.")
-    imgui.BulletText("Added linear equalizer to allow you to create 0x SV on linear much easier.")
-    imgui.BulletText("Added custom theme input, along with exporting/importing.")
-    imgui.BulletText("Added 3 custom reactive backgrounds. More will be added\nwhen the kofi products are paid for.")
-    imgui.BulletText("Added copy paste slots; now you can copy paste more than one thing at once.")
-    imgui.BulletText("Allow border pulse to be custom.")
+    imgui.BulletText(("Include code-based SV/SSF fast place."):obfuscate())
+    imgui.BulletText(("New settings menu with many more customizable features."):obfuscate())
+    imgui.BulletText(("Allow defaults to be edited."):obfuscate())
+    imgui.BulletText(("Include some new automate parameters for further customization."):obfuscate())
+    imgui.BulletText(("Edit > Layer Snaps feature: Save your snap colors before using AFFINE to\nbring them back easily.")
+        :obfuscate())
+    imgui.BulletText(("Edit > Split feature: Split notes into different TGs with the\nsurrounding SVs in one click.")
+        :obfuscate())
+    imgui.BulletText(("Added linear equalizer to allow you to create 0x SV on linear much easier."):obfuscate())
+    imgui.BulletText(("Added custom theme input, along with exporting/importing."):obfuscate())
+    imgui.BulletText(("Added 3 custom reactive backgrounds. More will be added\nwhen the kofi products are paid for.")
+        :obfuscate())
+    imgui.BulletText(("Added copy paste slots; now you can copy paste more than one thing at once."):obfuscate())
+    imgui.BulletText(("Allow border pulse to be custom."):obfuscate())
     imgui.BulletText(
         "Note lock feature: you don't need to worry about accidentally placing,\nmoving, or deleting notes during SV generation.")
-    imgui.BulletText("Now allows certain inputs to be computed automatically on the backend.")
-    imgui.BulletText("A new performance mode to speed up the FPS by 2-3x.")
-    imgui.BulletText("You can now merge SSFs to eliminate duped ones.")
-    imgui.BulletText("Added new option to allow combo-select.")
-    imgui.BulletText("New toggleable SV Info visualizer for the more inexperienced mappers.")
-    imgui.BulletText("Reworked bezier menu to be much more intuitive.")
-    imgui.BulletText("Added loadup animation because why not.")
-    imgui.BulletText("Added patch notes page.")
-    imgui.BulletText("Added map stats button to quickly grab SV and SSF count.")
-    imgui.BulletText("Added pagination to bookmarks.")
-    imgui.BulletText("Now allowed Direct SV to view SVs around a particular note.")
-    imgui.BulletText("Moved many linting features to Edit > Lint Map.")
-    imgui.BulletText("Added new feature to remove duplicated notes.")
+    imgui.BulletText(("Now allows certain inputs to be computed automatically on the backend."):obfuscate())
+    imgui.BulletText(("A new performance mode to speed up the FPS by 2-3x."):obfuscate())
+    imgui.BulletText(("You can now merge SSFs to eliminate duped ones."):obfuscate())
+    imgui.BulletText(("Added new option to allow combo-select."):obfuscate())
+    imgui.BulletText(("New toggleable SV Info visualizer for the more inexperienced mappers."):obfuscate())
+    imgui.BulletText(("Reworked bezier menu to be much more intuitive."):obfuscate())
+    imgui.BulletText(("Added loadup animation because why not."):obfuscate())
+    imgui.BulletText(("Added patch notes page."):obfuscate())
+    imgui.BulletText(("Added map stats button to quickly grab SV and SSF count."):obfuscate())
+    imgui.BulletText(("Added pagination to bookmarks."):obfuscate())
+    imgui.BulletText(("Now allowed Direct SV to view SVs around a particular note."):obfuscate())
+    imgui.BulletText(("Moved many linting features to Edit > Lint Map."):obfuscate())
+    imgui.BulletText(("Added new feature to remove duplicated notes."):obfuscate())
     imgui.BulletText(
         "Added new feature to remove hitsounds, for mappers who don't use\nthem but accidentally click on the menu.")
-    imgui.BulletText("Added a very rudimentary preset system, so you can send menu data to others.")
-    imgui.BulletText("Added a button to directly swap SVs and SSFs.")
-    imgui.BulletText("Added a startup animation.")
-    imgui.BulletText("Added hotkeys to switch between TGs.")
-    imgui.BulletText("Added hotkey to move all selected notes to the selected TG.")
+    imgui.BulletText(("Added a very rudimentary preset system, so you can send menu data to others."):obfuscate())
+    imgui.BulletText(("Added a button to directly swap SVs and SSFs."):obfuscate())
+    imgui.BulletText(("Added a startup animation."):obfuscate())
+    imgui.BulletText(("Added hotkeys to switch between TGs."):obfuscate())
+    imgui.BulletText(("Added hotkey to move all selected notes to the selected TG."):obfuscate())
     AddPadding()
     imgui.BeginChild("v1.1.2Bezier", vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
@@ -9119,18 +9130,18 @@ function showPatchNotesWindow()
     ctx.AddRect(topLeft + vector.New(243 + 127 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
     ::skip112::
     imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes / Minor Changes")
-    imgui.BulletText("Fixed stills placing duplicate SVs that changed order when called.")
-    imgui.BulletText("Fixed stills removing non-existent SVs.")
-    imgui.BulletText("Fixed copy/paste priority problems.")
-    imgui.BulletText("Fixed plugin TG selector overriding editor TG selector.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Now stores settings so you don't have to edit the plugin file to save them.")
-    imgui.BulletText("Added step size to the exponential intensity bar.")
-    imgui.BulletText("Distance fields now allow mathematical expressions\nthat are automatically evaluated.")
-    imgui.BulletText("Created a new advanced mode, which disabling causes less clutter.")
-    imgui.BulletText("Created Edit > Direct SV, an easier way to edit SVs directly within your selection.")
-    imgui.BulletText("Added colors to the TG selector to easily distinguish groups.")
+    imgui.SeparatorText(("Bug Fixes / Minor Changes"):obfuscate())
+    imgui.BulletText(("Fixed stills placing duplicate SVs that changed order when called."):obfuscate())
+    imgui.BulletText(("Fixed stills removing non-existent SVs."):obfuscate())
+    imgui.BulletText(("Fixed copy/paste priority problems."):obfuscate())
+    imgui.BulletText(("Fixed plugin TG selector overriding editor TG selector."):obfuscate())
+    imgui.SeparatorText(("New Features"):obfuscate())
+    imgui.BulletText(("Now stores settings so you don't have to edit the plugin file to save them."):obfuscate())
+    imgui.BulletText(("Added step size to the exponential intensity bar."):obfuscate())
+    imgui.BulletText(("Distance fields now allow mathematical expressions\nthat are automatically evaluated."):obfuscate())
+    imgui.BulletText(("Created a new advanced mode, which disabling causes less clutter."):obfuscate())
+    imgui.BulletText(("Created Edit > Direct SV, an easier way to edit SVs directly within your selection."):obfuscate())
+    imgui.BulletText(("Added colors to the TG selector to easily distinguish groups."):obfuscate())
     AddPadding()
     imgui.BeginChild("v1.1.1Bezier", vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
@@ -9143,11 +9154,11 @@ function showPatchNotesWindow()
     ctx.AddRect(topLeft + vector.New(243 + 111 / 2 + 15, 25), topLeft + vector.New(486, 28), color.int.white)
     ::skip111::
     imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes / Minor Changes")
-    imgui.BulletText("Fixed more bugs involving stills.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Added a new hotkey to quickly place SSFs.")
-    imgui.BulletText("Added a new TG selector.")
+    imgui.SeparatorText(("Bug Fixes / Minor Changes"):obfuscate())
+    imgui.BulletText(("Fixed more bugs involving stills."):obfuscate())
+    imgui.SeparatorText(("New Features"):obfuscate())
+    imgui.BulletText(("Added a new hotkey to quickly place SSFs."):obfuscate())
+    imgui.BulletText(("Added a new TG selector."):obfuscate())
     AddPadding()
     imgui.BeginChild("v1.1.0Bezier", vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
@@ -9160,19 +9171,19 @@ function showPatchNotesWindow()
     ctx.AddRect(topLeft + vector.New(243 + 129 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
     ::skip110::
     imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes / Minor Changes")
-    imgui.BulletText("Fixed issues where stills would incorrectly displace notes.")
-    imgui.BulletText("Fixed swap/negate buttons not working properly.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Added Select by Chord Size.")
-    imgui.BulletText("Now allows displace note/flicker to be linearly interpolated.")
-    imgui.BulletText("Stills now only require one undo instead of two.")
-    imgui.BulletText("New Still mode: still per note group, which drastically speeds up still production.")
-    imgui.BulletText("Two new exponential modes: start/end and distance-based algorithms.")
-    imgui.BulletText("Added hotkeys to quickly swap, negate, and reset certain parameters.")
-    imgui.BulletText("Added notifications to all features.")
-    imgui.BulletText("Copy and paste now supports bookmarks and timing lines.")
-    imgui.BulletText("New setting was added to allow you to ignore notes outside the current TG.")
+    imgui.SeparatorText(("Bug Fixes / Minor Changes"):obfuscate())
+    imgui.BulletText(("Fixed issues where stills would incorrectly displace notes."):obfuscate())
+    imgui.BulletText(("Fixed swap/negate buttons not working properly."):obfuscate())
+    imgui.SeparatorText(("New Features"):obfuscate())
+    imgui.BulletText(("Added Select by Chord Size."):obfuscate())
+    imgui.BulletText(("Now allows displace note/flicker to be linearly interpolated."):obfuscate())
+    imgui.BulletText(("Stills now only require one undo instead of two."):obfuscate())
+    imgui.BulletText(("New Still mode: still per note group, which drastically speeds up still production."):obfuscate())
+    imgui.BulletText(("Two new exponential modes: start/end and distance-based algorithms."):obfuscate())
+    imgui.BulletText(("Added hotkeys to quickly swap, negate, and reset certain parameters."):obfuscate())
+    imgui.BulletText(("Added notifications to all features."):obfuscate())
+    imgui.BulletText(("Copy and paste now supports bookmarks and timing lines."):obfuscate())
+    imgui.BulletText(("New setting was added to allow you to ignore notes outside the current TG."):obfuscate())
     AddPadding()
     imgui.BeginChild("v1.0.1Bezier", vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
@@ -9185,14 +9196,14 @@ function showPatchNotesWindow()
     ctx.AddRect(topLeft + vector.New(243 + 125 / 2 + 12.5, 25), topLeft + vector.New(486, 28), color.int.white)
     ::skip101::
     imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes / Minor Changes")
-    imgui.BulletText("Fixed game occasionally crashing when using the Select tab.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Added Select Bookmark feature (from BookmarkLeaper).")
-    imgui.BulletText("Added Edit > Align Timing Lines feature (from SmartAlign).")
-    imgui.BulletText("Added notifications for more features when executed.")
-    imgui.BulletText("Added tooltips for Select features and swap/negate buttons.")
-    imgui.BulletText("Changed the Delete menu to allow deleting SVs or SSFs.")
+    imgui.SeparatorText(("Bug Fixes / Minor Changes"):obfuscate())
+    imgui.BulletText(("Fixed game occasionally crashing when using the Select tab."):obfuscate())
+    imgui.SeparatorText(("New Features"):obfuscate())
+    imgui.BulletText(("Added Select Bookmark feature (from BookmarkLeaper)."):obfuscate())
+    imgui.BulletText(("Added Edit > Align Timing Lines feature (from SmartAlign)."):obfuscate())
+    imgui.BulletText(("Added notifications for more features when executed."):obfuscate())
+    imgui.BulletText(("Added tooltips for Select features and swap/negate buttons."):obfuscate())
+    imgui.BulletText(("Changed the Delete menu to allow deleting SVs or SSFs."):obfuscate())
     AddPadding()
     imgui.BeginChild("v1.0.0Bezier", vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
@@ -9205,11 +9216,11 @@ function showPatchNotesWindow()
     ctx.AddRect(topLeft + vector.New(243 + 137 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
     ::skip100::
     imgui.EndChild()
-    imgui.SeparatorText("Bug Fixes / Minor Changes")
-    imgui.BulletText("Fix LN Ends feature now flips LN ends, even if the corresponding ending SV is 0.")
-    imgui.BulletText("Allowed Still to treat LN ends as displacement markers.")
-    imgui.SeparatorText("New Features")
-    imgui.BulletText("Added the SSF equivalent to all Standard SV shapes.")
+    imgui.SeparatorText(("Bug Fixes / Minor Changes"):obfuscate())
+    imgui.BulletText(("Fix LN Ends feature now flips LN ends, even if the corresponding ending SV is 0."):obfuscate())
+    imgui.BulletText(("Allowed Still to treat LN ends as displacement markers."):obfuscate())
+    imgui.SeparatorText(("New Features"):obfuscate())
+    imgui.BulletText(("Added the SSF equivalent to all Standard SV shapes."):obfuscate())
     imgui.BulletText(
         "Added the Select tab, which allows users to quickly select desired notes based on\na variety of conditions. Currently, there is the Alternate option and the Snap option.")
     imgui.PopStyleColor()
@@ -11239,11 +11250,11 @@ function selectBookmarkMenu()
         KeepSameLine()
         _, menuVars.filterTerm = imgui.InputText("Ignore", menuVars.filterTerm, 4096)
         imgui.Columns(3)
-        imgui.Text("Time")
+        imgui.Text(("Time"):obfuscate())
         imgui.NextColumn()
-        imgui.Text("Bookmark Label")
+        imgui.Text(("Bookmark Label"):obfuscate())
         imgui.NextColumn()
-        imgui.Text("Leap")
+        imgui.Text(("Leap"):obfuscate())
         imgui.NextColumn()
         imgui.Separator()
         local skippedBookmarks = 0
@@ -11329,7 +11340,7 @@ function chooseSelectTool()
         "Select rice/ln notes."
     }
     imgui.AlignTextToFramePadding()
-    imgui.Text("  Current Type:")
+    imgui.Text(("  Current Type:"):obfuscate())
     KeepSameLine()
     local oldSelectTypeIndex = globalVars.selectTypeIndex
     globalVars.selectTypeIndex = Combo("##selecttool", SELECT_TOOLS, oldSelectTypeIndex, nil, nil, tooltipList)
@@ -11338,14 +11349,14 @@ function chooseSelectTool()
 end
 function selectNoteTypeMenu()
     local menuVars = getMenuVars("selectNoteType")
-    _, menuVars.rice = imgui.Checkbox("Select Rice Notes", menuVars.rice)
+    _, menuVars.rice = imgui.Checkbox(("Select Rice Notes"):obfuscate(), menuVars.rice)
     KeepSameLine()
-    _, menuVars.ln = imgui.Checkbox("Select LNs", menuVars.ln)
+    _, menuVars.ln = imgui.Checkbox(("Select LNs"):obfuscate(), menuVars.ln)
     ---@diagnostic disable-next-line: undefined-global
     if hitobject_type then
-        _, menuVars.normal = imgui.Checkbox("Select Normals", menuVars.normal)
+        _, menuVars.normal = imgui.Checkbox(("Select Normals"):obfuscate(), menuVars.normal)
         KeepSameLine()
-        _, menuVars.mine = imgui.Checkbox("Select Mines", menuVars.mine)
+        _, menuVars.mine = imgui.Checkbox(("Select Mines"):obfuscate(), menuVars.mine)
     end
     simpleActionMenu("Select notes within region", 2, selectByNoteType, menuVars)
     cache.saveTable("selectNoteTypeMenu", menuVars)
@@ -11386,7 +11397,7 @@ end
 function chooseMaxDisplacementMultiplierExponent()
     imgui.PushItemWidth(70)
     local oldMaxDisplacementMultiplierExponent = globalVars.maxDisplacementMultiplierExponent
-    _, tempMaxDisplacementMultiplierExponent = imgui.SliderInt("Max Displacement Multiplier Exp.",
+    _, tempMaxDisplacementMultiplierExponent = imgui.SliderInt(("Max Displacement Multiplier Exp."):obfuscate(),
         oldMaxDisplacementMultiplierExponent, 0, 10)
     HoverToolTip(
         "plumoguSV designs pseudo-instantaneous movement via a very large SV immediately followed by a different SV. To ensure that the movement truly looks instantaneous, the distance between these two SVs is minimal (conventionally, 1/64th of a millisecond). However, as a map progresses over time, this distance is too small for the engine to handle due to floating point errors. This causes issues for SV mappers trying to copy a section from an early part of the map to a later part of a map, where the displacement distance needs to be larger. Lowering this number fixes that, at the cost of potential two-frame teleports during the rendering of the map. In specific, the denominator of the displacement distance (in ms) will be set to 2^{setting}, where ^ denotes exponentiation.")
@@ -11536,7 +11547,7 @@ function chooseColorTheme()
                 if (k == "Custom") then
                     if (imgui.BeginMenu("Custom Themes")) then
                         if (not globalVars.customStyles or not next(globalVars.customStyles)) then
-                            imgui.Text("No Custom Themes")
+                            imgui.Text(("No Custom Themes"):obfuscate())
                         else
                             renderThemeTree(table.map(table.keys(globalVars.customStyles), function(s)
                                 return {
@@ -11883,7 +11894,7 @@ function showDefaultPropertiesSettings()
         nil,
         verticalShiftSettingsMenu
     }
-    imgui.SeparatorText("Create Tab Settings")
+    imgui.SeparatorText(("Create Tab Settings"):obfuscate())
     if (imgui.CollapsingHeader("General Standard Settings")) then
         local menuVars = getMenuVars("placeStandard", "Property")
         chooseStandardSVType(menuVars, false)
@@ -11913,7 +11924,7 @@ function showDefaultPropertiesSettings()
         local menuVars = getMenuVars("placeVibrato", "Property")
         chooseVibratoSVType(menuVars)
         AddSeparator()
-        imgui.Text("Vibrato Settings:")
+        imgui.Text(("Vibrato Settings:"):obfuscate())
         menuVars.vibratoMode = Combo("Vibrato Mode", VIBRATO_TYPES, menuVars.vibratoMode)
         chooseVibratoQuality(menuVars)
         if (menuVars.vibratoMode ~= 2) then
@@ -11922,7 +11933,7 @@ function showDefaultPropertiesSettings()
         saveMenuPropertiesButton(menuVars, "placeVibrato")
         cache.saveTable("placeVibratoPropertyMenu", menuVars)
     end
-    imgui.SeparatorText("Edit Tab Settings")
+    imgui.SeparatorText(("Edit Tab Settings"):obfuscate())
     local editTabDict = table.map(EDIT_SV_TOOLS, function(element, idx)
         return { label = element, fn = editFnList[idx] }
     end)
@@ -11937,19 +11948,19 @@ function showDefaultPropertiesSettings()
         end
         ::continue::
     end
-    imgui.SeparatorText("Delete Tab Settings")
+    imgui.SeparatorText(("Delete Tab Settings"):obfuscate())
     if (imgui.CollapsingHeader("Delete Menu Settings")) then
         local menuVars = getMenuVars("delete", "Property")
-        _, menuVars.deleteTable[1] = imgui.Checkbox("Delete Lines", menuVars.deleteTable[1])
+        _, menuVars.deleteTable[1] = imgui.Checkbox(("Delete Lines"):obfuscate(), menuVars.deleteTable[1])
         KeepSameLine()
-        _, menuVars.deleteTable[2] = imgui.Checkbox("Delete SVs", menuVars.deleteTable[2])
-        _, menuVars.deleteTable[3] = imgui.Checkbox("Delete SSFs", menuVars.deleteTable[3])
+        _, menuVars.deleteTable[2] = imgui.Checkbox(("Delete SVs"):obfuscate(), menuVars.deleteTable[2])
+        _, menuVars.deleteTable[3] = imgui.Checkbox(("Delete SSFs"):obfuscate(), menuVars.deleteTable[3])
         imgui.SameLine(0, SAMELINE_SPACING + 3.5)
-        _, menuVars.deleteTable[4] = imgui.Checkbox("Delete Bookmarks", menuVars.deleteTable[4])
+        _, menuVars.deleteTable[4] = imgui.Checkbox(("Delete Bookmarks"):obfuscate(), menuVars.deleteTable[4])
         saveMenuPropertiesButton(menuVars, "delete")
         cache.saveTable("deletePropertyMenu", menuVars)
     end
-    imgui.SeparatorText("Select Tab Settings")
+    imgui.SeparatorText(("Select Tab Settings"):obfuscate())
     if (imgui.CollapsingHeader("Select Alternating Settings")) then
         local menuVars = getMenuVars("selectAlternating", "Property")
         BasicInputInt(menuVars, "every", "Every __ notes", { 1, MAX_SV_POINTS })
@@ -11976,13 +11987,13 @@ function showDefaultPropertiesSettings()
     end
     if (imgui.CollapsingHeader("Select Note Type Settings")) then
         local menuVars = getMenuVars("selectNoteType", "Property")
-        _, menuVars.rice = imgui.Checkbox("Select Rice Notes", menuVars.rice)
+        _, menuVars.rice = imgui.Checkbox(("Select Rice Notes"):obfuscate(), menuVars.rice)
         KeepSameLine()
-        _, menuVars.ln = imgui.Checkbox("Select LNs", menuVars.ln)
+        _, menuVars.ln = imgui.Checkbox(("Select LNs"):obfuscate(), menuVars.ln)
         saveMenuPropertiesButton(menuVars, "selectNoteType")
         cache.saveTable("selectNoteTypePropertyMenu", menuVars)
     end
-    imgui.SeparatorText("Standard/Still Settings")
+    imgui.SeparatorText(("Standard/Still Settings"):obfuscate())
     local standardMenuDict = table.map(STANDARD_SVS, function(element, idx)
         return { label = element, fn = standardFnList[idx] }
     end)
@@ -11995,7 +12006,7 @@ function showDefaultPropertiesSettings()
             cache.saveTable(label .. "PropertySettings", settingVars)
         end
     end
-    imgui.SeparatorText("Special Settings")
+    imgui.SeparatorText(("Special Settings"):obfuscate())
     local specialMenuDict = table.map(SPECIAL_SVS, function(element, idx)
         return { label = element, fn = specialFnList[idx] }
     end)
@@ -12010,7 +12021,7 @@ function showDefaultPropertiesSettings()
         end
         ::continue::
     end
-    imgui.SeparatorText("SV Vibrato Settings")
+    imgui.SeparatorText(("SV Vibrato Settings"):obfuscate())
     if (imgui.CollapsingHeader("Linear Vibrato SV Settings")) then
         local settingVars = getSettingVars("LinearVibratoSV", "Property")
         SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End", " msx", 0, 0.875)
@@ -12046,7 +12057,7 @@ function showDefaultPropertiesSettings()
         saveSettingPropertiesButton(settingVars, "SigmoidalVibratoSV")
         cache.saveTable("SigmoidalVibratoSVPropertySettings", settingVars)
     end
-    imgui.SeparatorText("SSF Vibrato Settings")
+    imgui.SeparatorText(("SSF Vibrato Settings"):obfuscate())
     if (imgui.CollapsingHeader("Linear Vibrato SSF Settings")) then
         local settingVars = getSettingVars("LinearVibratoSSF", "Property")
         SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs", "x")
@@ -12116,7 +12127,7 @@ end
 function chooseStepSize()
     imgui.PushItemWidth(40)
     local oldStepSize = globalVars.stepSize
-    local _, tempStepSize = imgui.InputFloat("Exponential Intensity Step Size", oldStepSize, 0, 0, "%.0f%%")
+    local _, tempStepSize = imgui.InputFloat(("Exponential Intensity Step Size"):obfuscate(), oldStepSize, 0, 0, "%.0f%%")
     HoverToolTip(
         "Changes what the exponential intensity slider will round the nearest to. Recommended to keep this as a factor of 100 (1, 2, 5, 10, etc).")
     globalVars.stepSize = math.clamp(tempStepSize, 1, 100)
@@ -12182,7 +12193,7 @@ function showPluginSettingsWindow()
     imgui.SetColumnWidth(0, 150)
     imgui.SetColumnWidth(1, 283)
     imgui.BeginChild("Setting Categories")
-    imgui.Text("Setting Type")
+    imgui.Text(("Setting Type"):obfuscate())
     imgui.Separator()
     --- Key is name of setting. If value with respect to key is true, will hide setting at the left
     local hideSettingDict = {
@@ -12331,7 +12342,7 @@ function createMenuTab(tabName)
     imgui.EndTabItem()
 end
 function showCompositeEffectsTutorial()
-    imgui.SeparatorText("Exponential Composition")
+    imgui.SeparatorText(("Exponential Composition"):obfuscate())
     imgui.TextWrapped(
         "All of the previous effects we've seen have been done with just one effect; no changing settings, no different shapes. However, mixing and matching these different effects is what will make your SV map truly unique.")
     gpsim("DoubleExpoExample", vctr2(1), function(t, idx)
@@ -12339,29 +12350,29 @@ function showCompositeEffectsTutorial()
     end, { { 1, 2 }, {}, { 3, 4 }, {} }, 500)
 end
 function showEditingRemovingSVTutorial()
-    imgui.SeparatorText("Directly Editing SVs")
+    imgui.SeparatorText(("Directly Editing SVs"):obfuscate())
     imgui.TextWrapped(
         "You may want to occasionally directly edit an SV value, without having to navigate through the slow scroll velocity editor. That's what the direct SV feature is for.")
     imgui.TextColored(GUIDELINE_COLOR,
         'Make sure you\'re in the "EDIT" tab, then go to "DIRECT SV".\nSelect two notes, and if there are SVs between them,\nyou should be able to edit their start time and multiplier.')
-    imgui.SeparatorText("Scaling SVs")
+    imgui.SeparatorText(("Scaling SVs"):obfuscate())
     imgui.TextWrapped(
         'Sometimes you want to change how fast an SV is, or increase the intensity of a 0.00x average SV effect. You can scale SVs in several different ways, but the easiest one is to use the "SCALE (MULTIPLY)" feature. For more advanced mappers, you can also use ymulch.')
     imgui.TextColored(GUIDELINE_COLOR,
         'Make sure you\'re in the "EDIT" tab, then go to "SCALE (MULTIPLY)".\nYou can either scale the notes to have a different average SV using\nthe "Average SV" mode, or you can multiply all SVs within your\nselection by a constant factor with the "Relative Ratio" mode.')
-    imgui.SeparatorText("Deleting SVs")
+    imgui.SeparatorText(("Deleting SVs"):obfuscate())
     imgui.TextWrapped(
         "As with most things, deleting stuff is easier than creating it. Simply select two notes, and the delete tab will help you delete all desired objects within your selection range. You can also make a standard/special/still effect and the effect will remove any lingering SVs within its selection.")
     imgui.TextColored(GUIDELINE_COLOR,
         'Go to the "DELETE" tab, and ensure that "Delete SVs" is enabled.\nThen, select two notes and click the "Delete" button.')
-    imgui.SeparatorText("Reversing Effects")
+    imgui.SeparatorText(("Reversing Effects"):obfuscate())
     imgui.TextWrapped(
         'If you like upscroll, you can take any effect and turn it into upscroll using the "REVERSE SCROLL" feature under "EDIT". Generally, you should use 300-400 msx for your upscroll height, which is how much distance the "receptors" would be from the bottom.')
     imgui.TextColored(GUIDELINE_COLOR, 'Select an existing effect, and hit the "Reverse" button.')
     ForceHeight(540)
 end
 function showStillsAndDisplacementTutorial()
-    imgui.SeparatorText("What are Still effects?")
+    imgui.SeparatorText(("What are Still effects?"):obfuscate())
     imgui.TextWrapped(
         "So far, all effects have been done by selecting two notes with no notes between them. However, experienced SV mappers often select notes on a consistent beat (such as every 1/1 note). A naive approach would be to use the previous examples, but simply select two notes with notes in between them. This would produce a result such as the following:")
     gpsim("StillsAndDisplacementNaiveApproach", vctr2(1), function(t, idx)
@@ -12383,16 +12394,16 @@ function showStillsAndDisplacementTutorial()
     imgui.TextColored(GUIDELINE_COLOR,
         "Try using the following settings and place these SVs between\ntwo 1/1 notes in a jumpstream (or any other dense pattern):")
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
-    imgui.BulletText("Still > Linear")
-    imgui.BulletText("Still Spacing 1.00x")
+    imgui.BulletText(("Still > Linear"):obfuscate())
+    imgui.BulletText(("Still Spacing 1.00x"):obfuscate())
     imgui.BulletText('Displacement "END" 0.00msx')
-    imgui.BulletText("Start/End SV -1.5x to 1.5x")
+    imgui.BulletText(("Start/End SV -1.5x to 1.5x"):obfuscate())
     imgui.PopStyleColor()
     imgui.TextWrapped("You should be able to produce a jumping effect with little issues.")
     ForceHeight(860)
 end
 function showWorkingWithShapesTutorial()
-    imgui.SeparatorText("Working with different shapes")
+    imgui.SeparatorText(("Working with different shapes"):obfuscate())
     imgui.TextWrapped(
         'So far, we\'ve only been working with stutters, but the core of SV is being able to make cohesive and/or fluid movement. We do this by working with particular shapes in the "STANDARD" tab.')
     imgui.TextColored(INSTRUCTION_COLOR,
@@ -12444,7 +12455,7 @@ function showWorkingWithShapesTutorial()
     ForceHeight(1010)
 end
 function showYourFirstEffectTutorial()
-    imgui.SeparatorText("Making your first SV effect")
+    imgui.SeparatorText(("Making your first SV effect"):obfuscate())
     imgui.TextWrapped(
         "At the absolute basics of SV are the pulse effects, effects that highlight significant parts of the song, such as a repeating drum. We will apply a very basic stutter SV effect on the drum beat (assuming your song has that), like so:")
     gpsim("Your First Effect Stutter Example", vctr2(1), function(t)
@@ -12490,7 +12501,7 @@ function showYourFirstEffectTutorial()
     ForceHeight(720)
 end
 function showYourSecondEffectTutorial()
-    imgui.SeparatorText("Making your second SV effect")
+    imgui.SeparatorText(("Making your second SV effect"):obfuscate())
     imgui.TextWrapped(
         "Stutters are cool and all, but there's another type of stutter that's more versatile: teleport stutters. Usually, these would not be possible in engines like osu, but since Quaver has no limitations on SV size, we can do it here. Take a look at the difference between normal stutter and teleport stutter:")
     imgui.Dummy(vector.New(0, 10))
@@ -12533,7 +12544,7 @@ function showYourSecondEffectTutorial()
     ForceHeight(450)
     imgui.TextColored(GUIDELINE_COLOR,
         'Similarly, select a note representing a strong sound, and\nthe note after it. Either hit the "T" button on your keyboard or click\nthe "Place SVs between selected notes" button. Alternatively,\nyou can try selecting all the notes which you want to have SV.')
-    imgui.SeparatorText("Experimenting with Teleport Stutter")
+    imgui.SeparatorText(("Experimenting with Teleport Stutter"):obfuscate())
     imgui.TextWrapped(
         'It would be kind of boring if the teleport stutter remained the same throughout. You can adjust how the teleport stutter acts over time by enabling the "Change Stutter Over Time" option.')
     imgui.TextColored(INSTRUCTION_COLOR,
@@ -12555,43 +12566,44 @@ function showYourSecondEffectTutorial()
     ForceHeight(920)
     imgui.TextWrapped(
         "Now that you're hopefully feeling familiar with teleport stutter, try playing around with some of the parameters. Here are some ideas to try. All the effects below will be presented as a list of four numbers, where the first two are the start SV %% (start and end), while the last two are the main SV (start and end).")
-    imgui.BulletText("0%%, 100%%, 1.00x, 0.00x")
-    imgui.BulletText("100%%, 100%%, -1.00x, 0.00x")
-    imgui.BulletText("100%%, 0%%, -1.00x, 1.00x")
+    imgui.BulletText(("0%%, 100%%, 1.00x, 0.00x"):obfuscate())
+    imgui.BulletText(("100%%, 100%%, -1.00x, 0.00x"):obfuscate())
+    imgui.BulletText(("100%%, 0%%, -1.00x, 1.00x"):obfuscate())
     imgui.TextWrapped('Fun fact: the above effect is used in the popular SV map Hypnotizer.')
     ForceHeight(1120)
 end
 function showStartingTutorial()
-    imgui.SeparatorText("The Very Beginning")
+    imgui.SeparatorText(("The Very Beginning"):obfuscate())
     imgui.TextWrapped(
         "So, you want to make some SV maps, or scroll velocity maps. For those who don't know, scroll velocities are objects that change the speed at which notes fall towards the receptor. If you're new to plumogu, welcome! This plugin is your one-stop shop for creating SV maps. However, there are a few things we will need to go over before starting. These are important, so please read them!")
-    imgui.SeparatorText("Colors in the Tutorial")
-    imgui.Text("You may come across some instructions in ")
+    imgui.SeparatorText(("Colors in the Tutorial"):obfuscate())
+    imgui.Text(("You may come across some instructions in "):obfuscate())
     imgui.SameLine(0, 0)
     imgui.TextColored(INSTRUCTION_COLOR, "Red")
     imgui.SameLine(0, 0)
-    imgui.Text(" or ")
+    imgui.Text((" or "):obfuscate())
     imgui.SameLine(0, 0)
     imgui.TextColored(GUIDELINE_COLOR, "Blue")
     imgui.SameLine(0, 0)
-    imgui.Text(".")
+    imgui.Text(("."):obfuscate())
     imgui.PushStyleColor(imgui_col.Text, INSTRUCTION_COLOR)
-    imgui.BulletText("Red text indicates an instruction that MUST\nbe completed for the tutorial to continue.")
+    imgui.BulletText(("Red text indicates an instruction that MUST\nbe completed for the tutorial to continue.")
+        :obfuscate())
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
     imgui.BulletText(
         "Blue text indicates an instruction that could be skipped \nand won't progress the tutorial, but helps for learning.")
     imgui.PopStyleColor(2)
-    imgui.SeparatorText("Selections")
+    imgui.SeparatorText(("Selections"):obfuscate())
     imgui.TextWrapped(
         'Often times we will say the phrase "within the selection", which just means within a specific time (e.g. between 5 seconds and 6 seconds into the song). If you select two notes, the SVs within the selection are all SVs with a start time between the first note and the last note. This definition applies to all objects with a StartTime property, that being SVs, SSFs, and timing lines.')
-    imgui.SeparatorText("SVs vs SSFs")
+    imgui.SeparatorText(("SVs vs SSFs"):obfuscate())
     imgui.TextWrapped(
         "If you come from osu!, you may not be familiar with SSFs, or scroll speed factors; objects that change the player's scroll speed to some multiplier. The critical difference between SSFs and SVs is that while SVs do not instantly change the position of notes, SSFs do.")
-    imgui.SeparatorText("Now, let's start making some effects!")
+    imgui.SeparatorText(("Now, let's start making some effects!"):obfuscate())
     imgui.Text('Click "Placing Basic SVs" at the left, and start from "Your First Effect".')
 end
 function showHotkeyTutorial()
-    imgui.SeparatorText("Basic Hotkeys")
+    imgui.SeparatorText(("Basic Hotkeys"):obfuscate())
     imgui.TextWrapped(
         "The most basic hotkeys are ones that can simply speed up your SV making process; whether that be placing SVs/SSFs or quickly editing settings.")
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
@@ -12606,7 +12618,7 @@ function showHotkeyTutorial()
     imgui.BulletText('Press "' ..
         globalVars.hotkeyList[hotkeys_enum.reset_secondary] .. '" to quickly reset any resettable parameters.')
     imgui.PopStyleColor()
-    imgui.SeparatorText("Advanced Hotkeys")
+    imgui.SeparatorText(("Advanced Hotkeys"):obfuscate())
     imgui.TextWrapped(
         "Typically, these hotkeys are used in combination with advanced mode to efficiently switch between timing groups:")
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
@@ -12617,7 +12629,7 @@ function showHotkeyTutorial()
     imgui.BulletText('Press "' ..
         globalVars.hotkeyList[hotkeys_enum.go_to_note_tg] .. '" to go to the timing group of the selected note.')
     imgui.PopStyleColor()
-    imgui.SeparatorText("Lock Mode")
+    imgui.SeparatorText(("Lock Mode"):obfuscate())
     imgui.TextWrapped(
         'Sometimes, typing letters/numbers on your keyboard will unintentionally interact with the editor in ways you don\'t want. You can remedy this by using the built-in "NOTE LOCK" feature.')
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
@@ -12625,7 +12637,7 @@ function showHotkeyTutorial()
     imgui.PopStyleColor()
 end
 function showWhatIsMsxTutorial()
-    imgui.SeparatorText("Units of Distance and Velocity")
+    imgui.SeparatorText(("Units of Distance and Velocity"):obfuscate())
     imgui.TextColored(GUIDELINE_COLOR, "TLDR: 1 msx is the distance a note travels in 1 ms at 1x SV.")
     imgui.TextWrapped(
         "First and foremost, msx is a unit of distance. Similarly to how the meter is defined in real life, we define msx using speed instead of any objective distance. In real life, a meter is defined by the distance light travels in 1/299792458th of a second. Of course, in Quaver, we have much more control over how things move, so we can simply write that 1 msx is the distance a note travels in 1 millisecond at 1x scroll velocity. We can generalize this with the equation:")
@@ -12656,7 +12668,7 @@ function showTutorialWindow()
     end
     local navigatorWidth = 200
     local nullFn = function()
-        imgui.Text("Select a tutorial on the left to view it.")
+        imgui.Text(("Select a tutorial on the left to view it."):obfuscate())
     end
     local incompleteFn = function()
         imgui.TextWrapped("Sorry, this tutorial is not ready yet. Please come back when a new version comes out.")
@@ -12725,8 +12737,8 @@ function showTutorialWindow()
         imgui.TextColored(vctr4(0), "penis")
     end
     if (game.keyCount ~= 4) then
-        imgui.SeparatorText("This tutorial does not support this key mode.")
-        imgui.Text("Please go to a 4K map to continue.")
+        imgui.SeparatorText(("This tutorial does not support this key mode."):obfuscate())
+        imgui.Text(("Please go to a 4K map to continue."):obfuscate())
         goto tutorialRenderSkip
     end
     if (state.GetValue("tutorialWindowQueue")) then
@@ -12783,10 +12795,10 @@ function renderMeasureDataWidget()
         widgetVars.tgName = state.SelectedScrollGroupId
     end
     imgui.BeginTooltip()
-    imgui.Text("Measure Info:")
-    imgui.Text(table.concat({"NSV Distance = ", widgetVars.nsvDistance, " ms"}))
-    imgui.Text(table.concat({"SV Distance = ", widgetVars.roundedSVDistance, " msx"}))
-    imgui.Text(table.concat({"Avg SV = ", widgetVars.roundedAvgSV, "x"}))
+    imgui.Text(("Measure Info:"):obfuscate())
+    imgui.Text((table.concat({"NSV Distance = ", widgetVars.nsvDistance, " ms"})):obfuscate())
+    imgui.Text((table.concat({"SV Distance = ", widgetVars.roundedSVDistance, " msx"})):obfuscate())
+    imgui.Text((table.concat({"Avg SV = ", widgetVars.roundedAvgSV, "x"})):obfuscate())
     imgui.EndTooltip()
     widgetVars.oldStartOffset = startOffset
     widgetVars.oldEndOffset = endOffset
@@ -12795,17 +12807,17 @@ end
 function renderNoteDataWidget()
     if (#state.SelectedHitObjects ~= 1) then return end
     imgui.BeginTooltip()
-    imgui.Text("Note Info:")
+    imgui.Text(("Note Info:"):obfuscate())
     local selectedNote = state.SelectedHitObjects[1]
-    imgui.Text(table.concat({"StartTime = ", selectedNote.StartTime, " ms"}))
+    imgui.Text((table.concat({"StartTime = ", selectedNote.StartTime, " ms"})):obfuscate())
     local noteIsNotLN = selectedNote.EndTime == 0
     if noteIsNotLN then
         imgui.EndTooltip()
         return
     end
     local lnLength = selectedNote.EndTime - selectedNote.StartTime
-    imgui.Text(table.concat({"EndTime = ", selectedNote.EndTime, " ms"}))
-    imgui.Text(table.concat({"LN Length = ", lnLength, " ms"}))
+    imgui.Text((table.concat({"EndTime = ", selectedNote.EndTime, " ms"})):obfuscate())
+    imgui.Text((table.concat({"LN Length = ", lnLength, " ms"})):obfuscate())
     imgui.EndTooltip()
 end
 function chooseAddComboMultipliers(settingVars)
@@ -12818,7 +12830,8 @@ function chooseAddComboMultipliers(settingVars)
 end
 function chooseArcPercent(settingVars)
     local oldPercent = settingVars.arcPercent
-    _, settingVars.arcPercent = imgui.SliderInt("Arc Percent", math.clamp(oldPercent, 1, 99), 1, 99, oldPercent .. "%%")
+    _, settingVars.arcPercent = imgui.SliderInt(("Arc Percent"):obfuscate(), math.clamp(oldPercent, 1, 99), 1, 99,
+        oldPercent .. "%%")
     return oldPercent ~= settingVars.arcPercent
 end
 function chooseAverageSV(menuVars)
@@ -12873,11 +12886,11 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
             string.format("%.2f", normalizedPos2.x) .. table.concat({", ", string.format("%.2f", normalizedPos2.y), ")\n"}))
         imgui.SetCursorPosY(80)
         imgui.SetCursorPosX(5)
-        _, settingVars.freeMode = imgui.Checkbox("Free Mode##Bezier", settingVars.freeMode)
+        _, settingVars.freeMode = imgui.Checkbox(("Free Mode##Bezier"):obfuscate(), settingVars.freeMode)
         HoverToolTip(
             "Enable this to allow the bezier control points to move outside the boundary. WARNING: ONCE MOVED OUTSIDE, THEY CANNOT BE MOVED BACK IN. DISABLE AND RE-ENABLE FREE MODE TO ALLOW THEM TO BE INTERACTED WITH.")
         imgui.SetCursorPosX(5)
-        _, settingVars.manualMode = imgui.Checkbox("Manual Edit##Bezier", settingVars.manualMode)
+        _, settingVars.manualMode = imgui.Checkbox(("Manual Edit##Bezier"):obfuscate(), settingVars.manualMode)
         HoverToolTip(
             "Enable this to directly edit the bezier points.")
         imgui.EndChild()
@@ -12893,9 +12906,9 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
             imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
             _, normalizedPos2 = imgui.SliderFloat2("Point 2", pos2 / 150, 0, 1)
         end
-        _, settingVars.freeMode = imgui.Checkbox("Free Mode##Bezier", settingVars.freeMode)
+        _, settingVars.freeMode = imgui.Checkbox(("Free Mode##Bezier"):obfuscate(), settingVars.freeMode)
         KeepSameLine()
-        _, settingVars.manualMode = imgui.Checkbox("Manual Edit##Bezier", settingVars.manualMode)
+        _, settingVars.manualMode = imgui.Checkbox(("Manual Edit##Bezier"):obfuscate(), settingVars.manualMode)
         HoverToolTip(
             "Disable this to edit the bezier points with an interactive graph.")
     end
@@ -12958,14 +12971,14 @@ function chooseControlSecondSV(settingVars)
 end
 function chooseCurrentFrame(settingVars)
     imgui.AlignTextToFramePadding()
-    imgui.Text("Previewing frame:")
+    imgui.Text(("Previewing frame:"):obfuscate())
     KeepSameLine()
     imgui.PushItemWidth(35)
     if imgui.ArrowButton("##leftFrame", imgui_dir.Left) then
         settingVars.currentFrame = settingVars.currentFrame - 1
     end
     KeepSameLine()
-    _, settingVars.currentFrame = imgui.InputInt("##currentFrame", settingVars.currentFrame, 0, 0)
+    _, settingVars.currentFrame = imgui.InputInt(("##currentFrame"):obfuscate(), settingVars.currentFrame, 0, 0)
     KeepSameLine()
     if imgui.ArrowButton("##rightFrame", imgui_dir.Right) then
         settingVars.currentFrame = settingVars.currentFrame + 1
@@ -13013,12 +13026,12 @@ function chooseCursorShapeSize()
 end
 function chooseCurveSharpness(settingVars)
     local oldSharpness = settingVars.curveSharpness
-    if imgui.Button("Reset##curveSharpness", SECONDARY_BUTTON_SIZE) then
+    if imgui.Button(("Reset##curveSharpness"):obfuscate(), SECONDARY_BUTTON_SIZE) then
         settingVars.curveSharpness = 50
     end
     KeepSameLine()
     imgui.PushItemWidth(107)
-    local _, newSharpness = imgui.SliderInt("Curve Sharpness", settingVars.curveSharpness, 1, 100, "%d%%")
+    local _, newSharpness = imgui.SliderInt(("Curve Sharpness"):obfuscate(), settingVars.curveSharpness, 1, 100, "%d%%")
     imgui.PopItemWidth()
     settingVars.curveSharpness = newSharpness
     return oldSharpness ~= newSharpness
@@ -13034,7 +13047,7 @@ function chooseCustomMultipliers(settingVars)
     imgui.EndChild()
     local index = settingVars.selectedMultiplierIndex
     local oldMultiplier = settingVars.svMultipliers[index]
-    local _, newMultiplier = imgui.InputFloat("SV Multiplier", oldMultiplier, 0, 0, "%.2fx")
+    local _, newMultiplier = imgui.InputFloat(("SV Multiplier"):obfuscate(), oldMultiplier, 0, 0, "%.2fx")
     settingVars.svMultipliers[index] = newMultiplier
     return oldMultiplier ~= newMultiplier
 end
@@ -13066,7 +13079,7 @@ function chooseFinalSV(settingVars, skipFinalSV)
     local finalSVType = FINAL_SV_TYPES[settingVars.finalSVIndex]
     if finalSVType ~= "Normal" then
         imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.35)
-        _, settingVars.customSV = imgui.InputFloat("SV", settingVars.customSV, 0, 0, "%.2fx")
+        _, settingVars.customSV = imgui.InputFloat(("SV"):obfuscate(), settingVars.customSV, 0, 0, "%.2fx")
         KeepSameLine()
         imgui.PopItemWidth()
     else
@@ -13082,24 +13095,24 @@ function chooseFinalSV(settingVars, skipFinalSV)
     return (oldIndex ~= settingVars.finalSVIndex) or (oldCustomSV ~= settingVars.customSV)
 end
 function chooseFrameSpacing(settingVars)
-    _, settingVars.frameDistance = imgui.InputFloat("Frame Spacing", settingVars.frameDistance,
+    _, settingVars.frameDistance = imgui.InputFloat(("Frame Spacing"):obfuscate(), settingVars.frameDistance,
         0, 0, "%.0f msx")
     settingVars.frameDistance = math.clamp(settingVars.frameDistance, 2000, 100000)
 end
 function chooseFrameTimeData(settingVars)
     if not isTruthy(settingVars.frameTimes) then return end
     local frameTime = settingVars.frameTimes[settingVars.selectedTimeIndex]
-    _, frameTime.frame = imgui.InputInt("Frame #", math.floor(frameTime.frame))
+    _, frameTime.frame = imgui.InputInt(("Frame #"):obfuscate(), math.floor(frameTime.frame))
     frameTime.frame = math.clamp(frameTime.frame, 1, settingVars.numFrames)
-    _, frameTime.position = imgui.InputInt("Note height", math.floor(frameTime.position))
+    _, frameTime.position = imgui.InputInt(("Note height"):obfuscate(), math.floor(frameTime.position))
 end
 function chooseIntensity(settingVars)
     local userStepSize = globalVars.stepSize or 5
     local totalSteps = math.ceil(100 / userStepSize)
     local oldIntensity = settingVars.intensity
     local stepIndex = math.floor((oldIntensity - 0.01) / userStepSize)
-    local _, newStepIndex = imgui.SliderInt(
-        "Intensity",
+    local _, newStepIndex = imgui.SliderInt((
+            "Intensity"):obfuscate(),
         stepIndex,
         0,
         totalSteps - 1,
@@ -13115,7 +13128,7 @@ function chooseInterlace(menuVars)
     KeepSameLine()
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.5)
     local oldRatio = menuVars.interlaceRatio
-    _, menuVars.interlaceRatio = imgui.InputFloat("Ratio##interlace", menuVars.interlaceRatio,
+    _, menuVars.interlaceRatio = imgui.InputFloat(("Ratio##interlace"):obfuscate(), menuVars.interlaceRatio,
         0, 0, "%.2f")
     imgui.PopItemWidth()
     return interlaceChanged or oldRatio ~= menuVars.interlaceRatio
@@ -13129,18 +13142,18 @@ function chooseMainSV(settingVars)
         HelpMarker(helpMarkerText)
         return
     end
-    _, settingVars.mainSV2 = imgui.InputFloat("Main SV (end)", settingVars.mainSV2, 0, 0, "%.2fx")
+    _, settingVars.mainSV2 = imgui.InputFloat(("Main SV (end)"):obfuscate(), settingVars.mainSV2, 0, 0, "%.2fx")
 end
 function chooseMenuStep(settingVars)
     imgui.AlignTextToFramePadding()
-    imgui.Text("Step # :")
+    imgui.Text(("Step # :"):obfuscate())
     KeepSameLine()
     imgui.PushItemWidth(24)
     if imgui.ArrowButton("##leftMenuStep", imgui_dir.Left) then
         settingVars.menuStep = settingVars.menuStep - 1
     end
     KeepSameLine()
-    _, settingVars.menuStep = imgui.InputInt("##currentMenuStep", settingVars.menuStep, 0, 0)
+    _, settingVars.menuStep = imgui.InputInt(("##currentMenuStep"):obfuscate(), settingVars.menuStep, 0, 0)
     KeepSameLine()
     if imgui.ArrowButton("##rightMenuStep", imgui_dir.Right) then
         settingVars.menuStep = settingVars.menuStep + 1
@@ -13164,7 +13177,7 @@ function chooseFlickerPosition(menuVars)
 end
 function chooseNumPeriods(settingVars)
     local oldPeriods = settingVars.periods
-    local _, newPeriods = imgui.InputFloat("Periods/Cycles", oldPeriods, 0.25, 0.25, "%.2f")
+    local _, newPeriods = imgui.InputFloat(("Periods/Cycles"):obfuscate(), oldPeriods, 0.25, 0.25, "%.2f")
     newPeriods = math.quarter(newPeriods)
     newPeriods = math.clamp(newPeriods, 0.25, 69420)
     settingVars.periods = newPeriods
@@ -13172,7 +13185,7 @@ function chooseNumPeriods(settingVars)
 end
 function choosePeriodShift(settingVars)
     local oldShift = settingVars.periodsShift
-    local _, newShift = imgui.InputFloat("Phase Shift", oldShift, 0.25, 0.25, "%.2f")
+    local _, newShift = imgui.InputFloat(("Phase Shift"):obfuscate(), oldShift, 0.25, 0.25, "%.2f")
     if (globalVars.restrictSinusoidalPeriod) then
         newShift = math.quarter(newShift)
         newShift = math.wrappedClamp(newShift, -0.75, 1)
@@ -13184,7 +13197,7 @@ function choosePeriodShift(settingVars)
 end
 function chooseCurrentScrollGroup()
     imgui.AlignTextToFramePadding()
-    imgui.Text("  Timing Group: ")
+    imgui.Text(("  Timing Group: "):obfuscate())
     KeepSameLine()
     local groups = { "$Default", "$Global" }
     local cols = { map.TimingGroups["$Default"].ColorRgb or "86,253,110", map.TimingGroups["$Global"].ColorRgb or
@@ -13208,7 +13221,7 @@ function chooseCurrentScrollGroup()
 end
 function chooseTimingGroup(label, previousGroup)
     imgui.AlignTextToFramePadding()
-    imgui.Text(label)
+    imgui.Text(label:obfuscate())
     KeepSameLine()
     local groups = { "$Default", "$Global" }
     local cols = { map.TimingGroups["$Default"].ColorRgb or "86,253,110", map.TimingGroups["$Global"].ColorRgb or
@@ -13233,7 +13246,7 @@ function chooseTimingGroup(label, previousGroup)
 end
 function chooseRandomScale(settingVars)
     local oldScale = settingVars.randomScale
-    local _, newScale = imgui.InputFloat("Random Scale", oldScale, 0, 0, "%.2fx")
+    local _, newScale = imgui.InputFloat(("Random Scale"):obfuscate(), oldScale, 0, 0, "%.2fx")
     settingVars.randomScale = newScale
     return oldScale ~= newScale
 end
@@ -13244,7 +13257,7 @@ function chooseRandomType(settingVars)
 end
 function chooseRGBPeriod()
     local oldRGBPeriod = globalVars.rgbPeriod
-    _, globalVars.rgbPeriod = imgui.InputFloat("RGB cycle length", oldRGBPeriod, 0, 0,
+    _, globalVars.rgbPeriod = imgui.InputFloat(("RGB cycle length"):obfuscate(), oldRGBPeriod, 0, 0,
         "%.0f second" .. (math.round(globalVars.rgbPeriod) ~= 1 and "s" or ""))
     globalVars.rgbPeriod = math.clamp(globalVars.rgbPeriod, MIN_RGB_CYCLE_TIME,
         MAX_RGB_CYCLE_TIME)
@@ -13264,7 +13277,7 @@ function chooseSnakeSpringConstant()
     local currentTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
     if currentTrail ~= "Snake" then return end
     local oldValue = globalVars.snakeSpringConstant
-    _, globalVars.snakeSpringConstant = imgui.InputFloat("Reactiveness##snake", oldValue, 0, 0, "%.2f")
+    _, globalVars.snakeSpringConstant = imgui.InputFloat(("Reactiveness##snake"):obfuscate(), oldValue, 0, 0, "%.2f")
     HelpMarker("Pick any number from 0.01 to 1")
     globalVars.snakeSpringConstant = math.clamp(globalVars.snakeSpringConstant, 0.01, 1)
     if (globalVars.snakeSpringConstant ~= oldValue) then
@@ -13288,7 +13301,8 @@ end
 function chooseCurvatureCoefficient(settingVars, plotFn)
     plotFn(settingVars)
     imgui.SameLine(0, 0)
-    _, settingVars.curvatureIndex = imgui.SliderInt("Curvature", settingVars.curvatureIndex, 1, #VIBRATO_CURVATURES,
+    _, settingVars.curvatureIndex = imgui.SliderInt(("Curvature"):obfuscate(), settingVars.curvatureIndex, 1,
+        #VIBRATO_CURVATURES,
         tostring(VIBRATO_CURVATURES[settingVars.curvatureIndex]))
 end
 function chooseStandardSVType(menuVars, excludeCombo)
@@ -13309,7 +13323,7 @@ end
 function chooseStartEndSVs(settingVars)
     if settingVars.linearlyChange == false then
         local oldValue = settingVars.startSV
-        _, settingVars.startSV = imgui.InputFloat("SV Value", oldValue, 0, 0, "%.2fx")
+        _, settingVars.startSV = imgui.InputFloat(("SV Value"):obfuscate(), oldValue, 0, 0, "%.2fx")
         return oldValue ~= settingVars.startSV
     end
     return SwappableNegatableInputFloat2(settingVars, "startSV", "endSV", "Start/End SV")
@@ -13358,7 +13372,7 @@ end
 function chooseStutterDuration(settingVars)
     local oldDuration = settingVars.stutterDuration
     if settingVars.controlLastSV then oldDuration = 100 - oldDuration end
-    local _, newDuration = imgui.SliderInt("Duration", oldDuration, 1, 99, oldDuration .. "%%")
+    local _, newDuration = imgui.SliderInt(("Duration"):obfuscate(), oldDuration, 1, 99, oldDuration .. "%%")
     newDuration = math.clamp(newDuration, 1, 99)
     local durationChanged = oldDuration ~= newDuration
     if settingVars.controlLastSV then newDuration = 100 - newDuration end
@@ -13373,7 +13387,7 @@ function chooseStyleTheme()
     end
 end
 function chooseSVBehavior(settingVars)
-    local swapButtonPressed = imgui.Button("Swap", SECONDARY_BUTTON_SIZE)
+    local swapButtonPressed = imgui.Button(("Swap"):obfuscate(), SECONDARY_BUTTON_SIZE)
     HoverToolTip("Switch between slow down/speed up")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
@@ -13389,7 +13403,7 @@ function chooseSVBehavior(settingVars)
 end
 function chooseSVPerQuarterPeriod(settingVars)
     local oldPoints = settingVars.svsPerQuarterPeriod
-    local _, newPoints = imgui.InputInt("SV Points##perQuarter", oldPoints, 1, 1)
+    local _, newPoints = imgui.InputInt(("SV Points##perQuarter"):obfuscate(), oldPoints, 1, 1)
     HelpMarker("Number of SV points per 0.25 period/cycle")
     local maxSVsPerQuarterPeriod = MAX_SV_POINTS / (4 * settingVars.periods)
     newPoints = math.clamp(newPoints, 1, maxSVsPerQuarterPeriod)
@@ -14395,7 +14409,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
         end
     end
     if not skipDistGraph then
-        imgui.Text("Projected Note Motion:")
+        imgui.Text(("Projected Note Motion:"):obfuscate())
         HelpMarker("Distance vs Time graph of notes")
         plotSVMotion(svDistances, svGraphStats.distMinScale, svGraphStats.distMaxScale)
         if imgui.CollapsingHeader("New All -w-") then
@@ -14410,7 +14424,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
     end
     local projectedText = "Projected SVs:"
     if skipDistGraph then projectedText = "Projected Scaling (Avg SVs):" end
-    imgui.Text(projectedText)
+    imgui.Text(projectedText:obfuscate())
     plotSVs(svMultipliers, svGraphStats.minScale, svGraphStats.maxScale)
     if stutterDuration then
         displayStutterSVStats(svMultipliers, stutterDuration)
@@ -14425,8 +14439,8 @@ function displayStutterSVStats(svMultipliers, stutterDuration)
     local firstDuration = stutterDuration
     local secondDuration = 100 - stutterDuration
     imgui.Columns(2, "SV Stutter Stats", false)
-    imgui.Text("First SV:")
-    imgui.Text("Second SV:")
+    imgui.Text(("First SV:"):obfuscate())
+    imgui.Text(("Second SV:"):obfuscate())
     imgui.NextColumn()
     imgui.Text(firstSV .. table.concat({"x  (", firstDuration, "%% duration)"}))
     imgui.Text(secondSV .. table.concat({"x  (", secondDuration, "%% duration)"}))
@@ -14434,9 +14448,9 @@ function displayStutterSVStats(svMultipliers, stutterDuration)
 end
 function displaySVStats(svStats)
     imgui.Columns(2, "SV Stats", false)
-    imgui.Text("Max SV:")
-    imgui.Text("Min SV:")
-    imgui.Text("Average SV:")
+    imgui.Text(("Max SV:"):obfuscate())
+    imgui.Text(("Min SV:"):obfuscate())
+    imgui.Text(("Average SV:"):obfuscate())
     imgui.NextColumn()
     imgui.Text(svStats.maxSV .. "x")
     imgui.Text(svStats.minSV .. "x")
@@ -14500,7 +14514,7 @@ function codeSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     local settingsChanged = false
     CodeInput(settingVars, "code", "##code",
         "This input should return a function that takes in a number t=[0-1], and returns a value corresponding to the scroll velocity multiplier at (100t)% of the way between the first and last selected note times.")
-    if (imgui.Button("Refresh Plot", vector.New(ACTION_BUTTON_SIZE.x, 30))) then
+    if (imgui.Button(("Refresh Plot"):obfuscate(), vector.New(ACTION_BUTTON_SIZE.x, 30))) then
         settingsChanged = true
     end
     imgui.Separator()
@@ -14559,7 +14573,7 @@ function importCustomSVs(settingVars)
     local imguiFlag = imgui_input_text_flags.AutoSelectAll
     _, customSVText = imgui.InputText("##customSVs", customSVText, 99999, imguiFlag)
     KeepSameLine()
-    if imgui.Button("Parse##customSVs", SECONDARY_BUTTON_SIZE) then
+    if imgui.Button(("Parse##customSVs"):obfuscate(), SECONDARY_BUTTON_SIZE) then
         local regex = "(-?%d*%.?%d+)"
         local values = {}
         for value, _ in string.gmatch(customSVText, regex) do
@@ -14635,7 +14649,7 @@ function randomSettingsMenu(settingVars, skipFinalSV, svPointsForce, disableRege
     settingsChanged = chooseRandomType(settingVars) or settingsChanged
     settingsChanged = chooseRandomScale(settingVars) or settingsChanged
     settingsChanged = chooseSVPoints(settingVars, svPointsForce) or settingsChanged
-    if not disableRegeneration and imgui.Button("Generate New Random Set", BEEG_BUTTON_SIZE) then
+    if not disableRegeneration and imgui.Button(("Generate New Random Set"):obfuscate(), BEEG_BUTTON_SIZE) then
         generateRandomSetMenuSVs(settingVars)
         settingsChanged = true
     end
@@ -14655,7 +14669,7 @@ function generateRandomSetMenuSVs(settingVars)
 end
 function sinusoidalSettingsMenu(settingVars, skipFinalSV)
     local settingsChanged = false
-    imgui.Text("Amplitude:")
+    imgui.Text(("Amplitude:"):obfuscate())
     settingsChanged = chooseStartEndSVs(settingVars) or settingsChanged
     settingsChanged = chooseCurveSharpness(settingVars) or settingsChanged
     settingsChanged = chooseConstantShift(settingVars, 1) or settingsChanged
@@ -14711,6 +14725,7 @@ function awake()
     clock.prevTime = state.UnixTime
     game.keyCount = map.GetKeyCount()
 end
+direction = { 1, 1 }
 function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
@@ -14728,6 +14743,18 @@ function draw()
         checkForGlobalHotkeys()
         setPluginAppearance()
     end
+    if (not direction) then
+        direction = { 1, 1 }
+    end
+    local pos = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    if (pos.x + dim.x > state.WindowSize[1] or pos.x < 0) then
+        direction[1] = -direction[1]
+    end
+    if (pos.y + dim.y > state.WindowSize[2] or pos.y < 0) then
+        direction[2] = -direction[2]
+    end
+    imgui.SetWindowPos(PLUGIN_NAME, pos + table.vectorize2(direction) * vctr2(state.DeltaTime) / 2)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     imgui.BeginTabBar("SV tabs")
     for i = 1, #TAB_MENUS do

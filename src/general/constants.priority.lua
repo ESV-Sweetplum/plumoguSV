@@ -10,6 +10,7 @@ PLOT_GRAPH_SIZE = vector.New(253, 100)                                 -- dimens
 HALF_ACTION_BUTTON_SIZE = vector.New((253 - SAMELINE_SPACING) / 2, 42) -- dimensions of a button that does kinda important things
 SECONDARY_BUTTON_SIZE = vector.New(48, 24)                             -- dimensions of a button that does less important things
 TERTIARY_BUTTON_SIZE = vector.New(21.5, 24)                            -- dimensions of a button that does much less important things
+LARGER_TERTIARY_BUTTON_SIZE = vector.New(29.5, 24)                     -- dimensions of another button that does much less important things
 EXPORT_BUTTON_SIZE = vector.New(40, 24)                                -- dimensions of the export menu settings button
 BEEG_BUTTON_SIZE = vector.New(253, 24)                                 -- beeg button
 

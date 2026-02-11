@@ -1,5 +1,5 @@
 function showWorkingWithShapesTutorial()
-    imgui.SeparatorText("Working with different shapes")
+    imgui.SeparatorText(("Working with different shapes"):obfuscate())
     imgui.TextWrapped(
         'So far, we\'ve only been working with stutters, but the core of SV is being able to make cohesive and/or fluid movement. We do this by working with particular shapes in the "STANDARD" tab.')
     imgui.TextColored(INSTRUCTION_COLOR,

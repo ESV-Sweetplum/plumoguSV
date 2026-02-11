@@ -8,11 +8,11 @@
 ---@return T idx The value of the currently selected radio button.
 function RadioButtons(label, value, options, optionValues, tooltipText)
     imgui.AlignTextToFramePadding()
-    imgui.Text(label)
+    imgui.Text(label:obfuscate())
     if tooltipText then HoverToolTip(tooltipText) end
     for idx, option in pairs(options) do
         imgui.SameLine(0, RADIO_BUTTON_SPACING)
-        if imgui.RadioButton(option, value == optionValues[idx]) then
+        if imgui.RadioButton(option:obfuscate(), value == optionValues[idx]) then
             value = optionValues[idx]
         end
         if tooltipText then HoverToolTip(tooltipText) end

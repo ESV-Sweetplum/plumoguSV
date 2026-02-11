@@ -1,5 +1,5 @@
 function showHotkeyTutorial()
-    imgui.SeparatorText("Basic Hotkeys")
+    imgui.SeparatorText(("Basic Hotkeys"):obfuscate())
     imgui.TextWrapped(
         "The most basic hotkeys are ones that can simply speed up your SV making process; whether that be placing SVs/SSFs or quickly editing settings.")
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
@@ -14,7 +14,7 @@ function showHotkeyTutorial()
     imgui.BulletText('Press "' ..
         globalVars.hotkeyList[hotkeys_enum.reset_secondary] .. '" to quickly reset any resettable parameters.')
     imgui.PopStyleColor()
-    imgui.SeparatorText("Advanced Hotkeys")
+    imgui.SeparatorText(("Advanced Hotkeys"):obfuscate())
     imgui.TextWrapped(
         "Typically, these hotkeys are used in combination with advanced mode to efficiently switch between timing groups:")
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
@@ -25,7 +25,7 @@ function showHotkeyTutorial()
     imgui.BulletText('Press "' ..
         globalVars.hotkeyList[hotkeys_enum.go_to_note_tg] .. '" to go to the timing group of the selected note.')
     imgui.PopStyleColor()
-    imgui.SeparatorText("Lock Mode")
+    imgui.SeparatorText(("Lock Mode"):obfuscate())
     imgui.TextWrapped(
         'Sometimes, typing letters/numbers on your keyboard will unintentionally interact with the editor in ways you don\'t want. You can remedy this by using the built-in "NOTE LOCK" feature.')
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)

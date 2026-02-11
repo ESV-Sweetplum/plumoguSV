@@ -12,10 +12,10 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     local enoughSelectedNotes = checkEnoughSelectedNotes(minimumNotes)
     local infoText = table.concat({ "Select ", minimumNotes, " or more ", pluralize("note", minimumNotes) })
     if (not enoughSelectedNotes) then
-        if (not hideNoteReq) then imgui.Text(infoText) end
+        if (not hideNoteReq) then imgui.Text(infoText:obfuscate()) end
         return
     end
-    FunctionButton(buttonText, ACTION_BUTTON_SIZE, actionfunc, menuVars)
+    FunctionButton(buttonText:obfuscate(), ACTION_BUTTON_SIZE, actionfunc, menuVars)
     if disableKeyInput then return end
     local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + tn(hideNoteReq)]
     local tooltip = HoverToolTip("Press \'" .. keyCombo ..

@@ -218,7 +218,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
         end
     end
     if not skipDistGraph then
-        imgui.Text("Projected Note Motion:")
+        imgui.Text(("Projected Note Motion:"):obfuscate())
         HelpMarker("Distance vs Time graph of notes")
         plotSVMotion(svDistances, svGraphStats.distMinScale, svGraphStats.distMaxScale)
         if imgui.CollapsingHeader("New All -w-") then
@@ -233,7 +233,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
     end
     local projectedText = "Projected SVs:"
     if skipDistGraph then projectedText = "Projected Scaling (Avg SVs):" end
-    imgui.Text(projectedText)
+    imgui.Text(projectedText:obfuscate())
     plotSVs(svMultipliers, svGraphStats.minScale, svGraphStats.maxScale)
     if stutterDuration then
         displayStutterSVStats(svMultipliers, stutterDuration)
@@ -254,8 +254,8 @@ function displayStutterSVStats(svMultipliers, stutterDuration)
     local firstDuration = stutterDuration
     local secondDuration = 100 - stutterDuration
     imgui.Columns(2, "SV Stutter Stats", false)
-    imgui.Text("First SV:")
-    imgui.Text("Second SV:")
+    imgui.Text(("First SV:"):obfuscate())
+    imgui.Text(("Second SV:"):obfuscate())
     imgui.NextColumn()
     imgui.Text(firstSV .. "x  (" .. firstDuration .. "%% duration)")
     imgui.Text(secondSV .. "x  (" .. secondDuration .. "%% duration)")
@@ -267,9 +267,9 @@ end
 --    svStats : list of stats for the current menu [Table]
 function displaySVStats(svStats)
     imgui.Columns(2, "SV Stats", false)
-    imgui.Text("Max SV:")
-    imgui.Text("Min SV:")
-    imgui.Text("Average SV:")
+    imgui.Text(("Max SV:"):obfuscate())
+    imgui.Text(("Min SV:"):obfuscate())
+    imgui.Text(("Average SV:"):obfuscate())
     imgui.NextColumn()
     imgui.Text(svStats.maxSV .. "x")
     imgui.Text(svStats.minSV .. "x")

@@ -14,11 +14,11 @@ function selectBookmarkMenu()
 
         imgui.Columns(3)
 
-        imgui.Text("Time")
+        imgui.Text(("Time"):obfuscate())
         imgui.NextColumn()
-        imgui.Text("Bookmark Label")
+        imgui.Text(("Bookmark Label"):obfuscate())
         imgui.NextColumn()
-        imgui.Text("Leap")
+        imgui.Text(("Leap"):obfuscate())
         imgui.NextColumn()
 
         imgui.Separator()

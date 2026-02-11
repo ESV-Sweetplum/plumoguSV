@@ -31,7 +31,7 @@ function showPluginSettingsWindow()
 
     imgui.BeginChild("Setting Categories")
 
-    imgui.Text("Setting Type")
+    imgui.Text(("Setting Type"):obfuscate())
     imgui.Separator()
 
     --- Key is name of setting. If value with respect to key is true, will hide setting at the left
@@ -48,7 +48,7 @@ function showPluginSettingsWindow()
         ::nextSetting::
     end
     AddSeparator()
-    if (imgui.Button("Reset Settings")) then
+    if (imgui.Button(("Reset Settings"):obfuscate())) then
         write({})
         globalVars = DEFAULT_GLOBAL_VARS
         toggleablePrint("e!", "Settings have been reset.")
@@ -124,7 +124,7 @@ function renderMemeButtons()
     local text = state.GetValue("crazy", "Crazy?")
     local full =
     " I was crazy\nonce. They put me in\na map. A ranked map.\nA ranked map\nwith no SV. And no\nSV makes me crazy.\nCrazy?"
-    if (imgui.Button("Crazy?")) then
+    if (imgui.Button(("Crazy?"):obfuscate())) then
         state.SetValue("activateCrazy", true)
     end
     if (state.GetValue("activateCrazy")) then

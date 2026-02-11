@@ -1,13 +1,13 @@
 function renderPresetMenu(menuLabel, menuVars, settingVars)
     local newPresetName = state.GetValue("newPresetName", "")
     imgui.AlignTextToFramePadding()
-    imgui.Text("New Preset Name:")
+    imgui.Text(("New Preset Name:"):obfuscate())
     KeepSameLine()
     imgui.PushItemWidth(90)
     _, newPresetName = imgui.InputText("##PresetName", newPresetName, 4096)
     imgui.PopItemWidth()
     imgui.SameLine()
-    if (imgui.Button("Save") and newPresetName:len() > 0) then
+    if (imgui.Button(("Save"):obfuscate()) and newPresetName:len() > 0) then
         preset = {}
         preset.name = newPresetName
         newPresetName = ""
@@ -31,14 +31,14 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
 
     local importCustomPreset = state.GetValue("importCustomPreset", "")
     imgui.AlignTextToFramePadding()
-    imgui.Text("Import Preset:")
+    imgui.Text(("Import Preset:"):obfuscate())
     KeepSameLine()
     imgui.PushItemWidth(103)
     _, importCustomPreset = imgui.InputText("##CustomPreset", importCustomPreset, MAX_IMPORT_CHARACTER_LIMIT)
     state.SetValue("importCustomPreset", importCustomPreset)
     imgui.PopItemWidth()
     imgui.SameLine()
-    if (imgui.Button("Import##CustomPreset")) then
+    if (imgui.Button(("Import##CustomPreset"):obfuscate())) then
         local parsedTable = table.parse(importCustomPreset)
         if (table.includes(table.property(globalVars.presets, "name"), parsedTable.name)) then
             print("e!",
@@ -54,11 +54,11 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
 
     imgui.Columns(3)
 
-    imgui.Text("Name")
+    imgui.Text(("Name"):obfuscate())
     imgui.NextColumn()
-    imgui.Text("Menu")
+    imgui.Text(("Menu"):obfuscate())
     imgui.NextColumn()
-    imgui.Text("Actions")
+    imgui.Text(("Actions"):obfuscate())
     imgui.NextColumn()
 
     imgui.Separator()
@@ -69,7 +69,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         imgui.AlignTextToFramePadding()
         imgui.Text(table.concat({ preset.type:shorten(), " > ", removeTrailingTag(preset.menu):sub(1, 3) }))
         imgui.NextColumn()
-        if (imgui.Button("Select##Preset" .. idx)) then
+        if (imgui.Button(("Select##Preset"):obfuscate() .. idx)) then
             local data = table.parse(preset.data)
             globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
             cache.saveTable(preset.menu .. preset.type .. "Settings", data.settingVars)
@@ -82,7 +82,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         end
         HoverToolTip("Left-click to select this preset. Right-click to copy this preset to your clipboard.")
         KeepSameLine()
-        if (imgui.Button("X##Preset" .. idx)) then
+        if (imgui.Button(("X##Preset"):obfuscate() .. idx)) then
             table.remove(globalVars.presets, idx)
             write(globalVars)
         end

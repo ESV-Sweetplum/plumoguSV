@@ -1,5 +1,5 @@
 function showWhatIsMsxTutorial()
-    imgui.SeparatorText("Units of Distance and Velocity")
+    imgui.SeparatorText(("Units of Distance and Velocity"):obfuscate())
     imgui.TextColored(GUIDELINE_COLOR, "TLDR: 1 msx is the distance a note travels in 1 ms at 1x SV.")
     imgui.TextWrapped(
         "First and foremost, msx is a unit of distance. Similarly to how the meter is defined in real life, we define msx using speed instead of any objective distance. In real life, a meter is defined by the distance light travels in 1/299792458th of a second. Of course, in Quaver, we have much more control over how things move, so we can simply write that 1 msx is the distance a note travels in 1 millisecond at 1x scroll velocity. We can generalize this with the equation:")

@@ -22,7 +22,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
             vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, alpha))
     end
 
-    if not imgui.BeginCombo(label, currentComboItem, comboFlag) then
+    if not imgui.BeginCombo(label, currentComboItem:obfuscate(), comboFlag) then
         if (colorList and isTruthy(colorList)) then imgui.PopStyleColor() end
         return newListIndex
     end
@@ -38,7 +38,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
         end
         local listItem = list[i]
         if (table.contains(hiddenGroups, listItem)) then goto skipRender end
-        if imgui.Selectable(listItem) then
+        if imgui.Selectable(listItem:obfuscate()) then
             newListIndex = i
         end
         if (tooltipList and isTruthy(tooltipList)) then

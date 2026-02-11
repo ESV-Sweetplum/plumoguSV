@@ -71,7 +71,7 @@ function chooseEditTool()
     }
 
     imgui.AlignTextToFramePadding()
-    imgui.Text("  Current Tool:")
+    imgui.Text(("  Current Tool:"):obfuscate())
     KeepSameLine()
     local oldEditToolIndex = globalVars.editToolIndex
     globalVars.editToolIndex = Combo("##edittool", EDIT_SV_TOOLS, oldEditToolIndex, nil, nil, tooltipList)

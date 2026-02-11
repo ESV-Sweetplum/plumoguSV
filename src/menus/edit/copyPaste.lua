@@ -11,12 +11,12 @@ function copyNPasteMenu()
 end
 
 function copyNPasteSettingsMenu(menuVars, actionable)
-    _, menuVars.copyLines = imgui.Checkbox("Copy Lines", menuVars.copyLines)
+    _, menuVars.copyLines = imgui.Checkbox(("Copy Lines"):obfuscate(), menuVars.copyLines)
     KeepSameLine()
-    _, menuVars.copySVs = imgui.Checkbox("Copy SVs", menuVars.copySVs)
-    _, menuVars.copySSFs = imgui.Checkbox("Copy SSFs", menuVars.copySSFs)
+    _, menuVars.copySVs = imgui.Checkbox(("Copy SVs"):obfuscate(), menuVars.copySVs)
+    _, menuVars.copySSFs = imgui.Checkbox(("Copy SSFs"):obfuscate(), menuVars.copySSFs)
     imgui.SameLine(0, SAMELINE_SPACING + 3.5)
-    _, menuVars.copyBMs = imgui.Checkbox("Copy Bookmarks", menuVars.copyBMs)
+    _, menuVars.copyBMs = imgui.Checkbox(("Copy Bookmarks"):obfuscate(), menuVars.copyBMs)
     AddSeparator()
     if actionable then BasicInputInt(menuVars, "curSlot", "Current slot", { 1, 999 }) end
     if (actionable and #menuVars.copied.lines < menuVars.curSlot) then
@@ -46,9 +46,9 @@ function copyNPasteSettingsMenu(menuVars, actionable)
 
     if actionable then AddSeparator() end
 
-    _, menuVars.tryAlign = imgui.Checkbox("Try to fix misalignments", menuVars.tryAlign)
+    _, menuVars.tryAlign = imgui.Checkbox(("Try to fix misalignments"):obfuscate(), menuVars.tryAlign)
     imgui.PushItemWidth(100)
-    _, menuVars.alignWindow = imgui.SliderInt("Alignment window (ms)", menuVars.alignWindow, 1, 10)
+    _, menuVars.alignWindow = imgui.SliderInt(("Alignment window (ms)"):obfuscate(), menuVars.alignWindow, 1, 10)
     menuVars.alignWindow = math.clamp(menuVars.alignWindow, 1, 10)
     imgui.PopItemWidth()
 

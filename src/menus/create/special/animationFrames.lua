@@ -2,7 +2,7 @@ function animationFramesSetupMenu(settingVars)
     chooseMenuStep(settingVars)
     if settingVars.menuStep == 1 then
         KeepSameLine()
-        imgui.Text("Choose Frame Settings")
+        imgui.Text(("Choose Frame Settings"):obfuscate())
         AddSeparator()
         BasicInputInt(settingVars, "numFrames", "Total # Frames", { 1, MAX_ANIMATION_FRAMES })
         chooseFrameSpacing(settingVars)
@@ -13,7 +13,7 @@ function animationFramesSetupMenu(settingVars)
         chooseNoteSkinType(settingVars)
     elseif settingVars.menuStep == 2 then
         KeepSameLine()
-        imgui.Text("Adjust Notes/Frames")
+        imgui.Text(("Adjust Notes/Frames"):obfuscate())
         AddSeparator()
         imgui.Columns(2, "Notes and Frames", false)
         addFrameTimes(settingVars)
@@ -29,10 +29,10 @@ function animationFramesSetupMenu(settingVars)
         imgui.InvisibleButton("sv isnt a real skill", invisibleButtonSize)
     else
         KeepSameLine()
-        imgui.Text("Place SVs")
+        imgui.Text(("Place SVs"):obfuscate())
         AddSeparator()
         if not isTruthy(settingVars.frameTimes) then
-            imgui.Text("No notes added in Step 2, so can't place SVs yet")
+            imgui.Text(("No notes added in Step 2, so can't place SVs yet"):obfuscate())
             return
         end
         HelpMarker("This tool displaces notes into frames after the (first) selected note")
@@ -46,14 +46,14 @@ end
 
 function removeSelectedFrameTimeButton(settingVars)
     if not isTruthy(settingVars.frameTimes) then return end
-    if not imgui.Button("Removed currently selected time", BEEG_BUTTON_SIZE) then return end
+    if not imgui.Button(("Removed currently selected time"):obfuscate(), BEEG_BUTTON_SIZE) then return end
     table.remove(settingVars.frameTimes, settingVars.selectedTimeIndex)
     local maxIndex = math.max(1, #settingVars.frameTimes)
     settingVars.selectedTimeIndex = math.clamp(settingVars.selectedTimeIndex, 1, maxIndex)
 end
 
 function addFrameTimes(settingVars)
-    if not imgui.Button("Add selected notes to use for frames", ACTION_BUTTON_SIZE) then return end
+    if not imgui.Button(("Add selected notes to use for frames"):obfuscate(), ACTION_BUTTON_SIZE) then return end
 
     local hasAlreadyAddedLaneTime = {}
     for _ = 1, game.keyCount do
@@ -95,9 +95,9 @@ end
 
 function displayFrameTimes(settingVars)
     if not isTruthy(settingVars.frameTimes) then
-        imgui.Text("Add notes to fill the selection box below")
+        imgui.Text(("Add notes to fill the selection box below"):obfuscate())
     else
-        imgui.Text("time | lanes | frame # | position")
+        imgui.Text(("time | lanes | frame # | position"):obfuscate())
     end
     HelpMarker("Make sure to select ALL lanes from a chord with multiple notes, not just one lane")
     AddPadding()

@@ -1,5 +1,5 @@
 function showYourSecondEffectTutorial()
-    imgui.SeparatorText("Making your second SV effect")
+    imgui.SeparatorText(("Making your second SV effect"):obfuscate())
     imgui.TextWrapped(
         "Stutters are cool and all, but there's another type of stutter that's more versatile: teleport stutters. Usually, these would not be possible in engines like osu, but since Quaver has no limitations on SV size, we can do it here. Take a look at the difference between normal stutter and teleport stutter:")
 
@@ -45,7 +45,7 @@ function showYourSecondEffectTutorial()
     ForceHeight(450)
     imgui.TextColored(GUIDELINE_COLOR,
         'Similarly, select a note representing a strong sound, and\nthe note after it. Either hit the "T" button on your keyboard or click\nthe "Place SVs between selected notes" button. Alternatively,\nyou can try selecting all the notes which you want to have SV.')
-    imgui.SeparatorText("Experimenting with Teleport Stutter")
+    imgui.SeparatorText(("Experimenting with Teleport Stutter"):obfuscate())
     imgui.TextWrapped(
         'It would be kind of boring if the teleport stutter remained the same throughout. You can adjust how the teleport stutter acts over time by enabling the "Change Stutter Over Time" option.')
     imgui.TextColored(INSTRUCTION_COLOR,
@@ -67,9 +67,9 @@ function showYourSecondEffectTutorial()
     ForceHeight(920)
     imgui.TextWrapped(
         "Now that you're hopefully feeling familiar with teleport stutter, try playing around with some of the parameters. Here are some ideas to try. All the effects below will be presented as a list of four numbers, where the first two are the start SV %% (start and end), while the last two are the main SV (start and end).")
-    imgui.BulletText("0%%, 100%%, 1.00x, 0.00x")
-    imgui.BulletText("100%%, 100%%, -1.00x, 0.00x")
-    imgui.BulletText("100%%, 0%%, -1.00x, 1.00x")
+    imgui.BulletText(("0%%, 100%%, 1.00x, 0.00x"):obfuscate())
+    imgui.BulletText(("100%%, 100%%, -1.00x, 0.00x"):obfuscate())
+    imgui.BulletText(("100%%, 0%%, -1.00x, 1.00x"):obfuscate())
     imgui.TextWrapped('Fun fact: the above effect is used in the popular SV map Hypnotizer.')
     ForceHeight(1120)
 end

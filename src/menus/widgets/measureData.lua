@@ -40,10 +40,10 @@ function renderMeasureDataWidget()
         widgetVars.tgName = state.SelectedScrollGroupId
     end
     imgui.BeginTooltip()
-    imgui.Text("Measure Info:")
-    imgui.Text("NSV Distance = " .. widgetVars.nsvDistance .. " ms")
-    imgui.Text("SV Distance = " .. widgetVars.roundedSVDistance .. " msx")
-    imgui.Text("Avg SV = " .. widgetVars.roundedAvgSV .. "x")
+    imgui.Text(("Measure Info:"):obfuscate())
+    imgui.Text(("NSV Distance = " .. widgetVars.nsvDistance .. " ms"):obfuscate())
+    imgui.Text(("SV Distance = " .. widgetVars.roundedSVDistance .. " msx"):obfuscate())
+    imgui.Text(("Avg SV = " .. widgetVars.roundedAvgSV .. "x"):obfuscate())
     imgui.EndTooltip()
 
     widgetVars.oldStartOffset = startOffset

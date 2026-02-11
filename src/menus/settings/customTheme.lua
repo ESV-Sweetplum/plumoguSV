@@ -84,23 +84,23 @@ function showCustomThemeSettings()
     local settingsChanged = false
     imgui.SeparatorText("Editing '" .. globalVars.colorThemeName:gsub("custom_", "") .. "'")
 
-    if (imgui.Button("Reset")) then
+    if (imgui.Button(("Reset"):obfuscate())) then
         globalCustomStyle = table.duplicate(DEFAULT_STYLE)
         globalVars.colorThemeName = "Original"
         write(globalVars)
     end
     KeepSameLine()
-    if (imgui.Button("Rename")) then
+    if (imgui.Button(("Rename"):obfuscate())) then
         cache.boolean.renamingCustomTheme = not cache.boolean.renamingCustomTheme
     end
     KeepSameLine()
-    if (imgui.Button("Export")) then
+    if (imgui.Button(("Export"):obfuscate())) then
         local str = stringifyCustomStyle(globalCustomStyle)
         imgui.SetClipboardText(str)
         print("i!", "Exported custom theme to your clipboard.")
     end
     KeepSameLine()
-    if (imgui.Button("Delete")) then
+    if (imgui.Button(("Delete"):obfuscate())) then
         print("e!", "Deleted custom theme.")
         globalVars.customStyles[globalVars.colorThemeName] = nil
         globalVars.colorThemeName = "Original"
@@ -113,7 +113,7 @@ function showCustomThemeSettings()
         _, input = imgui.InputText("##customThemeStr", input, 69420)
         state.SetValue("renamingCustomThemeInput", input)
         KeepSameLine()
-        if (imgui.Button("Send")) then
+        if (imgui.Button(("Send"):obfuscate())) then
             local newName = "custom_" .. input
             globalVars.customStyles[newName] = globalCustomStyle
             globalVars.customStyles[globalVars.colorThemeName] = nil
@@ -123,7 +123,7 @@ function showCustomThemeSettings()
             state.SetValue("renamingCustomThemeInput", "")
         end
         KeepSameLine()
-        if (imgui.Button("X")) then
+        if (imgui.Button(("X"):obfuscate())) then
             cache.boolean.renamingCustomTheme = false
             state.SetValue("renamingCustomThemeInput", "")
         end
@@ -132,7 +132,7 @@ function showCustomThemeSettings()
 
     imgui.SeparatorText("Other Actions")
 
-    if (imgui.Button("Import")) then
+    if (imgui.Button(("Import"):obfuscate())) then
         cache.boolean.importingCustomTheme = not cache.boolean.importingCustomTheme
     end
     if (cache.boolean.importingCustomTheme) then
@@ -142,7 +142,7 @@ function showCustomThemeSettings()
         _, input = imgui.InputText("##customThemeStr", input, 69420)
         state.SetValue("importingCustomThemeInput", input)
         KeepSameLine()
-        if (imgui.Button("Send")) then
+        if (imgui.Button(("Send"):obfuscate())) then
             setCustomStyleString(input)
             settingsChanged = true
             cache.boolean.importingCustomTheme = false

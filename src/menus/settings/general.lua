@@ -35,7 +35,7 @@ end
 function chooseStepSize()
     imgui.PushItemWidth(40)
     local oldStepSize = globalVars.stepSize
-    local _, tempStepSize = imgui.InputFloat("Exponential Intensity Step Size", oldStepSize, 0, 0, "%.0f%%")
+    local _, tempStepSize = imgui.InputFloat(("Exponential Intensity Step Size"):obfuscate(), oldStepSize, 0, 0, "%.0f%%")
     HoverToolTip(
         "Changes what the exponential intensity slider will round the nearest to. Recommended to keep this as a factor of 100 (1, 2, 5, 10, etc).")
     globalVars.stepSize = math.clamp(tempStepSize, 1, 100)

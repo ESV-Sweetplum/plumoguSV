@@ -1,5 +1,5 @@
 function showCompositeEffectsTutorial()
-    imgui.SeparatorText("Exponential Composition")
+    imgui.SeparatorText(("Exponential Composition"):obfuscate())
     imgui.TextWrapped(
         "All of the previous effects we've seen have been done with just one effect; no changing settings, no different shapes. However, mixing and matching these different effects is what will make your SV map truly unique.")
 

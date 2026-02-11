@@ -18,7 +18,8 @@ function sinusoidalVibratoMenu(menuVars, settingVars, separateWindow)
         chooseConstantShift(settingVars)
         chooseNumPeriods(settingVars)
         choosePeriodShift(settingVars)
-        _, settingVars.applyToHigher = imgui.Checkbox("Apply Vibrato to Higher SSF?", settingVars.applyToHigher)
+        _, settingVars.applyToHigher = imgui.Checkbox(("Apply Vibrato to Higher SSF?"):obfuscate(),
+            settingVars.applyToHigher)
 
         local func1 = function(t)
             return math.sin(2 * math.pi * (settingVars.periods * t + settingVars.periodsShift)) *

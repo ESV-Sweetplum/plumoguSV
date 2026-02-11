@@ -27,7 +27,7 @@ function chooseCreateTool()
     }
 
     imgui.AlignTextToFramePadding()
-    imgui.Text("  Type:  ")
+    imgui.Text(("  Type:  "):obfuscate())
     KeepSameLine()
     local oldPlaceTypeIndex = globalVars.placeTypeIndex
     globalVars.placeTypeIndex = Combo("##placeType", CREATE_TYPES, oldPlaceTypeIndex, nil, nil, tooltipList)

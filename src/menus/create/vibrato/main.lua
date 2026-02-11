@@ -13,7 +13,7 @@ function placeVibratoSVMenu(separateWindow)
     chooseVibratoSVType(menuVars)
 
     AddSeparator()
-    imgui.Text("Vibrato Settings:")
+    imgui.Text(("Vibrato Settings:"):obfuscate())
     menuVars.vibratoMode = Combo("Vibrato Mode", VIBRATO_TYPES, menuVars.vibratoMode)
 
     chooseVibratoQuality(menuVars)

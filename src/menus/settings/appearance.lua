@@ -6,7 +6,7 @@ function showAppearanceSettings()
     end
     chooseStyleTheme()
     chooseColorTheme()
-    if (globalVars.colorThemeName:sub(1, 7) ~= "custom_" and imgui.Button("Load Theme to Custom")) then
+    if (globalVars.colorThemeName:sub(1, 7) ~= "custom_" and imgui.Button(("Load Theme to Custom"):obfuscate())) then
         setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
         for _, id in ipairs(customStyleIds) do
@@ -43,7 +43,7 @@ function showAppearanceSettings()
     GlobalCheckbox("disableLoadup", "Disable Loadup Animation",
         "Disables the loadup animation when launching the editor.")
     KeepSameLine()
-    if (imgui.Button("Play", vector.New(42, 24))) then
+    if (imgui.Button(("Play"):obfuscate(), vector.New(42, 24))) then
         cache.logoStartTime = clock.getTime()
     end
     AddSeparator()
@@ -56,7 +56,7 @@ function showAppearanceSettings()
     GlobalCheckbox("useCustomPulseColor", "Use Custom Color?")
     if (not globalVars.useCustomPulseColor) then imgui.BeginDisabled() end
     KeepSameLine()
-    if (imgui.Button("Edit Color")) then
+    if (imgui.Button(("Edit Color"):obfuscate())) then
         cache.windows.showColorPicker = not cache.windows.showColorPicker
     end
     if (cache.windows.showColorPicker) then
@@ -137,7 +137,7 @@ function chooseColorTheme()
                 if (k == "Custom") then
                     if (imgui.BeginMenu("Custom Themes")) then
                         if (not globalVars.customStyles or not next(globalVars.customStyles)) then
-                            imgui.Text("No Custom Themes")
+                            imgui.Text(("No Custom Themes"):obfuscate())
                         else
                             renderThemeTree(table.map(table.keys(globalVars.customStyles), function(s)
                                 return {

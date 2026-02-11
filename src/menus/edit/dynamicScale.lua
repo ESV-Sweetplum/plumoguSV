@@ -12,15 +12,15 @@ function dynamicScaleMenu()
 
     AddSeparator()
     if #menuVars.noteTimes < 3 then
-        imgui.Text("Not enough note times assigned")
-        imgui.Text("Assign 3 or more note times instead")
+        imgui.Text(("Not enough note times assigned"):obfuscate())
+        imgui.Text(("Assign 3 or more note times instead"):obfuscate())
         cache.saveTable("dynamicScaleMenu", menuVars)
         return
     end
     local numSVPoints = numNoteTimes - 1
     local needSVUpdate = not isTruthy(menuVars.svMultipliers) or (#menuVars.svMultipliers ~= numSVPoints)
     imgui.AlignTextToFramePadding()
-    imgui.Text("Shape:")
+    imgui.Text(("Shape:"):obfuscate())
     KeepSameLine()
     needSVUpdate = chooseStandardSVType(menuVars, true) or needSVUpdate
 
@@ -43,7 +43,7 @@ function dynamicScaleMenu()
 end
 
 function clearNoteTimesButton(menuVars)
-    if not imgui.Button("Clear all assigned note times", BEEG_BUTTON_SIZE) then return end
+    if not imgui.Button(("Clear all assigned note times"):obfuscate(), BEEG_BUTTON_SIZE) then return end
     menuVars.noteTimes = {}
 end
 

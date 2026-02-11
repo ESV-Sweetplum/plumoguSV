@@ -1,5 +1,5 @@
 function saveSettingPropertiesButton(settingVars, label)
-    local saveButtonClicked = imgui.Button("Save##setting" .. label)
+    local saveButtonClicked = imgui.Button(("Save##setting"):obfuscate() .. label)
     imgui.Separator()
     if (not saveButtonClicked) then return end
     label = label:identify()
@@ -15,7 +15,7 @@ function saveSettingPropertiesButton(settingVars, label)
 end
 
 function saveMenuPropertiesButton(menuVars, label)
-    local saveButtonClicked = imgui.Button("Save##menu" .. label)
+    local saveButtonClicked = imgui.Button(("Save##menu"):obfuscate() .. label)
     imgui.Separator()
     if (not saveButtonClicked) then return end
     label = label:identify()
@@ -75,7 +75,7 @@ function showDefaultPropertiesSettings()
         verticalShiftSettingsMenu
     }
 
-    imgui.SeparatorText("Create Tab Settings")
+    imgui.SeparatorText(("Create Tab Settings"):obfuscate())
 
     if (imgui.CollapsingHeader("General Standard Settings")) then
         local menuVars = getMenuVars("placeStandard", "Property")
@@ -113,7 +113,7 @@ function showDefaultPropertiesSettings()
 
         chooseVibratoSVType(menuVars)
         AddSeparator()
-        imgui.Text("Vibrato Settings:")
+        imgui.Text(("Vibrato Settings:"):obfuscate())
         menuVars.vibratoMode = Combo("Vibrato Mode", VIBRATO_TYPES, menuVars.vibratoMode)
         chooseVibratoQuality(menuVars)
         if (menuVars.vibratoMode ~= 2) then
@@ -124,7 +124,7 @@ function showDefaultPropertiesSettings()
         cache.saveTable("placeVibratoPropertyMenu", menuVars)
     end
 
-    imgui.SeparatorText("Edit Tab Settings")
+    imgui.SeparatorText(("Edit Tab Settings"):obfuscate())
 
     local editTabDict = table.map(EDIT_SV_TOOLS, function(element, idx)
         return { label = element, fn = editFnList[idx] }
@@ -142,23 +142,23 @@ function showDefaultPropertiesSettings()
         ::continue::
     end
 
-    imgui.SeparatorText("Delete Tab Settings")
+    imgui.SeparatorText(("Delete Tab Settings"):obfuscate())
 
     if (imgui.CollapsingHeader("Delete Menu Settings")) then
         local menuVars = getMenuVars("delete", "Property")
 
-        _, menuVars.deleteTable[1] = imgui.Checkbox("Delete Lines", menuVars.deleteTable[1])
+        _, menuVars.deleteTable[1] = imgui.Checkbox(("Delete Lines"):obfuscate(), menuVars.deleteTable[1])
         KeepSameLine()
-        _, menuVars.deleteTable[2] = imgui.Checkbox("Delete SVs", menuVars.deleteTable[2])
-        _, menuVars.deleteTable[3] = imgui.Checkbox("Delete SSFs", menuVars.deleteTable[3])
+        _, menuVars.deleteTable[2] = imgui.Checkbox(("Delete SVs"):obfuscate(), menuVars.deleteTable[2])
+        _, menuVars.deleteTable[3] = imgui.Checkbox(("Delete SSFs"):obfuscate(), menuVars.deleteTable[3])
         imgui.SameLine(0, SAMELINE_SPACING + 3.5)
-        _, menuVars.deleteTable[4] = imgui.Checkbox("Delete Bookmarks", menuVars.deleteTable[4])
+        _, menuVars.deleteTable[4] = imgui.Checkbox(("Delete Bookmarks"):obfuscate(), menuVars.deleteTable[4])
 
         saveMenuPropertiesButton(menuVars, "delete")
         cache.saveTable("deletePropertyMenu", menuVars)
     end
 
-    imgui.SeparatorText("Select Tab Settings")
+    imgui.SeparatorText(("Select Tab Settings"):obfuscate())
 
     -- local selectTabDict = table.map(SELECT_TOOLS, function(element, idx)
     --     return { label = element, fn = selectFnList[idx] }
@@ -209,15 +209,15 @@ function showDefaultPropertiesSettings()
     if (imgui.CollapsingHeader("Select Note Type Settings")) then
         local menuVars = getMenuVars("selectNoteType", "Property")
 
-        _, menuVars.rice = imgui.Checkbox("Select Rice Notes", menuVars.rice)
+        _, menuVars.rice = imgui.Checkbox(("Select Rice Notes"):obfuscate(), menuVars.rice)
         KeepSameLine()
-        _, menuVars.ln = imgui.Checkbox("Select LNs", menuVars.ln)
+        _, menuVars.ln = imgui.Checkbox(("Select LNs"):obfuscate(), menuVars.ln)
 
         saveMenuPropertiesButton(menuVars, "selectNoteType")
         cache.saveTable("selectNoteTypePropertyMenu", menuVars)
     end
 
-    imgui.SeparatorText("Standard/Still Settings")
+    imgui.SeparatorText(("Standard/Still Settings"):obfuscate())
 
     local standardMenuDict = table.map(STANDARD_SVS, function(element, idx)
         return { label = element, fn = standardFnList[idx] }
@@ -233,7 +233,7 @@ function showDefaultPropertiesSettings()
         end
     end
 
-    imgui.SeparatorText("Special Settings")
+    imgui.SeparatorText(("Special Settings"):obfuscate())
 
     local specialMenuDict = table.map(SPECIAL_SVS, function(element, idx)
         return { label = element, fn = specialFnList[idx] }
@@ -251,7 +251,7 @@ function showDefaultPropertiesSettings()
         ::continue::
     end
 
-    imgui.SeparatorText("SV Vibrato Settings")
+    imgui.SeparatorText(("SV Vibrato Settings"):obfuscate())
 
     if (imgui.CollapsingHeader("Linear Vibrato SV Settings")) then
         local settingVars = getSettingVars("LinearVibratoSV", "Property")
@@ -299,7 +299,7 @@ function showDefaultPropertiesSettings()
         cache.saveTable("SigmoidalVibratoSVPropertySettings", settingVars)
     end
 
-    imgui.SeparatorText("SSF Vibrato Settings")
+    imgui.SeparatorText(("SSF Vibrato Settings"):obfuscate())
 
     if (imgui.CollapsingHeader("Linear Vibrato SSF Settings")) then
         local settingVars = getSettingVars("LinearVibratoSSF", "Property")

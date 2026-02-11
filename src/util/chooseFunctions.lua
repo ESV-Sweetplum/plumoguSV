@@ -9,7 +9,8 @@ end
 
 function chooseArcPercent(settingVars)
     local oldPercent = settingVars.arcPercent
-    _, settingVars.arcPercent = imgui.SliderInt("Arc Percent", math.clamp(oldPercent, 1, 99), 1, 99, oldPercent .. "%%")
+    _, settingVars.arcPercent = imgui.SliderInt(("Arc Percent"):obfuscate(), math.clamp(oldPercent, 1, 99), 1, 99,
+        oldPercent .. "%%")
     return oldPercent ~= settingVars.arcPercent
 end
 
@@ -82,11 +83,11 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
 
         imgui.SetCursorPosY(80)
         imgui.SetCursorPosX(5)
-        _, settingVars.freeMode = imgui.Checkbox("Free Mode##Bezier", settingVars.freeMode)
+        _, settingVars.freeMode = imgui.Checkbox(("Free Mode##Bezier"):obfuscate(), settingVars.freeMode)
         HoverToolTip(
             "Enable this to allow the bezier control points to move outside the boundary. WARNING: ONCE MOVED OUTSIDE, THEY CANNOT BE MOVED BACK IN. DISABLE AND RE-ENABLE FREE MODE TO ALLOW THEM TO BE INTERACTED WITH.")
         imgui.SetCursorPosX(5)
-        _, settingVars.manualMode = imgui.Checkbox("Manual Edit##Bezier", settingVars.manualMode)
+        _, settingVars.manualMode = imgui.Checkbox(("Manual Edit##Bezier"):obfuscate(), settingVars.manualMode)
         HoverToolTip(
             "Enable this to directly edit the bezier points.")
 
@@ -103,9 +104,9 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
             imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
             _, normalizedPos2 = imgui.SliderFloat2("Point 2", pos2 / 150, 0, 1)
         end
-        _, settingVars.freeMode = imgui.Checkbox("Free Mode##Bezier", settingVars.freeMode)
+        _, settingVars.freeMode = imgui.Checkbox(("Free Mode##Bezier"):obfuscate(), settingVars.freeMode)
         KeepSameLine()
-        _, settingVars.manualMode = imgui.Checkbox("Manual Edit##Bezier", settingVars.manualMode)
+        _, settingVars.manualMode = imgui.Checkbox(("Manual Edit##Bezier"):obfuscate(), settingVars.manualMode)
         HoverToolTip(
             "Disable this to edit the bezier points with an interactive graph.")
     end
@@ -179,14 +180,14 @@ end
 
 function chooseCurrentFrame(settingVars)
     imgui.AlignTextToFramePadding()
-    imgui.Text("Previewing frame:")
+    imgui.Text(("Previewing frame:"):obfuscate())
     KeepSameLine()
     imgui.PushItemWidth(35)
     if imgui.ArrowButton("##leftFrame", imgui_dir.Left) then
         settingVars.currentFrame = settingVars.currentFrame - 1
     end
     KeepSameLine()
-    _, settingVars.currentFrame = imgui.InputInt("##currentFrame", settingVars.currentFrame, 0, 0)
+    _, settingVars.currentFrame = imgui.InputInt(("##currentFrame"):obfuscate(), settingVars.currentFrame, 0, 0)
     KeepSameLine()
     if imgui.ArrowButton("##rightFrame", imgui_dir.Right) then
         settingVars.currentFrame = settingVars.currentFrame + 1
@@ -243,12 +244,12 @@ end
 
 function chooseCurveSharpness(settingVars)
     local oldSharpness = settingVars.curveSharpness
-    if imgui.Button("Reset##curveSharpness", SECONDARY_BUTTON_SIZE) then
+    if imgui.Button(("Reset##curveSharpness"):obfuscate(), SECONDARY_BUTTON_SIZE) then
         settingVars.curveSharpness = 50
     end
     KeepSameLine()
     imgui.PushItemWidth(107)
-    local _, newSharpness = imgui.SliderInt("Curve Sharpness", settingVars.curveSharpness, 1, 100, "%d%%")
+    local _, newSharpness = imgui.SliderInt(("Curve Sharpness"):obfuscate(), settingVars.curveSharpness, 1, 100, "%d%%")
     imgui.PopItemWidth()
     settingVars.curveSharpness = newSharpness
     return oldSharpness ~= newSharpness
@@ -265,7 +266,7 @@ function chooseCustomMultipliers(settingVars)
     imgui.EndChild()
     local index = settingVars.selectedMultiplierIndex
     local oldMultiplier = settingVars.svMultipliers[index]
-    local _, newMultiplier = imgui.InputFloat("SV Multiplier", oldMultiplier, 0, 0, "%.2fx")
+    local _, newMultiplier = imgui.InputFloat(("SV Multiplier"):obfuscate(), oldMultiplier, 0, 0, "%.2fx")
     settingVars.svMultipliers[index] = newMultiplier
     return oldMultiplier ~= newMultiplier
 end
@@ -302,7 +303,7 @@ function chooseFinalSV(settingVars, skipFinalSV)
     local finalSVType = FINAL_SV_TYPES[settingVars.finalSVIndex]
     if finalSVType ~= "Normal" then
         imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.35)
-        _, settingVars.customSV = imgui.InputFloat("SV", settingVars.customSV, 0, 0, "%.2fx")
+        _, settingVars.customSV = imgui.InputFloat(("SV"):obfuscate(), settingVars.customSV, 0, 0, "%.2fx")
         KeepSameLine()
         imgui.PopItemWidth()
     else
@@ -319,7 +320,7 @@ function chooseFinalSV(settingVars, skipFinalSV)
 end
 
 function chooseFrameSpacing(settingVars)
-    _, settingVars.frameDistance = imgui.InputFloat("Frame Spacing", settingVars.frameDistance,
+    _, settingVars.frameDistance = imgui.InputFloat(("Frame Spacing"):obfuscate(), settingVars.frameDistance,
         0, 0, "%.0f msx")
     settingVars.frameDistance = math.clamp(settingVars.frameDistance, 2000, 100000)
 end
@@ -327,9 +328,9 @@ end
 function chooseFrameTimeData(settingVars)
     if not isTruthy(settingVars.frameTimes) then return end
     local frameTime = settingVars.frameTimes[settingVars.selectedTimeIndex]
-    _, frameTime.frame = imgui.InputInt("Frame #", math.floor(frameTime.frame))
+    _, frameTime.frame = imgui.InputInt(("Frame #"):obfuscate(), math.floor(frameTime.frame))
     frameTime.frame = math.clamp(frameTime.frame, 1, settingVars.numFrames)
-    _, frameTime.position = imgui.InputInt("Note height", math.floor(frameTime.position))
+    _, frameTime.position = imgui.InputInt(("Note height"):obfuscate(), math.floor(frameTime.position))
 end
 
 function chooseIntensity(settingVars)
@@ -340,8 +341,8 @@ function chooseIntensity(settingVars)
 
     local stepIndex = math.floor((oldIntensity - 0.01) / userStepSize)
 
-    local _, newStepIndex = imgui.SliderInt(
-        "Intensity",
+    local _, newStepIndex = imgui.SliderInt((
+            "Intensity"):obfuscate(),
         stepIndex,
         0,
         totalSteps - 1,
@@ -360,7 +361,7 @@ function chooseInterlace(menuVars)
     KeepSameLine()
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.5)
     local oldRatio = menuVars.interlaceRatio
-    _, menuVars.interlaceRatio = imgui.InputFloat("Ratio##interlace", menuVars.interlaceRatio,
+    _, menuVars.interlaceRatio = imgui.InputFloat(("Ratio##interlace"):obfuscate(), menuVars.interlaceRatio,
         0, 0, "%.2f")
     imgui.PopItemWidth()
     return interlaceChanged or oldRatio ~= menuVars.interlaceRatio
@@ -376,19 +377,19 @@ function chooseMainSV(settingVars)
         return
     end
 
-    _, settingVars.mainSV2 = imgui.InputFloat("Main SV (end)", settingVars.mainSV2, 0, 0, "%.2fx")
+    _, settingVars.mainSV2 = imgui.InputFloat(("Main SV (end)"):obfuscate(), settingVars.mainSV2, 0, 0, "%.2fx")
 end
 
 function chooseMenuStep(settingVars)
     imgui.AlignTextToFramePadding()
-    imgui.Text("Step # :")
+    imgui.Text(("Step # :"):obfuscate())
     KeepSameLine()
     imgui.PushItemWidth(24)
     if imgui.ArrowButton("##leftMenuStep", imgui_dir.Left) then
         settingVars.menuStep = settingVars.menuStep - 1
     end
     KeepSameLine()
-    _, settingVars.menuStep = imgui.InputInt("##currentMenuStep", settingVars.menuStep, 0, 0)
+    _, settingVars.menuStep = imgui.InputInt(("##currentMenuStep"):obfuscate(), settingVars.menuStep, 0, 0)
     KeepSameLine()
     if imgui.ArrowButton("##rightMenuStep", imgui_dir.Right) then
         settingVars.menuStep = settingVars.menuStep + 1
@@ -416,7 +417,7 @@ end
 
 function chooseNumPeriods(settingVars)
     local oldPeriods = settingVars.periods
-    local _, newPeriods = imgui.InputFloat("Periods/Cycles", oldPeriods, 0.25, 0.25, "%.2f")
+    local _, newPeriods = imgui.InputFloat(("Periods/Cycles"):obfuscate(), oldPeriods, 0.25, 0.25, "%.2f")
     newPeriods = math.quarter(newPeriods)
     newPeriods = math.clamp(newPeriods, 0.25, 69420)
     settingVars.periods = newPeriods
@@ -425,7 +426,7 @@ end
 
 function choosePeriodShift(settingVars)
     local oldShift = settingVars.periodsShift
-    local _, newShift = imgui.InputFloat("Phase Shift", oldShift, 0.25, 0.25, "%.2f")
+    local _, newShift = imgui.InputFloat(("Phase Shift"):obfuscate(), oldShift, 0.25, 0.25, "%.2f")
     if (globalVars.restrictSinusoidalPeriod) then
         newShift = math.quarter(newShift)
         newShift = math.wrappedClamp(newShift, -0.75, 1)
@@ -438,7 +439,7 @@ end
 
 function chooseCurrentScrollGroup()
     imgui.AlignTextToFramePadding()
-    imgui.Text("  Timing Group: ")
+    imgui.Text(("  Timing Group: "):obfuscate())
     KeepSameLine()
     local groups = { "$Default", "$Global" }
     local cols = { map.TimingGroups["$Default"].ColorRgb or "86,253,110", map.TimingGroups["$Global"].ColorRgb or
@@ -463,7 +464,7 @@ end
 
 function chooseTimingGroup(label, previousGroup)
     imgui.AlignTextToFramePadding()
-    imgui.Text(label)
+    imgui.Text(label:obfuscate())
     KeepSameLine()
 
     local groups = { "$Default", "$Global" }
@@ -491,7 +492,7 @@ end
 
 function chooseRandomScale(settingVars)
     local oldScale = settingVars.randomScale
-    local _, newScale = imgui.InputFloat("Random Scale", oldScale, 0, 0, "%.2fx")
+    local _, newScale = imgui.InputFloat(("Random Scale"):obfuscate(), oldScale, 0, 0, "%.2fx")
     settingVars.randomScale = newScale
     return oldScale ~= newScale
 end
@@ -504,7 +505,7 @@ end
 
 function chooseRGBPeriod()
     local oldRGBPeriod = globalVars.rgbPeriod
-    _, globalVars.rgbPeriod = imgui.InputFloat("RGB cycle length", oldRGBPeriod, 0, 0,
+    _, globalVars.rgbPeriod = imgui.InputFloat(("RGB cycle length"):obfuscate(), oldRGBPeriod, 0, 0,
         "%.0f second" .. (math.round(globalVars.rgbPeriod) ~= 1 and "s" or ""))
     globalVars.rgbPeriod = math.clamp(globalVars.rgbPeriod, MIN_RGB_CYCLE_TIME,
         MAX_RGB_CYCLE_TIME)
@@ -528,7 +529,7 @@ function chooseSnakeSpringConstant()
     if currentTrail ~= "Snake" then return end
 
     local oldValue = globalVars.snakeSpringConstant
-    _, globalVars.snakeSpringConstant = imgui.InputFloat("Reactiveness##snake", oldValue, 0, 0, "%.2f")
+    _, globalVars.snakeSpringConstant = imgui.InputFloat(("Reactiveness##snake"):obfuscate(), oldValue, 0, 0, "%.2f")
     HelpMarker("Pick any number from 0.01 to 1")
     globalVars.snakeSpringConstant = math.clamp(globalVars.snakeSpringConstant, 0.01, 1)
     if (globalVars.snakeSpringConstant ~= oldValue) then
@@ -556,7 +557,8 @@ end
 function chooseCurvatureCoefficient(settingVars, plotFn)
     plotFn(settingVars)
     imgui.SameLine(0, 0)
-    _, settingVars.curvatureIndex = imgui.SliderInt("Curvature", settingVars.curvatureIndex, 1, #VIBRATO_CURVATURES,
+    _, settingVars.curvatureIndex = imgui.SliderInt(("Curvature"):obfuscate(), settingVars.curvatureIndex, 1,
+        #VIBRATO_CURVATURES,
         tostring(VIBRATO_CURVATURES[settingVars.curvatureIndex]))
 end
 
@@ -580,7 +582,7 @@ end
 function chooseStartEndSVs(settingVars)
     if settingVars.linearlyChange == false then
         local oldValue = settingVars.startSV
-        _, settingVars.startSV = imgui.InputFloat("SV Value", oldValue, 0, 0, "%.2fx")
+        _, settingVars.startSV = imgui.InputFloat(("SV Value"):obfuscate(), oldValue, 0, 0, "%.2fx")
         return oldValue ~= settingVars.startSV
     end
     return SwappableNegatableInputFloat2(settingVars, "startSV", "endSV", "Start/End SV")
@@ -636,7 +638,7 @@ end
 function chooseStutterDuration(settingVars)
     local oldDuration = settingVars.stutterDuration
     if settingVars.controlLastSV then oldDuration = 100 - oldDuration end
-    local _, newDuration = imgui.SliderInt("Duration", oldDuration, 1, 99, oldDuration .. "%%")
+    local _, newDuration = imgui.SliderInt(("Duration"):obfuscate(), oldDuration, 1, 99, oldDuration .. "%%")
     newDuration = math.clamp(newDuration, 1, 99)
     local durationChanged = oldDuration ~= newDuration
     if settingVars.controlLastSV then newDuration = 100 - newDuration end
@@ -653,7 +655,7 @@ function chooseStyleTheme()
 end
 
 function chooseSVBehavior(settingVars)
-    local swapButtonPressed = imgui.Button("Swap", SECONDARY_BUTTON_SIZE)
+    local swapButtonPressed = imgui.Button(("Swap"):obfuscate(), SECONDARY_BUTTON_SIZE)
     HoverToolTip("Switch between slow down/speed up")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
@@ -670,7 +672,7 @@ end
 
 function chooseSVPerQuarterPeriod(settingVars)
     local oldPoints = settingVars.svsPerQuarterPeriod
-    local _, newPoints = imgui.InputInt("SV Points##perQuarter", oldPoints, 1, 1)
+    local _, newPoints = imgui.InputInt(("SV Points##perQuarter"):obfuscate(), oldPoints, 1, 1)
     HelpMarker("Number of SV points per 0.25 period/cycle")
     local maxSVsPerQuarterPeriod = MAX_SV_POINTS / (4 * settingVars.periods)
     newPoints = math.clamp(newPoints, 1, maxSVsPerQuarterPeriod)

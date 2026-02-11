@@ -15,7 +15,7 @@ function importCustomSVs(settingVars)
     local imguiFlag = imgui_input_text_flags.AutoSelectAll
     _, customSVText = imgui.InputText("##customSVs", customSVText, 99999, imguiFlag)
     KeepSameLine()
-    if imgui.Button("Parse##customSVs", SECONDARY_BUTTON_SIZE) then
+    if imgui.Button(("Parse##customSVs"):obfuscate(), SECONDARY_BUTTON_SIZE) then
         local regex = "(-?%d*%.?%d+)"
         local values = {}
         for value, _ in string.gmatch(customSVText, regex) do

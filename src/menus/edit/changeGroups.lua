@@ -15,9 +15,9 @@ function changeGroupsSettingsMenu(menuVars)
     menuVars.designatedTimingGroup = chooseTimingGroup(table.concat({ "  ", action, " to: " }),
         menuVars.designatedTimingGroup)
 
-    _, menuVars.changeSVs = imgui.Checkbox("Change SVs?", menuVars.changeSVs)
+    _, menuVars.changeSVs = imgui.Checkbox(("Change SVs?"):obfuscate(), menuVars.changeSVs)
     KeepSameLine()
-    _, menuVars.changeSSFs = imgui.Checkbox("Change SSFs?", menuVars.changeSSFs)
+    _, menuVars.changeSSFs = imgui.Checkbox(("Change SSFs?"):obfuscate(), menuVars.changeSSFs)
 
     menuVars.clone = RadioButtons("Mode: ", menuVars.clone, { "Clone", "Move" }, { true, false })
 

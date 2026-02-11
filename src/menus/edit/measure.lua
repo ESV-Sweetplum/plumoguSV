@@ -9,7 +9,7 @@ function measureMenu()
         displayMeasuredStatsRounded(menuVars)
     end
     AddPadding()
-    imgui.TextDisabled("*** Measuring disclaimer ***")
+    imgui.TextDisabled(("*** Measuring disclaimer ***"):obfuscate())
     HoverToolTip("Measured values might not be 100%% accurate & may not work on older maps")
 
     simpleActionMenu("Measure SVs between selected notes", 2, measureSVs, menuVars)
@@ -18,12 +18,12 @@ end
 
 function displayMeasuredStatsRounded(menuVars)
     imgui.Columns(2, "Measured SV Stats", false)
-    imgui.Text("NSV distance:")
-    imgui.Text("SV distance:")
-    imgui.Text("Average SV:")
-    imgui.Text("Start displacement:")
-    imgui.Text("End displacement:")
-    imgui.Text("True average SV:")
+    imgui.Text(("NSV distance:"):obfuscate())
+    imgui.Text(("SV distance:"):obfuscate())
+    imgui.Text(("Average SV:"):obfuscate())
+    imgui.Text(("Start displacement:"):obfuscate())
+    imgui.Text(("End displacement:"):obfuscate())
+    imgui.Text(("True average SV:"):obfuscate())
     imgui.NextColumn()
     imgui.Text(menuVars.roundedNSVDistance .. " msx")
     HelpMarker("The normal distance between the start and the end, ignoring SVs")
@@ -54,7 +54,7 @@ end
 --    label   : label of the input text [String]
 --    content : content to put in the box [String]
 function CopiableBox(text, label, content)
-    imgui.TextWrapped(text)
+    imgui.TextWrapped(text:obfuscate())
     imgui.PushItemWidth(imgui.GetContentRegionAvailWidth())
     imgui.InputText(label, content, #content, imgui_input_text_flags.AutoSelectAll)
     imgui.PopItemWidth()

@@ -15,7 +15,7 @@ function showTutorialWindow()
     local navigatorWidth = 200
 
     local nullFn = function()
-        imgui.Text("Select a tutorial on the left to view it.")
+        imgui.Text(("Select a tutorial on the left to view it."):obfuscate())
     end
     local incompleteFn = function()
         imgui.TextWrapped("Sorry, this tutorial is not ready yet. Please come back when a new version comes out.")
@@ -94,8 +94,8 @@ function showTutorialWindow()
     end
 
     if (game.keyCount ~= 4) then
-        imgui.SeparatorText("This tutorial does not support this key mode.")
-        imgui.Text("Please go to a 4K map to continue.")
+        imgui.SeparatorText(("This tutorial does not support this key mode."):obfuscate())
+        imgui.Text(("Please go to a 4K map to continue."):obfuscate())
         goto tutorialRenderSkip
     end
 
