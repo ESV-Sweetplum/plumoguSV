@@ -7,7 +7,6 @@ DEFAULT_STARTING_MENU_VARS = {
         svStats = createSVStats(),
         interlace = false,
         interlaceRatio = -0.5,
-        overrideFinal = false
     },
     placeSpecial = { svTypeIndex = 1 },
     placeStill = {
@@ -23,7 +22,6 @@ DEFAULT_STARTING_MENU_VARS = {
         svStats = createSVStats(),
         interlace = false,
         interlaceRatio = -0.5,
-        overrideFinal = false
     },
     placeVibrato = {
         svTypeIndex = 1,

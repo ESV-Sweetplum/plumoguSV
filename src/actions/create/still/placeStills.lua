@@ -21,7 +21,8 @@ function placeStillSVsParent(menuVars)
         svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
         svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
     end
-    addFinalSV(svsToAdd, offsets[#offsets], menuVars.svMultipliers[#menuVars.svMultipliers], true)
+    addFinalSV(svsToAdd, offsets[#offsets], menuVars.svMultipliers[#menuVars.svMultipliers],
+        FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex] == "Override")
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 
