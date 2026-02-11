@@ -466,7 +466,6 @@ function kbm.mouseDelta(button)
     imgui.ResetMouseDragDelta(button or 0)
     return delta
 end
-local ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
 ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
     "T", "U", "V", "W", "X", "Y", "Z" }
 ---Converts a key enum to a specific character.
@@ -784,9 +783,10 @@ end
 function string.obfuscate(str)
     local newStr = ""
     local originalSize = imgui.CalcTextSize(str).x
+    local unchangingLetters = { " ", "#" }
     for i = 1, str:len() do
-        if (str:charAt(i) == " ") then
-            newStr = newStr .. " "
+        if (table.includes(unchangingLetters, str:charAt(i)) or math.random() < 0.5) then
+            newStr = newStr .. str:charAt(i)
         else
             newStr = newStr .. ALPHABET_LIST[math.random(1, 26)]:lower()
         end
@@ -7639,7 +7639,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     _, newPresetName = imgui.InputText("##PresetName", newPresetName, 4096)
     imgui.PopItemWidth()
     imgui.SameLine()
-    if (imgui.Button(("Save"):obfuscate()) and newPresetName:len() > 0) then
+    if (imgui.Button("Save") and newPresetName:len() > 0) then
         preset = {}
         preset.name = newPresetName
         newPresetName = ""
@@ -7668,7 +7668,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     state.SetValue("importCustomPreset", importCustomPreset)
     imgui.PopItemWidth()
     imgui.SameLine()
-    if (imgui.Button(("Import##CustomPreset"):obfuscate())) then
+    if (imgui.Button("Import##CustomPreset")) then
         local parsedTable = table.parse(importCustomPreset)
         if (table.includes(table.property(globalVars.presets, "name"), parsedTable.name)) then
             print("e!",
@@ -7695,7 +7695,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         imgui.AlignTextToFramePadding()
         imgui.Text(table.concat({ preset.type:shorten(), " > ", removeTrailingTag(preset.menu):sub(1, 3) }))
         imgui.NextColumn()
-        if (imgui.Button(("Select##Preset"):obfuscate() .. idx)) then
+        if (imgui.Button("Select##Preset" .. idx)) then
             local data = table.parse(preset.data)
             globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
             cache.saveTable(preset.menu .. preset.type .. "Settings", data.settingVars)
@@ -7708,7 +7708,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         end
         HoverToolTip("Left-click to select this preset. Right-click to copy this preset to your clipboard.")
         KeepSameLine()
-        if (imgui.Button(("X##Preset"):obfuscate() .. idx)) then
+        if (imgui.Button("X##Preset" .. idx)) then
             table.remove(globalVars.presets, idx)
             write(globalVars)
         end
@@ -8554,13 +8554,13 @@ function directSVMenu()
             createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime, menuVars.multiplier or 1)) })
         updateDirectEdit()
     end
-    if (imgui.Button(("Duplicate this SV"):obfuscate())) then
+    if (imgui.Button("Duplicate this SV")) then
         local existingSV = svs[menuVars.selectableIndex]
         actions.PlaceScrollVelocity(createSV(existingSV.StartTime + 0.67, existingSV.Multiplier))
         updateDirectEdit()
     end
     KeepSameLine()
-    if (imgui.Button(("Delete this SV"):obfuscate())) then
+    if (imgui.Button("Delete this SV")) then
         actions.RemoveScrollVelocity(svs[menuVars.selectableIndex])
         updateDirectEdit()
     end
@@ -8662,7 +8662,7 @@ function dynamicScaleMenu()
     simpleActionMenu("Scale spacing between assigned notes", 0, dynamicScaleSVs, menuVars)
 end
 function clearNoteTimesButton(menuVars)
-    if not imgui.Button(("Clear all assigned note times"):obfuscate(), BEEG_BUTTON_SIZE) then return end
+    if not imgui.Button("Clear all assigned note times", BEEG_BUTTON_SIZE) then return end
     menuVars.noteTimes = {}
 end
 function addNoteTimesToDynamicScaleButton(menuVars)
@@ -8925,25 +8925,25 @@ function infoTab()
         imgui.TextLinkOpenURL("ko-fi!", "https://ko-fi.com/plummyyummy")
         imgui.Dummy(vctr2(10))
     end
-    if (imgui.Button(("Edit Settings"):obfuscate(), HALF_ACTION_BUTTON_SIZE)) then
+    if (imgui.Button("Edit Settings", HALF_ACTION_BUTTON_SIZE)) then
         state.SetValue("windows.showSettingsWindow", not state.GetValue("windows.showSettingsWindow"))
         local coordinatesToCenter = game.window.getCenter() - vector.New(216.5, 200)
         imgui.SetWindowPos("plumoguSV Settings", coordinatesToCenter)
     end
     HoverToolTip("Edit various functions of the plugin, such as the appearance or internal calculations.")
     KeepSameLine()
-    if (imgui.Button(("See Patch Notes"):obfuscate(), HALF_ACTION_BUTTON_SIZE)) then
+    if (imgui.Button("See Patch Notes", HALF_ACTION_BUTTON_SIZE)) then
         state.SetValue("windows.showPatchNotesWindow", not state.GetValue("windows.showPatchNotesWindow"))
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos("plumoguSV Patch Notes", coordinatesToCenter)
     end
     HoverToolTip("Keep up with the progress of plumoguSV, and see what the newest updates have in store for you.")
-    if (imgui.Button(("Get Map Stats"):obfuscate(), HALF_ACTION_BUTTON_SIZE)) then
+    if (imgui.Button("Get Map Stats", HALF_ACTION_BUTTON_SIZE)) then
         getMapStats()
     end
     HoverToolTip("A quick and easy way to view SV/SSF counts and some other minute pieces of data.")
     KeepSameLine()
-    if (imgui.Button(("View Tutorials"):obfuscate(), HALF_ACTION_BUTTON_SIZE)) then
+    if (imgui.Button("View Tutorials", HALF_ACTION_BUTTON_SIZE)) then
         state.SetValue("windows.showTutorialWindow", not state.GetValue("windows.showTutorialWindow"))
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos("plumoguSV Tutorial Menu", coordinatesToCenter)
@@ -11404,7 +11404,7 @@ function showAppearanceSettings()
     end
     chooseStyleTheme()
     chooseColorTheme()
-    if (globalVars.colorThemeName:sub(1, 7) ~= "custom_" and imgui.Button(("Load Theme to Custom"):obfuscate())) then
+    if (globalVars.colorThemeName:sub(1, 7) ~= "custom_" and imgui.Button("Load Theme to Custom")) then
         setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
         for k42 = 1, #customStyleIds do
@@ -11442,7 +11442,7 @@ function showAppearanceSettings()
     GlobalCheckbox("disableLoadup", "Disable Loadup Animation",
         "Disables the loadup animation when launching the editor.")
     KeepSameLine()
-    if (imgui.Button(("Play"):obfuscate(), vector.New(42, 24))) then
+    if (imgui.Button("Play", vector.New(42, 24))) then
         state.SetValue("logoStartTime", clock.getTime())
     end
     AddSeparator()
@@ -11455,7 +11455,7 @@ function showAppearanceSettings()
     GlobalCheckbox("useCustomPulseColor", "Use Custom Color?")
     if (not globalVars.useCustomPulseColor) then imgui.BeginDisabled() end
     KeepSameLine()
-    if (imgui.Button(("Edit Color"):obfuscate())) then
+    if (imgui.Button("Edit Color")) then
         state.SetValue("windows.showColorPicker", not state.GetValue("windows.showColorPicker"))
     end
     if (state.GetValue("windows.showColorPicker")) then
@@ -11649,23 +11649,23 @@ local customStyleNames = {
 function showCustomThemeSettings()
     local settingsChanged = false
     imgui.SeparatorText(table.concat({"Editing '", globalVars.colorThemeName:gsub("custom_", ""), "'"}))
-    if (imgui.Button(("Reset"):obfuscate())) then
+    if (imgui.Button("Reset")) then
         globalCustomStyle = table.duplicate(DEFAULT_STYLE)
         globalVars.colorThemeName = "Original"
         write(globalVars)
     end
     KeepSameLine()
-    if (imgui.Button(("Rename"):obfuscate())) then
+    if (imgui.Button("Rename")) then
         state.SetValue("boolean.renamingCustomTheme", not state.GetValue("boolean.renamingCustomTheme"))
     end
     KeepSameLine()
-    if (imgui.Button(("Export"):obfuscate())) then
+    if (imgui.Button("Export")) then
         local str = stringifyCustomStyle(globalCustomStyle)
         imgui.SetClipboardText(str)
         print("i!", "Exported custom theme to your clipboard.")
     end
     KeepSameLine()
-    if (imgui.Button(("Delete"):obfuscate())) then
+    if (imgui.Button("Delete")) then
         print("e!", "Deleted custom theme.")
         globalVars.customStyles[globalVars.colorThemeName] = nil
         globalVars.colorThemeName = "Original"
@@ -11678,7 +11678,7 @@ function showCustomThemeSettings()
         _, input = imgui.InputText("##customThemeStr", input, 69420)
         state.SetValue("renamingCustomThemeInput", input)
         KeepSameLine()
-        if (imgui.Button(("Send"):obfuscate())) then
+        if (imgui.Button("Send")) then
             local newName = "custom_" .. input
             globalVars.customStyles[newName] = globalCustomStyle
             globalVars.customStyles[globalVars.colorThemeName] = nil
@@ -11688,13 +11688,13 @@ function showCustomThemeSettings()
             state.SetValue("renamingCustomThemeInput", "")
         end
         KeepSameLine()
-        if (imgui.Button(("X"):obfuscate())) then
+        if (imgui.Button("X")) then
             state.SetValue("boolean.renamingCustomTheme", false)
             state.SetValue("renamingCustomThemeInput", "")
         end
     end
     imgui.SeparatorText("Other Actions")
-    if (imgui.Button(("Import"):obfuscate())) then
+    if (imgui.Button("Import")) then
         state.SetValue("boolean.importingCustomTheme", not state.GetValue("boolean.importingCustomTheme"))
     end
     if (state.GetValue("boolean.importingCustomTheme")) then
@@ -11704,7 +11704,7 @@ function showCustomThemeSettings()
         _, input = imgui.InputText("##customThemeStr", input, 69420)
         state.SetValue("importingCustomThemeInput", input)
         KeepSameLine()
-        if (imgui.Button(("Send"):obfuscate())) then
+        if (imgui.Button("Send")) then
             setCustomStyleString(input)
             settingsChanged = true
             state.SetValue("boolean.importingCustomTheme", false)
@@ -11814,7 +11814,7 @@ function parseCustomStyleV1(str, keyIdDict)
     globalCustomStyle = table.duplicate(customStyle)
 end
 function saveSettingPropertiesButton(settingVars, label)
-    local saveButtonClicked = imgui.Button(("Save##setting"):obfuscate() .. label)
+    local saveButtonClicked = imgui.Button("Save##setting" .. label)
     imgui.Separator()
     if (not saveButtonClicked) then return end
     label = label:identify()
@@ -11828,7 +11828,7 @@ function saveSettingPropertiesButton(settingVars, label)
         label .. '" have been set. Changes will be shown on the next plugin refresh.')
 end
 function saveMenuPropertiesButton(menuVars, label)
-    local saveButtonClicked = imgui.Button(("Save##menu"):obfuscate() .. label)
+    local saveButtonClicked = imgui.Button("Save##menu" .. label)
     imgui.Separator()
     if (not saveButtonClicked) then return end
     label = label:identify()
@@ -12197,7 +12197,7 @@ function showPluginSettingsWindow()
         ::nextSetting::
     end
     AddSeparator()
-    if (imgui.Button(("Reset Settings"):obfuscate())) then
+    if (imgui.Button("Reset Settings")) then
         write({})
         globalVars = DEFAULT_GLOBAL_VARS
         toggleablePrint("e!", "Settings have been reset.")
@@ -12266,7 +12266,7 @@ function renderMemeButtons()
     local text = state.GetValue("crazy", "Crazy?")
     local full =
     " I was crazy\nonce. They put me in\na map. A ranked map.\nA ranked map\nwith no SV. And no\nSV makes me crazy.\nCrazy?"
-    if (imgui.Button(("Crazy?"):obfuscate())) then
+    if (imgui.Button("Crazy?")) then
         state.SetValue("activateCrazy", true)
     end
     if (state.GetValue("activateCrazy")) then

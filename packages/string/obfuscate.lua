@@ -3,9 +3,10 @@ require("packages.kbm.numToKey")
 function string.obfuscate(str)
     local newStr = ""
     local originalSize = imgui.CalcTextSize(str).x
+    local unchangingLetters = { " ", "#" }
     for i = 1, str:len() do
-        if (str:charAt(i) == " ") then
-            newStr = newStr .. " "
+        if (table.includes(unchangingLetters, str:charAt(i)) or math.random() < 0.5) then
+            newStr = newStr .. str:charAt(i)
         else
             newStr = newStr .. ALPHABET_LIST[math.random(1, 26)]:lower()
         end
