@@ -1,8 +1,0 @@
-{
-    "compilerOptions": {
-      "target": "ES2022",
-      "module": "commonjs",
-      "outDir": "dist",
-      "lib": ["ES2023"]
-    }
-}  

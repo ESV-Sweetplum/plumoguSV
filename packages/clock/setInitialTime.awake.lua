@@ -1,1 +1,0 @@
-clock.prevTime = state.UnixTime
