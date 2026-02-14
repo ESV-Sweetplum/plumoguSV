@@ -12814,11 +12814,11 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
     local normalizedPos2 = pos2 / 150
     if (not settingVars.manualMode) then
         imgui.BeginChild("Bezier Interactive Window" .. optionalLabel, vctr2(150), 67, 31)
-        local red = 4278190335
-        local blue = 4294901760
+        local pointColor1 = 4278190335
+        local pointColor2 = 4294735619
         pos1.y = 150 - pos1.y
         pos2.y = 150 - pos2.y
-        local pointList = { { pos = pos1, col = red, size = 5 }, { pos = pos2, col = blue, size = 5 } }
+        local pointList = { { pos = pos1, col = pointColor1, size = 5 }, { pos = pos2, col = pointColor2, size = 5 } }
         local ctx = renderGraph("Bezier Interactive Window" .. optionalLabel, vctr2(150), pointList, settingVars
             .freeMode)
         local topLeft = imgui.GetWindowPos()
