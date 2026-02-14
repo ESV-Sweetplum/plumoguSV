@@ -97,7 +97,7 @@ function showCustomThemeSettings()
     if (imgui.Button("Export")) then
         local str = stringifyCustomStyle(globalCustomStyle)
         imgui.SetClipboardText(str)
-        print("i!", "Exported custom theme to your clipboard.")
+        print("s!", "Exported custom theme to your clipboard.")
     end
     KeepSameLine()
     if (imgui.Button("Delete")) then
@@ -110,7 +110,7 @@ function showCustomThemeSettings()
     if (cache.boolean.renamingCustomTheme) then
         local input = state.GetValue("renamingCustomThemeInput", "")
         imgui.SetNextItemWidth(130)
-        _, input = imgui.InputText("##customThemeStr", input, 69420)
+        _, input = imgui.InputTextWithHint("##customThemeStr", "New Custom Theme Name", input, 69420)
         state.SetValue("renamingCustomThemeInput", input)
         KeepSameLine()
         if (imgui.Button("Send")) then
@@ -133,7 +133,7 @@ function showCustomThemeSettings()
 
     imgui.PushItemWidth(imgui.GetWindowWidth() - 25)
     local searchText = state.GetValue("customTheme_searchText", "")
-    _, searchText = imgui.InputText("##CustomThemeSearch", searchText, 100)
+    _, searchText = imgui.InputTextWithHint("##CustomThemeSearch", "Border, Title, Frame BG, etc.", searchText, 100)
     state.SetValue("customTheme_searchText", searchText)
     imgui.PopItemWidth()
 
@@ -210,6 +210,7 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
         local newName = "custom_Import" .. state.UnixTime
         globalVars.customStyles[newName] = globalCustomStyle
         globalVars.colorThemeName = newName
+        print("s!", "Imported a new theme into your custom theme list.")
         return
     end
 

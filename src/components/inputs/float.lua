@@ -9,7 +9,7 @@ function ComputableInputFloat(label, value, decimalPlaces, suffix)
     local fmt = "%." .. decimalPlaces .. "f"
     if suffix then fmt = fmt .. suffix end
 
-    _, value = imgui.InputText(label,
+    _, value = imgui.InputTextWithHint(label, "2, 4/3 + 1, etc.",
         string.format(fmt, value), 4096,
         imgui_input_text_flags.AutoSelectAll)
     if (imgui.IsItemEdited()) then

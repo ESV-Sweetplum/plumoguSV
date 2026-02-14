@@ -33,6 +33,7 @@ function pulseController()
     outputPulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
 
     local borderColor = cache.borderColor or vctr4(1)
+    if (type(borderColor) == "table") then borderColor = table.vectorize4(borderColor) end
     local negatedBorderColor = vctr4(1) - borderColor
 
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor

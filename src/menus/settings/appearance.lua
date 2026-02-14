@@ -25,6 +25,7 @@ function showAppearanceSettings()
         if (not globalVars.customStyles) then globalVars.customStyles = {} end
         globalVars.customStyles[newName] = globalCustomStyle
         setPluginAppearanceColors(newName)
+        print("s!", "Duplicated the current theme into your custom theme list.")
         write(globalVars)
     end
     if (globalVars.colorThemeName:sub(1, 7) ~= "custom_") then

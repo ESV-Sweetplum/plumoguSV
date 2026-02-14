@@ -6176,6 +6176,7 @@ function pulseController()
     end
     outputPulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
     local borderColor = state.GetValue("borderColor") or vctr4(1)
+    if (type(borderColor) == "table") then borderColor = table.vectorize4(borderColor) end
     local negatedBorderColor = vctr4(1) - borderColor
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
     imgui.PushStyleColor(imgui_col.Border, pulseColor * outputPulseStatus + borderColor * (1 - outputPulseStatus))
@@ -7215,7 +7216,7 @@ function ComputableInputFloat(label, value, decimalPlaces, suffix)
     local output = value
     local fmt = table.concat({"%.", decimalPlaces, "f"})
     if suffix then fmt = fmt .. suffix end
-    _, value = imgui.InputText(label,
+    _, value = imgui.InputTextWithHint(label, "2, 4/3 + 1, etc.",
         string.format(fmt, value), 4096,
         imgui_input_text_flags.AutoSelectAll)
     if (imgui.IsItemEdited()) then
@@ -11413,6 +11414,7 @@ function showAppearanceSettings()
         if (not globalVars.customStyles) then globalVars.customStyles = {} end
         globalVars.customStyles[newName] = globalCustomStyle
         setPluginAppearanceColors(newName)
+        print("s!", "Duplicated the current theme into your custom theme list.")
         write(globalVars)
     end
     if (globalVars.colorThemeName:sub(1, 7) ~= "custom_") then
@@ -11668,7 +11670,7 @@ function showCustomThemeSettings()
     if (imgui.Button("Export")) then
         local str = stringifyCustomStyle(globalCustomStyle)
         imgui.SetClipboardText(str)
-        print("i!", "Exported custom theme to your clipboard.")
+        print("s!", "Exported custom theme to your clipboard.")
     end
     KeepSameLine()
     if (imgui.Button("Delete")) then
@@ -11681,7 +11683,7 @@ function showCustomThemeSettings()
     if (state.GetValue("boolean.renamingCustomTheme")) then
         local input = state.GetValue("renamingCustomThemeInput", "")
         imgui.SetNextItemWidth(130)
-        _, input = imgui.InputText("##customThemeStr", input, 69420)
+        _, input = imgui.InputTextWithHint("##customThemeStr", "New Custom Theme Name", input, 69420)
         state.SetValue("renamingCustomThemeInput", input)
         KeepSameLine()
         if (imgui.Button("Send")) then
@@ -11702,7 +11704,7 @@ function showCustomThemeSettings()
     imgui.SeparatorText("Search")
     imgui.PushItemWidth(imgui.GetWindowWidth() - 25)
     local searchText = state.GetValue("customTheme_searchText", "")
-    _, searchText = imgui.InputText("##CustomThemeSearch", searchText, 100)
+    _, searchText = imgui.InputTextWithHint("##CustomThemeSearch", "Border, Title, Frame BG, etc.", searchText, 100)
     state.SetValue("customTheme_searchText", searchText)
     imgui.PopItemWidth()
     for idx, id in ipairs(customStyleIds) do
@@ -11770,6 +11772,7 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
         local newName = "custom_Import" .. state.UnixTime
         globalVars.customStyles[newName] = globalCustomStyle
         globalVars.colorThemeName = newName
+        print("s!", "Imported a new theme into your custom theme list.")
         return
     end
     local outStr = ""
@@ -11801,7 +11804,7 @@ function saveSettingPropertiesButton(settingVars, label)
     globalVars.defaultProperties.settings[label] = settingVars
     loadDefaultProperties(globalVars.defaultProperties)
     write(globalVars)
-    print("i!",
+    print("s!",
         'Default setting properties for submenu "' ..
         label .. '" have been set. Changes will be shown on the next plugin refresh.')
 end
@@ -11815,7 +11818,7 @@ function saveMenuPropertiesButton(menuVars, label)
     globalVars.defaultProperties.menu[label] = menuVars
     loadDefaultProperties(globalVars.defaultProperties)
     write(globalVars)
-    print("i!",
+    print("s!",
         'Default menu properties for menu "' ..
         label .. '" have been set. Changes will be shown on the next plugin refresh.')
 end
