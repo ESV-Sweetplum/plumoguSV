@@ -451,7 +451,7 @@ defaultProperties:
     selectBySnap:
       snap: 1
 disableKofiMessage: true
-disableLoadup: true
+disableLoadup: false
 dontPrintCreation: true
 dontReplaceSV: false
 drawCapybara: true
