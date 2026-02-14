@@ -6,7 +6,7 @@ function showAppearanceSettings()
     end
     chooseStyleTheme()
     chooseColorTheme()
-    if (globalVars.colorThemeName:sub(1, 7) ~= "custom_" and imgui.Button("Load Theme to Custom")) then
+    if (imgui.Button("Copy Current Theme")) then
         setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
         for _, id in ipairs(customStyleIds) do
@@ -20,7 +20,7 @@ function showAppearanceSettings()
         end
         globalCustomStyle = customStyle
         globalCustomStyle.border = cache.borderColor
-        local newName = "custom_Copy of " .. globalVars.colorThemeName
+        local newName = "custom_Copy of " .. globalVars.colorThemeName:gsub("^custom_", "")
         globalVars.colorThemeName = newName
         if (not globalVars.customStyles) then globalVars.customStyles = {} end
         globalVars.customStyles[newName] = globalCustomStyle
@@ -30,6 +30,23 @@ function showAppearanceSettings()
     if (globalVars.colorThemeName:sub(1, 7) ~= "custom_") then
         HoverToolTip(
             "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
+    end
+    KeepSameLine()
+    if (imgui.Button("Import Theme")) then
+        cache.boolean.importingCustomTheme = not cache.boolean.importingCustomTheme
+    end
+    if (cache.boolean.importingCustomTheme) then
+        local input = state.GetValue("importingCustomThemeInput", "")
+        imgui.SetNextItemWidth(180)
+        _, input = imgui.InputTextWithHint("##customThemeStr", "Paste your theme string here.", input, 69420)
+        state.SetValue("importingCustomThemeInput", input)
+        KeepSameLine()
+        if (imgui.Button("Send")) then
+            setCustomStyleString(input)
+            settingsChanged = true
+            cache.boolean.importingCustomTheme = false
+            state.SetValue("importingCustomThemeInput", "")
+        end
     end
     AddSeparator()
     chooseCursorTrail()

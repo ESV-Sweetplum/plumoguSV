@@ -139,17 +139,6 @@ function color.uintToRgba(n)
     end
     return table.vectorize4(tbl) / 255
 end
----Converts a hexa string to an rgba Vector4 (0-1 for each element).
----@param hexa string
----@return Vector4
-function color.hexaToRgba(hexa)
-    local rgbaTable = {}
-    for i = 1, 8, 2 do
-        table.insert(rgbaTable,
-            table.indexOf(HEXADECIMAL, hexa:charAt(i)) * 16 + table.indexOf(HEXADECIMAL, hexa:charAt(i + 1)) - 17)
-    end
-    return table.vectorize4(rgbaTable)
-end
 ---Converts rgba to an ndua string (base 92).
 ---@param r integer
 ---@param g integer
@@ -1752,7 +1741,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
     globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
-    globalVars.customStyles = tempGlobalVars.customStyles
+    globalVars.customStyles = table.duplicate(tempGlobalVars.customStyles)
     globalVars.disableKofiMessage = isTruthy(tempGlobalVars.disableKofiMessage)
     globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
     globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)
@@ -11404,7 +11393,7 @@ function showAppearanceSettings()
     end
     chooseStyleTheme()
     chooseColorTheme()
-    if (globalVars.colorThemeName:sub(1, 7) ~= "custom_" and imgui.Button("Load Theme to Custom")) then
+    if (imgui.Button("Copy Current Theme")) then
         setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
         for k42 = 1, #customStyleIds do
@@ -11419,7 +11408,7 @@ function showAppearanceSettings()
         end
         globalCustomStyle = customStyle
         globalCustomStyle.border = state.GetValue("borderColor")
-        local newName = "custom_Copy of " .. globalVars.colorThemeName
+        local newName = "custom_Copy of " .. globalVars.colorThemeName:gsub("^custom_", "")
         globalVars.colorThemeName = newName
         if (not globalVars.customStyles) then globalVars.customStyles = {} end
         globalVars.customStyles[newName] = globalCustomStyle
@@ -11429,6 +11418,23 @@ function showAppearanceSettings()
     if (globalVars.colorThemeName:sub(1, 7) ~= "custom_") then
         HoverToolTip(
             "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
+    end
+    KeepSameLine()
+    if (imgui.Button("Import Theme")) then
+        state.SetValue("boolean.importingCustomTheme", not state.GetValue("boolean.importingCustomTheme"))
+    end
+    if (state.GetValue("boolean.importingCustomTheme")) then
+        local input = state.GetValue("importingCustomThemeInput", "")
+        imgui.SetNextItemWidth(180)
+        _, input = imgui.InputTextWithHint("##customThemeStr", "Paste your theme string here.", input, 69420)
+        state.SetValue("importingCustomThemeInput", input)
+        KeepSameLine()
+        if (imgui.Button("Send")) then
+            setCustomStyleString(input)
+            settingsChanged = true
+            state.SetValue("boolean.importingCustomTheme", false)
+            state.SetValue("importingCustomThemeInput", "")
+        end
     end
     AddSeparator()
     chooseCursorTrail()
@@ -11693,24 +11699,6 @@ function showCustomThemeSettings()
             state.SetValue("renamingCustomThemeInput", "")
         end
     end
-    imgui.SeparatorText("Other Actions")
-    if (imgui.Button("Import")) then
-        state.SetValue("boolean.importingCustomTheme", not state.GetValue("boolean.importingCustomTheme"))
-    end
-    if (state.GetValue("boolean.importingCustomTheme")) then
-        imgui.SameLine()
-        local input = state.GetValue("importingCustomThemeInput", "")
-        imgui.SetNextItemWidth(118)
-        _, input = imgui.InputText("##customThemeStr", input, 69420)
-        state.SetValue("importingCustomThemeInput", input)
-        KeepSameLine()
-        if (imgui.Button("Send")) then
-            setCustomStyleString(input)
-            settingsChanged = true
-            state.SetValue("boolean.importingCustomTheme", false)
-            state.SetValue("importingCustomThemeInput", "")
-        end
-    end
     imgui.SeparatorText("Search")
     imgui.PushItemWidth(imgui.GetWindowWidth() - 25)
     local searchText = state.GetValue("customTheme_searchText", "")
@@ -11762,9 +11750,9 @@ function setCustomStyleString(str, exportInstead)
     end
     if (str:sub(1, 3) == "v2 ") then
         parseCustomStyleV2(str:sub(4), keyIdDict, exportInstead)
-    else
-        parseCustomStyleV1(str, keyIdDict)
+        return
     end
+    print("e!", "This version of theming is no longer supported. We apologize for any inconvenience.")
 end
 function parseCustomStyleV2(str, keyIdDict, exportInstead)
     local customStyle = {}
@@ -11779,7 +11767,7 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
     if (not exportInstead) then
         globalCustomStyle = table.duplicate(customStyle)
         if (not globalVars.customStyles) then globalVars.customStyles = {} end
-        local newName = "custom_Import " .. state.UnixTime
+        local newName = "custom_Import" .. state.UnixTime
         globalVars.customStyles[newName] = globalCustomStyle
         globalVars.colorThemeName = newName
         return
@@ -11802,16 +11790,6 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
         end
     end
     imgui.SetClipboardText(outStr)
-end
-function parseCustomStyleV1(str, keyIdDict)
-    local customStyle = {}
-    for kvPair in str:gmatch("[0-9#:a-zA-Z]+") do -- Equivalent to validate, no need to change
-        local keyId = kvPair:match("[a-zA-Z]+:"):sub(1, -2)
-        local hexa = kvPair:match(":[a-f0-9]+"):sub(2)
-        local key = table.indexOf(keyIdDict, keyId)
-        if (key ~= -1) then customStyle[key] = color.hexaToRgba(hexa) end
-    end
-    globalCustomStyle = table.duplicate(customStyle)
 end
 function saveSettingPropertiesButton(settingVars, label)
     local saveButtonClicked = imgui.Button("Save##setting" .. label)

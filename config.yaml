@@ -7,7 +7,7 @@ cursorTrailPoints: 20
 cursorTrailShapeIndex: 2
 cursorTrailSize: 10
 customStyles:
-  custom_penit 1: 
+- 
 defaultProperties:
   settings:
     linearVibratoSV:
@@ -276,7 +276,6 @@ defaultProperties:
         avgSV: 0
       interlace: false
       interlaceRatio: -0.5
-      overrideFinal: false
     placeSpecial:
       svTypeIndex: 1
     placeStill:
@@ -302,7 +301,6 @@ defaultProperties:
         avgSV: 0
       interlace: false
       interlaceRatio: -0.5
-      overrideFinal: false
     placeVibrato:
       svTypeIndex: 1
       vibratoMode: 1

@@ -60,7 +60,8 @@ function setGlobalVars(tempGlobalVars)
     globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
     globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
-    globalVars.customStyles = tempGlobalVars.customStyles
+    -- `table.duplicate` must be used to prevent YAML issues; more specifically, when setting a table's value to nil (which should erase the key) and writing, the YAML file contains the key with a null parameter. To fix this, we iterate over the table and reconstruct it from scratch (which is what `table.duplicate` does).
+    globalVars.customStyles = table.duplicate(tempGlobalVars.customStyles)
     globalVars.disableKofiMessage = isTruthy(tempGlobalVars.disableKofiMessage)
     globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
     globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)

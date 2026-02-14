@@ -129,27 +129,6 @@ function showCustomThemeSettings()
         end
     end
 
-
-    imgui.SeparatorText("Other Actions")
-
-    if (imgui.Button("Import")) then
-        cache.boolean.importingCustomTheme = not cache.boolean.importingCustomTheme
-    end
-    if (cache.boolean.importingCustomTheme) then
-        imgui.SameLine()
-        local input = state.GetValue("importingCustomThemeInput", "")
-        imgui.SetNextItemWidth(118)
-        _, input = imgui.InputText("##customThemeStr", input, 69420)
-        state.SetValue("importingCustomThemeInput", input)
-        KeepSameLine()
-        if (imgui.Button("Send")) then
-            setCustomStyleString(input)
-            settingsChanged = true
-            cache.boolean.importingCustomTheme = false
-            state.SetValue("importingCustomThemeInput", "")
-        end
-    end
-
     imgui.SeparatorText("Search")
 
     imgui.PushItemWidth(imgui.GetWindowWidth() - 25)
@@ -208,9 +187,9 @@ function setCustomStyleString(str, exportInstead)
 
     if (str:sub(1, 3) == "v2 ") then
         parseCustomStyleV2(str:sub(4), keyIdDict, exportInstead)
-    else
-        parseCustomStyleV1(str, keyIdDict)
+        return
     end
+    print("e!", "This version of theming is no longer supported. We apologize for any inconvenience.")
 end
 
 function parseCustomStyleV2(str, keyIdDict, exportInstead)
@@ -228,7 +207,7 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
     if (not exportInstead) then
         globalCustomStyle = table.duplicate(customStyle)
         if (not globalVars.customStyles) then globalVars.customStyles = {} end
-        local newName = "custom_Import " .. state.UnixTime
+        local newName = "custom_Import" .. state.UnixTime
         globalVars.customStyles[newName] = globalCustomStyle
         globalVars.colorThemeName = newName
         return
@@ -254,17 +233,4 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
     end
 
     imgui.SetClipboardText(outStr)
-end
-
-function parseCustomStyleV1(str, keyIdDict)
-    local customStyle = {}
-
-    for kvPair in str:gmatch("[0-9#:a-zA-Z]+") do -- Equivalent to validate, no need to change
-        local keyId = kvPair:match("[a-zA-Z]+:"):sub(1, -2)
-        local hexa = kvPair:match(":[a-f0-9]+"):sub(2)
-        local key = table.indexOf(keyIdDict, keyId)
-        if (key ~= -1) then customStyle[key] = color.hexaToRgba(hexa) end
-    end
-
-    globalCustomStyle = table.duplicate(customStyle)
 end
