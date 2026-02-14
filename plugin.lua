@@ -12836,8 +12836,8 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         ctx.AddBezierCubic(bottomLeft, topLeft + pos1, topLeft + pos2, topRight, mainCol, 3)
         local dist1 = vector.Distance(bottomLeft, topLeft + pos1)
         local dist2 = vector.Distance(topRight, topLeft + pos2)
-        local factor1 = 1 - 10 / dist1
-        local factor2 = 1 - 10 / dist2
+        local factor1 = 1 - pointList[1].size / dist1
+        local factor2 = 1 - pointList[2].size / dist2
         ctx.AddLine(bottomLeft, bottomLeft + factor1 * vector.New(pos1.x, pos1.y - dim.y), dottedCol, 2)
         ctx.AddLine(topRight, topRight + factor2 * vector.New(pos2.x - dim.x, pos2.y), dottedCol, 2)
         imgui.EndChild()
