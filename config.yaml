@@ -1,12 +1,12 @@
 advancedMode: true
-colorThemeIndex: 8
-comboizeSelect: false
+colorThemeName: plum's purple palace
+comboizeSelect: true
 cursorTrailGhost: false
 cursorTrailIndex: 1
-cursorTrailPoints: 10
-cursorTrailShapeIndex: 1
-cursorTrailSize: 5
-customStyle:
+cursorTrailPoints: 20
+cursorTrailShapeIndex: 2
+cursorTrailSize: 10
+customStyles:
 - 
 defaultProperties:
   settings:
@@ -46,7 +46,7 @@ defaultProperties:
       code: >-
         return function (x)
             local maxHeight = 150
-            heightFactor = maxHeight * math.exp((1 - math.sqrt(17)) * 0.5) / (31 - 7 * math.sqrt(17)) * 16
+            heightFactor = maxHeight * math.exp((1 - math.sqrt(17)) / 2) / (31 - 7 * math.sqrt(17)) * 16
             primaryCoefficient = (x^2 - x^3) * math.exp(2 * x)
             sinusoidalCoefficient = math.sin(8 * math.pi * x)
             return heightFactor * primaryCoefficient * sinusoidalCoefficient
@@ -61,7 +61,7 @@ defaultProperties:
       lowerEnd: 0.5
       higherStart: 1
       higherEnd: 1
-      curvatureIndex: 5
+      curvatureIndex: 10
     sinusoidalVibratoSSF:
       lowerStart: 0.5
       lowerEnd: 0.5
@@ -81,8 +81,8 @@ defaultProperties:
       code1: return function (x) return 0.69 end
       code2: return function (x) return 1.420 end
     linear:
-      startSV: 1.5
-      endSV: 0.5
+      startSV: -1.5
+      endSV: 1.5
       svPoints: 16
       finalSVIndex: 2
       customSV: 1
@@ -121,10 +121,10 @@ defaultProperties:
       finalSVIndex: 2
       customSV: 1
     sinusoidal:
-      startSV: 2
-      endSV: 2
+      startSV: 1
+      endSV: 1
       curveSharpness: 50
-      verticalShift: 1
+      verticalShift: 0
       periods: 1
       periodsShift: 0.25
       svsPerQuarterPeriod: 8
@@ -171,12 +171,12 @@ defaultProperties:
       svType1Index: 2
       svType2Index: 2
       comboPhase: 0
-      comboTypeIndex: 1
+      comboTypeIndex: 4
       comboMultiplier1: 1
       comboMultiplier2: 1
       finalSVIndex: 2
       customSV: 1
-      dontNormalize: true
+      dontNormalize: false
       avgSV: 1
       verticalShift: 0
     code:
@@ -185,15 +185,15 @@ defaultProperties:
             local startPeriod = 4
             local endPeriod = -1
             local height = 1.5
-            return height * math.sin(2 * math.pi * (startPeriod * x + (endPeriod - startPeriod) * 0.5 * x^2))
+            return height * math.sin(2 * math.pi * (startPeriod * x + (endPeriod - startPeriod) / 2 * x^2))
         end
       svPoints: 64
       finalSVIndex: 2
       customSV: 1
     stutter:
-      startSV: 1.5
+      startSV: 5
       endSV: 0.5
-      stutterDuration: 50
+      stutterDuration: 15
       stutterDuration2: 0
       stuttersPerSection: 1
       avgSV: 1
@@ -220,10 +220,10 @@ defaultProperties:
         distMinScale: 0
         distMaxScale: 0
     teleportStutter:
-      svPercent: 50
+      svPercent: 90
       svPercent2: 0
       distance: 50
-      mainSV: 0.5
+      mainSV: 0.10000000149011612
       mainSV2: 0
       useDistance: false
       linearlyChange: false
@@ -252,7 +252,7 @@ defaultProperties:
       - 
       deleteCopiedSVs: true
       maintainMs: true
-      ms: 1000
+      ms: 500
       scaleSVs: false
       initialSV: 1
       optimizeTGs: true
@@ -260,7 +260,7 @@ defaultProperties:
       instructions: ''
   menu:
     placeStandard:
-      svTypeIndex: 2
+      svTypeIndex: 1
       svMultipliers:
       - 
       svDistances:
@@ -276,11 +276,10 @@ defaultProperties:
         avgSV: 0
       interlace: false
       interlaceRatio: -0.5
-      overrideFinal: false
     placeSpecial:
       svTypeIndex: 1
     placeStill:
-      svTypeIndex: 2
+      svTypeIndex: 1
       noteSpacing: 1
       stillTypeIndex: 1
       stillDistance: 0
@@ -302,12 +301,13 @@ defaultProperties:
         avgSV: 0
       interlace: false
       interlaceRatio: -0.5
-      overrideFinal: false
     placeVibrato:
       svTypeIndex: 1
       vibratoMode: 1
       vibratoQuality: 3
       sides: 2
+      deviationFunctionIndex: 1
+      deviationDistance: 0
     delete:
       deleteTable:
       - true
@@ -315,13 +315,13 @@ defaultProperties:
       - true
       - true
     addTeleport:
-      distance: 10000
+      distance: 5000
       teleportBeforeHand: false
     changeGroups:
       designatedTimingGroup: $Default
       changeSVs: true
       changeSSFs: true
-      clone: false
+      clone: true
     completeDuplicate:
       objects:
       - 
@@ -330,7 +330,7 @@ defaultProperties:
       ssfTbl:
       - 
       msOffset: 0
-      dontCloneHos: false
+      dontCloneHos: true
     convertSVSSF:
       conversionDirection: true
     copyPaste:
@@ -450,17 +450,18 @@ defaultProperties:
       mine: false
     selectBySnap:
       snap: 1
-disableLoadup: true
+disableKofiMessage: true
+disableLoadup: false
 dontPrintCreation: true
 dontReplaceSV: false
-drawCapybara: false
+drawCapybara: true
 drawCapybara2: false
 drawCapybara312: false
 dynamicBackgroundIndex: 1
 editToolIndex: 1
-effectFPS: 90
+effectFPS: 100
 equalizeLinear: true
-hideAutomatic: false
+hideAutomatic: true
 hideSVInfo: false
 hotkeyList:
 - T
@@ -476,31 +477,32 @@ hotkeyList:
 - Ctrl+Alt+E
 - O
 ignoreNotesOutsideTg: false
-maxDisplacementMultiplierExponent: 6
+maxDisplacementMultiplierExponent: 0
 performanceMode: false
 placeTypeIndex: 1
 presets:
 - 
 printLegacyLNMessage: true
-pulseCoefficient: 0
+pulseCoefficient: 1
 pulseColor:
+- 0.39215686917304993
 - 0
-- 0
-- 0
-- 0
-restrictSinusoidalPeriod: true
+- 1
+- 1
+restrictSinusoidalPeriod: false
 rgbPeriod: 3
-scrollGroupIndex: 3
+scrollGroupIndex: 1
 selectTypeIndex: 1
 showMeasureDataWidget: true
 showNoteDataWidget: true
 showPresetMenu: false
-showSVInfoVisualizer: false
+showSVInfoVisualizer: true
 showVibratoWidget: false
-snakeSpringConstant: 1
+snakeSpringConstant: 0.5
 stepSize: 5
 styleThemeIndex: 1
 upscroll: false
-useCustomPulseColor: false
-useEndTimeOffsets: true
+useCustomPulseColor: true
+useEndTimeOffsets: false
+useMinDisplacementMultiplier: true
 ignoreNotes: false

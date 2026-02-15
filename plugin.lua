@@ -1,5 +1,5 @@
-DISTRO="steam"
-ENVIRONMENT = "production"
+ENVIRONMENT = "development"
+devMode = true
 cache = {
     boolean = {},
     windows = {},
@@ -42,6 +42,8 @@ function cache.saveTable(listName, variables)
         state.SetValue(listName .. key, value)
     end
 end
+---Returns the number of milliseconds the plugin has been active.
+---@return number lifetime
 function clock.getTime()
     return (state.UnixTime - clock.prevTime) / 1000
 end
@@ -137,17 +139,6 @@ function color.uintToRgba(n)
     end
     return table.vectorize4(tbl) / 255
 end
----Converts a hexa string to an rgba Vector4 (0-1 for each element).
----@param hexa string
----@return Vector4
-function color.hexaToRgba(hexa)
-    local rgbaTable = {}
-    for i = 1, 8, 2 do
-        table.insert(rgbaTable,
-            table.indexOf(HEXADECIMAL, hexa:charAt(i)) * 16 + table.indexOf(HEXADECIMAL, hexa:charAt(i + 1)) - 17)
-    end
-    return table.vectorize4(rgbaTable)
-end
 ---Converts rgba to an ndua string (base 92).
 ---@param r integer
 ---@param g integer
@@ -205,32 +196,33 @@ local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
 ---@param dontPrintInaccuracy? boolean If set to true, will not print warning messages on unconfident guesses.
 ---@return SnapNumber
 function game.get.snapAt(time, dontPrintInaccuracy)
+    local MAX_SNAP = 48
     local previousBar = math.floor(map.GetNearestSnapTimeFromTime(false, 1, time + 6) or 0)
     local barLength = 60000 / game.get.timingPointAt(state.SongTime).Bpm
     local distanceAbovePrev = time - previousBar
     if (distanceAbovePrev <= 5 or distanceAbovePrev >= barLength - 5) then return 1 end
-    local snap48 = barLength / 48
+    local minSnapTime = barLength / MAX_SNAP
     local checkingTime = 0
     local index = -1
-    for _ = 1, 48 do
+    for _ = 1, MAX_SNAP do
         if checkingTime > distanceAbovePrev then break end
-        checkingTime = checkingTime + snap48
+        checkingTime = checkingTime + minSnapTime
         index = index + 1
     end
-    if (math.abs(snap48 * (index + 1) - distanceAbovePrev) < math.abs(snap48 * index - distanceAbovePrev)) then
+    if (math.abs(minSnapTime * (index + 1) - distanceAbovePrev) < math.abs(minSnapTime * index - distanceAbovePrev)) then
         index = index + 1
     end
-    local v = 48
+    local divisor = MAX_SNAP
     local div = index
-    local r = -1
-    while (r ~= 0) do
-        r = v % div
-        v = div
-        div = r
+    local remainder = -1
+    while (remainder ~= 0) do
+        remainder = divisor % div
+        divisor = div
+        div = remainder
     end
-    if (math.floor(48 / v) ~= 48 / v) then return 5 end
-    if (48 / v > 16) then return 5 end
-    return 48 / v
+    if (math.floor(MAX_SNAP / divisor) ~= MAX_SNAP / divisor) then return 5 end
+    if (MAX_SNAP / divisor > 16) then return 5 end
+    return MAX_SNAP / divisor
 end
 ---Gets the multiplier of the most recent SSF, or returns 1 if there is no SSF before the given offset.
 ---@param offset number
@@ -336,6 +328,8 @@ function game.get.svsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort
     if dontSort then return svsBetweenOffsets end
     return sort(svsBetweenOffsets, sortAscendingStartTime)
 end
+---Returns an array of all timing group ids, including `$DEFAULT` and `$GLOBAL`.
+---@return string[]
 function game.get.timingGroupList()
     local baseList = table.keys(map.TimingGroups)
     local defaultIndex = table.indexOf(baseList, "$Default")
@@ -428,6 +422,8 @@ function game.get.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     noteOffsetsBetween = sort(noteOffsetsBetween, sortAscending)
     return noteOffsetsBetween
 end
+---Returns the center of the window (in pixels).
+---@return Vector2 center
 function game.window.getCenter()
     local windowDim = state.WindowSize
     return vector.New(state.WindowSize[1] / 2, state.WindowSize[2] / 2)
@@ -459,7 +455,7 @@ function kbm.mouseDelta(button)
     imgui.ResetMouseDragDelta(button or 0)
     return delta
 end
-local ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+ALPHABET_LIST = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
     "T", "U", "V", "W", "X", "Y", "Z" }
 ---Converts a key enum to a specific character.
 ---@param num integer
@@ -517,6 +513,10 @@ function math.clamp(number, lowerBound, upperBound)
     if number > upperBound then return upperBound end
     return number
 end
+---Evaluates a polynomial (specified by the coefficient array) at a value `x`.
+---@param ceff number[] The coefficients of the polynomial in descending order; for example, the polynomial x^3+3x^2-3x+4 is represented as `{1, 3, -3, 4}`.
+---@param x number
+---@return number y
 function math.evaluatePolynomial(ceff, x)
     local sum = 0
     local degree = #ceff - 1
@@ -555,6 +555,23 @@ end
 function math.frac(n)
     return n - math.floor(n)
 end
+---Picks a random number with a Gaussian distribution; implemented with the polar Box-Muller transform.
+---@param mean number The mean of the Gaussian distribution.
+---@param stdDev number The standard deviation of the Gaussian distribution.
+---@param withinStdDevCount number If the resulting random number is over this number of standard deviations from the mean, rerolls until it is no longer so.
+---@return number z1 A random number.
+---@return number x2 Another random number.
+function math.gaussianRandom(mean, stdDev, withinStdDevCount)
+    local output, output2 = nil, 0
+    while (not output or math.abs(output - mean) / stdDev > withinStdDevCount) do
+        local randomRadius = math.random()
+        while (randomRadius == 0) do randomRadius = math.random() end
+        local R = math.sqrt(-2 * math.log(randomRadius))
+        local theta = 2 * math.pi * math.random()
+        output, output2 = R * math.cos(theta) * stdDev + mean, R * math.sin(theta) * stdDev + mean
+    end
+    return output, output2
+end
 ---Evaluates a simplified one-dimensional hermite related (?) spline for SV purposes
 ---@param m1 number
 ---@param m2 number
@@ -575,6 +592,9 @@ end
 function math.inverseLerp(num, lowerBound, upperBound)
     return (num - lowerBound) / (upperBound - lowerBound)
 end
+---Returns the index of a zero row, or `nil` if none are found.
+---@param mtrx number[][]
+---@return integer?
 function matrix.findZeroRow(mtrx)
     for idx, row in pairs(mtrx) do
         local zeroRow = true
@@ -587,7 +607,7 @@ function matrix.findZeroRow(mtrx)
         end
         if zeroRow then return idx end
     end
-    return -1
+    return nil
 end
 function matrix.rowLinComb(mtrx, rowIdx1, rowIdx2, row2Factor)
     for k, v in pairs(mtrx[rowIdx1]) do
@@ -602,8 +622,10 @@ end
 ---Given a square matrix A and equally-sized vector B, returns a vector x such that Ax=B.
 ---@param mtrx number[][]
 ---@param vctr number[]
+---@return number[]? sln The solution vector, given that it exists. Will return `nil` if no such vector exists.
+---@return number? errType If no such vector exists, returns positive infinity if the system has infinite solutions, zero if the system has zero solutions, and negative infinity if the matrix and vector are not compatible.
 function matrix.solve(mtrx, vctr)
-    if (#vctr ~= #mtrx) then return -1 / 0 end
+    if (#vctr ~= #mtrx) then return nil, -1 / 0 end
     local augMtrx = table.duplicate(mtrx)
     for i, n in pairs(vctr) do
         augMtrx[i][#augMtrx[i] + 1] = n
@@ -612,8 +634,9 @@ function matrix.solve(mtrx, vctr)
         matrix.scaleRow(augMtrx, i, 1 / augMtrx[i][i])
         for j = i + 1, #mtrx do
             matrix.rowLinComb(augMtrx, j, i, -augMtrx[j][i]) -- Triangular Downward Sweep
-            if (matrix.findZeroRow(augMtrx) ~= -1) then
-                return augMtrx[matrix.findZeroRow(augMtrx)][#mtrx + 1] == 0 and 1 / 0 or 0
+            local zeroRowIdx = matrix.findZeroRow(augMtrx)
+            if zeroRowIdx then
+                return nil, augMtrx[zeroRowIdx][#mtrx + 1] == 0 and 1 / 0 or 0
             end
         end
     end
@@ -744,6 +767,23 @@ end
 function string.identify(str)
     newStr = str:gsub("[%s%(%)#&]+", "")
     newStr = newStr:charAt(1):lower() .. newStr:sub(2)
+    return newStr
+end
+function string.obfuscate(str)
+    local newStr = ""
+    local originalSize = imgui.CalcTextSize(str).x
+    local unchangingLetters = { " ", "#" }
+    for i = 1, str:len() do
+        if (table.includes(unchangingLetters, str:charAt(i)) or math.random() < 0.5) then
+            newStr = newStr .. str:charAt(i)
+        else
+            newStr = newStr .. ALPHABET_LIST[math.random(1, 26)]:lower()
+        end
+        if (imgui.CalcTextSize(newStr).x > originalSize) then
+            newStr = newStr:sub(1, -2)
+            break
+        end
+    end
     return newStr
 end
 ---Lots of imgui functions have ## in them as identifiers. This will remove everything after the ##.
@@ -1263,7 +1303,7 @@ BEEG_BUTTON_SIZE = vector.New(253, 24)
 MIN_RGB_CYCLE_TIME = 0.1
 MAX_RGB_CYCLE_TIME = 300
 MAX_CURSOR_TRAIL_POINTS = 100
-MAX_SV_POINTS = 1000
+MAX_SV_POINTS = 1024
 MAX_ANIMATION_FRAMES = 999
 MAX_IMPORT_CHARACTER_LIMIT = 999999
 CHINCHILLA_TYPES = {
@@ -1275,41 +1315,87 @@ CHINCHILLA_TYPES = {
     "Inverse Power",
     "Peter Stock"
 }
-COLOR_THEMES = {
-    "Classic",
-    "Strawberry",
-    "Amethyst",
-    "Tree",
-    "Barbie",
-    "Incognito",
-    "Incognito + RGB",
-    "Tobi's Glass",
-    "Tobi's RGB Glass",
-    "Glass",
-    "Glass + RGB",
-    "RGB Gamer Mode",
-    "edom remag BGR",
-    "otingocnI",
-    "BGR + otingocnI",
-    "CUSTOM"
-}
-COLOR_THEME_COLORS = {
-    "255,255,255",
-    "251,41,67",
-    "153,102,204",
-    "150,111,51",
-    "227,5,173",
-    "150,150,150",
-    "255,0,0",
-    "200,200,200",
-    "0,255,0",
-    "220,220,220",
-    "0,0,255",
-    "255,100,100",
-    "100,255,100",
-    "255,255,255",
-    "100,100,255",
-    "0,0,0",
+THEME_TREE = {
+    Classic = {
+        {
+            id = "Original",
+            textColor = { 170, 170, 255 }
+        },
+        {
+            id = "Strawberry",
+            textColor = { { 251, 41, 67 }, { 255, 100, 150 } }
+        },
+        {
+            id = "Amethyst",
+            textColor = { { 153, 102, 204 }, { 170, 120, 255 } }
+        },
+        {
+            id = "Tree",
+            textColor = { 150, 111, 51 }
+        },
+        {
+            id = "Barbie",
+            textColor = { { 227, 5, 173 }, { 100, 255, 255 } }
+        }
+    },
+    Modern = {
+        {
+            id = "Incognito",
+            textColor = { { 150, 150, 150 }, { 200, 200, 200 } }
+        },
+        {
+            id = "Incognito + RGB",
+            textColor = { { 150, 50, 50 }, { 50, 150, 50 }, { 50, 50, 150 } }
+        },
+        {
+            id = "otingocnI",
+            textColor = { { 255, 255, 255 }, { 200, 200, 200 } }
+        },
+        {
+            id = "BGR + otingocnI",
+            textColor = { { 255, 150, 150 }, { 150, 255, 150 }, { 150, 150, 255 } }
+        },
+        {
+            id = "Glass",
+            textColor = { { 200, 200, 200 }, { 255, 255, 255 }, { 200, 200, 200 } }
+        },
+        {
+            id = "Glass + RGB",
+            textColor = { { 150, 255, 255 }, { 255, 150, 255 }, { 255, 255, 150 } }
+        },
+        {
+            id = "RGB Gamer Mode",
+            textColor = { { 255, 0, 0 }, { 0, 255, 0 }, { 0, 0, 255 } }
+        },
+        {
+            id = "edom remag BGR",
+            textColor = { { 255, 100, 0 }, { 0, 255, 100 }, { 100, 0, 255 } }
+        }
+    },
+    ["Mappers' Picks"] = {
+        {
+            id = "7xbi's Glass",
+            textColor = { { 150, 150, 150 }, { 200, 200, 200 } }
+        },
+        {
+            id = "7xbi's RGB Glass",
+            textColor = { { 255, 100, 255 }, { 255, 255, 100 }, { 100, 255, 255 } }
+        },
+        {
+            id = "aster's catppuccin",
+            textColor = { { 136, 57, 239 }, { 186, 187, 241 }, { 203, 166, 247 } }
+        },
+        {
+            id = "plum's purple palace",
+            textColor = { { 100, 0, 255 }, { 255, 0, 255 } }
+        }
+    },
+    Custom = {
+        {
+            id = "CUSTOM",
+            textColor = { 0, 0, 0 }
+        }
+    }
 }
 DYNAMIC_BACKGROUND_TYPES = {
     "None",
@@ -1401,6 +1487,11 @@ STILL_TYPES = {
     "End",
     "Auto",
     "Otua"
+}
+VIBRATO_DEVIATION_TYPES = {
+    "None",
+    "Linear",
+    "Gaussian",
 }
 STUTTER_CONTROLS = {
     "First SV",
@@ -1592,15 +1683,16 @@ function parseDefaultProperty(v, default)
 end
 globalVars = {
     advancedMode = false,
-    colorThemeIndex = 1,
+    colorThemeName = "Original",
     comboizeSelect = false,
     cursorTrailGhost = false,
     cursorTrailIndex = 1,
     cursorTrailPoints = 10,
     cursorTrailShapeIndex = 1,
     cursorTrailSize = 5,
-    customStyle = {},
+    customStyles = {},
     defaultProperties = { settings = {}, menu = {} },
+    disableKofiMessage = false,
     disableLoadup = false,
     dontPrintCreation = false,
     dontReplaceSV = false,
@@ -1637,18 +1729,20 @@ globalVars = {
     upscroll = false,
     useCustomPulseColor = false,
     useEndTimeOffsets = false,
+    useMinDisplacementMultiplier = true
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 function setGlobalVars(tempGlobalVars)
     globalVars.advancedMode = isTruthy(tempGlobalVars.advancedMode)
-    globalVars.colorThemeIndex = tn(tempGlobalVars.colorThemeIndex)
+    globalVars.colorThemeName = tempGlobalVars.colorThemeName or "Original"
     globalVars.comboizeSelect = isTruthy(tempGlobalVars.comboizeSelect)
     globalVars.cursorTrailGhost = isTruthy(tempGlobalVars.cursorTrailGhost)
     globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
     globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
     globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
-    globalVars.customStyle = tempGlobalVars.customStyle or {}
+    globalVars.customStyles = table.duplicate(tempGlobalVars.customStyles)
+    globalVars.disableKofiMessage = isTruthy(tempGlobalVars.disableKofiMessage)
     globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
     globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)
     globalVars.dontReplaceSV = isTruthy(tempGlobalVars.dontReplaceSV)
@@ -1679,13 +1773,21 @@ function setGlobalVars(tempGlobalVars)
     globalVars.upscroll = isTruthy(tempGlobalVars.upscroll)
     globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
     globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
+    globalVars.useMinDisplacementMultiplier = isTruthy(tempGlobalVars.useMinDisplacementMultiplier, true)
     local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
         "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
-    for k12 = 1, #forceVectorizeList do
-        local key = forceVectorizeList[k12]
-        if (globalVars.customStyle[key]) then
-            globalVars.customStyle[key] = table.vectorize4(globalVars.customStyle[key])
+    if (tempGlobalVars.customStyles) then
+        for themeName, themeData in pairs(globalVars.customStyles) do
+            for k12 = 1, #forceVectorizeList do
+                local key = forceVectorizeList[k12]
+                if (themeData[key]) then
+                    globalVars.customStyles[themeName][key] = table.vectorize4(themeData[key])
+                end
+            end
         end
+        globalCustomStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
+    else
+        globalCustomStyle = {}
     end
     globalVars.placeTypeIndex = state.GetValue("global.placeTypeIndex", globalVars.placeTypeIndex)
     globalVars.editToolIndex = state.GetValue("global.editToolIndex", globalVars.editToolIndex)
@@ -1700,7 +1802,6 @@ DEFAULT_STARTING_MENU_VARS = {
         svStats = createSVStats(),
         interlace = false,
         interlaceRatio = -0.5,
-        overrideFinal = false
     },
     placeSpecial = { svTypeIndex = 1 },
     placeStill = {
@@ -1716,13 +1817,14 @@ DEFAULT_STARTING_MENU_VARS = {
         svStats = createSVStats(),
         interlace = false,
         interlaceRatio = -0.5,
-        overrideFinal = false
     },
     placeVibrato = {
         svTypeIndex = 1,
         vibratoMode = 1,
         vibratoQuality = 3,
-        sides = 2
+        sides = 2,
+        deviationFunctionIndex = 1,
+        deviationDistance = 0,
     },
     delete = {
         deleteTable = { true, true, true, true }
@@ -1991,7 +2093,7 @@ end]]
     },
     exponential = {
         behaviorIndex = 1,
-        intensity = 30,
+        intensity = 20,
         verticalShift = 0,
         distance = 100,
         startSV = 0.01,
@@ -2484,17 +2586,17 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
     local lastMultiplier = menuVars.svMultipliers[numMultipliers]
     if (place == nil or place == true) then
         if placingStillSVs then
-            local tbl = getStillSVs(menuVars, firstOffset, lastOffset,
+            local stillSVResult = getStillSVs(menuVars, firstOffset, lastOffset,
                 sort(svsToAdd, sortAscendingStartTime), svsToAdd)
-            svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
+            svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
         end
         addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == "Override")
         removeAndAddSVs(svsToRemove, svsToAdd)
         return
     end
-    local tbl = getStillSVs(menuVars, firstOffset, lastOffset,
+    local stillSVResult = getStillSVs(menuVars, firstOffset, lastOffset,
         sort(svsToAdd, sortAscendingStartTime), svsToAdd, queuedSVs)
-    svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
+    svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
     return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
 end
 function placeStillSVsParent(menuVars)
@@ -2520,7 +2622,8 @@ function placeStillSVsParent(menuVars)
         svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
         svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
     end
-    addFinalSV(svsToAdd, offsets[#offsets], menuVars.svMultipliers[#menuVars.svMultipliers], true)
+    addFinalSV(svsToAdd, offsets[#offsets], menuVars.svMultipliers[#menuVars.svMultipliers],
+        FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex] == "Override")
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRemovalTable, queuedSVs)
@@ -2612,6 +2715,7 @@ end
 ---@param heightFn fun(t: number, idx?: integer): number
 function svVibrato(menuVars, heightFn)
     printLegacyLNMessage()
+    local deviance = menuVars.deviationDistance or 0
     local offsets = game.get.uniqueNoteOffsetsBetweenSelected(true)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -2632,14 +2736,17 @@ function svVibrato(menuVars, heightFn)
             return
         end
         if (menuVars.sides == 1) then
-            for tp = 1, teleportCount do
+            for tp = 1, teleportCount, 2 do
                 local x = (tp - 1) / teleportCount
                 local offset = nextVibro * x + startVibro * (1 - x)
                 local height = heightFn(math.floor((tp - 1) / 2) * 2 / teleportCount * posDifference +
                     startPos, tp)
-                if (tp % 2 == 1) then
-                    height = -height
-                end
+                height = deviateVibratoHeight(height, menuVars.deviationFunctionIndex, menuVars.deviationDistance)
+                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
+                    height, 0)
+                x = tp / teleportCount
+                offset = nextVibro * x + startVibro * (1 - x)
+                height = -height
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     height, 0)
             end
@@ -2647,48 +2754,56 @@ function svVibrato(menuVars, heightFn)
             teleportCount = teleportCount + 1
             prepareDisplacingSVs(startVibro, svsToAdd, svTimeIsAdded, nil,
                 -heightFn(startPos, 0), 0)
+            local prevHeight = heightFn(startPos, 0)
             for tp = 1, teleportCount - 2, 2 do
                 local x = tp / teleportCount
                 local offset = nextVibro * x + startVibro * (1 - x)
-                local prevHeight = heightFn((tp - 1) / (teleportCount - 1) * posDifference +
-                    startPos, tp)
                 local newHeight = heightFn((tp + 1) / (teleportCount - 1) * posDifference +
                     startPos, tp + 1)
+                newHeight = deviateVibratoHeight(newHeight, menuVars.deviationFunctionIndex, menuVars.deviationDistance)
+                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
+                    prevHeight + newHeight, 0)
+                x = (tp + 1) / teleportCount
+                offset = nextVibro * x + startVibro * (1 - x)
+                local multiplicativeFactor = tp == teleportCount - 2 and 1 or 2
+                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
+                    -newHeight * multiplicativeFactor, 0)
+                prevHeight = newHeight
+            end
+        else
+            local prevHeight = heightFn(startPos, 1)
+            for tp = 1, teleportCount - 2, 3 do
+                local x = (tp - 1) / teleportCount
+                local offset = nextVibro * x + startVibro * (1 - x)
+                local newHeight = heightFn(startPos + (tp + 2) / teleportCount * posDifference, (tp - 1) / 3 + 2)
+                newHeight = deviateVibratoHeight(newHeight, menuVars.deviationFunctionIndex, menuVars.deviationDistance)
+                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
+                    -prevHeight, 0)
+                x = tp / teleportCount
+                offset = nextVibro * x + startVibro * (1 - x)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     prevHeight + newHeight, 0)
                 x = (tp + 1) / teleportCount
                 offset = nextVibro * x + startVibro * (1 - x)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
-                    -newHeight * 2, 0)
-            end
-            prepareDisplacingSVs(nextVibro * (1 - 2 / teleportCount) + 2 * startVibro / teleportCount, svsToAdd,
-                svTimeIsAdded, nil,
-                heightFn(posDifference * (1 - 2 / (teleportCount - 1)) + startPos, teleportCount - 2) +
-                heightFn(endPos, teleportCount - 1), 0)
-            prepareDisplacingSVs(nextVibro * (1 - 1 / teleportCount) + startVibro / teleportCount, svsToAdd,
-                svTimeIsAdded, nil,
-                -heightFn(endPos, teleportCount), 0)
-        else
-            for tp = 1, teleportCount - 2, 3 do
-                local x = (tp - 1) / teleportCount
-                local offset = nextVibro * x + startVibro * (1 - x)
-                local height = heightFn(startPos + (tp - 1) / teleportCount * posDifference, (tp - 1) / 3 + 1)
-                local newHeight = heightFn(startPos + (tp + 2) / teleportCount * posDifference, (tp - 1) / 3 + 2)
-                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
-                    -height, 0)
-                x = tp / teleportCount
-                offset = nextVibro * x + startVibro * (1 - x)
-                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
-                    height + newHeight, 0)
-                x = (tp + 1) / teleportCount
-                offset = nextVibro * x + startVibro * (1 - x)
-                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil,
                     -newHeight, 0)
+                prevHeight = newHeight
             end
         end
     end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
+end
+function deviateVibratoHeight(initHeight, deviationIndex, deviationDistance)
+    if (deviationIndex == 1) then return initHeight end
+    if (deviationIndex == 2) then
+        return initHeight + (math.random() * 2 - 1) * deviationDistance
+    end
+    if (deviationIndex == 3) then
+        local stdDevTolerance = 2
+        return initHeight + math.gaussianRandom(0, deviationDistance / stdDevTolerance, stdDevTolerance)
+    end
+    return initHeight
 end
 function deleteItems(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
@@ -2826,7 +2941,7 @@ function storeDuplicateItems(menuVars)
     for _, bm in pairs(bms) do
         table.insert(objects, { type = "bm", data = bm })
     end
-    local ogId = state.SelectedScrollGroupId
+    local ogTg = state.SelectedScrollGroupId
     local svTbl = {}
     local ssfTbl = {}
     for tgId, tg in pairs(map.TimingGroups) do
@@ -2842,7 +2957,7 @@ function storeDuplicateItems(menuVars)
             ssfTbl[tgId][#ssfTbl[tgId] + 1] = ssf
         end
     end
-    state.SelectedScrollGroupId = ogId
+    state.SelectedScrollGroupId = ogTg
     menuVars.objects = objects
     menuVars.svTbl = svTbl
     menuVars.ssfTbl = ssfTbl
@@ -3186,14 +3301,14 @@ function displaceNoteSVsParent(menuVars)
     local svsToAdd = {}
     for k23 = 1, #offsets do
         local offset = offsets[k23]
-        local tbl = displaceNoteSVs(
+        local displaceNoteResults = displaceNoteSVs(
             {
                 distance = (offset - offsets[1]) / (offsets[#offsets] - offsets[1]) *
                     (menuVars.distance2 - menuVars.distance1) + menuVars.distance1
             },
             false, offset)
-        svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
-        svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
+        svsToRemove = table.combine(svsToRemove, displaceNoteResults.svsToRemove)
+        svsToAdd = table.combine(svsToAdd, displaceNoteResults.svsToAdd)
     end
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
@@ -3495,7 +3610,9 @@ function fixFlippedLNEnds()
     local svTimeIsAdded = {}
     local lnEndTimeFixed = {}
     local fixedLNEndsCount = 0
+    local ogTg = state.SelectedScrollGroupId
     for _, ho in ipairs(map.HitObjects) do
+        state.SelectedScrollGroupId = ho.TimingGroup
         local lnEndTime = ho.EndTime
         local isLN = lnEndTime ~= 0
         local endHasNegativeSV = (game.get.svMultiplierAt(lnEndTime) <= 0)
@@ -3529,36 +3646,44 @@ function fixFlippedLNEnds()
     removeAndAddSVs(svsToRemove, svsToAdd)
     local type = isTruthy(fixedLNEndsCount) and "s!" or "w!"
     print(type, "Fixed " .. fixedLNEndsCount .. pluralize(" flipped LN end.", fixedLNEndsCount, -2))
+    state.SelectedScrollGroupId = ogTg
 end
 function mergeSVsAndSSFs()
-    local svTimeDict = {}
-    local svsToRemove = {}
-    local ssfTimeDict = {}
-    local ssfsToRemove = {}
-    for _, sv in ipairs(table.reverse(map.ScrollVelocities)) do
-        if (svTimeDict[sv.StartTime]) then
-            svsToRemove[#svsToRemove + 1] = sv
-        else
-            svTimeDict[sv.StartTime] = true
+    local editorActions = {}
+    local svSum = 0
+    local ssfSum = 0
+    local ogTg = state.SelectedScrollGroupId
+    for tgId, tg in pairs(map.TimingGroups) do
+        state.SelectedScrollGroupId = tgId
+        local svTimeDict = {}
+        local svsToRemove = {}
+        local ssfTimeDict = {}
+        local ssfsToRemove = {}
+        for _, sv in ipairs(table.reverse(map.ScrollVelocities)) do
+            if (svTimeDict[sv.StartTime]) then
+                svsToRemove[#svsToRemove + 1] = sv
+            else
+                svTimeDict[sv.StartTime] = true
+            end
         end
-    end
-    for _, ssf in ipairs(table.reverse(map.ScrollSpeedFactors)) do
-        if (ssfTimeDict[ssf.StartTime]) then
-            ssfsToRemove[#ssfsToRemove + 1] = ssf
-        else
-            ssfTimeDict[ssf.StartTime] = true
+        for _, ssf in ipairs(table.reverse(map.ScrollSpeedFactors)) do
+            if (ssfTimeDict[ssf.StartTime]) then
+                ssfsToRemove[#ssfsToRemove + 1] = ssf
+            else
+                ssfTimeDict[ssf.StartTime] = true
+            end
         end
+        table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
+        table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
+        svSum = svSum + #svsToRemove
+        ssfSum = ssfSum + #ssfsToRemove
     end
-    if (isTruthy(#svsToRemove + #ssfsToRemove)) then
-        actions.PerformBatch({
-            utils.CreateEditorAction(action_type.RemoveScrollVelocityBatch, svsToRemove),
-            utils.CreateEditorAction(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove)
-        })
-    end
-    local type = isTruthy(#svsToRemove + #ssfsToRemove) and "s!" or "w!"
+    if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = isTruthy(svSum + ssfSum) and "s!" or "w!"
     print(type,
-        table.concat({ "Removed ", #svsToRemove, pluralize(" SV", #svsToRemove), " and ", #ssfsToRemove, pluralize(
-            " SSF.", #ssfsToRemove, -2) }))
+        table.concat({ "Removed ", svSum, pluralize(" SV", svSum), " and ", ssfSum, pluralize(
+            " SSF.", ssfSum, -2) }))
+    state.SelectedScrollGroupId = ogTg
 end
 function mergeNotes()
     local noteDict = {}
@@ -3641,6 +3766,52 @@ function removeAllHitSounds()
     print("w!", "Note that the Quaver hitsound system is funky and some hitsounds exist that aren't audible.")
     imgui.SetClipboardText(table.concat(objs, ","))
     actions.PerformBatch(hitsoundActions)
+end
+function removePostTGSVsAndSSFs()
+    local editorActions = {}
+    local ogTG = state.SelectedScrollGroupId
+    local svSum = 0
+    local ssfSum = 0
+    local lastHoDict = {}
+    for _, ho in pairs(map.HitObjects) do
+        local maxTime = math.max(ho.StartTime, ho.EndTime)
+        if (not lastHoDict[ho.TimingGroup] or lastHoDict[ho.TimingGroup] < maxTime) then
+            lastHoDict[ho.TimingGroup] = maxTime
+        end
+    end
+    for tgId, tg in pairs(map.TimingGroups) do
+        if (tg == map.DefaultScrollGroup or tg == map.GlobalScrollGroup) then goto nextTG end
+        do
+            state.SelectedScrollGroupId = tgId
+            local maxTime = lastHoDict[tgId]
+            local svsToAdd = {}
+            local svsToRemove = {}
+            local ssfsToRemove = {}
+            for _, sv in pairs(map.ScrollVelocities) do
+                if (sv.StartTime > maxTime + 1) then
+                    svsToRemove[#svsToRemove + 1] = sv
+                end
+            end
+            for _, ssf in pairs(map.ScrollSpeedFactors) do
+                if (ssf.StartTime > maxTime + 1) then
+                    ssfsToRemove[#ssfsToRemove + 1] = ssf
+                end
+            end
+            prepareDisplacingSVs(maxTime, svsToAdd, {}, nil,
+                100000, 0)
+            table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
+            table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove))
+            table.insert(editorActions, createEA(action_type.AddScrollVelocityBatch, svsToAdd))
+            svSum = svSum + #svsToRemove
+            ssfSum = ssfSum + #ssfsToRemove
+        end
+        ::nextTG::
+    end
+    if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = isTruthy(svSum + ssfSum) and "s!" or "w!"
+    print(type,
+        table.concat({ "Removed ", svSum, pluralize(" SV", svSum), " and ", ssfSum, pluralize(" SSF.", ssfSum, -2) }))
+    state.SelectedScrollGroupId = ogTG
 end
 function measureSVs(menuVars)
     local roundingDecimalPlaces = 5
@@ -3977,7 +4148,7 @@ function goToNextTg()
 end
 function jumpToTg()
     if (not isTruthy(state.SelectedHitObjects)) then return end
-    local tgId = game.get.uniqueNotesBetweenSelected()[1].TimingGroup
+    local tgId = state.SelectedHitObjects[1].TimingGroup
     for _, ho in pairs(state.SelectedHitObjects) do
         if (ho.TimingGroup ~= tgId) then return end
     end
@@ -5940,7 +6111,7 @@ function generateParticle(x, y, xRange, yRange, endTime, showParticle)
     return particle
 end
 function checkIfMouseMoved(currentMousePosition)
-    oldMousePosition = state.GetValue("oldMousePosition", vctr2(0))
+    oldMousePosition = state.GetValue("oldMousePosition") or vctr2(0)
     local mousePositionChanged = currentMousePosition ~= oldMousePosition
     state.SetValue("oldMousePosition", currentMousePosition)
     return mousePositionChanged
@@ -6005,6 +6176,7 @@ function pulseController()
     end
     outputPulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
     local borderColor = state.GetValue("borderColor") or vctr4(1)
+    if (type(borderColor) == "table") then borderColor = table.vectorize4(borderColor) end
     local negatedBorderColor = vctr4(1) - borderColor
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
     imgui.PushStyleColor(imgui_col.Border, pulseColor * outputPulseStatus + borderColor * (1 - outputPulseStatus))
@@ -6025,7 +6197,7 @@ function renderBackground()
     end
 end
 function setPluginAppearance()
-    local colorTheme = COLOR_THEMES[globalVars.colorThemeIndex]
+    local colorTheme = globalVars.colorThemeName
     local styleTheme = STYLE_THEMES[globalVars.styleThemeIndex]
     setPluginAppearanceStyles(styleTheme)
     setPluginAppearanceColors(colorTheme)
@@ -6048,27 +6220,30 @@ function setPluginAppearanceStyles(styleTheme)
     imgui.PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessvalue)
 end
 function setPluginAppearanceColors(colorTheme, hideBorder)
-    local borderColor = vctr4(1)
-    if colorTheme == "Classic" or not colorTheme then borderColor = setClassicColors() end
+    local borderColor = nil
+    if colorTheme == "Original" or not colorTheme then borderColor = setOriginalColors() end
     if colorTheme == "Strawberry" then borderColor = setStrawberryColors() end
     if colorTheme == "Amethyst" then borderColor = setAmethystColors() end
     if colorTheme == "Tree" then borderColor = setTreeColors() end
     if colorTheme == "Barbie" then borderColor = setBarbieColors() end
     if colorTheme == "Incognito" then borderColor = setIncognitoColors() end
     if colorTheme == "Incognito + RGB" then borderColor = setIncognitoRGBColors(globalVars.rgbPeriod) end
-    if colorTheme == "Tobi's Glass" then borderColor = setTobiGlassColors() end
-    if colorTheme == "Tobi's RGB Glass" then borderColor = setTobiRGBGlassColors(globalVars.rgbPeriod) end
+    if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
+    if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
     if colorTheme == "Glass" then borderColor = setGlassColors() end
     if colorTheme == "Glass + RGB" then borderColor = setGlassRGBColors(globalVars.rgbPeriod) end
     if colorTheme == "RGB Gamer Mode" then borderColor = setRGBGamerColors(globalVars.rgbPeriod) end
     if colorTheme == "edom remag BGR" then borderColor = setInvertedRGBGamerColors(globalVars.rgbPeriod) end
-    if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
-    if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
-    if colorTheme == "CUSTOM" then borderColor = setCustomColors() end
+    if colorTheme == "7xbi's Glass" then borderColor = set7xbiGlassColors() end
+    if colorTheme == "7xbi's RGB Glass" then borderColor = set7xbiRGBGlassColors(globalVars.rgbPeriod) end
+    if colorTheme == "aster's catppuccin" then borderColor = setAsterCatppuccinColors() end
+    if colorTheme == "plum's purple palace" then borderColor = setPlumPurplePalaceColors() end
+    if colorTheme:sub(1, 7) == "custom_" then borderColor = setCustomColors() end
+    if not borderColor then borderColor = setOriginalColors() end
     if hideBorder then return end
     state.SetValue("borderColor", borderColor)
 end
-function setClassicColors()
+function setOriginalColors()
     local borderColor = vector.New(0.81, 0.88, 1.00, 0.30)
     imgui.PushStyleColor(imgui_col.WindowBg, vector.New(0.00, 0.00, 0.00, 1.00))
     imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.08, 0.08, 0.08, 0.94))
@@ -6367,7 +6542,7 @@ function setIncognitoRGBColors(rgbPeriod)
     loadup.BgBr = white
     return rgbColor
 end
-function setTobiGlassColors()
+function set7xbiGlassColors()
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.70)
     local transparentWhite = vector.New(0.30, 0.30, 0.30, 0.50)
     local whiteTint = vector.New(1.00, 1.00, 1.00, 0.30)
@@ -6413,7 +6588,7 @@ function setTobiGlassColors()
     loadup.BgBr = buttonColor / 2 + color.vctr.white / 2
     return frameColor
 end
-function setTobiRGBGlassColors(rgbPeriod)
+function set7xbiRGBGlassColors(rgbPeriod)
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.85)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     local currentRGB = getCurrentRGBColors(rgbPeriod)
@@ -6731,64 +6906,140 @@ function setInvertedIncognitoRGBColors(rgbPeriod)
     loadup.BgBr = white
     return rgbColor
 end
+function setAsterCatppuccinColors()
+    imgui.PushStyleColor(imgui_col.WindowBg, vector.New(0.07, 0.07, 0.11, 1))
+    imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.12, 0.12, 0.18, 1))
+    imgui.PushStyleColor(imgui_col.FrameBg, vector.New(0.12, 0.12, 0.18, 1))
+    imgui.PushStyleColor(imgui_col.FrameBgHovered, vector.New(0.35, 0.36, 0.44, 1))
+    imgui.PushStyleColor(imgui_col.FrameBgActive, vector.New(0.19, 0.2, 0.27, 1))
+    imgui.PushStyleColor(imgui_col.TitleBg, vector.New(0.12, 0.12, 0.18, 1))
+    imgui.PushStyleColor(imgui_col.TitleBgActive, vector.New(0.07, 0.07, 0.11, 1))
+    imgui.PushStyleColor(imgui_col.TitleBgCollapsed, vector.New(0.12, 0.12, 0.18, 0.4))
+    imgui.PushStyleColor(imgui_col.CheckMark, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.SliderGrab, vector.New(0.12, 0.12, 0.18, 1))
+    imgui.PushStyleColor(imgui_col.SliderGrabActive, vector.New(0.35, 0.36, 0.44, 1))
+    imgui.PushStyleColor(imgui_col.Button, vector.New(0.19, 0.2, 0.27, 1))
+    imgui.PushStyleColor(imgui_col.ButtonHovered, vector.New(0.35, 0.36, 0.44, 1))
+    imgui.PushStyleColor(imgui_col.ButtonActive, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.Tab, vector.New(0.19, 0.2, 0.27, 1))
+    imgui.PushStyleColor(imgui_col.TabHovered, vector.New(0.35, 0.36, 0.44, 1))
+    imgui.PushStyleColor(imgui_col.TabActive, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.Header, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.HeaderHovered, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.HeaderActive, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.Separator, vector.New(0.35, 0.36, 0.44, 1))
+    imgui.PushStyleColor(imgui_col.Text, vector.New(0.8, 0.84, 0.96, 1))
+    imgui.PushStyleColor(imgui_col.TextSelectedBg, vector.New(0.8, 0.65, 0.97, 0.4))
+    imgui.PushStyleColor(imgui_col.ScrollbarGrabHovered, vector.New(0.19, 0.2, 0.27, 1))
+    imgui.PushStyleColor(imgui_col.PlotLines, vector.New(0.95, 0.55, 0.66, 1))
+    imgui.PushStyleColor(imgui_col.PlotLinesHovered, vector.New(0.82, 0.06, 0.22, 1))
+    imgui.PushStyleColor(imgui_col.PlotHistogram, vector.New(0.8, 0.65, 0.97, 1))
+    imgui.PushStyleColor(imgui_col.PlotHistogramHovered, vector.New(0.53, 0.22, 0.94, 1))
+    loadup.OpeningTextColor = vector.New(0.19, 0.2, 0.27, 1)
+    loadup.PulseTextColorLeft = vector.New(0.8, 0.65, 0.97, 1)
+    loadup.PulseTextColorRight = vector.New(0.96, 0.76, 0.91, 1)
+    loadup.BgTl = vector.New(0.07, 0.07, 0.11, 0.6)
+    loadup.BgTr = vector.New(0.11, 0.05, 0.2, 0.6)
+    loadup.BgBl = vector.New(0.2, 0.1, 0.17, 0.6)
+    loadup.BgBr = vector.New(0.12, 0.12, 0.18, 0.6)
+    return vector.New(0.42, 0.44, 0.53, 1)
+end
+function setPlumPurplePalaceColors()
+    imgui.PushStyleColor(imgui_col.WindowBg, vector.New(0, 0, 0, 0.52))
+    imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.17, 0.11, 0.24, 0.69))
+    imgui.PushStyleColor(imgui_col.FrameBg, vector.New(0.16, 0.03, 0.27, 0.51))
+    imgui.PushStyleColor(imgui_col.FrameBgHovered, vector.New(0.3, 0.07, 0.49, 0.52))
+    imgui.PushStyleColor(imgui_col.FrameBgActive, vector.New(0.69, 0.5, 0.94, 1))
+    imgui.PushStyleColor(imgui_col.TitleBg, vector.New(0, 0, 0, 0.76))
+    imgui.PushStyleColor(imgui_col.TitleBgActive, vector.New(0.12, 0.02, 0.27, 1))
+    imgui.PushStyleColor(imgui_col.TitleBgCollapsed, vector.New(0.6, 0.51, 0.75, 0.39))
+    imgui.PushStyleColor(imgui_col.CheckMark, vector.New(0.89, 0, 1, 0.65))
+    imgui.PushStyleColor(imgui_col.SliderGrab, vector.New(0.31, 0.38, 0.5, 1))
+    imgui.PushStyleColor(imgui_col.SliderGrabActive, vector.New(0.51, 0.58, 0.7, 1))
+    imgui.PushStyleColor(imgui_col.Button, vector.New(0.18, 0.03, 0.37, 0.8))
+    imgui.PushStyleColor(imgui_col.ButtonHovered, vector.New(0.24, 0.02, 0.4, 1))
+    imgui.PushStyleColor(imgui_col.ButtonActive, vector.New(0.49, 0.2, 0.82, 1))
+    imgui.PushStyleColor(imgui_col.Tab, vector.New(0.39, 0.12, 0.73, 0.39))
+    imgui.PushStyleColor(imgui_col.TabHovered, vector.New(0.25, 0.02, 0.41, 1))
+    imgui.PushStyleColor(imgui_col.TabActive, vector.New(0.4, 0, 0.69, 1))
+    imgui.PushStyleColor(imgui_col.Header, vector.New(0.69, 0.44, 1, 0.4))
+    imgui.PushStyleColor(imgui_col.HeaderHovered, vector.New(0.69, 0.44, 1, 0.4))
+    imgui.PushStyleColor(imgui_col.HeaderActive, vector.New(0.69, 0.44, 1, 0.4))
+    imgui.PushStyleColor(imgui_col.Separator, vector.New(0.53, 0, 1, 0.3))
+    imgui.PushStyleColor(imgui_col.Text, vector.New(1, 1, 1, 1))
+    imgui.PushStyleColor(imgui_col.TextSelectedBg, vector.New(0.96, 0.51, 1, 0.4))
+    imgui.PushStyleColor(imgui_col.ScrollbarGrabHovered, vector.New(0.41, 0.48, 0.6, 1))
+    imgui.PushStyleColor(imgui_col.PlotLines, vector.New(1, 0.44, 0.44, 1))
+    imgui.PushStyleColor(imgui_col.PlotLinesHovered, vector.New(1, 0.12, 0, 1))
+    imgui.PushStyleColor(imgui_col.PlotHistogram, vector.New(0.28, 0, 0.9, 1))
+    imgui.PushStyleColor(imgui_col.PlotHistogramHovered, vector.New(0.58, 0, 1, 1))
+    loadup.OpeningTextColor = vector.New(0, 0, 0, 1)
+    loadup.PulseTextColorLeft = vector.New(0.5, 0, 1, 1)
+    loadup.PulseTextColorRight = vector.New(0.75, 0.25, 1, 1)
+    loadup.BgTl = vector.New(0.08, 0, 0.08, 0.39)
+    loadup.BgTr = vector.New(0.16, 0, 0.16, 0.67)
+    loadup.BgBl = vector.New(0.16, 0, 0.16, 0.67)
+    loadup.BgBr = vector.New(0.25, 0, 0.25, 1)
+    return vector.New(0, 0, 0, 1)
+end
 function setCustomColors()
-    if (globalVars.customStyle == nil) then
-        return setClassicColors()
+    if (globalCustomStyle == nil) then
+        return setOriginalColors()
     end
-    local borderColor = globalVars.customStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
-    imgui.PushStyleColor(imgui_col.WindowBg, globalVars.customStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00))
-    imgui.PushStyleColor(imgui_col.PopupBg, globalVars.customStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94))
-    imgui.PushStyleColor(imgui_col.FrameBg, globalVars.customStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00))
+    local borderColor = globalCustomStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
+    imgui.PushStyleColor(imgui_col.WindowBg, globalCustomStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00))
+    imgui.PushStyleColor(imgui_col.PopupBg, globalCustomStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94))
+    imgui.PushStyleColor(imgui_col.FrameBg, globalCustomStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00))
     imgui.PushStyleColor(imgui_col.FrameBgHovered,
-        globalVars.customStyle.frameBgHovered or vector.New(0.24, 0.34, 0.38, 1.00))
+        globalCustomStyle.frameBgHovered or vector.New(0.24, 0.34, 0.38, 1.00))
     imgui.PushStyleColor(imgui_col.FrameBgActive,
-        globalVars.customStyle.frameBgActive or vector.New(0.29, 0.39, 0.43, 1.00))
-    imgui.PushStyleColor(imgui_col.TitleBg, globalVars.customStyle.titleBg or vector.New(0.41, 0.48, 0.65, 1.00))
+        globalCustomStyle.frameBgActive or vector.New(0.29, 0.39, 0.43, 1.00))
+    imgui.PushStyleColor(imgui_col.TitleBg, globalCustomStyle.titleBg or vector.New(0.41, 0.48, 0.65, 1.00))
     imgui.PushStyleColor(imgui_col.TitleBgActive,
-        globalVars.customStyle.titleBgActive or vector.New(0.51, 0.58, 0.75, 1.00))
+        globalCustomStyle.titleBgActive or vector.New(0.51, 0.58, 0.75, 1.00))
     imgui.PushStyleColor(imgui_col.TitleBgCollapsed,
-        globalVars.customStyle.titleBgCollapsed or vector.New(0.51, 0.58, 0.75, 0.50))
-    imgui.PushStyleColor(imgui_col.CheckMark, globalVars.customStyle.checkMark or vector.New(0.81, 0.88, 1.00, 1.00))
-    imgui.PushStyleColor(imgui_col.SliderGrab, globalVars.customStyle.sliderGrab or vector.New(0.56, 0.63, 0.75, 1.00))
+        globalCustomStyle.titleBgCollapsed or vector.New(0.51, 0.58, 0.75, 0.50))
+    imgui.PushStyleColor(imgui_col.CheckMark, globalCustomStyle.checkMark or vector.New(0.81, 0.88, 1.00, 1.00))
+    imgui.PushStyleColor(imgui_col.SliderGrab, globalCustomStyle.sliderGrab or vector.New(0.56, 0.63, 0.75, 1.00))
     imgui.PushStyleColor(imgui_col.SliderGrabActive,
-        globalVars.customStyle.sliderGrabActive or vector.New(0.61, 0.68, 0.80, 1.00))
-    imgui.PushStyleColor(imgui_col.Button, globalVars.customStyle.button or vector.New(0.31, 0.38, 0.50, 1.00))
+        globalCustomStyle.sliderGrabActive or vector.New(0.61, 0.68, 0.80, 1.00))
+    imgui.PushStyleColor(imgui_col.Button, globalCustomStyle.button or vector.New(0.31, 0.38, 0.50, 1.00))
     imgui.PushStyleColor(imgui_col.ButtonHovered,
-        globalVars.customStyle.buttonHovered or vector.New(0.41, 0.48, 0.60, 1.00))
+        globalCustomStyle.buttonHovered or vector.New(0.41, 0.48, 0.60, 1.00))
     imgui.PushStyleColor(imgui_col.ButtonActive,
-        globalVars.customStyle.buttonActive or vector.New(0.51, 0.58, 0.70, 1.00))
-    imgui.PushStyleColor(imgui_col.Tab, globalVars.customStyle.tab or vector.New(0.31, 0.38, 0.50, 1.00))
-    imgui.PushStyleColor(imgui_col.TabHovered, globalVars.customStyle.tabHovered or vector.New(0.51, 0.58, 0.75, 1.00))
-    imgui.PushStyleColor(imgui_col.TabActive, globalVars.customStyle.tabActive or vector.New(0.51, 0.58, 0.75, 1.00))
-    imgui.PushStyleColor(imgui_col.Header, globalVars.customStyle.header or vector.New(0.81, 0.88, 1.00, 0.40))
+        globalCustomStyle.buttonActive or vector.New(0.51, 0.58, 0.70, 1.00))
+    imgui.PushStyleColor(imgui_col.Tab, globalCustomStyle.tab or vector.New(0.31, 0.38, 0.50, 1.00))
+    imgui.PushStyleColor(imgui_col.TabHovered, globalCustomStyle.tabHovered or vector.New(0.51, 0.58, 0.75, 1.00))
+    imgui.PushStyleColor(imgui_col.TabActive, globalCustomStyle.tabActive or vector.New(0.51, 0.58, 0.75, 1.00))
+    imgui.PushStyleColor(imgui_col.Header, globalCustomStyle.header or vector.New(0.81, 0.88, 1.00, 0.40))
     imgui.PushStyleColor(imgui_col.HeaderHovered,
-        globalVars.customStyle.headerHovered or vector.New(0.81, 0.88, 1.00, 0.50))
+        globalCustomStyle.headerHovered or vector.New(0.81, 0.88, 1.00, 0.50))
     imgui.PushStyleColor(imgui_col.HeaderActive,
-        globalVars.customStyle.headerActive or vector.New(0.81, 0.88, 1.00, 0.54))
-    imgui.PushStyleColor(imgui_col.Separator, globalVars.customStyle.separator or vector.New(0.81, 0.88, 1.00, 0.30))
-    imgui.PushStyleColor(imgui_col.Text, globalVars.customStyle.text or vector.New(1.00, 1.00, 1.00, 1.00))
+        globalCustomStyle.headerActive or vector.New(0.81, 0.88, 1.00, 0.54))
+    imgui.PushStyleColor(imgui_col.Separator, globalCustomStyle.separator or vector.New(0.81, 0.88, 1.00, 0.30))
+    imgui.PushStyleColor(imgui_col.Text, globalCustomStyle.text or vector.New(1.00, 1.00, 1.00, 1.00))
     imgui.PushStyleColor(imgui_col.TextSelectedBg,
-        globalVars.customStyle.textSelectedBg or vector.New(0.81, 0.88, 1.00, 0.40))
+        globalCustomStyle.textSelectedBg or vector.New(0.81, 0.88, 1.00, 0.40))
     imgui.PushStyleColor(imgui_col.ScrollbarGrab,
-        globalVars.customStyle.scrollbarGrab or vector.New(0.31, 0.38, 0.50, 1.00))
+        globalCustomStyle.scrollbarGrab or vector.New(0.31, 0.38, 0.50, 1.00))
     imgui.PushStyleColor(imgui_col.ScrollbarGrabHovered,
-        globalVars.customStyle.scrollbarGrabHovered or vector.New(0.41, 0.48, 0.60, 1.00))
+        globalCustomStyle.scrollbarGrabHovered or vector.New(0.41, 0.48, 0.60, 1.00))
     imgui.PushStyleColor(imgui_col.ScrollbarGrabActive,
-        globalVars.customStyle.scrollbarGrabActive or vector.New(0.51, 0.58, 0.70, 1.00))
-    imgui.PushStyleColor(imgui_col.PlotLines, globalVars.customStyle.plotLines or vector.New(0.61, 0.61, 0.61, 1.00))
+        globalCustomStyle.scrollbarGrabActive or vector.New(0.51, 0.58, 0.70, 1.00))
+    imgui.PushStyleColor(imgui_col.PlotLines, globalCustomStyle.plotLines or vector.New(0.61, 0.61, 0.61, 1.00))
     imgui.PushStyleColor(imgui_col.PlotLinesHovered,
-        globalVars.customStyle.plotLinesHovered or vector.New(1.00, 0.43, 0.35, 1.00))
+        globalCustomStyle.plotLinesHovered or vector.New(1.00, 0.43, 0.35, 1.00))
     imgui.PushStyleColor(imgui_col.PlotHistogram,
-        globalVars.customStyle.plotHistogram or vector.New(0.90, 0.70, 0.00, 1.00))
+        globalCustomStyle.plotHistogram or vector.New(0.90, 0.70, 0.00, 1.00))
     imgui.PushStyleColor(imgui_col.PlotHistogramHovered,
-        globalVars.customStyle.plotHistogramHovered or vector.New(1.00, 0.60, 0.00, 1.00))
-    loadup.OpeningTextColor = globalVars.customStyle.loadupOpeningTextColor
-    loadup.PulseTextColorLeft = globalVars.customStyle.loadupPulseTextColorLeft
-    loadup.PulseTextColorRight = globalVars.customStyle.loadupPulseTextColorRight
-    loadup.BgTl = globalVars.customStyle.loadupBgTl
-    loadup.BgTr = globalVars.customStyle.loadupBgTr
-    loadup.BgBl = globalVars.customStyle.loadupBgBl
-    loadup.BgBr = globalVars.customStyle.loadupBgBr
+        globalCustomStyle.plotHistogramHovered or vector.New(1.00, 0.60, 0.00, 1.00))
+    loadup.OpeningTextColor = globalCustomStyle.loadupOpeningTextColor
+    loadup.PulseTextColorLeft = globalCustomStyle.loadupPulseTextColorLeft
+    loadup.PulseTextColorRight = globalCustomStyle.loadupPulseTextColorRight
+    loadup.BgTl = globalCustomStyle.loadupBgTl
+    loadup.BgTr = globalCustomStyle.loadupBgTr
+    loadup.BgBl = globalCustomStyle.loadupBgBl
+    loadup.BgBr = globalCustomStyle.loadupBgBr
     return borderColor
 end
 function getCurrentRGBColors(rgbPeriod)
@@ -6965,11 +7216,11 @@ function ComputableInputFloat(label, value, decimalPlaces, suffix)
     local output = value
     local fmt = table.concat({"%.", decimalPlaces, "f"})
     if suffix then fmt = fmt .. suffix end
-    _, value = imgui.InputText(label,
+    _, value = imgui.InputTextWithHint(label, "2, 4/3 + 1, etc.",
         string.format(fmt, value), 4096,
         imgui_input_text_flags.AutoSelectAll)
     if (imgui.IsItemEdited()) then
-        local desiredComp = tostring(value):gsub("[^%d%+%-%*%/%.]", ""):gsub(suffix, "")
+        local desiredComp = tostring(value):gsub("[^%d%+%-%*%/%.]", ""):gsub(suffix or "", "")
         output = expr(desiredComp)
         if (output == nil) then output = value end
     end
@@ -6983,7 +7234,7 @@ function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
     HoverToolTip("Negate this value.")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
+    imgui.PushItemWidth(107)
     local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
     imgui.PopItemWidth()
     if ((negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary])) and newValue ~= 0) then
@@ -7009,7 +7260,7 @@ function ResettableNegatableComputableInputFloat(label, value, defaultValue, dec
     HoverToolTip("Negate this value.")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
+    imgui.PushItemWidth(107)
     local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
     imgui.PopItemWidth()
     imgui.PopStyleVar(3)
@@ -7021,12 +7272,12 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     widthFactor = widthFactor or 0.7
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local swapButtonPressed = imgui.Button("S##" .. lowerName, TERTIARY_BUTTON_SIZE)
-    HoverToolTip("Swap start/end values")
+    HoverToolTip("Swap the two values.")
     local oldValues = vector.New(varsTable[lowerName], varsTable[higherName])
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
     local negateButtonPressed = imgui.Button("N##" .. higherName, TERTIARY_BUTTON_SIZE)
-    HoverToolTip("Negate start/end values")
+    HoverToolTip("Negate the two values.")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * widthFactor - SAMELINE_SPACING)
@@ -7148,6 +7399,29 @@ function BasicInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 1, 1)
     if tooltipText then HelpMarker(tooltipText) end
+    if (bounds and bounds[1] and bounds[2]) then
+        varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
+    end
+    return oldValue ~= varsTable[parameterName]
+end
+function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipText)
+    local oldValue = varsTable[parameterName]
+    local multButtonPressed = imgui.Button("x2##" .. label)
+    HoverToolTip("Double this value.")
+    KeepSameLine()
+    local divButtonPressed = imgui.Button("/2##" .. label)
+    HoverToolTip("Half this value.")
+    KeepSameLine()
+    imgui.PushItemWidth(91.5)
+    _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)
+    imgui.PopItemWidth()
+    if tooltipText then HelpMarker(tooltipText) end
+    if (multButtonPressed) then
+        oldValue = oldValue * 2
+    end
+    if (divButtonPressed) then
+        oldValue = oldValue / 2
+    end
     if (bounds and bounds[1] and bounds[2]) then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
     end
@@ -7889,6 +8163,7 @@ function placeVibratoSVMenu(separateWindow)
     menuVars.vibratoMode = Combo("Vibrato Mode", VIBRATO_TYPES, menuVars.vibratoMode)
     chooseVibratoQuality(menuVars)
     if (menuVars.vibratoMode ~= 2) then
+        chooseVibratoDeviance(menuVars)
         chooseVibratoSides(menuVars)
     end
     local modeText = menuVars.vibratoMode == 1 and "SV" or "SSF"
@@ -8261,11 +8536,23 @@ function directSVMenu()
     if (imgui.IsItemDeactivatedAfterEdit()) then
         actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
             createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime or 0, menuVars.multiplier)) })
+        updateDirectEdit()
     end
     menuVars.multiplier = ComputableInputFloat("Multiplier", svs[menuVars.selectableIndex].Multiplier, 10)
     if (imgui.IsItemDeactivatedAfterEdit()) then
         actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
             createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime, menuVars.multiplier or 1)) })
+        updateDirectEdit()
+    end
+    if (imgui.Button("Duplicate this SV")) then
+        local existingSV = svs[menuVars.selectableIndex]
+        actions.PlaceScrollVelocity(createSV(existingSV.StartTime + 0.67, existingSV.Multiplier))
+        updateDirectEdit()
+    end
+    KeepSameLine()
+    if (imgui.Button("Delete this SV")) then
+        actions.RemoveScrollVelocity(svs[menuVars.selectableIndex])
+        updateDirectEdit()
     end
     imgui.Separator()
     if (imgui.ArrowButton("##DirectSVLeft", imgui_dir.Left)) then
@@ -8287,6 +8574,7 @@ function directSVMenu()
     KeepSameLine()
     imgui.SetCursorPosX(150)
     imgui.Text("Multiplier")
+    KeepSameLine()
     imgui.Separator()
     local startingPoint = 10 * menuVars.pageNumber - 10
     imgui.BeginTable("Test", 2)
@@ -8294,14 +8582,14 @@ function directSVMenu()
         imgui.PushID(idx)
         imgui.TableNextRow()
         imgui.TableSetColumnIndex(0)
-        imgui.Selectable(tostring(math.round(v.StartTime, 2)), menuVars.selectableIndex == idx,
+        imgui.Selectable(string.format("%.2f", v.StartTime), menuVars.selectableIndex == idx,
             imgui_selectable_flags.SpanAllColumns)
         if (imgui.IsItemClicked()) then
             menuVars.selectableIndex = idx + startingPoint
         end
         imgui.TableSetColumnIndex(1)
         imgui.SetCursorPosX(150)
-        imgui.Text(tostring(math.round(v.Multiplier, 2)));
+        imgui.Text(string.format("%.2f", v.Multiplier));
         imgui.PopID()
     end
     imgui.EndTable()
@@ -8403,6 +8691,9 @@ function lintMapMenu()
     simpleActionMenu("Remove unnecessary SVs/SSFs", 0, removeUnnecessarySVsAndSSFs, nil, false, true)
     HoverToolTip(
         "(DOESN'T VISUALLY AFFECT MAP) If two consecutive SVs have the same multiplier, removes the second SV. If three consecutive SSFs have the same multiplier, removes the middle SSF.")
+    simpleActionMenu("Remove SVs/SSFs after all TG notes", 0, removePostTGSVsAndSSFs, nil, false, true)
+    HoverToolTip(
+        "(DOESN'T VISUALLY AFFECT MAP) (ONLY APPLY AFTER MAP IS FINISHED) For all TGs, removes all SVs/SSFs after the last note and places a teleport in their place (except for the default and global groups).")
     simpleActionMenu("Remove duplicate notes", 0, mergeNotes, nil, false, true)
     HoverToolTip("Removes stacked notes.")
     simpleActionMenu("Remove all hitsounds in selection", 0, removeAllHitSounds, nil, true, true)
@@ -8615,13 +8906,15 @@ function infoTab()
     imgui.BulletText("Emik + William for plugin help.")
     imgui.BulletText("ESV members for constant support.")
     imgui.Dummy(vctr2(10))
-    imgui.SetCursorPosX((imgui.GetWindowWidth() - 153) / 2)
-    imgui.Text("If you enjoy using this plugin,")
-    imgui.SetCursorPosX((imgui.GetWindowWidth() - 172) / 2)
-    imgui.Text("consider supporting me on")
-    imgui.SameLine(0, 3)
-    imgui.TextLinkOpenURL("ko-fi!", "https://ko-fi.com/plummyyummy")
-    imgui.Dummy(vctr2(10))
+    if (not globalVars.disableKofiMessage) then
+        imgui.SetCursorPosX((imgui.GetWindowWidth() - 153) / 2)
+        imgui.Text("If you enjoy using this plugin,")
+        imgui.SetCursorPosX((imgui.GetWindowWidth() - 172) / 2)
+        imgui.Text("consider supporting me on")
+        imgui.SameLine(0, 3)
+        imgui.TextLinkOpenURL("ko-fi!", "https://ko-fi.com/plummyyummy")
+        imgui.Dummy(vctr2(10))
+    end
     if (imgui.Button("Edit Settings", HALF_ACTION_BUTTON_SIZE)) then
         state.SetValue("windows.showSettingsWindow", not state.GetValue("windows.showSettingsWindow"))
         local coordinatesToCenter = game.window.getCenter() - vector.New(216.5, 200)
@@ -11070,7 +11363,15 @@ function showAdvancedSettings()
         "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets.")
     GlobalCheckbox("ignoreNotesOutsideTg", "Ignore Notes Not In Current Timing Group",
         "Notes that are in a timing group outside of the current one will be ignored by stills, selection checks, etc.")
+    GlobalCheckbox("useMinDisplacementMultiplier", "Use Displacement Multiplier Supremum",
+        "Uses the greatest minimum possible displacement multiplier throughout the whole map to ensure that copy-paste is possible while maintaining consistency.")
+    if (globalVars.useMinDisplacementMultiplier) then
+        imgui.BeginDisabled()
+    end
     chooseMaxDisplacementMultiplierExponent()
+    if (globalVars.useMinDisplacementMultiplier) then
+        imgui.EndDisabled()
+    end
 end
 function chooseMaxDisplacementMultiplierExponent()
     imgui.PushItemWidth(70)
@@ -11093,8 +11394,8 @@ function showAppearanceSettings()
     end
     chooseStyleTheme()
     chooseColorTheme()
-    if (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" and imgui.Button("Load Theme to Custom")) then
-        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex])
+    if (imgui.Button("Copy Current Theme")) then
+        setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
         for k42 = 1, #customStyleIds do
             local id = customStyleIds[k42]
@@ -11106,12 +11407,37 @@ function showAppearanceSettings()
             customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[query]))
             ::nextCustomStyle::
         end
-        globalVars.customStyle = customStyle
-        globalVars.colorThemeIndex = table.indexOf(COLOR_THEMES, "CUSTOM")
-        setPluginAppearanceColors("CUSTOM")
+        globalCustomStyle = customStyle
+        globalCustomStyle.border = state.GetValue("borderColor")
+        local newName = "custom_Copy of " .. globalVars.colorThemeName:gsub("^custom_", "")
+        globalVars.colorThemeName = newName
+        if (not globalVars.customStyles) then globalVars.customStyles = {} end
+        globalVars.customStyles[newName] = globalCustomStyle
+        setPluginAppearanceColors(newName)
+        print("s!", "Duplicated the current theme into your custom theme list.")
+        write(globalVars)
     end
-    HoverToolTip(
-        "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
+    if (globalVars.colorThemeName:sub(1, 7) ~= "custom_") then
+        HoverToolTip(
+            "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
+    end
+    KeepSameLine()
+    if (imgui.Button("Import Theme")) then
+        state.SetValue("boolean.importingCustomTheme", not state.GetValue("boolean.importingCustomTheme"))
+    end
+    if (state.GetValue("boolean.importingCustomTheme")) then
+        local input = state.GetValue("importingCustomThemeInput", "")
+        imgui.SetNextItemWidth(180)
+        _, input = imgui.InputTextWithHint("##customThemeStr", "Paste your theme string here.", input, 69420)
+        state.SetValue("importingCustomThemeInput", input)
+        KeepSameLine()
+        if (imgui.Button("Send")) then
+            setCustomStyleString(input)
+            settingsChanged = true
+            state.SetValue("boolean.importingCustomTheme", false)
+            state.SetValue("importingCustomThemeInput", "")
+        end
+    end
     AddSeparator()
     chooseCursorTrail()
     chooseCursorTrailShape()
@@ -11138,9 +11464,9 @@ function showAppearanceSettings()
     if (not globalVars.useCustomPulseColor) then imgui.BeginDisabled() end
     KeepSameLine()
     if (imgui.Button("Edit Color")) then
-        state.SetValue("showColorPicker", not state.GetValue("showColorPicker", false))
+        state.SetValue("windows.showColorPicker", not state.GetValue("windows.showColorPicker"))
     end
-    if (state.GetValue("showColorPicker")) then
+    if (state.GetValue("windows.showColorPicker")) then
         choosePulseColor()
     end
     if (not globalVars.useCustomPulseColor) then
@@ -11156,6 +11482,97 @@ function showAppearanceSettings()
     if (globalVars.performanceMode) then
         imgui.EndDisabled()
     end
+end
+function chooseColorTheme()
+    local function renderThemeTree(tree)
+        local padding = 10
+        if (tree[1]) then
+            local maxItemSize = 0
+            for k43 = 1, #tree do
+                local item = tree[k43]
+                if (imgui.CalcTextSize(item.id).x > maxItemSize) then
+                    maxItemSize = imgui.CalcTextSize(item.id).x * 1.03
+                end
+            end
+            for k44 = 1, #tree do
+                local item = tree[k44]
+                local col = item.textColor
+                local sz = vector.New(maxItemSize, imgui.CalcTextSize(item.id).y) + vector.New(padding, 0)
+                imgui.BeginChild("themetree" .. item.id, sz)
+                local topLeft = imgui.GetWindowPos()
+                local dim = imgui.GetWindowSize()
+                local pos = imgui.GetMousePos()
+                if (pos.x > topLeft.x and pos.x < topLeft.x + dim.x and pos.y > topLeft.y and pos.y < topLeft.y + dim.y) then
+                    local ctx = imgui.GetWindowDrawList()
+                    ctx.AddRectFilled(topLeft, topLeft + dim, color.int.white - color.int.alphaMask * 200)
+                end
+                if (type(item.textColor[1]) == "table") then
+                    local strLen = item.id:len()
+                    local charProgress = 0
+                    local subdivisionLength = #item.textColor - 1
+                    for char in item.id:gmatch(".") do
+                        local progress = charProgress / (strLen - 1) * subdivisionLength % (1 + 1 / 10000)
+                        local currentSubdivision = 1 + math.floor(charProgress / (strLen - 0.999) * subdivisionLength)
+                        local col1 = vector.New(item.textColor[currentSubdivision][1] / 255,
+                            item.textColor[currentSubdivision][2] / 255, item.textColor[currentSubdivision][3] / 255, 1)
+                        local col2 = vector.New(item.textColor[currentSubdivision + 1][1] / 255,
+                            item.textColor[currentSubdivision + 1][2] / 255,
+                            item.textColor[currentSubdivision + 1][3] / 255, 1)
+                        imgui.TextColored(col1 * (1 - progress) +
+                            col2 * progress, char)
+                        imgui.SameLine(0, 0)
+                        charProgress = charProgress + 1
+                    end
+                else
+                    for char in item.id:gmatch(".") do
+                        imgui.TextColored(vector.New(col[1] / 255, col[2] / 255, col[3] / 255, 1), char)
+                        imgui.SameLine(0, 0)
+                    end
+                end
+                imgui.EndChild()
+                if (imgui.IsItemClicked("Left")) then
+                    globalVars.colorThemeName = item.internalId or item.id
+                    if (item.internalId) then
+                        globalCustomStyle = globalVars.customStyles[globalVars.colorThemeName]
+                    end
+                    write(globalVars)
+                    imgui.CloseCurrentPopup()
+                end
+            end
+        else
+            for k, v in pairs(tree) do
+                if (k == "Custom") then
+                    if (imgui.BeginMenu("Custom Themes")) then
+                        if (not globalVars.customStyles or not next(globalVars.customStyles)) then
+                            imgui.Text("No Custom Themes")
+                        else
+                            renderThemeTree(table.map(table.keys(globalVars.customStyles), function(s)
+                                return {
+                                    id = s:sub(8),
+                                    textColor = { 255, 255, 255 },
+                                    internalId = s
+                                }
+                            end))
+                        end
+                        imgui.EndMenu()
+                    end
+                else
+                    ---@diagnostic disable-next-line: param-type-mismatch
+                    if (imgui.BeginMenu(k)) then
+                        renderThemeTree(v)
+                        imgui.EndMenu()
+                    end
+                end
+            end
+        end
+    end
+    if (imgui.BeginCombo("Color Theme", globalVars.colorThemeName:gsub("custom_", ""):fixToSize(130))) then
+        renderThemeTree(THEME_TREE)
+        imgui.EndCombo()
+    end
+    local isRGBColorTheme = globalVars.colorThemeName:find("RGB") or globalVars.colorThemeName:find("BGR")
+    if not isRGBColorTheme or globalVars.colorThemeName:find("custom_") then return end
+    chooseRGBPeriod()
 end
 customStyleIds = {
     "windowBg",
@@ -11239,48 +11656,61 @@ local customStyleNames = {
 }
 function showCustomThemeSettings()
     local settingsChanged = false
-    imgui.SeparatorText("Custom Theme Actions")
+    imgui.SeparatorText(table.concat({"Editing '", globalVars.colorThemeName:gsub("custom_", ""), "'"}))
     if (imgui.Button("Reset")) then
-        globalVars.customStyle = table.duplicate(DEFAULT_STYLE)
-        write()
+        globalCustomStyle = table.duplicate(DEFAULT_STYLE)
+        globalVars.colorThemeName = "Original"
+        write(globalVars)
     end
     KeepSameLine()
-    if (imgui.Button("Import")) then
-        state.SetValue("boolean.importingCustomTheme", true)
+    if (imgui.Button("Rename")) then
+        state.SetValue("boolean.renamingCustomTheme", not state.GetValue("boolean.renamingCustomTheme"))
     end
     KeepSameLine()
     if (imgui.Button("Export")) then
-        local str = stringifyCustomStyle(globalVars.customStyle)
+        local str = stringifyCustomStyle(globalCustomStyle)
         imgui.SetClipboardText(str)
-        print("i!", "Exported custom theme to your clipboard.")
+        print("s!", "Exported custom theme to your clipboard.")
     end
-    if (state.GetValue("boolean.importingCustomTheme")) then
-        local input = state.GetValue("importingCustomThemeInput", "")
-        _, input = imgui.InputText("##customThemeStr", input, 69420)
-        state.SetValue("importingCustomThemeInput", input)
+    KeepSameLine()
+    if (imgui.Button("Delete")) then
+        print("e!", "Deleted custom theme.")
+        globalVars.customStyles[globalVars.colorThemeName] = nil
+        globalVars.colorThemeName = "Original"
+        state.SetValue("settingTypeIndex", table.indexOf(SETTING_TYPES, "Appearance"))
+        write(globalVars)
+    end
+    if (state.GetValue("boolean.renamingCustomTheme")) then
+        local input = state.GetValue("renamingCustomThemeInput", "")
+        imgui.SetNextItemWidth(130)
+        _, input = imgui.InputTextWithHint("##customThemeStr", "New Custom Theme Name", input, 69420)
+        state.SetValue("renamingCustomThemeInput", input)
         KeepSameLine()
         if (imgui.Button("Send")) then
-            setCustomStyleString(input)
+            local newName = "custom_" .. input
+            globalVars.customStyles[newName] = globalCustomStyle
+            globalVars.customStyles[globalVars.colorThemeName] = nil
+            globalVars.colorThemeName = newName
             settingsChanged = true
-            state.SetValue("boolean.importingCustomTheme", false)
-            state.SetValue("importingCustomThemeInput", "")
+            state.SetValue("boolean.renamingCustomTheme", false)
+            state.SetValue("renamingCustomThemeInput", "")
         end
         KeepSameLine()
         if (imgui.Button("X")) then
-            state.SetValue("boolean.importingCustomTheme", false)
-            state.SetValue("importingCustomThemeInput", "")
+            state.SetValue("boolean.renamingCustomTheme", false)
+            state.SetValue("renamingCustomThemeInput", "")
         end
     end
     imgui.SeparatorText("Search")
     imgui.PushItemWidth(imgui.GetWindowWidth() - 25)
     local searchText = state.GetValue("customTheme_searchText", "")
-    _, searchText = imgui.InputText("##CustomThemeSearch", searchText, 100)
+    _, searchText = imgui.InputTextWithHint("##CustomThemeSearch", "Border, Title, Frame BG, etc.", searchText, 100)
     state.SetValue("customTheme_searchText", searchText)
     imgui.PopItemWidth()
     for idx, id in ipairs(customStyleIds) do
         local name = customStyleNames[idx]
         if (not name:lower():find(searchText:lower())) then goto nextId end
-        settingsChanged = ColorInput(globalVars.customStyle, id, name) or settingsChanged
+        settingsChanged = ColorInput(globalCustomStyle, id, name) or settingsChanged
         ::nextId::
     end
     if settingsChanged then
@@ -11301,8 +11731,8 @@ end
 function stringifyCustomStyle(customStyle)
     local keys = table.keys(customStyle)
     local resultStr = "v2 "
-    for k43 = 1, #keys do
-        local key = keys[k43]
+    for k45 = 1, #keys do
+        local key = keys[k45]
         local value = customStyle[key]
         keyId = convertStrToShort(key)
         if (key:sub(1, 6) == "loadup") then keyId = keyId .. key:sub(-1):upper() end
@@ -11314,39 +11744,55 @@ function stringifyCustomStyle(customStyle)
     end
     return resultStr:sub(1, -2)
 end
-function setCustomStyleString(str)
+function setCustomStyleString(str, exportInstead)
     local keyIdDict = {}
     for _, key in ipairs(table.keys(DEFAULT_STYLE)) do
         keyIdDict[key] = convertStrToShort(key)
         if (key:sub(1, 6) == "loadup") then keyIdDict[key] = keyIdDict[key] .. key:sub(-1):upper() end
     end
     if (str:sub(1, 3) == "v2 ") then
-        parseCustomStyleV2(str:sub(4), keyIdDict)
-    else
-        parseCustomStyleV1(str, keyIdDict)
+        parseCustomStyleV2(str:sub(4), keyIdDict, exportInstead)
+        return
     end
+    print("e!", "This version of theming is no longer supported. We apologize for any inconvenience.")
 end
-function parseCustomStyleV2(str, keyIdDict)
+function parseCustomStyleV2(str, keyIdDict, exportInstead)
     local customStyle = {}
     for kvPair in str:gmatch("[^ ]+") do
         local keyId = kvPair:sub(1, kvPair:len() - 5)
         local keyValue = kvPair:sub(-5)
         local key = table.indexOf(keyIdDict, keyId)
         if (not keyId or key == -1) then goto nextPair end
-        customStyle[key] = color.nduaToRgba(keyValue) / 255
+        customStyle[key] = color.nduaToRgba(keyValue)
         ::nextPair::
     end
-    globalVars.customStyle = table.duplicate(customStyle)
-end
-function parseCustomStyleV1(str, keyIdDict)
-    local customStyle = {}
-    for kvPair in str:gmatch("[0-9#:a-zA-Z]+") do -- Equivalent to validate, no need to change
-        local keyId = kvPair:match("[a-zA-Z]+:"):sub(1, -2)
-        local hexa = kvPair:match(":[a-f0-9]+"):sub(2)
-        local key = table.indexOf(keyIdDict, keyId)
-        if (key ~= -1) then customStyle[key] = color.hexaToRgba(hexa) / 255 end
+    if (not exportInstead) then
+        globalCustomStyle = table.duplicate(customStyle)
+        if (not globalVars.customStyles) then globalVars.customStyles = {} end
+        local newName = "custom_Import" .. state.UnixTime
+        globalVars.customStyles[newName] = globalCustomStyle
+        globalVars.colorThemeName = newName
+        print("s!", "Imported a new theme into your custom theme list.")
+        return
     end
-    globalVars.customStyle = table.duplicate(customStyle)
+    local outStr = ""
+    for k, v in pairs(customStyle) do
+        if (k:find("loadup")) then
+            outStr = outStr ..
+                "loadup." ..
+                k:gsub("loadup", "") ..
+                " = vector.New(" ..
+                math.round(v.x, 2) ..
+                table.concat({", ", math.round(v.y, 2) .. ", " .. math.round(v.z, 2) .. ", " .. math.round(v.w, 2), ")\n"})
+        else
+            outStr = outStr .. "imgui.PushStyleColor(imgui_col." ..
+                k:capitalize() ..
+                ", vector.New(" ..
+                math.round(v.x, 2) ..
+                table.concat({", ", math.round(v.y, 2) .. ", " .. math.round(v.z, 2) .. ", " .. math.round(v.w, 2), "))\n"})
+        end
+    end
+    imgui.SetClipboardText(outStr)
 end
 function saveSettingPropertiesButton(settingVars, label)
     local saveButtonClicked = imgui.Button("Save##setting" .. label)
@@ -11358,7 +11804,7 @@ function saveSettingPropertiesButton(settingVars, label)
     globalVars.defaultProperties.settings[label] = settingVars
     loadDefaultProperties(globalVars.defaultProperties)
     write(globalVars)
-    print("i!",
+    print("s!",
         'Default setting properties for submenu "' ..
         label .. '" have been set. Changes will be shown on the next plugin refresh.')
 end
@@ -11372,7 +11818,7 @@ function saveMenuPropertiesButton(menuVars, label)
     globalVars.defaultProperties.menu[label] = menuVars
     loadDefaultProperties(globalVars.defaultProperties)
     write(globalVars)
-    print("i!",
+    print("s!",
         'Default menu properties for menu "' ..
         label .. '" have been set. Changes will be shown on the next plugin refresh.')
 end
@@ -11621,6 +12067,8 @@ function showGeneralSettings()
         "Disables some visual enhancement to boost performance.")
     GlobalCheckbox("advancedMode", "Enable Advanced Mode",
         "Advanced mode enables a few features that simplify SV creation, at the cost of making the plugin more cluttered.")
+    GlobalCheckbox("disableKofiMessage", "Disable Ko-Fi Message",
+        "Removes the text at the bottom of the 'Info' section requesting a donation.")
     AddSeparator()
     chooseUpscroll()
     AddSeparator()
@@ -11710,7 +12158,7 @@ function showPluginSettingsWindow()
     startNextWindowNotCollapsed("plumoguSV Settings")
     _, settingsOpened = imgui.Begin("plumoguSV Settings", true, 42)
     imgui.SetWindowSize("plumoguSV Settings", vector.New(433, 400))
-    local typeIndex = state.GetValue("settings_typeIndex", 1)
+    local typeIndex = state.GetValue("settingTypeIndex") or 1
     imgui.Columns(2, "settings_columnList", true)
     imgui.SetColumnWidth(0, 150)
     imgui.SetColumnWidth(1, 283)
@@ -11720,7 +12168,7 @@ function showPluginSettingsWindow()
     --- Key is name of setting. If value with respect to key is true, will hide setting at the left
     local hideSettingDict = {
         ["Advanced"] = not globalVars.advancedMode,
-        ["Custom Theme"] = (COLOR_THEMES[globalVars.colorThemeIndex] ~= "CUSTOM" or globalVars.performanceMode)
+        ["Custom Theme"] = (globalVars.colorThemeName:sub(1, 7) ~= "custom_" or globalVars.performanceMode)
     }
     for idx, v in pairs(SETTING_TYPES) do
         if (hideSettingDict[v]) then goto nextSetting end
@@ -11740,6 +12188,7 @@ function showPluginSettingsWindow()
     imgui.NextColumn()
     imgui.BeginChild("Settings Data")
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
+    state.SetValue("settingTypeIndex", typeIndex)
     if (SETTING_TYPES[typeIndex] == "General") then
         showGeneralSettings()
     end
@@ -11764,10 +12213,9 @@ function showPluginSettingsWindow()
     imgui.PopItemWidth()
     imgui.EndChild()
     imgui.Columns(1)
-    state.SetValue("settings_typeIndex", typeIndex)
     if (not settingsOpened) then
         state.SetValue("windows.showSettingsWindow", false)
-        state.SetValue("settings_typeIndex", 1)
+        state.SetValue("settingTypeIndex", 1)
         state.SetValue("crazy", "Crazy?")
         state.SetValue("activateCrazy", false)
         state.SetValue("crazyIdx", 1)
@@ -11775,7 +12223,7 @@ function showPluginSettingsWindow()
     if (not globalVars.performanceMode) then
         imgui.PopStyleColor(41)
         pulseController()
-        setPluginAppearanceColors(COLOR_THEMES[globalVars.colorThemeIndex], true)
+        setPluginAppearanceColors(globalVars.colorThemeName, true)
         setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])
     end
     imgui.End()
@@ -12366,11 +12814,11 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
     local normalizedPos2 = pos2 / 150
     if (not settingVars.manualMode) then
         imgui.BeginChild("Bezier Interactive Window" .. optionalLabel, vctr2(150), 67, 31)
-        local red = 4278190335
-        local blue = 4294901760
+        local pointColor1 = 4278190335
+        local pointColor2 = 4294735619
         pos1.y = 150 - pos1.y
         pos2.y = 150 - pos2.y
-        local pointList = { { pos = pos1, col = red, size = 5 }, { pos = pos2, col = blue, size = 5 } }
+        local pointList = { { pos = pos1, col = pointColor1, size = 5 }, { pos = pos2, col = pointColor2, size = 5 } }
         local ctx = renderGraph("Bezier Interactive Window" .. optionalLabel, vctr2(150), pointList, settingVars
             .freeMode)
         local topLeft = imgui.GetWindowPos()
@@ -12388,8 +12836,8 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         ctx.AddBezierCubic(bottomLeft, topLeft + pos1, topLeft + pos2, topRight, mainCol, 3)
         local dist1 = vector.Distance(bottomLeft, topLeft + pos1)
         local dist2 = vector.Distance(topRight, topLeft + pos2)
-        local factor1 = 1 - 10 / dist1
-        local factor2 = 1 - 10 / dist2
+        local factor1 = 1 - pointList[1].size / dist1
+        local factor2 = 1 - pointList[2].size / dist2
         ctx.AddLine(bottomLeft, bottomLeft + factor1 * vector.New(pos1.x, pos1.y - dim.y), dottedCol, 2)
         ctx.AddLine(topRight, topRight + factor2 * vector.New(pos2.x - dim.x, pos2.y), dottedCol, 2)
         imgui.EndChild()
@@ -12415,10 +12863,19 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
             "Enable this to directly edit the bezier points.")
         imgui.EndChild()
     else
-        imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
-        _, normalizedPos1 = imgui.SliderFloat2("Point 1", pos1 / 150, 0, 1)
-        imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
-        _, normalizedPos2 = imgui.SliderFloat2("Point 2", pos2 / 150, 0, 1)
+        if (settingVars.freeMode) then
+            imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
+            _, normalizedPos1 = imgui.InputFloat2("Point 1", pos1 / 150)
+            imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
+            _, normalizedPos2 = imgui.InputFloat2("Point 2", pos2 / 150)
+        else
+            imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
+            _, normalizedPos1 = imgui.SliderFloat2("Point 1", pos1 / 150, 0, 1)
+            imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
+            _, normalizedPos2 = imgui.SliderFloat2("Point 2", pos2 / 150, 0, 1)
+        end
+        _, settingVars.freeMode = imgui.Checkbox("Free Mode##Bezier", settingVars.freeMode)
+        KeepSameLine()
         _, settingVars.manualMode = imgui.Checkbox("Manual Edit##Bezier", settingVars.manualMode)
         HoverToolTip(
             "Disable this to edit the bezier points with an interactive graph.")
@@ -12442,17 +12899,6 @@ function chooseChinchillaType(settingVars)
     local oldIndex = settingVars.chinchillaTypeIndex
     settingVars.chinchillaTypeIndex = Combo("Chinchilla Type", CHINCHILLA_TYPES, oldIndex)
     return oldIndex ~= settingVars.chinchillaTypeIndex
-end
-function chooseColorTheme()
-    local oldColorThemeIndex = globalVars.colorThemeIndex
-    globalVars.colorThemeIndex = Combo("Color Theme", COLOR_THEMES, globalVars.colorThemeIndex, COLOR_THEME_COLORS)
-    if (oldColorThemeIndex ~= globalVars.colorThemeIndex) then
-        write(globalVars)
-    end
-    local currentTheme = COLOR_THEMES[globalVars.colorThemeIndex]
-    local isRGBColorTheme = currentTheme:find("RGB") or currentTheme:find("BGR")
-    if not isRGBColorTheme then return end
-    chooseRGBPeriod()
 end
 function chooseComboSVOption(settingVars, maxComboPhase)
     local oldIndex = settingVars.comboTypeIndex
@@ -12552,7 +12998,7 @@ function chooseCurveSharpness(settingVars)
         settingVars.curveSharpness = 50
     end
     KeepSameLine()
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
+    imgui.PushItemWidth(107)
     local _, newSharpness = imgui.SliderInt("Curve Sharpness", settingVars.curveSharpness, 1, 100, "%d%%")
     imgui.PopItemWidth()
     settingVars.curveSharpness = newSharpness
@@ -12912,7 +13358,7 @@ function chooseSVBehavior(settingVars)
     HoverToolTip("Switch between slow down/speed up")
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.7 - SAMELINE_SPACING)
+    imgui.PushItemWidth(107)
     local oldBehaviorIndex = settingVars.behaviorIndex
     settingVars.behaviorIndex = Combo("Behavior", SV_BEHAVIORS, oldBehaviorIndex)
     imgui.PopItemWidth()
@@ -12936,7 +13382,7 @@ function chooseSVPoints(settingVars, svPointsForce)
         settingVars.svPoints = svPointsForce
         return false
     end
-    return BasicInputInt(settingVars, "svPoints", "SV Points##regular", { 1, MAX_SV_POINTS })
+    return ExponentialInputInt(settingVars, "svPoints", "SV Points##regular", { 1, MAX_SV_POINTS })
 end
 function chooseDistanceMode(menuVars)
     local oldMode = menuVars.distanceMode
@@ -12961,14 +13407,41 @@ function choosePulseColor()
         write(globalVars)
     end
     if (not colorPickerOpened) then
-        state.SetValue("showColorPicker", false)
+        state.SetValue("windows.showColorPicker", false)
     end
     imgui.End()
 end
 function chooseVibratoSides(menuVars)
-    imgui.Dummy(vector.New(27, 0))
+    imgui.Dummy(vector.New(38, 0))
     KeepSameLine()
     menuVars.sides = RadioButtons("Sides:", menuVars.sides, { "1", "2", "3" }, { 1, 2, 3 })
+end
+function chooseVibratoDeviance(menuVars)
+    local tooltipList = {
+        "Don't deviate vibrato at all.",
+        "Deviate vibrato with the given displacement. All displacements are equally likely to be chosen.",
+        "Deviate vibrato with the given displacement. Displacements are chosen via a Gaussian distribution."
+    }
+    local deviationType = VIBRATO_DEVIATION_TYPES[menuVars.deviationFunctionIndex]
+    local dontChooseDistance = deviationType == "None"
+    local indentWidth = DEFAULT_WIDGET_WIDTH * 0.37 + 16
+    if dontChooseDistance then
+        imgui.Indent(indentWidth)
+    else
+        imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.47 - 5)
+        menuVars.deviationDistance = ComputableInputFloat("##deviation", menuVars.deviationDistance, 2, " msx")
+        KeepSameLine()
+        imgui.PopItemWidth()
+    end
+    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.53)
+    menuVars.deviationFunctionIndex = Combo("Deviance Type", VIBRATO_DEVIATION_TYPES, menuVars.deviationFunctionIndex, {},
+        {},
+        tooltipList)
+    HoverToolTip(tooltipList[menuVars.deviationFunctionIndex])
+    if dontChooseDistance then
+        imgui.Unindent(indentWidth)
+    end
+    imgui.PopItemWidth()
 end
 function chooseConvertSVSSFDirection(menuVars)
     menuVars.conversionDirection = RadioButtons("Direction:", menuVars.conversionDirection, { "SSF -> SV", "SV -> SSF" },
@@ -13668,8 +14141,8 @@ end
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for k44 = 1, #svs do
-        local sv = svs[k44]
+    for k46 = 1, #svs do
+        local sv = svs[k46]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
         if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
     end
@@ -14181,63 +14654,13 @@ function toggleablePrint(type, msg)
     if (creationMsg and globalVars.dontPrintCreation) then return end
     print(type, msg)
 end
-function draw()
-    if (not state.CurrentTimingPoint) then return end
-    local performanceMode = globalVars.performanceMode
-    PLUGIN_NAME = "plumoguSV v2.0.2"
-    state.IsWindowHovered = imgui.IsWindowHovered()
-    startNextWindowNotCollapsed(PLUGIN_NAME)
-    imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
-    imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
-    if (not performanceMode) then
-        addGradient()
-        renderBackground()
-        drawCapybaraParent()
-        drawCursorTrail()
-        pulseController()
-        checkForGlobalHotkeys()
-        setPluginAppearance()
-    end
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
-    imgui.BeginTabBar("SV tabs")
-    for i = 1, #TAB_MENUS do
-        createMenuTab(TAB_MENUS[i])
-    end
-    imgui.EndTabBar()
-    if (not performanceMode) then
-        if (globalVars.showVibratoWidget) then
-            imgui.Begin("plumoguSV-vibrato", imgui_window_flags.AlwaysAutoResize)
-            imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
-            placeVibratoSVMenu(true)
-            imgui.End()
-        end
-        if (globalVars.showNoteDataWidget) then
-            renderNoteDataWidget()
-        end
-        if (globalVars.showMeasureDataWidget) then
-            renderMeasureDataWidget()
-        end
-    end
-    if (state.GetValue("windows.showTutorialWindow")) then
-        showTutorialWindow()
-    end
-    if (state.GetValue("windows.showSettingsWindow")) then
-        showPluginSettingsWindow()
-    end
-    if (state.GetValue("windows.showPatchNotesWindow")) then
-        showPatchNotesWindow()
-    end
-    imgui.End()
-    logoThread()
-    state.SetValue("boolean.changeOccurred", false)
-    local groups = state.GetValue("tgList")
-    if (state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex]) then
-        globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
-    end
-end
 function awake()
     loadup = {} -- later inserted to via setStyleVars.lua
     local tempGlobalVars = read()
+    if (tempGlobalVars.colorThemeIndex) then
+        print("w!",
+            "Due to an internal change, your selected theme may have been reset. Please reselect the theme in the plugin settings")
+    end
     if (not tempGlobalVars) then
         write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
         ---@diagnostic disable-next-line: undefined-global
@@ -14272,7 +14695,7 @@ end
 function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
-    PLUGIN_NAME = "plumoguSV v2.0.2"
+    PLUGIN_NAME = "plumoguSV-dev"
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed(PLUGIN_NAME)
     imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
