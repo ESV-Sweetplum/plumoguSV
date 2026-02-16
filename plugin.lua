@@ -11520,9 +11520,10 @@ function chooseMaxDisplacementMultiplierExponent(forceCache)
     if (forceCache) then oldMDME = state.GetValue("displacementExponent") or 0 end
     _, tempMDME = imgui.SliderInt("Max Displacement Multiplier Exp.",
         oldMDME, 0, 6)
+    if (forceCache) then return end
     HoverToolTip(
         "plumoguSV designs pseudo-instantaneous movement via a very large SV immediately followed by a different SV. To ensure that the movement truly looks instantaneous, the distance between these two SVs is minimal (conventionally, 1/64th of a millisecond). However, as a map progresses over time, this distance is too small for the engine to handle due to floating point errors. This causes issues for SV mappers trying to copy a section from an early part of the map to a later part of a map, where the displacement distance needs to be larger. Lowering this number fixes that, at the cost of potential two-frame teleports during the rendering of the map. In specific, the denominator of the displacement distance (in ms) will be set to 2^{setting}, where ^ denotes exponentiation.")
-    globalVars.maxDisplacementMultiplierExponent = math.clamp(tempMDME, 0, 10)
+    globalVars.maxDisplacementMultiplierExponent = math.clamp(tempMDME, 0, 6)
     imgui.PopItemWidth()
     if (oldMDME ~= globalVars.maxDisplacementMultiplierExponent) then
         write(globalVars)
