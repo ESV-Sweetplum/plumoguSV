@@ -11287,7 +11287,7 @@ function showPatchNotesV210(lc, rc)
         'Set max displacement exponent supremum to 6.',
         'Fixed relative ratio throwing an error when changed.',
         'Fixed the draw function being in the plugin file twice.',
-        'Added aster\'s theme to the theming menu.',
+        "Added aster's theme to the theming menu.",
     }
     local newFeatures = {
         'Added a deviation parameter to all vibrato functions.',
@@ -13988,7 +13988,7 @@ function getUsableDisplacementMultiplier(offset)
     end
 end
 function initializeDisplacementExponentCache()
-    state.SetValue("displacementExponent", math.clamp(23 - math.floor(math.log(math.abs(map.TrackLength) + 1, 2)), 0, 6))
+    state.SetValue("displacementExponent", math.clamp(23 - math.floor(math.log(math.ceil(map.TrackLength) + 1, 2)), 0, 6))
 end
 function prepareDisplacingSV(svsToAdd, svTimeIsAdded, svTime, displacement, displacementMultiplier, hypothetical, svs)
     svTimeIsAdded[svTime] = true

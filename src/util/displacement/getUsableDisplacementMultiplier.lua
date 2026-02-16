@@ -26,5 +26,5 @@ function getUsableDisplacementMultiplier(offset)
 end
 
 function initializeDisplacementExponentCache()
-    cache.displacementExponent = math.clamp(23 - math.floor(math.log(math.abs(map.TrackLength) + 1, 2)), 0, 6)
+    cache.displacementExponent = math.clamp(23 - math.floor(math.log(math.ceil(map.TrackLength) + 1, 2)), 0, 6)
 end

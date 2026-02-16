@@ -14,7 +14,7 @@ function showPatchNotesV210(lc, rc)
         'Set max displacement exponent supremum to 6.',
         'Fixed relative ratio throwing an error when changed.',
         'Fixed the draw function being in the plugin file twice.',
-        'Added aster\'s theme to the theming menu.',
+        "Added aster's theme to the theming menu.",
     }
 
     local newFeatures = {
