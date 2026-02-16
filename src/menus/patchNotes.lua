@@ -12,6 +12,18 @@ function showPatchNotesWindow()
         cache.windows.showPatchNotesWindow = false
     end
 
+    imgui.BeginChild('v2.1.0Bezier', vector.New(486, 48), 2, 3)
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    if (topLeft.y - maxHeight > 0) then goto skip210 end
+    if (topLeft.y - minHeight < -50) then goto skip210 end
+    drawV210(ctx, topLeft + vector.New(243, 17), 1, 1)
+    ctx.AddRect(topLeft + vector.New(0, 25), topLeft + vector.New(243 - 136 / 2 - 10, 28), color.int.white)
+    ctx.AddRect(topLeft + vector.New(243 + 136 / 2 + 10, 25), topLeft + vector.New(486, 28), color.int.white)
+    ::skip210::
+    imgui.EndChild()
+
     imgui.BeginChild('v2.0.2Bezier', vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
@@ -286,6 +298,311 @@ function showPatchNotesWindow()
 
     imgui.PopStyleColor()
     imgui.End()
+end
+
+---Draws v210 on screen, with dimensions = scale * [136,37].
+---@param ctx ImDrawListPtr
+---@param location Vector2
+---@param scale number
+---@param thickness integer
+function drawV210(ctx, location, scale, thickness)
+    location = location - vector.New(64.5, 24) * scale
+    local lightnessAdjust = (state.UnixTime % 2400) / 1200 * math.pi
+    local colFn = function(x)
+        return color.vrgbaToUint(color.hslaToRgba(x + 200, 1, math.sin(lightnessAdjust + x / 20) / 5 + 0.67, 1))
+    end
+    ctx.AddBezierCubic(location + scale * vector.New(24.43, 21.16), location + scale * vector.New(24.43, 21.16),
+        location + scale * vector.New(14.35, 48.44), location + scale * vector.New(14.35, 48.44), colFn(14.35), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(14.35, 48.44), location + scale * vector.New(14.35, 48.44),
+        location + scale * vector.New(10.09, 48.44), location + scale * vector.New(10.09, 48.44), colFn(10.09), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(10.09, 48.44), location + scale * vector.New(10.09, 48.44),
+        location + scale * vector.New(0, 21.16), location + scale * vector.New(0, 21.16), colFn(0), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(0, 21.16), location + scale * vector.New(0, 21.16),
+        location + scale * vector.New(4.55, 21.16), location + scale * vector.New(4.55, 21.16), colFn(4.55), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(4.55, 21.16), location + scale * vector.New(4.55, 21.16),
+        location + scale * vector.New(12.07, 42.9), location + scale * vector.New(12.07, 42.9), colFn(12.07), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(12.07, 42.9), location + scale * vector.New(12.07, 42.9),
+        location + scale * vector.New(12.36, 42.9), location + scale * vector.New(12.36, 42.9), colFn(12.36), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(12.36, 42.9), location + scale * vector.New(12.36, 42.9),
+        location + scale * vector.New(19.89, 21.16), location + scale * vector.New(19.89, 21.16), colFn(19.89), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(19.89, 21.16), location + scale * vector.New(19.89, 21.16),
+        location + scale * vector.New(24.43, 21.16), location + scale * vector.New(24.43, 21.16), colFn(24.43), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(29.9, 48.44), location + scale * vector.New(29.9, 48.44),
+        location + scale * vector.New(29.9, 45.24), location + scale * vector.New(29.9, 45.24), colFn(29.9), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(29.9, 45.24), location + scale * vector.New(29.9, 45.24),
+        location + scale * vector.New(41.9, 32.1), location + scale * vector.New(41.9, 32.1), colFn(41.9), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(41.9, 32.1), location + scale * vector.New(43.31333333333333, 30.56),
+        location + scale * vector.New(44.473333333333336, 29.22), location + scale * vector.New(45.38, 28.08),
+        colFn(45.38),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(45.38, 28.08),
+        location + scale * vector.New(46.29333333333333, 26.939999999999998),
+        location + scale * vector.New(46.97333333333333, 25.86333333333333), location + scale * vector.New(47.42, 24.85),
+        colFn(47.42), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(47.42, 24.85),
+        location + scale * vector.New(47.85999999999999, 23.836666666666666),
+        location + scale * vector.New(48.07999999999999, 22.77333333333333), location + scale * vector.New(48.08, 21.66),
+        colFn(48.08), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(48.08, 21.66),
+        location + scale * vector.New(48.07999999999999, 20.38),
+        location + scale * vector.New(47.77666666666666, 19.273333333333333), location + scale * vector.New(47.17, 18.34),
+        colFn(47.17), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(47.17, 18.34),
+        location + scale * vector.New(46.556666666666665, 17.406666666666666),
+        location + scale * vector.New(45.72333333333333, 16.686666666666667), location + scale * vector.New(44.67, 16.18),
+        colFn(44.67), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(44.67, 16.18),
+        location + scale * vector.New(43.61666666666667, 15.666666666666666),
+        location + scale * vector.New(42.43333333333333, 15.41), location + scale * vector.New(41.12, 15.41),
+        colFn(41.12),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(41.12, 15.41),
+        location + scale * vector.New(39.72666666666667, 15.41), location + scale * vector.New(38.51, 15.696666666666665),
+        location + scale * vector.New(37.47, 16.27), colFn(37.47), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(37.47, 16.27),
+        location + scale * vector.New(36.43666666666667, 16.84333333333333),
+        location + scale * vector.New(35.64, 17.646666666666665), location + scale * vector.New(35.08, 18.68),
+        colFn(35.08),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(35.08, 18.68),
+        location + scale * vector.New(34.51333333333333, 19.706666666666663),
+        location + scale * vector.New(34.23, 20.913333333333334), location + scale * vector.New(34.23, 22.3),
+        colFn(34.23),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(34.23, 22.3), location + scale * vector.New(34.23, 22.3),
+        location + scale * vector.New(30.04, 22.3), location + scale * vector.New(30.04, 22.3), colFn(30.04), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(30.04, 22.3),
+        location + scale * vector.New(30.039999999999996, 20.173333333333332),
+        location + scale * vector.New(30.53333333333333, 18.30333333333333), location + scale * vector.New(31.52, 16.69),
+        colFn(31.52), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(31.52, 16.69),
+        location + scale * vector.New(32.5, 15.083333333333332),
+        location + scale * vector.New(33.839999999999996, 13.829999999999998),
+        location + scale * vector.New(35.54, 12.93), colFn(35.54), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(35.54, 12.93), location + scale * vector.New(37.24, 12.03),
+        location + scale * vector.New(39.14666666666667, 11.58), location + scale * vector.New(41.26, 11.58),
+        colFn(41.26),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(41.26, 11.58),
+        location + scale * vector.New(43.39333333333333, 11.58), location + scale * vector.New(45.28333333333333, 12.03),
+        location + scale * vector.New(46.93, 12.93), colFn(46.93), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(46.93, 12.93),
+        location + scale * vector.New(48.57666666666666, 13.829999999999998),
+        location + scale * vector.New(49.86666666666666, 15.043333333333333), location + scale * vector.New(50.8, 16.57),
+        colFn(50.8), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(50.8, 16.57),
+        location + scale * vector.New(51.73333333333333, 18.096666666666664),
+        location + scale * vector.New(52.199999999999996, 19.793333333333333), location + scale * vector.New(52.2, 21.66),
+        colFn(52.2), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(52.2, 21.66), location + scale * vector.New(52.199999999999996, 23),
+        location + scale * vector.New(51.959999999999994, 24.306666666666665),
+        location + scale * vector.New(51.48, 25.58), colFn(51.48), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(51.48, 25.58),
+        location + scale * vector.New(50.99999999999999, 26.85333333333333),
+        location + scale * vector.New(50.17333333333333, 28.266666666666666), location + scale * vector.New(49, 29.82),
+        colFn(49), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(49, 29.82),
+        location + scale * vector.New(47.81999999999999, 31.379999999999995),
+        location + scale * vector.New(46.19, 33.276666666666664), location + scale * vector.New(44.11, 35.51),
+        colFn(44.11),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(44.11, 35.51), location + scale * vector.New(44.11, 35.51),
+        location + scale * vector.New(35.94, 44.25), location + scale * vector.New(35.94, 44.25), colFn(35.94), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(35.94, 44.25), location + scale * vector.New(35.94, 44.25),
+        location + scale * vector.New(35.94, 44.53), location + scale * vector.New(35.94, 44.53), colFn(35.94), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(35.94, 44.53), location + scale * vector.New(35.94, 44.53),
+        location + scale * vector.New(52.84, 44.53), location + scale * vector.New(52.84, 44.53), colFn(52.84), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(52.84, 44.53), location + scale * vector.New(52.84, 44.53),
+        location + scale * vector.New(52.84, 48.44), location + scale * vector.New(52.84, 48.44), colFn(52.84), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(52.84, 48.44), location + scale * vector.New(52.84, 48.44),
+        location + scale * vector.New(29.9, 48.44), location + scale * vector.New(29.9, 48.44), colFn(29.9), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(63.28, 48.72),
+        location + scale * vector.New(62.406666666666666, 48.72),
+        location + scale * vector.New(61.656666666666666, 48.406666666666666),
+        location + scale * vector.New(61.03, 47.78), colFn(61.03), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(61.03, 47.78),
+        location + scale * vector.New(60.403333333333336, 47.153333333333336),
+        location + scale * vector.New(60.09, 46.403333333333336), location + scale * vector.New(60.09, 45.53),
+        colFn(60.09),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(60.09, 45.53), location + scale * vector.New(60.09, 44.65),
+        location + scale * vector.New(60.403333333333336, 43.89666666666667), location + scale * vector.New(61.03, 43.27),
+        colFn(61.03), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(61.03, 43.27),
+        location + scale * vector.New(61.656666666666666, 42.64333333333333),
+        location + scale * vector.New(62.406666666666666, 42.33), location + scale * vector.New(63.28, 42.33),
+        colFn(63.28),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(63.28, 42.33), location + scale * vector.New(64.16, 42.33),
+        location + scale * vector.New(64.91333333333333, 42.64333333333333), location + scale * vector.New(65.54, 43.27),
+        colFn(65.54), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(65.54, 43.27),
+        location + scale * vector.New(66.16666666666667, 43.89666666666667), location + scale * vector.New(66.48, 44.65),
+        location + scale * vector.New(66.48, 45.53), colFn(66.48), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(66.48, 45.53), location + scale * vector.New(66.48, 46.11),
+        location + scale * vector.New(66.33333333333334, 46.63999999999999), location + scale * vector.New(66.04, 47.12),
+        colFn(66.04), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(66.04, 47.12),
+        location + scale * vector.New(65.75333333333333, 47.60666666666666),
+        location + scale * vector.New(65.36999999999999, 47.99666666666666), location + scale * vector.New(64.89, 48.29),
+        colFn(64.89), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(64.89, 48.29),
+        location + scale * vector.New(64.41, 48.57666666666666), location + scale * vector.New(63.873333333333335, 48.72),
+        location + scale * vector.New(63.28, 48.72), colFn(63.28), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(86.72, 12.07), location + scale * vector.New(86.72, 12.07),
+        location + scale * vector.New(86.72, 48.44), location + scale * vector.New(86.72, 48.44), colFn(86.72), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(86.72, 48.44), location + scale * vector.New(86.72, 48.44),
+        location + scale * vector.New(82.32, 48.44), location + scale * vector.New(82.32, 48.44), colFn(82.32), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(82.32, 48.44), location + scale * vector.New(82.32, 48.44),
+        location + scale * vector.New(82.32, 16.69), location + scale * vector.New(82.32, 16.69), colFn(82.32), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(82.32, 16.69), location + scale * vector.New(82.32, 16.69),
+        location + scale * vector.New(82.1, 16.69), location + scale * vector.New(82.1, 16.69), colFn(82.1), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(82.1, 16.69), location + scale * vector.New(82.1, 16.69),
+        location + scale * vector.New(73.22, 22.59), location + scale * vector.New(73.22, 22.59), colFn(73.22), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(73.22, 22.59), location + scale * vector.New(73.22, 22.59),
+        location + scale * vector.New(73.22, 18.11), location + scale * vector.New(73.22, 18.11), colFn(73.22), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(73.22, 18.11), location + scale * vector.New(73.22, 18.11),
+        location + scale * vector.New(82.32, 12.07), location + scale * vector.New(82.32, 12.07), colFn(82.32), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(82.32, 12.07), location + scale * vector.New(82.32, 12.07),
+        location + scale * vector.New(86.72, 12.07), location + scale * vector.New(86.72, 12.07), colFn(86.72), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(100.28, 48.72),
+        location + scale * vector.New(99.40666666666665, 48.72),
+        location + scale * vector.New(98.65666666666665, 48.406666666666666), location + scale * vector.New(98.03, 47.78),
+        colFn(98.03), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(98.03, 47.78),
+        location + scale * vector.New(97.40333333333332, 47.153333333333336),
+        location + scale * vector.New(97.08999999999999, 46.403333333333336), location + scale * vector.New(97.09, 45.53),
+        colFn(97.09), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(97.09, 45.53),
+        location + scale * vector.New(97.08999999999999, 44.65),
+        location + scale * vector.New(97.40333333333332, 43.89666666666667), location + scale * vector.New(98.03, 43.27),
+        colFn(98.03), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(98.03, 43.27),
+        location + scale * vector.New(98.65666666666665, 42.64333333333333),
+        location + scale * vector.New(99.40666666666665, 42.33), location + scale * vector.New(100.28, 42.33),
+        colFn(100.28),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(100.28, 42.33),
+        location + scale * vector.New(101.15999999999998, 42.33),
+        location + scale * vector.New(101.91333333333333, 42.64333333333333),
+        location + scale * vector.New(102.54, 43.27), colFn(102.54), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(102.54, 43.27),
+        location + scale * vector.New(103.16666666666666, 43.89666666666667),
+        location + scale * vector.New(103.47999999999999, 44.65), location + scale * vector.New(103.48, 45.53),
+        colFn(103.48),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(103.48, 45.53),
+        location + scale * vector.New(103.47999999999999, 46.11),
+        location + scale * vector.New(103.33666666666666, 46.63999999999999),
+        location + scale * vector.New(103.05, 47.12), colFn(103.05), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(103.05, 47.12),
+        location + scale * vector.New(102.75666666666666, 47.60666666666666),
+        location + scale * vector.New(102.37, 47.99666666666666), location + scale * vector.New(101.89, 48.29),
+        colFn(101.89),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(101.89, 48.29),
+        location + scale * vector.New(101.41, 48.57666666666666),
+        location + scale * vector.New(100.87333333333332, 48.72), location + scale * vector.New(100.28, 48.72),
+        colFn(100.28),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(122.8, 48.93),
+        location + scale * vector.New(120.12666666666667, 48.92999999999999),
+        location + scale * vector.New(117.84666666666666, 48.199999999999996),
+        location + scale * vector.New(115.96, 46.74), colFn(115.96), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(115.96, 46.74),
+        location + scale * vector.New(114.07999999999998, 45.279999999999994),
+        location + scale * vector.New(112.64333333333333, 43.15666666666666),
+        location + scale * vector.New(111.65, 40.37), colFn(111.65), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(111.65, 40.37),
+        location + scale * vector.New(110.65666666666667, 37.58333333333333),
+        location + scale * vector.New(110.16, 34.21333333333333), location + scale * vector.New(110.16, 30.26),
+        colFn(110.16),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(110.16, 30.26),
+        location + scale * vector.New(110.16, 26.326666666666664),
+        location + scale * vector.New(110.66, 22.966666666666665), location + scale * vector.New(111.66, 20.18),
+        colFn(111.66),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(111.66, 20.18),
+        location + scale * vector.New(112.66, 17.39333333333333),
+        location + scale * vector.New(114.10333333333332, 15.263333333333332),
+        location + scale * vector.New(115.99, 13.79), colFn(115.99), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(115.99, 13.79),
+        location + scale * vector.New(117.87666666666665, 12.316666666666666),
+        location + scale * vector.New(120.14666666666665, 11.58), location + scale * vector.New(122.8, 11.58),
+        colFn(122.8),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(122.8, 11.58),
+        location + scale * vector.New(125.45333333333332, 11.58),
+        location + scale * vector.New(127.72333333333333, 12.316666666666666),
+        location + scale * vector.New(129.61, 13.79), colFn(129.61), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(129.61, 13.79),
+        location + scale * vector.New(131.49666666666667, 15.263333333333332),
+        location + scale * vector.New(132.94, 17.39333333333333), location + scale * vector.New(133.94, 20.18),
+        colFn(133.94),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(133.94, 20.18),
+        location + scale * vector.New(134.94, 22.966666666666665),
+        location + scale * vector.New(135.44, 26.326666666666664), location + scale * vector.New(135.44, 30.26),
+        colFn(135.44),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(135.44, 30.26),
+        location + scale * vector.New(135.44, 34.21333333333333),
+        location + scale * vector.New(134.94333333333333, 37.58333333333333),
+        location + scale * vector.New(133.95, 40.37), colFn(133.95), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(133.95, 40.37),
+        location + scale * vector.New(132.95666666666665, 43.15666666666666),
+        location + scale * vector.New(131.51666666666665, 45.279999999999994),
+        location + scale * vector.New(129.63, 46.74), colFn(129.63), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(129.63, 46.74),
+        location + scale * vector.New(127.74999999999999, 48.199999999999996),
+        location + scale * vector.New(125.47333333333333, 48.92999999999999), location + scale * vector.New(122.8, 48.93),
+        colFn(122.8), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(122.8, 45.03),
+        location + scale * vector.New(125.45333333333332, 45.03),
+        location + scale * vector.New(127.51333333333332, 43.75), location + scale * vector.New(128.98, 41.19),
+        colFn(128.98),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(128.98, 41.19),
+        location + scale * vector.New(130.44666666666666, 38.63666666666666),
+        location + scale * vector.New(131.18, 34.99333333333333), location + scale * vector.New(131.18, 30.26),
+        colFn(131.18),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(131.18, 30.26),
+        location + scale * vector.New(131.18, 27.106666666666666),
+        location + scale * vector.New(130.84666666666666, 24.423333333333332),
+        location + scale * vector.New(130.18, 22.21), colFn(130.18), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(130.18, 22.21),
+        location + scale * vector.New(129.50666666666666, 19.996666666666666),
+        location + scale * vector.New(128.54666666666665, 18.31), location + scale * vector.New(127.3, 17.15),
+        colFn(127.3),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(127.3, 17.15),
+        location + scale * vector.New(126.05333333333334, 15.989999999999998),
+        location + scale * vector.New(124.55333333333334, 15.41), location + scale * vector.New(122.8, 15.41),
+        colFn(122.8),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(122.8, 15.41),
+        location + scale * vector.New(120.17333333333332, 15.41),
+        location + scale * vector.New(118.11999999999999, 16.703333333333333),
+        location + scale * vector.New(116.64, 19.29), colFn(116.64), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(116.64, 19.29),
+        location + scale * vector.New(115.16, 21.876666666666665),
+        location + scale * vector.New(114.42, 25.53333333333333), location + scale * vector.New(114.42, 30.26),
+        colFn(114.42),
+        thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(114.42, 30.26),
+        location + scale * vector.New(114.42, 33.406666666666666), location + scale * vector.New(114.75, 36.08),
+        location + scale * vector.New(115.41, 38.28), colFn(115.41), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(115.41, 38.28),
+        location + scale * vector.New(116.07666666666665, 40.48),
+        location + scale * vector.New(117.03333333333332, 42.156666666666666),
+        location + scale * vector.New(118.28, 43.31), colFn(118.28), thickness)
+    ctx.AddBezierCubic(location + scale * vector.New(118.28, 43.31),
+        location + scale * vector.New(119.52666666666666, 44.45666666666666),
+        location + scale * vector.New(121.03333333333333, 45.03), location + scale * vector.New(122.8, 45.03),
+        colFn(122.8),
+        thickness)
 end
 
 ---Draws v202 on screen, with dimensions = scale * [142,37].
