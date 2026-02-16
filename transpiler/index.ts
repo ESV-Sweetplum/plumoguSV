@@ -4,15 +4,17 @@ import {
     rmSync,
     existsSync,
     renameSync,
-    copyFileSync
-} from 'fs';
-import { getFilesRecursively } from './lib/getFilesRecursively.js';
-import getFunctionList from './lib/getFunctionList.js';
-import getUnusedFunctions from './lib/getUnusedFunctions.js';
-import { join, sep } from 'path';
-import readAndLintLua from './lib/readAndLintLua.js';
+    copyFileSync,
+} from "fs";
+import { getFilesRecursively } from "./lib/getFilesRecursively.js";
+import getFunctionList from "./lib/getFunctionList.js";
+import getUnusedFunctions from "./lib/getUnusedFunctions.js";
+import { join, sep } from "path";
+import readAndLintLua from "./lib/readAndLintLua.js";
 
 let counter = 0;
+
+const lineSeparator = "\n";
 
 export function getCounterAndIncrement() {
     counter++;
@@ -22,24 +24,24 @@ export function getCounterAndIncrement() {
 export default async function transpiler(
     devMode = false,
     lint = true,
-    environment: 'production' | 'development' = 'production'
+    environment: "production" | "development" = "production",
 ) {
     counter = 0;
     let fileCount = 0;
     let output = `ENVIRONMENT = "${environment}"`;
 
-    const entryPoints = ['_draw.lua', '_awake.lua'];
-    const ignoredFiles = ['intellisense.lua', join('packages', 'tests')];
-    if (devMode) output = `${output}\ndevMode = true`;
+    const entryPoints = ["_draw.lua", "_awake.lua"];
+    const ignoredFiles = ["intellisense.lua", join("packages", "tests")];
+    if (devMode) output = `${output}${lineSeparator}devMode = true`;
 
-    const files = getFilesRecursively('packages').sort(
-        (a, b) => +b.includes('.priority.') - +a.includes('.priority.')
+    const files = getFilesRecursively("packages").sort(
+        (a, b) => +b.includes(".priority.") - +a.includes(".priority."),
     );
 
     files.push(
-        ...getFilesRecursively('src').sort(
-            (a, b) => +b.includes('.priority.') - +a.includes('.priority.')
-        )
+        ...getFilesRecursively("src").sort(
+            (a, b) => +b.includes(".priority.") - +a.includes(".priority."),
+        ),
     ); // Force priority functions towards the top to avoid hot-reload error.
 
     let splicedFileCount = 0;
@@ -61,17 +63,17 @@ export default async function transpiler(
     files.forEach((file: string) => {
         if (
             [...ignoredFiles, ...entryPoints].some((f) => file.includes(f)) ||
-            !file.endsWith('.lua')
+            !file.endsWith(".lua")
         )
             return;
         let fileData = readAndLintLua(file).map((l) => {
             l = l.replaceAll(
                 /^([^\-\r\n]*)[\-]{2}([\-]{2,})?[^\-\r\n].+[ \r\n]*/g,
-                '$1'
+                "$1",
             ); // Removes <const> tag, removes --[[ --]] comments, removes double dash comments (not triple dash) from lines with code
             l = l.replaceAll(
                 /table\.insert\(([a-zA-Z0-9\[\]_]+), ([^,\r\n]+)\)( end)?$/g,
-                '$1[#$1 + 1] = $2$3'
+                "$1[#$1 + 1] = $2$3",
             ); // Replace table insert for performance (only on tables of 1ply)
             return l;
         });
@@ -88,95 +90,95 @@ export default async function transpiler(
                 entryFileData[path].splice(
                     data.length - 1,
                     0,
-                    ...fileData.map((d) => `${whitespace}${d}`)
+                    ...fileData.map((d) => `${whitespace}${d}`),
                 );
                 fileIsInsert = true;
-            }
+            },
         );
 
         if (fileIsInsert) return;
 
-        output = `${output}\n${fileData
-            .map((str) => str.replace(/\s+$/, ''))
+        output = `${output}${lineSeparator}${fileData
+            .map((str) => str.replace(/\s+$/, ""))
             .filter((str) => str)
-            .join('\n')}`;
+            .join(lineSeparator)}`;
         fileCount++;
     });
 
     Object.values(entryFileData).forEach((data: string[]) => {
-        output = `${output}\n${data.join('\n')}`;
+        output = `${output}${lineSeparator}${data.join(lineSeparator)}`;
     });
 
-    output = output.replaceAll(/---@meta [a-zA-Z0-9\-]+\n/g, ''); // Remove meta tags from packages
+    output = output.replaceAll(/---@meta [a-zA-Z0-9\-]+\n/g, ""); // Remove meta tags from packages
 
     output = output.replaceAll(
         /"([^"]+?)" \.\. (.+) \.\. "([^"]+?)"/g,
-        'table.concat({"$1", $2, "$3"})'
+        'table.concat({"$1", $2, "$3"})',
     ); // Remove double string concats with table
 
     output = output.replaceAll(
         /(p|P)rint\(("[a-z]{1,7}!"), "([^"]+?)" \.\. (.+) \.\. (.+)\)/g,
-        '$1rint($2, table.concat({"$3", $4, $5}))'
+        '$1rint($2, table.concat({"$3", $4, $5}))',
     ); // Same as above, but with notification type parameter for print statements
 
     const ipairMatches = [
         ...output.matchAll(
-            /for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_, ]+)\) do\n( *)/g
-        )
+            /for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_, ]+)\) do\n( *)/g,
+        ),
     ];
     ipairMatches.forEach((match) => {
         const idx = getCounterAndIncrement();
         output = output.replace(
             match[0],
-            `for k${idx} = 1, #${match[2]} do\n${match[3]}local ${match[1]} = ${match[2]}[k${idx}]\n${match[3]}`
+            `for k${idx} = 1, #${match[2]} do${lineSeparator}${match[3]}local ${match[1]} = ${match[2]}[k${idx}]${lineSeparator}${match[3]}`,
         );
     }); // Reduce function overhead by removing ipairs (only for static tables)
 
     for (let i = 2; i <= 5; i++) {
-        const regex = new RegExp(` ([^\\)]) \\^ ${i}`, 'g');
+        const regex = new RegExp(` ([^\\)]) \\^ ${i}`, "g");
         output = output.replaceAll(
             regex,
             ` $1${Array(i - 1)
-                .fill(' * $1')
-                .join('')}`
+                .fill(" * $1")
+                .join("")}`,
         );
     } // Remove integer exponentiation and replace with repeated multiplication
 
-    output = output.replaceAll(/\ncache.+ = \{\}\n/g, '\n'); // Remove cache dictionary instantiation
+    output = output.replaceAll(/\ncache.+ = \{\}\n/g, lineSeparator); // Remove cache dictionary instantiation
 
     for (let i = 9; i >= 1; i--) {
         const obtainmentRegex = new RegExp(
-            `(?<!; )cache\\.(?!saveTable|loadTable|[a-zA-Z0-9_\\.]+\\[)([a-zA-Z0-9_]+)${'\\.([a-zA-Z0-9_]+)'.repeat(
-                i - 1
+            `(?<!; )cache\\.(?!saveTable|loadTable|[a-zA-Z0-9_\\.]+\\[)([a-zA-Z0-9_]+)${"\\.([a-zA-Z0-9_]+)".repeat(
+                i - 1,
             )}`,
-            'g'
+            "g",
         );
         const assignmentRegex = new RegExp(
-            `(?<!; )cache${'\\.([a-zA-Z0-9_]+)'.repeat(
-                i
+            `(?<!; )cache${"\\.([a-zA-Z0-9_]+)".repeat(
+                i,
             )} = ([a-z ]{0,4}(?:[^ \n,]|, | [\\+\\-\\*\\/\\%\\^] )+)`,
-            'g'
+            "g",
         );
         output = output.replaceAll(
             assignmentRegex,
             `state.SetValue("${Array(i)
                 .fill(0)
                 .map((_, idx) => `$${idx + 1}`)
-                .join('.')}", $${i + 1})`
+                .join(".")}", $${i + 1})`,
         );
         output = output.replaceAll(
             obtainmentRegex,
             `state.GetValue("${Array(i)
                 .fill(0)
                 .map((_, idx) => `$${idx + 1}`)
-                .join('.')}")`
+                .join(".")}")`,
         );
     } // Change all cache assignments and cache calls to use state instead
 
-    output = output.replaceAll('\n\n', '\n').trimStart();
+    output = output.replaceAll("\n\n", lineSeparator).trimStart();
     if (lint) {
         let linted = true;
-        const splitOutput = output.split('\n');
+        const splitOutput = output.split(lineSeparator);
 
         while (linted) {
             linted = false;
@@ -184,7 +186,7 @@ export default async function transpiler(
             const spliceIndices = [];
 
             functions.forEach((fn, i) => {
-                const cond = fn.startsWith('string') || fn.startsWith('table');
+                const cond = fn.startsWith("string") || fn.startsWith("table");
                 if (cond) {
                     spliceIndices.unshift(i);
                 }
@@ -198,7 +200,7 @@ export default async function transpiler(
             const [_, unusedIndexes] = getUnusedFunctions(
                 splitOutput,
                 functions,
-                fnIndices
+                fnIndices,
             );
 
             const listLength = unusedIndexes.length;
@@ -208,22 +210,22 @@ export default async function transpiler(
                 let startIdx = idx;
                 let endIdx = idx;
                 while (
-                    splitOutput[startIdx - 1].startsWith('---') &&
+                    splitOutput[startIdx - 1].startsWith("---") &&
                     startIdx > 0
                 )
                     startIdx--;
-                while (!splitOutput[endIdx].startsWith('end')) endIdx++;
+                while (!splitOutput[endIdx].startsWith("end")) endIdx++;
                 splitOutput.splice(startIdx, endIdx - startIdx + 1);
             });
         }
-        output = splitOutput.join('\n');
+        output = splitOutput.join(lineSeparator);
     }
 
-    if (existsSync('plugin.lua')) rmSync('plugin.lua');
-    writeFileSync('temp.lua', output);
-    renameSync('temp.lua', 'plugin.lua');
-    if (existsSync('quinsight/intellisense.lua'))
-        copyFileSync('quinsight/intellisense.lua', 'intellisense.lua');
+    if (existsSync("plugin.lua")) rmSync("plugin.lua");
+    writeFileSync("temp.lua", output);
+    renameSync("temp.lua", "plugin.lua");
+    if (existsSync("quinsight/intellisense.lua"))
+        copyFileSync("quinsight/intellisense.lua", "intellisense.lua");
 
     return fileCount;
 }

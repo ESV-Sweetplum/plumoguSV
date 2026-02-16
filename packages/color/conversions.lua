@@ -110,7 +110,6 @@ end
 ---@param lightness number The lightness, within [0, 1].
 ---@param alpha number The opacity, within [0, 1].
 ---@return Vector4
----@nodiscard
 function color.hslaToRgba(hue, saturation, lightness, alpha)
     local a = saturation * math.min(lightness, 1 - lightness)
     local f = function(n)
