@@ -1,5 +1,5 @@
-ENVIRONMENT = "development"
-devMode = true
+DISTRO="steam"
+ENVIRONMENT = "production"
 cache = {
     boolean = {},
     windows = {},
@@ -15134,7 +15134,7 @@ end
 function awake()
     loadup = {} -- later inserted to via setStyleVars.lua
     local tempGlobalVars = read()
-    if (tempGlobalVars.colorThemeIndex) then
+    if (tempGlobalVars and tempGlobalVars.colorThemeIndex) then
         print('w!',
             'Due to an internal change, your selected theme may have been reset. Please reselect the theme in the plugin settings')
     end
@@ -15173,7 +15173,7 @@ end
 function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
-    PLUGIN_NAME = 'plumoguSV-dev'
+    PLUGIN_NAME = 'plumoguSV v2.1.0'
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed(PLUGIN_NAME)
     imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))

@@ -16,7 +16,7 @@ const pluginLines = fs.readFileSync("plugin.lua", "utf-8").split("\n");
 
 pluginLines.forEach((line, idx) => {
     if (line.includes("PLUGIN_NAME = ")) {
-        pluginLines[idx] = pluginLines[idx].replaceAll(/"[a-zA-Z\-]+"/g, `"plumoguSV ${versionNumber}"`);
+        pluginLines[idx] = pluginLines[idx].replaceAll(/('|")[a-zA-Z\-]+('|")/g, `$1plumoguSV ${versionNumber}$2`);
     }
 });
 

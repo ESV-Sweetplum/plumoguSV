@@ -16,3 +16,5 @@ continuation_indent = 4
 call_arg_parentheses = keep
 trailing_table_separator = smart
 
+[.version]
+insert_final_newline = false
