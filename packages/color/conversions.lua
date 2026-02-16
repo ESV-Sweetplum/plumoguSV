@@ -100,5 +100,23 @@ end
 ---@param vctr Vector4
 ---@return string
 function color.rgbaToStr(vctr)
-    return table.concat({ vctr.x, vctr.y, vctr.z }, ",")
+    local flr = math.floor
+    return table.concat({ flr(vctr.x * 255), flr(vctr.y * 255), flr(vctr.z * 255) }, ",")
+end
+
+---Converts hsl to an rgba `Vector4`, where `hue` is in degrees. The abstract formula comes from [Wikipedia](https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB_alternative).
+---@param hue integer The hue in degrees.
+---@param saturation number The saturation, within [0, 1].
+---@param lightness number The lightness, within [0, 1].
+---@param alpha number The opacity, within [0, 1].
+---@return Vector4
+---@nodiscard
+function color.hslaToRgba(hue, saturation, lightness, alpha)
+    local a = saturation * math.min(lightness, 1 - lightness)
+    local f = function(n)
+        local k = (n + hue / 30) % 12
+        return lightness - a * math.max(-1, math.min(k - 3, 9 - k, 1))
+    end
+
+    return vector.New(f(0), f(8), f(4), alpha)
 end
