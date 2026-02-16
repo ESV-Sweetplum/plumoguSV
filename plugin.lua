@@ -13654,14 +13654,17 @@ function getUsableDisplacementMultiplier(offset)
     local exponent
     if (globalVars.useMinDisplacementMultiplier) then
         if (not state.GetValue("displacementExponent")) then
-            state.SetValue("displacementExponent", 23 - math.floor(math.log(math.abs(map.TrackLength) + 1, 2)))
+            initializeDisplacementExponentCache()
         end
-        return 2 ^ math.clamp(state.GetValue("displacementExponent"), 0, 6)
+        return 2 ^ state.GetValue("displacementExponent")
     else
         exponent = math.clamp(23 - math.floor(math.log(math.abs(offset) + 1, 2)), 0,
             globalVars.maxDisplacementMultiplierExponent)
         return 2 ^ exponent
     end
+end
+function initializeDisplacementExponentCache()
+    state.SetValue("displacementExponent", math.clamp(23 - math.floor(math.log(math.abs(map.TrackLength) + 1, 2)), 0, 6))
 end
 function prepareDisplacingSV(svsToAdd, svTimeIsAdded, svTime, displacement, displacementMultiplier, hypothetical, svs)
     svTimeIsAdded[svTime] = true
@@ -14839,7 +14842,7 @@ function awake()
             "Your ImGui scale is set to " ..
             printedScale .. "% instead of 100%. For visual purposes, please set it back to 100%.")
     end
-    getUsableDisplacementMultiplier(map.TrackLength) -- To initialize state.GetValue("displacementExponent")
+    initializeDisplacementExponentCache()
     clock.prevTime = state.UnixTime
     game.keyCount = map.GetKeyCount()
 end
