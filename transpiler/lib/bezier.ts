@@ -5,8 +5,9 @@ const files = fs.readdirSync("bezier").filter(p => p.endsWith("bezier"));
 
 function vectorize(str: string) {
     const params = str.split(/, ?/);
-    const x = parseFloat(params[0]);
-    const y = parseFloat(params[1]);
+    const roundingFactor = 0.01;
+    const x = Math.round(parseFloat(params[0]) / roundingFactor) * roundingFactor;
+    const y = Math.round(parseFloat(params[1]) / roundingFactor) * roundingFactor;
     return [x, y];
 }
 
