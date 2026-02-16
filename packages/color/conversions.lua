@@ -113,7 +113,7 @@ end
 function color.hslaToRgba(hue, saturation, lightness, alpha)
     local a = saturation * math.min(lightness, 1 - lightness)
     local f = function(n)
-        local k = (n + hue / 30) % 12
+        local k = (n + (hue % 360) / 30) % 12
         return lightness - a * math.max(-1, math.min(k - 3, 9 - k, 1))
     end
 
