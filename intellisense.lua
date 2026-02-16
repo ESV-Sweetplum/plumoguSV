@@ -744,7 +744,7 @@ state.SongTime                 = 0.0 ---@type number
 state.SelectedHitObjects       = {} ---@type HitObject[]
 
 ---#### The `id`, or name, of the current selected [scroll group](lua://ScrollGroup).
-state.SelectedScrollGroupId    = '$Default' ---@type string
+state.SelectedScrollGroupId    = "$Default" ---@type string
 
 ---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The current selected [scroll group](lua://ScrollGroup).
@@ -1285,13 +1285,13 @@ action_type    = {
     ChangeScrollSpeedFactorLaneMaskBatch = 55,
     ChangeScrollSpeedFactorOffsetBatch = 56,
     RemoveScrollSpeedFactor = 57,
-    RemoveScrollSpeedFactorBatch = 58,
+    RemoveScrollSpeedFactorBatch = 58
 }
 
 ---@enum HitObjectType
 hitobject_type = {
     Normal = 0,
-    Mine = 1,
+    Mine = 1
 }
 
 ---@enum Key
@@ -1463,7 +1463,7 @@ keys           = {
     Kanji = 0x19,              -- Kanji key on Japanese keyboards.
     OemAuto = 0xf3,            -- OEM Auto key.
     OemCopy = 0xf2,            -- OEM Copy key.
-    OemEnlW = 0xf4,            -- OEM Enlarge Window key.
+    OemEnlW = 0xf4             -- OEM Enlarge Window key.
 }
 
 ---@enum HistoryType
@@ -1476,7 +1476,7 @@ history_type   = {
 ---@alias fmt string | number | boolean | table
 ---@class Type
 
-imgui          = {}
+imgui = {}
 
 ---##### (READ-ONLY)
 ---@param type string
