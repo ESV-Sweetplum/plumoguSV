@@ -9,7 +9,7 @@ function createFrameTime(thisTime, thisLanes, thisFrame, thisPosition)
         time = thisTime,
         lanes = thisLanes,
         frame = thisFrame,
-        position = thisPosition
+        position = thisPosition,
     }
     return frameTime
 end

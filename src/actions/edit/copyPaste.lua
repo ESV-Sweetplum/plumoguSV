@@ -23,7 +23,7 @@ function copyItems(menuVars)
     for _, sv in ipairs(svs) do
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
-            multiplier = sv.Multiplier
+            multiplier = sv.Multiplier,
         }
         table.insert(menuVars.copied.SVs[menuVars.curSlot], copiedSV)
     end
@@ -32,7 +32,7 @@ function copyItems(menuVars)
     for _, ssf in ipairs(ssfs) do
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
-            multiplier = ssf.Multiplier
+            multiplier = ssf.Multiplier,
         }
         table.insert(menuVars.copied.SSFs[menuVars.curSlot], copiedSSF)
     end
@@ -41,7 +41,7 @@ function copyItems(menuVars)
     for _, bm in ipairs(bms) do
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
-            note = bm.Note
+            note = bm.Note,
         }
         table.insert(menuVars.copied.BMs[menuVars.curSlot], copiedBM)
     end

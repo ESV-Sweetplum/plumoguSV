@@ -3,7 +3,7 @@ TAB_MENUS = { -- names of the tab menus
     "Select",
     "Create",
     "Edit",
-    "Delete"
+    "Delete",
 }
 
 ---Creates a menu tab.

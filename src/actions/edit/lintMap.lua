@@ -37,7 +37,7 @@ function alignTimingLines()
     end
     actions.PerformBatch({
         createEA(action_type.AddTimingPointBatch, tpsToAdd),
-        createEA(action_type.RemoveTimingPointBatch, tpsToRemove)
+        createEA(action_type.RemoveTimingPointBatch, tpsToRemove),
     })
 
     toggleablePrint("s!", "Created " .. #tpsToAdd .. pluralize(" timing point.", #tpsToAdd, -2))

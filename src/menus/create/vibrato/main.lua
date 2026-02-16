@@ -4,7 +4,7 @@ VIBRATO_SVS = { -- types of vibrato SVs
     "Exponential##Vibrato",
     "Sinusoidal##Vibrato",
     "Sigmoidal##Vibrato",
-    "Custom##Vibrato"
+    "Custom##Vibrato",
 }
 
 function placeVibratoSVMenu(separateWindow)

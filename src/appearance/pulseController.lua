@@ -2,7 +2,7 @@ function pulseController()
     local pulseVars = {
         previousBar = 0,
         pulseStatus = 0,
-        pulsedThisFrame = false
+        pulsedThisFrame = false,
     }
 
     cache.loadTable("pulseController", pulseVars)

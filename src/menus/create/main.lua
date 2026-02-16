@@ -23,7 +23,7 @@ function chooseCreateTool()
         "Place standard shapes.",
         "Non-standard effects.",
         "Still shapes keep notes normal distance/spacing apart.",
-        "Make notes vibrate or appear to duplicate."
+        "Make notes vibrate or appear to duplicate.",
     }
 
     imgui.AlignTextToFramePadding()

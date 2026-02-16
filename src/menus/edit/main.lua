@@ -17,7 +17,7 @@ EDIT_SV_TOOLS = { -- tools for editing SVs
     "Scale (Multiply)",
     "Split",
     "Swap Notes",
-    "Vertical Shift"
+    "Vertical Shift",
 }
 
 function editSVTab()

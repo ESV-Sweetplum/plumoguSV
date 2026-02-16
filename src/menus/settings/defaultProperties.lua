@@ -42,7 +42,7 @@ function showDefaultPropertiesSettings()
         customSettingsMenu,
         chinchillaSettingsMenu,
         comboSettingsMenu,
-        codeSettingsMenu
+        codeSettingsMenu,
     }
 
     local specialFnList = {
@@ -50,7 +50,7 @@ function showDefaultPropertiesSettings()
         teleportStutterSettingsMenu,
         nil,
         automateSVSettingsMenu,
-        penisSettingsMenu
+        penisSettingsMenu,
     }
 
     local editFnList = {
@@ -72,7 +72,7 @@ function showDefaultPropertiesSettings()
         scaleMultiplySettingsMenu,
         splitSettingsMenu,
         nil,
-        verticalShiftSettingsMenu
+        verticalShiftSettingsMenu,
     }
 
     imgui.SeparatorText("Create Tab Settings")

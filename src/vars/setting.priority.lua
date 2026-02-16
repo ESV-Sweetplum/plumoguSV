@@ -1,7 +1,7 @@
 DEFAULT_STARTING_SETTING_VARS = {
     linearVibratoSV = {
         startMsx = 100,
-        endMsx = 0
+        endMsx = 0,
     },
     polynomialVibratoSV = {
         startMsx = 0,
@@ -14,19 +14,19 @@ DEFAULT_STARTING_SETTING_VARS = {
     exponentialVibratoSV = {
         startMsx = 100,
         endMsx = 0,
-        curvatureIndex = 5
+        curvatureIndex = 5,
     },
     sinusoidalVibratoSV = {
         startMsx = 100,
         endMsx = 0,
         verticalShift = 0,
         periods = 1,
-        periodsShift = 0.25
+        periodsShift = 0.25,
     },
     sigmoidalVibratoSV = {
         startMsx = 100,
         endMsx = 0,
-        curvatureIndex = 5
+        curvatureIndex = 5,
     },
     customVibratoSV = {
         code = [[return function (x)
@@ -36,7 +36,7 @@ DEFAULT_STARTING_SETTING_VARS = {
     primaryCoefficient = (x^2 - x^3) * math.exp(2 * x)
     sinusoidalCoefficient = math.sin(8 * math.pi * x)
     return heightFactor * primaryCoefficient * sinusoidalCoefficient
-end]]
+end]],
     },
     linearVibratoSSF = {
         lowerStart = 0.5,
@@ -49,7 +49,7 @@ end]]
         lowerEnd = 0.5,
         higherStart = 1,
         higherEnd = 1,
-        curvatureIndex = 5
+        curvatureIndex = 5,
     },
     sinusoidalVibratoSSF = {
         lowerStart = 0.5,
@@ -66,18 +66,18 @@ end]]
         lowerEnd = 0.5,
         higherStart = 1,
         higherEnd = 1,
-        curvatureIndex = 5
+        curvatureIndex = 5,
     },
     customVibratoSSF = {
         code1 = "return function (x) return 0.69 end",
-        code2 = "return function (x) return 1.420 end"
+        code2 = "return function (x) return 1.420 end",
     },
     linear = {
         startSV = 1.5,
         endSV = 0.5,
         svPoints = 16,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     exponential = {
         behaviorIndex = 1,
@@ -90,7 +90,7 @@ end]]
         svPoints = 16,
         finalSVIndex = 2,
         customSV = 1,
-        distanceMode = 1
+        distanceMode = 1,
     },
     bezier = {
         p1 = vector.New(0.1, 0.9),
@@ -101,7 +101,7 @@ end]]
         avgSV = 1,
         svPoints = 16,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     hermite = {
         startSV = 0,
@@ -110,7 +110,7 @@ end]]
         avgSV = 1,
         svPoints = 16,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     sinusoidal = {
         startSV = 2,
@@ -122,7 +122,7 @@ end]]
         svsPerQuarterPeriod = 8,
         svPoints = 16,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     circular = {
         behaviorIndex = 1,
@@ -132,7 +132,7 @@ end]]
         svPoints = 16,
         finalSVIndex = 2,
         customSV = 1,
-        dontNormalize = false
+        dontNormalize = false,
     },
     random = {
         svMultipliers = {},
@@ -143,14 +143,14 @@ end]]
         customSV = 1,
         dontNormalize = false,
         avgSV = 1,
-        verticalShift = 0
+        verticalShift = 0,
     },
     custom = {
         svMultipliers = { 0 },
         selectedMultiplierIndex = 1,
         svPoints = 1,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     chinchilla = {
         behaviorIndex = 1,
@@ -160,7 +160,7 @@ end]]
         verticalShift = 0,
         svPoints = 16,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     combo = {
         svType1Index = 1,
@@ -173,7 +173,7 @@ end]]
         customSV = 1,
         dontNormalize = false,
         avgSV = 1,
-        verticalShift = 0
+        verticalShift = 0,
     },
     code = {
         code = [[return function (x)
@@ -185,7 +185,7 @@ end]]
 end]],
         svPoints = 64,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     stutter = {
         startSV = 1.5,
@@ -203,7 +203,7 @@ end]],
         svGraphStats = createSVGraphStats(),
         svMultipliers2 = {},
         svDistances2 = {},
-        svGraph2Stats = createSVGraphStats()
+        svGraph2Stats = createSVGraphStats(),
     },
     teleportStutter = {
         svPercent = 50,
@@ -216,7 +216,7 @@ end]],
         avgSV = 1,
         finalSVIndex = 2,
         customSV = 1,
-        stuttersPerSection = 1
+        stuttersPerSection = 1,
     },
     framesSetup = {
         menuStep = 1,
@@ -227,13 +227,13 @@ end]],
         noteSkinTypeIndex = 1,
         frameTimes = {},
         selectedTimeIndex = 1,
-        currentFrame = 1
+        currentFrame = 1,
     },
     penis = {
         bWidth = 50,
         sWidth = 100,
         sCurvature = 100,
-        bCurvature = 100
+        bCurvature = 100,
     },
     automate = {
         copiedSVs = {},
@@ -245,8 +245,8 @@ end]],
         optimizeTGs = true,
     },
     animationPalette = {
-        instructions = ""
-    }
+        instructions = "",
+    },
 }
 
 ---Gets the current menu's setting variables.

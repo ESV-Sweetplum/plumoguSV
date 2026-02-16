@@ -13,7 +13,7 @@ function displaceNoteSVsParent(menuVars)
         local displaceNoteResults = displaceNoteSVs(
             {
                 distance = (offset - offsets[1]) / (offsets[#offsets] - offsets[1]) *
-                    (menuVars.distance2 - menuVars.distance1) + menuVars.distance1
+                    (menuVars.distance2 - menuVars.distance1) + menuVars.distance1,
             },
             false, offset)
         svsToRemove = table.combine(svsToRemove, displaceNoteResults.svsToRemove)

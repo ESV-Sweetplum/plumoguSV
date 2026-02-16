@@ -2,5 +2,5 @@
 
 color = {
     vctr = {},
-    int = {}
+    int = {},
 }

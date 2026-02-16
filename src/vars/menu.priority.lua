@@ -32,11 +32,11 @@ DEFAULT_STARTING_MENU_VARS = {
         deviationDistance = 0,
     },
     delete = {
-        deleteTable = { true, true, true, true }
+        deleteTable = { true, true, true, true },
     },
     addTeleport = {
         distance = 10727,
-        teleportBeforeHand = false
+        teleportBeforeHand = false,
     },
     changeGroups = {
         designatedTimingGroup = "$Default",
@@ -49,10 +49,10 @@ DEFAULT_STARTING_MENU_VARS = {
         svTbl = {},
         ssfTbl = {},
         msOffset = 0,
-        dontCloneHos = false
+        dontCloneHos = false,
     },
     convertSVSSF = {
-        conversionDirection = true
+        conversionDirection = true,
     },
     copyPaste = {
         copyLines = false,
@@ -73,16 +73,16 @@ DEFAULT_STARTING_MENU_VARS = {
         selectableIndex = 1,
         startTime = 0,
         multiplier = 0,
-        pageNumber = 1
+        pageNumber = 1,
     },
     displaceNote = {
         distance = 200,
         distance1 = 0,
         distance2 = 200,
-        linearlyChange = false
+        linearlyChange = false,
     },
     displaceView = {
-        distance = 200
+        distance = 200,
     },
     dynamicScale = {
         noteTimes = {},
@@ -90,7 +90,7 @@ DEFAULT_STARTING_MENU_VARS = {
         svMultipliers = {},
         svDistances = {},
         svGraphStats = createSVGraphStats(),
-        svStats = createSVStats()
+        svStats = createSVStats(),
     },
     flicker = {
         flickerTypeIndex = 1,
@@ -99,7 +99,7 @@ DEFAULT_STARTING_MENU_VARS = {
         distance2 = -69420.727,
         numFlickers = 1,
         linearlyChange = false,
-        flickerPosition = 0.5
+        flickerPosition = 0.5,
     },
     measure = {
         unrounded = false,
@@ -114,14 +114,14 @@ DEFAULT_STARTING_MENU_VARS = {
         roundedAvgSV = 0,
         roundedStartDisplacement = 0,
         roundedEndDisplacement = 0,
-        roundedAvgSVDisplaceless = 0
+        roundedAvgSVDisplaceless = 0,
     },
     reverseScroll = {
-        distance = 400
+        distance = 400,
     },
     scaleBookmark = {
         searchTerm = "",
-        filterTerm = ""
+        filterTerm = "",
     },
     scaleDisplace = {
         scaleSpotIndex = 1,
@@ -134,19 +134,19 @@ DEFAULT_STARTING_MENU_VARS = {
         scaleTypeIndex = 1,
         avgSV = 0.6,
         distance = 100,
-        ratio = 0.6
+        ratio = 0.6,
     },
     split = {
         modeIndex = 1,
         cloneSVs = false,
-        cloneRadius = 1000
+        cloneRadius = 1000,
     },
     verticalShift = {
-        verticalShift = 1
+        verticalShift = 1,
     },
     selectAlternating = {
         every = 1,
-        offset = 0
+        offset = 0,
     },
     selectBookmark = {
         searchTerm = "",
@@ -166,17 +166,17 @@ DEFAULT_STARTING_MENU_VARS = {
         select8 = false,
         select9 = false,
         select10 = false,
-        laneSelector = 1
+        laneSelector = 1,
     },
     selectNoteType = {
         rice = true,
         ln = false,
         normal = true,
-        mine = false
+        mine = false,
     },
     selectBySnap = {
-        snap = 1
-    }
+        snap = 1,
+    },
 }
 
 ---Gets the current menu's variables.

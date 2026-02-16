@@ -3,5 +3,5 @@
 cache = {
     boolean = {},
     windows = {},
-    lists = {}
+    lists = {},
 }

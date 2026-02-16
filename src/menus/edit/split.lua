@@ -11,7 +11,7 @@ function splitSettingsMenu(menuVars)
     menuVars.modeIndex = Combo("Split Mode", SPLIT_MODES, menuVars.modeIndex, nil, nil, {
         "Split notes via column; either with individual TGs or a certain transformation of such columns.",
         "Split notes via time; each time has its own TG.",
-        "Split all notes into their own TG regardless of any properties they have."
+        "Split all notes into their own TG regardless of any properties they have.",
     })
 
     BasicCheckbox(menuVars, "cloneSVs", "Clone SVs?",

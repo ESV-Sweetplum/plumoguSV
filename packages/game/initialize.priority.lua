@@ -2,5 +2,5 @@
 
 game = {
     window = {},
-    get = {}
+    get = {},
 }

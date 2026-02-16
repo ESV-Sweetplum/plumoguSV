@@ -3,14 +3,14 @@ devMode = true
 cache = {
     boolean = {},
     windows = {},
-    lists = {}
+    lists = {},
 }
 clock = {}; cache.clock = {}
 clock.prevTime = 0
 tempClockCount = 0
 color = {
     vctr = {},
-    int = {}
+    int = {},
 }
 color.int.alphaMask = 16777216
 color.int.redMask = 1
@@ -19,7 +19,7 @@ color.int.blueMask = 65536
 color.int.whiteMask = color.int.redMask + color.int.greenMask + color.int.blueMask
 game = {
     window = {},
-    get = {}
+    get = {},
 }
 kbm = {}
 matrix = {}
@@ -1637,7 +1637,7 @@ function createSVGraphStats()
         minScale = 0,
         maxScale = 0,
         distMinScale = 0,
-        distMaxScale = 0
+        distMaxScale = 0,
     }
     return svGraphStats
 end
@@ -1645,7 +1645,7 @@ function createSVStats()
     local svStats = {
         minSV = 0,
         maxSV = 0,
-        avgSV = 0
+        avgSV = 0,
     }
     return svStats
 end
@@ -1744,7 +1744,7 @@ globalVars = {
     upscroll = false,
     useCustomPulseColor = false,
     useEndTimeOffsets = false,
-    useMinDisplacementMultiplier = true
+    useMinDisplacementMultiplier = true,
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 function setGlobalVars(tempGlobalVars)
@@ -1842,11 +1842,11 @@ DEFAULT_STARTING_MENU_VARS = {
         deviationDistance = 0,
     },
     delete = {
-        deleteTable = { true, true, true, true }
+        deleteTable = { true, true, true, true },
     },
     addTeleport = {
         distance = 10727,
-        teleportBeforeHand = false
+        teleportBeforeHand = false,
     },
     changeGroups = {
         designatedTimingGroup = "$Default",
@@ -1859,10 +1859,10 @@ DEFAULT_STARTING_MENU_VARS = {
         svTbl = {},
         ssfTbl = {},
         msOffset = 0,
-        dontCloneHos = false
+        dontCloneHos = false,
     },
     convertSVSSF = {
-        conversionDirection = true
+        conversionDirection = true,
     },
     copyPaste = {
         copyLines = false,
@@ -1883,16 +1883,16 @@ DEFAULT_STARTING_MENU_VARS = {
         selectableIndex = 1,
         startTime = 0,
         multiplier = 0,
-        pageNumber = 1
+        pageNumber = 1,
     },
     displaceNote = {
         distance = 200,
         distance1 = 0,
         distance2 = 200,
-        linearlyChange = false
+        linearlyChange = false,
     },
     displaceView = {
-        distance = 200
+        distance = 200,
     },
     dynamicScale = {
         noteTimes = {},
@@ -1900,7 +1900,7 @@ DEFAULT_STARTING_MENU_VARS = {
         svMultipliers = {},
         svDistances = {},
         svGraphStats = createSVGraphStats(),
-        svStats = createSVStats()
+        svStats = createSVStats(),
     },
     flicker = {
         flickerTypeIndex = 1,
@@ -1909,7 +1909,7 @@ DEFAULT_STARTING_MENU_VARS = {
         distance2 = -69420.727,
         numFlickers = 1,
         linearlyChange = false,
-        flickerPosition = 0.5
+        flickerPosition = 0.5,
     },
     measure = {
         unrounded = false,
@@ -1924,14 +1924,14 @@ DEFAULT_STARTING_MENU_VARS = {
         roundedAvgSV = 0,
         roundedStartDisplacement = 0,
         roundedEndDisplacement = 0,
-        roundedAvgSVDisplaceless = 0
+        roundedAvgSVDisplaceless = 0,
     },
     reverseScroll = {
-        distance = 400
+        distance = 400,
     },
     scaleBookmark = {
         searchTerm = "",
-        filterTerm = ""
+        filterTerm = "",
     },
     scaleDisplace = {
         scaleSpotIndex = 1,
@@ -1944,19 +1944,19 @@ DEFAULT_STARTING_MENU_VARS = {
         scaleTypeIndex = 1,
         avgSV = 0.6,
         distance = 100,
-        ratio = 0.6
+        ratio = 0.6,
     },
     split = {
         modeIndex = 1,
         cloneSVs = false,
-        cloneRadius = 1000
+        cloneRadius = 1000,
     },
     verticalShift = {
-        verticalShift = 1
+        verticalShift = 1,
     },
     selectAlternating = {
         every = 1,
-        offset = 0
+        offset = 0,
     },
     selectBookmark = {
         searchTerm = "",
@@ -1976,17 +1976,17 @@ DEFAULT_STARTING_MENU_VARS = {
         select8 = false,
         select9 = false,
         select10 = false,
-        laneSelector = 1
+        laneSelector = 1,
     },
     selectNoteType = {
         rice = true,
         ln = false,
         normal = true,
-        mine = false
+        mine = false,
     },
     selectBySnap = {
-        snap = 1
-    }
+        snap = 1,
+    },
 }
 ---Gets the current menu's variables.
 ---@param menuType string The menu type.
@@ -2029,7 +2029,7 @@ end
 DEFAULT_STARTING_SETTING_VARS = {
     linearVibratoSV = {
         startMsx = 100,
-        endMsx = 0
+        endMsx = 0,
     },
     polynomialVibratoSV = {
         startMsx = 0,
@@ -2042,19 +2042,19 @@ DEFAULT_STARTING_SETTING_VARS = {
     exponentialVibratoSV = {
         startMsx = 100,
         endMsx = 0,
-        curvatureIndex = 5
+        curvatureIndex = 5,
     },
     sinusoidalVibratoSV = {
         startMsx = 100,
         endMsx = 0,
         verticalShift = 0,
         periods = 1,
-        periodsShift = 0.25
+        periodsShift = 0.25,
     },
     sigmoidalVibratoSV = {
         startMsx = 100,
         endMsx = 0,
-        curvatureIndex = 5
+        curvatureIndex = 5,
     },
     customVibratoSV = {
         code = [[return function (x)
@@ -2063,7 +2063,7 @@ DEFAULT_STARTING_SETTING_VARS = {
     primaryCoefficient = (x^2 - x^3) * math.exp(2 * x)
     sinusoidalCoefficient = math.sin(8 * math.pi * x)
     return heightFactor * primaryCoefficient * sinusoidalCoefficient
-end]]
+end]],
     },
     linearVibratoSSF = {
         lowerStart = 0.5,
@@ -2076,7 +2076,7 @@ end]]
         lowerEnd = 0.5,
         higherStart = 1,
         higherEnd = 1,
-        curvatureIndex = 5
+        curvatureIndex = 5,
     },
     sinusoidalVibratoSSF = {
         lowerStart = 0.5,
@@ -2093,18 +2093,18 @@ end]]
         lowerEnd = 0.5,
         higherStart = 1,
         higherEnd = 1,
-        curvatureIndex = 5
+        curvatureIndex = 5,
     },
     customVibratoSSF = {
         code1 = "return function (x) return 0.69 end",
-        code2 = "return function (x) return 1.420 end"
+        code2 = "return function (x) return 1.420 end",
     },
     linear = {
         startSV = 1.5,
         endSV = 0.5,
         svPoints = 16,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     exponential = {
         behaviorIndex = 1,
@@ -2117,7 +2117,7 @@ end]]
         svPoints = 16,
         finalSVIndex = 2,
         customSV = 1,
-        distanceMode = 1
+        distanceMode = 1,
     },
     bezier = {
         p1 = vector.New(0.1, 0.9),
@@ -2128,7 +2128,7 @@ end]]
         avgSV = 1,
         svPoints = 16,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     hermite = {
         startSV = 0,
@@ -2137,7 +2137,7 @@ end]]
         avgSV = 1,
         svPoints = 16,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     sinusoidal = {
         startSV = 2,
@@ -2149,7 +2149,7 @@ end]]
         svsPerQuarterPeriod = 8,
         svPoints = 16,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     circular = {
         behaviorIndex = 1,
@@ -2159,7 +2159,7 @@ end]]
         svPoints = 16,
         finalSVIndex = 2,
         customSV = 1,
-        dontNormalize = false
+        dontNormalize = false,
     },
     random = {
         svMultipliers = {},
@@ -2170,14 +2170,14 @@ end]]
         customSV = 1,
         dontNormalize = false,
         avgSV = 1,
-        verticalShift = 0
+        verticalShift = 0,
     },
     custom = {
         svMultipliers = { 0 },
         selectedMultiplierIndex = 1,
         svPoints = 1,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     chinchilla = {
         behaviorIndex = 1,
@@ -2187,7 +2187,7 @@ end]]
         verticalShift = 0,
         svPoints = 16,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     combo = {
         svType1Index = 1,
@@ -2200,7 +2200,7 @@ end]]
         customSV = 1,
         dontNormalize = false,
         avgSV = 1,
-        verticalShift = 0
+        verticalShift = 0,
     },
     code = {
         code = [[return function (x)
@@ -2211,7 +2211,7 @@ end]]
 end]],
         svPoints = 64,
         finalSVIndex = 2,
-        customSV = 1
+        customSV = 1,
     },
     stutter = {
         startSV = 1.5,
@@ -2229,7 +2229,7 @@ end]],
         svGraphStats = createSVGraphStats(),
         svMultipliers2 = {},
         svDistances2 = {},
-        svGraph2Stats = createSVGraphStats()
+        svGraph2Stats = createSVGraphStats(),
     },
     teleportStutter = {
         svPercent = 50,
@@ -2242,7 +2242,7 @@ end]],
         avgSV = 1,
         finalSVIndex = 2,
         customSV = 1,
-        stuttersPerSection = 1
+        stuttersPerSection = 1,
     },
     framesSetup = {
         menuStep = 1,
@@ -2253,13 +2253,13 @@ end]],
         noteSkinTypeIndex = 1,
         frameTimes = {},
         selectedTimeIndex = 1,
-        currentFrame = 1
+        currentFrame = 1,
     },
     penis = {
         bWidth = 50,
         sWidth = 100,
         sCurvature = 100,
-        bCurvature = 100
+        bCurvature = 100,
     },
     automate = {
         copiedSVs = {},
@@ -2271,8 +2271,8 @@ end]],
         optimizeTGs = true,
     },
     animationPalette = {
-        instructions = ""
-    }
+        instructions = "",
+    },
 }
 ---Gets the current menu's setting variables.
 ---@param svType string The SV type - that is, the shape of the SV once plotted.
@@ -2340,7 +2340,7 @@ function automateCopySVs(settingVars)
         local sv = svs[k13]
         local copiedSV = {
             relativeOffset = sv.StartTime - firstSVTime,
-            multiplier = sv.Multiplier
+            multiplier = sv.Multiplier,
         }
         table.insert(settingVars.copiedSVs, copiedSV)
     end
@@ -2721,7 +2721,7 @@ function ssfVibrato(menuVars, func1, func2)
     end
     addFinalSSF(ssfs, endTime, game.get.ssfMultiplierAt(endTime))
     actions.PerformBatch({
-        createEA(action_type.AddScrollSpeedFactorBatch, ssfs)
+        createEA(action_type.AddScrollSpeedFactorBatch, ssfs),
     })
     toggleablePrint("s!", table.concat({"Created ", #ssfs, pluralize(" SSF.", #ssfs, -2)}))
 end
@@ -3120,7 +3120,7 @@ function copyItems(menuVars)
         local sv = svs[k20]
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
-            multiplier = sv.Multiplier
+            multiplier = sv.Multiplier,
         }
         table.insert(menuVars.copied.SVs[menuVars.curSlot], copiedSV)
     end
@@ -3130,7 +3130,7 @@ function copyItems(menuVars)
         local ssf = ssfs[k21]
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
-            multiplier = ssf.Multiplier
+            multiplier = ssf.Multiplier,
         }
         table.insert(menuVars.copied.SSFs[menuVars.curSlot], copiedSSF)
     end
@@ -3140,7 +3140,7 @@ function copyItems(menuVars)
         local bm = bms[k22]
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
-            note = bm.Note
+            note = bm.Note,
         }
         table.insert(menuVars.copied.BMs[menuVars.curSlot], copiedBM)
     end
@@ -3319,7 +3319,7 @@ function displaceNoteSVsParent(menuVars)
         local displaceNoteResults = displaceNoteSVs(
             {
                 distance = (offset - offsets[1]) / (offsets[#offsets] - offsets[1]) *
-                    (menuVars.distance2 - menuVars.distance1) + menuVars.distance1
+                    (menuVars.distance2 - menuVars.distance1) + menuVars.distance1,
             },
             false, offset)
         svsToRemove = table.combine(svsToRemove, displaceNoteResults.svsToRemove)
@@ -3456,7 +3456,7 @@ COLOR_MAP = {
     [8] =
     "Orange",
     [12] = "Cyan",
-    [16] = "Green"
+    [16] = "Green",
 }
 REVERSE_COLOR_MAP = {
     Red = 1,
@@ -3467,7 +3467,7 @@ REVERSE_COLOR_MAP = {
     Pink = 6,
     Orange = 8,
     Cyan = 12,
-    Green = 16
+    Green = 16,
 }
 function layerSnaps()
     local layerDict = {}
@@ -3611,7 +3611,7 @@ function alignTimingLines()
     end
     actions.PerformBatch({
         createEA(action_type.AddTimingPointBatch, tpsToAdd),
-        createEA(action_type.RemoveTimingPointBatch, tpsToRemove)
+        createEA(action_type.RemoveTimingPointBatch, tpsToRemove),
     })
     toggleablePrint("s!", table.concat({"Created ", #tpsToAdd, pluralize(" timing point.", #tpsToAdd, -2)}))
     if (isTruthy(tpsToRemove)) then
@@ -6121,7 +6121,7 @@ function generateParticle(x, y, xRange, yRange, endTime, showParticle)
         xRange = xRange,
         yRange = yRange,
         endTime = endTime,
-        showParticle = showParticle
+        showParticle = showParticle,
     }
     return particle
 end
@@ -6171,7 +6171,7 @@ function pulseController()
     local pulseVars = {
         previousBar = 0,
         pulseStatus = 0,
-        pulsedThisFrame = false
+        pulsedThisFrame = false,
     }
     cache.loadTable("pulseController", pulseVars)
     local timeOffset = 50
@@ -7539,7 +7539,7 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
     local blue = color.rgbaToUint(75, 75, 255, 255)
     local yellow = color.rgbaToUint(200, 200, 0, 255)
     local colorTable = {
-        [4] = { red, yellow, blue, yellow }
+        [4] = { red, yellow, blue, yellow },
     }
     for i = 1, #colTbl do
         for _, col in ipairs(colTbl[i]) do
@@ -7625,7 +7625,7 @@ function chooseCreateTool()
         "Place standard shapes.",
         "Non-standard effects.",
         "Still shapes keep notes normal distance/spacing apart.",
-        "Make notes vibrate or appear to duplicate."
+        "Make notes vibrate or appear to duplicate.",
     }
     imgui.AlignTextToFramePadding()
     imgui.Text("  Type:  ")
@@ -8011,7 +8011,7 @@ STANDARD_SVS = {
     "Custom",
     "Chinchilla",
     "Combo",
-    "Code"
+    "Code",
 }
 function placeStandardSVMenu()
     PresetButton()
@@ -8167,7 +8167,7 @@ VIBRATO_SVS = {
     "Exponential##Vibrato",
     "Sinusoidal##Vibrato",
     "Sigmoidal##Vibrato",
-    "Custom##Vibrato"
+    "Custom##Vibrato",
 }
 function placeVibratoSVMenu(separateWindow)
     PresetButton()
@@ -8733,7 +8733,7 @@ EDIT_SV_TOOLS = {
     "Scale (Multiply)",
     "Split",
     "Swap Notes",
-    "Vertical Shift"
+    "Vertical Shift",
 }
 function editSVTab()
     if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
@@ -8882,7 +8882,7 @@ function splitSettingsMenu(menuVars)
     menuVars.modeIndex = Combo("Split Mode", SPLIT_MODES, menuVars.modeIndex, nil, nil, {
         "Split notes via column; either with individual TGs or a certain transformation of such columns.",
         "Split notes via time; each time has its own TG.",
-        "Split all notes into their own TG regardless of any properties they have."
+        "Split all notes into their own TG regardless of any properties they have.",
     })
     BasicCheckbox(menuVars, "cloneSVs", "Clone SVs?",
         "If enabled, each note will clone the SVs around it in the current timing group.")
@@ -11457,7 +11457,7 @@ function chooseSelectTool()
         "Select all notes with a certain snap color.",
         "Select all notes within a certain timing group.",
         "Select all notes with a certain chord size.",
-        "Select rice/ln notes."
+        "Select rice/ln notes.",
     }
     imgui.AlignTextToFramePadding()
     imgui.Text("  Current Type:")
@@ -11691,7 +11691,7 @@ function chooseColorTheme()
                                 return {
                                     id = s:sub(8),
                                     textColor = { 255, 255, 255 },
-                                    internalId = s
+                                    internalId = s,
                                 }
                             end))
                         end
@@ -11975,14 +11975,14 @@ function showDefaultPropertiesSettings()
         customSettingsMenu,
         chinchillaSettingsMenu,
         comboSettingsMenu,
-        codeSettingsMenu
+        codeSettingsMenu,
     }
     local specialFnList = {
         stutterSettingsMenu,
         teleportStutterSettingsMenu,
         nil,
         automateSVSettingsMenu,
-        penisSettingsMenu
+        penisSettingsMenu,
     }
     local editFnList = {
         addTeleportSettingsMenu,
@@ -12003,7 +12003,7 @@ function showDefaultPropertiesSettings()
         scaleMultiplySettingsMenu,
         splitSettingsMenu,
         nil,
-        verticalShiftSettingsMenu
+        verticalShiftSettingsMenu,
     }
     imgui.SeparatorText("Create Tab Settings")
     if (imgui.CollapsingHeader("General Standard Settings")) then
@@ -12309,7 +12309,7 @@ function showPluginSettingsWindow()
     --- Key is name of setting. If value with respect to key is true, will hide setting at the left
     local hideSettingDict = {
         ["Advanced"] = not globalVars.advancedMode,
-        ["Custom Theme"] = (globalVars.colorThemeName:sub(1, 7) ~= "custom_" or globalVars.performanceMode)
+        ["Custom Theme"] = (globalVars.colorThemeName:sub(1, 7) ~= "custom_" or globalVars.performanceMode),
     }
     for idx, v in pairs(SETTING_TYPES) do
         if (hideSettingDict[v]) then goto nextSetting end
@@ -12438,7 +12438,7 @@ TAB_MENUS = {
     "Select",
     "Create",
     "Edit",
-    "Delete"
+    "Delete",
 }
 ---Creates a menu tab.
 ---@param tabName string
@@ -12526,7 +12526,7 @@ function showWorkingWithShapesTutorial()
         return
     end
     imgui.TextWrapped(
-        'In the tab below the type dropdown, you\'ll notice a plethora of different options to choose from. Don\'t get overwhelmed; most experienced SV mappers usually limit themselves to using 3-5 of these shapes. Most commonly seen, we have the exponential shape, which makes the notes go towards the receptor at an exponential rate.')
+        "In the tab below the type dropdown, you\'ll notice a plethora of different options to choose from. Don\'t get overwhelmed; most experienced SV mappers usually limit themselves to using 3-5 of these shapes. Most commonly seen, we have the exponential shape, which makes the notes go towards the receptor at an exponential rate.")
     imgui.TextColored(INSTRUCTION_COLOR,
         'Under the "STANDARD" tab, select "EXPONENTIAL".')
     local menuVars = getMenuVars("placeStandard")
@@ -12554,7 +12554,7 @@ function showWorkingWithShapesTutorial()
         return 0.9 - 2 * (t - t * t)
     end, { { 1, 2, 3, 4 }, {}, {}, {} }, 500)
     imgui.TextColored(GUIDELINE_COLOR,
-        'Select more than 2 chords (at least 3 notes with different times),\nand place the SV using an aforementioned method.')
+        "Select more than 2 chords (at least 3 notes with different times),\nand place the SV using an aforementioned method.")
     imgui.Dummy(vector.New(0, 10))
     imgui.TextWrapped(
         "If your notes are in different columns, you may have noticed that all the notes have combined into one large chord. Looking at the SV Info window, the reasoning becomes clear; the average SV is 0.00x, meaning the notes are always going to be next to each other. We can remedy this by adding a teleport to each set of notes, so they no longer line up with each other.")
@@ -12606,7 +12606,7 @@ function showYourFirstEffectTutorial()
     ForceHeight(570)
     imgui.TextColored(vctr4(0), "penis")
     imgui.TextWrapped(
-        'If you want, you can change some of the other settings; try seeing what happens when you increase the stutter count. However, for the sake of this tutorial, you are done.')
+        "If you want, you can change some of the other settings; try seeing what happens when you increase the stutter count. However, for the sake of this tutorial, you are done.")
     imgui.TextColored(GUIDELINE_COLOR,
         'Now, select a note representing a strong sound, and\nthe note after it. Either hit the "T" button, or click\nthe "Place SVs between selected notes" button.')
     ForceHeight(720)
@@ -12648,7 +12648,7 @@ function showYourSecondEffectTutorial()
     imgui.TextWrapped(
         "Teleport Stutter differs from normal stutter, in that you don't control the speed at which the note moves, but rather how far down the note teleports. For example, if your start SV is 75%%, then your note will start 75%% of the way down. If you want the note to land on the receptor, you must make the start SV %% (in decimal form, not percent) and the main SV add up to the average SV.")
     imgui.TextColored(INSTRUCTION_COLOR,
-        'Set the main SV to 0.2x. Then, set the start SV %% to be the\npercentage required to have the notes land on the receptor.\nHINT: 1.00x - 0.20x = ??%%')
+        "Set the main SV to 0.2x. Then, set the start SV %% to be the\npercentage required to have the notes land on the receptor.\nHINT: 1.00x - 0.20x = ??%%")
     local settingVars = getSettingVars("Teleport Stutter", "Special")
     ForceHeight(490)
     if (not settingVars.linearlyChange and (math.abs(settingVars.mainSV - 0.2) > 0.001 or settingVars.svPercent ~= 80)) then return end
@@ -12664,7 +12664,7 @@ function showYourSecondEffectTutorial()
     if (not settingVars.linearlyChange) then return end
     ForceHeight(610)
     imgui.TextWrapped(
-        'You\'ll now notice that we have two options for both start SV %% and main SV value; one for start, and one for end. The way this works is that when you select more than two notes (obviously with different times), the teleport stutter for that note will change linearly according to the start/end values. For example, if your start SV %% (start) is 100%%, and your start SV %% (end) is 0%%, then a note in the very middle of your selection would have a teleport stutter with start SV %% of 50%%. We will use this to create some dynamic effects.')
+        "You\'ll now notice that we have two options for both start SV %% and main SV value; one for start, and one for end. The way this works is that when you select more than two notes (obviously with different times), the teleport stutter for that note will change linearly according to the start/end values. For example, if your start SV %% (start) is 100%%, and your start SV %% (end) is 0%%, then a note in the very middle of your selection would have a teleport stutter with start SV %% of 50%%. We will use this to create some dynamic effects.")
     imgui.TextColored(INSTRUCTION_COLOR,
         "Set the Start SV %% (start) to 100%%, the main SV (start) to 0.00x,\nand main SV (end) to whichever value it must be such that the\nnote lines up with the receptor. HINT: 0%% + ?.??x = 1.00x")
     ForceHeight(820)
@@ -12680,7 +12680,7 @@ function showYourSecondEffectTutorial()
     imgui.BulletText("0%%, 100%%, 1.00x, 0.00x")
     imgui.BulletText("100%%, 100%%, -1.00x, 0.00x")
     imgui.BulletText("100%%, 0%%, -1.00x, 1.00x")
-    imgui.TextWrapped('Fun fact: the above effect is used in the popular SV map Hypnotizer.')
+    imgui.TextWrapped("Fun fact: the above effect is used in the popular SV map Hypnotizer.")
     ForceHeight(1120)
 end
 function showStartingTutorial()
@@ -12808,8 +12808,8 @@ function showTutorialWindow()
                 ["The calculus of SV"] = incompleteFn,
                 ["Why do we call them shapes?"] = incompleteFn,
                 ["Analogies to Physics"] = incompleteFn,
-            }
-        }
+            },
+        },
     }
     imgui.Columns(2)
     imgui.SetColumnWidth(0, 200)
@@ -12874,7 +12874,7 @@ function renderMeasureDataWidget()
         nsvDistance = 0,
         roundedSVDistance = 0,
         roundedAvgSV = 0,
-        tgName = ""
+        tgName = "",
     }
     cache.loadTable("measureWidget", widgetVars)
     local uniqueDict = {}
@@ -13561,7 +13561,7 @@ function chooseVibratoDeviance(menuVars)
     local tooltipList = {
         "Don't deviate vibrato at all.",
         "Deviate vibrato with the given displacement. All displacements are equally likely to be chosen.",
-        "Deviate vibrato with the given displacement. Displacements are chosen via a Gaussian distribution."
+        "Deviate vibrato with the given displacement. Displacements are chosen via a Gaussian distribution.",
     }
     local deviationType = VIBRATO_DEVIATION_TYPES[menuVars.deviationFunctionIndex]
     local dontChooseDistance = deviationType == "None"
@@ -14114,7 +14114,7 @@ function createFrameTime(thisTime, thisLanes, thisFrame, thisPosition)
         time = thisTime,
         lanes = thisLanes,
         frame = thisFrame,
-        position = thisPosition
+        position = thisPosition,
     }
     return frameTime
 end
@@ -14152,7 +14152,7 @@ function printLegacyLNMessage()
     if (not globalVars.printLegacyLNMessage or state.GetValue("disablePrintLegacyLNMessage")) then return end
     if (not checkNotesForLNs(state.SelectedHitObjects) or map.LegacyLNRendering) then return end
     print("w!",
-        'Using any sort of displacements with LNs while Legacy LN rendering is highly discouraged. Consider turning on Legacy LN Rendering in the F1 menu. You can permanently disable this message in the plumoguSV settings.')
+        "Using any sort of displacements with LNs while Legacy LN rendering is highly discouraged. Consider turning on Legacy LN Rendering in the F1 menu. You can permanently disable this message in the plumoguSV settings.")
     state.SetValue("disablePrintLegacyLNMessage", true)
 end
 ---Alias for [`utils.CreateScrollVelocity`](lua://utils.CreateScrollVelocity).
@@ -14198,7 +14198,7 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
     end
     local editorActions = {
         createEA(action_type.RemoveScrollVelocityBatch, svsToRemove),
-        createEA(action_type.AddScrollVelocityBatch, svsToAdd)
+        createEA(action_type.AddScrollVelocityBatch, svsToAdd),
     }
     actions.PerformBatch(editorActions)
     toggleablePrint("s!", table.concat({"Created ", #svsToAdd, pluralize(" SV.", #svsToAdd, -2)}))
@@ -14207,7 +14207,7 @@ function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
     if not isTruthy(ssfsToAdd) then return end
     local editorActions = {
         createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
-        createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)
+        createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
     }
     actions.PerformBatch(editorActions)
     toggleablePrint("s!", table.concat({"Created ", #ssfsToAdd, pluralize(" SSF.", #ssfsToAdd, -2)}))

@@ -13,7 +13,7 @@ function automateCopySVs(settingVars)
     for _, sv in ipairs(svs) do
         local copiedSV = {
             relativeOffset = sv.StartTime - firstSVTime,
-            multiplier = sv.Multiplier
+            multiplier = sv.Multiplier,
         }
         table.insert(settingVars.copiedSVs, copiedSV)
     end

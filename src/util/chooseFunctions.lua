@@ -727,7 +727,7 @@ function chooseVibratoDeviance(menuVars)
     local tooltipList = {
         "Don't deviate vibrato at all.",
         "Deviate vibrato with the given displacement. All displacements are equally likely to be chosen.",
-        "Deviate vibrato with the given displacement. Displacements are chosen via a Gaussian distribution."
+        "Deviate vibrato with the given displacement. Displacements are chosen via a Gaussian distribution.",
     }
 
     local deviationType = VIBRATO_DEVIATION_TYPES[menuVars.deviationFunctionIndex]

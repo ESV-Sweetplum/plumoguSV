@@ -18,7 +18,7 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
     local yellow = color.rgbaToUint(200, 200, 0, 255)
 
     local colorTable = {
-        [4] = { red, yellow, blue, yellow }
+        [4] = { red, yellow, blue, yellow },
     }
 
     for i = 1, #colTbl do

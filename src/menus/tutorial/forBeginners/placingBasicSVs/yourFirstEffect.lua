@@ -41,7 +41,7 @@ function showYourFirstEffectTutorial()
     ForceHeight(570)
     imgui.TextColored(vctr4(0), "penis")
     imgui.TextWrapped(
-        'If you want, you can change some of the other settings; try seeing what happens when you increase the stutter count. However, for the sake of this tutorial, you are done.')
+        "If you want, you can change some of the other settings; try seeing what happens when you increase the stutter count. However, for the sake of this tutorial, you are done.")
     imgui.TextColored(GUIDELINE_COLOR,
         'Now, select a note representing a strong sound, and\nthe note after it. Either hit the "T" button, or click\nthe "Place SVs between selected notes" button.')
     ForceHeight(720)

@@ -8,7 +8,7 @@ end
 function expect(expr)
     if (type(expr) ~= "function") then
         return {
-            toBe = function(x) return __toBeFunction(x, expr), { x, expr } end
+            toBe = function(x) return __toBeFunction(x, expr), { x, expr } end,
         }
     else
         local fn = expr
@@ -22,14 +22,14 @@ function expect(expr)
                                 if (not __toBeFunction(tbl[i], fn(x[i]))) then return false, { i, tbl[i], fn(x[i]) } end
                             end
                             return true
-                        end
+                        end,
                     }
                 else
                     return {
-                        toBe = function(y) return __toBeFunction(x, fn(y)) end
+                        toBe = function(y) return __toBeFunction(x, fn(y)) end,
                     }
                 end
-            end
+            end,
         }
     end
 end

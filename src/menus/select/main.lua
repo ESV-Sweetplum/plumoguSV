@@ -27,7 +27,7 @@ function chooseSelectTool()
         "Select all notes with a certain snap color.",
         "Select all notes within a certain timing group.",
         "Select all notes with a certain chord size.",
-        "Select rice/ln notes."
+        "Select rice/ln notes.",
     }
     imgui.AlignTextToFramePadding()
     imgui.Text("  Current Type:")

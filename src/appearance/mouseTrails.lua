@@ -303,7 +303,7 @@ function generateParticle(x, y, xRange, yRange, endTime, showParticle)
         xRange = xRange,
         yRange = yRange,
         endTime = endTime,
-        showParticle = showParticle
+        showParticle = showParticle,
     }
     return particle
 end

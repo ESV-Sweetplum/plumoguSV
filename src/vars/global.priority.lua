@@ -46,7 +46,7 @@ globalVars = {
     upscroll = false,
     useCustomPulseColor = false,
     useEndTimeOffsets = false,
-    useMinDisplacementMultiplier = true
+    useMinDisplacementMultiplier = true,
 }
 
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)

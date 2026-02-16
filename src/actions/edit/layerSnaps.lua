@@ -8,7 +8,7 @@ COLOR_MAP = {
     [8] =
     "Orange",
     [12] = "Cyan",
-    [16] = "Green"
+    [16] = "Green",
 }
 
 REVERSE_COLOR_MAP = {
@@ -20,7 +20,7 @@ REVERSE_COLOR_MAP = {
     Pink = 6,
     Orange = 8,
     Cyan = 12,
-    Green = 16
+    Green = 16,
 }
 
 function layerSnaps()

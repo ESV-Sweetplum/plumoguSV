@@ -11,7 +11,7 @@ function showWorkingWithShapesTutorial()
         return
     end
     imgui.TextWrapped(
-        'In the tab below the type dropdown, you\'ll notice a plethora of different options to choose from. Don\'t get overwhelmed; most experienced SV mappers usually limit themselves to using 3-5 of these shapes. Most commonly seen, we have the exponential shape, which makes the notes go towards the receptor at an exponential rate.')
+        "In the tab below the type dropdown, you\'ll notice a plethora of different options to choose from. Don\'t get overwhelmed; most experienced SV mappers usually limit themselves to using 3-5 of these shapes. Most commonly seen, we have the exponential shape, which makes the notes go towards the receptor at an exponential rate.")
     imgui.TextColored(INSTRUCTION_COLOR,
         'Under the "STANDARD" tab, select "EXPONENTIAL".')
     local menuVars = getMenuVars("placeStandard")
@@ -40,7 +40,7 @@ function showWorkingWithShapesTutorial()
         return 0.9 - 2 * (t - t ^ 2)
     end, { { 1, 2, 3, 4 }, {}, {}, {} }, 500)
     imgui.TextColored(GUIDELINE_COLOR,
-        'Select more than 2 chords (at least 3 notes with different times),\nand place the SV using an aforementioned method.')
+        "Select more than 2 chords (at least 3 notes with different times),\nand place the SV using an aforementioned method.")
     imgui.Dummy(vector.New(0, 10))
     imgui.TextWrapped(
         "If your notes are in different columns, you may have noticed that all the notes have combined into one large chord. Looking at the SV Info window, the reasoning becomes clear; the average SV is 0.00x, meaning the notes are always going to be next to each other. We can remedy this by adding a teleport to each set of notes, so they no longer line up with each other.")

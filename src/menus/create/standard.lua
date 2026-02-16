@@ -9,7 +9,7 @@ STANDARD_SVS = {
     "Custom",
     "Chinchilla",
     "Combo",
-    "Code"
+    "Code",
 }
 
 function placeStandardSVMenu()

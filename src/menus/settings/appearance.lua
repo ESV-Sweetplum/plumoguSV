@@ -161,7 +161,7 @@ function chooseColorTheme()
                                 return {
                                     id = s:sub(8),
                                     textColor = { 255, 255, 255 },
-                                    internalId = s
+                                    internalId = s,
                                 }
                             end))
                         end

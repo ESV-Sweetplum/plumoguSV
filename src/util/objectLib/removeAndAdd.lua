@@ -12,7 +12,7 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
     end
     local editorActions = {
         createEA(action_type.RemoveScrollVelocityBatch, svsToRemove),
-        createEA(action_type.AddScrollVelocityBatch, svsToAdd)
+        createEA(action_type.AddScrollVelocityBatch, svsToAdd),
     }
     actions.PerformBatch(editorActions)
     toggleablePrint("s!", "Created " .. #svsToAdd .. pluralize(" SV.", #svsToAdd, -2))
@@ -22,7 +22,7 @@ function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
     if not isTruthy(ssfsToAdd) then return end
     local editorActions = {
         createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove),
-        createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd)
+        createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
     }
     actions.PerformBatch(editorActions)
     toggleablePrint("s!", "Created " .. #ssfsToAdd .. pluralize(" SSF.", #ssfsToAdd, -2))

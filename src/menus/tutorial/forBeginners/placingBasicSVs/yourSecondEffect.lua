@@ -38,7 +38,7 @@ function showYourSecondEffectTutorial()
     imgui.TextWrapped(
         "Teleport Stutter differs from normal stutter, in that you don't control the speed at which the note moves, but rather how far down the note teleports. For example, if your start SV is 75%%, then your note will start 75%% of the way down. If you want the note to land on the receptor, you must make the start SV %% (in decimal form, not percent) and the main SV add up to the average SV.")
     imgui.TextColored(INSTRUCTION_COLOR,
-        'Set the main SV to 0.2x. Then, set the start SV %% to be the\npercentage required to have the notes land on the receptor.\nHINT: 1.00x - 0.20x = ??%%')
+        "Set the main SV to 0.2x. Then, set the start SV %% to be the\npercentage required to have the notes land on the receptor.\nHINT: 1.00x - 0.20x = ??%%")
     local settingVars = getSettingVars("Teleport Stutter", "Special")
     ForceHeight(490)
     if (not settingVars.linearlyChange and (math.abs(settingVars.mainSV - 0.2) > 0.001 or settingVars.svPercent ~= 80)) then return end
@@ -54,7 +54,7 @@ function showYourSecondEffectTutorial()
     if (not settingVars.linearlyChange) then return end
     ForceHeight(610)
     imgui.TextWrapped(
-        'You\'ll now notice that we have two options for both start SV %% and main SV value; one for start, and one for end. The way this works is that when you select more than two notes (obviously with different times), the teleport stutter for that note will change linearly according to the start/end values. For example, if your start SV %% (start) is 100%%, and your start SV %% (end) is 0%%, then a note in the very middle of your selection would have a teleport stutter with start SV %% of 50%%. We will use this to create some dynamic effects.')
+        "You\'ll now notice that we have two options for both start SV %% and main SV value; one for start, and one for end. The way this works is that when you select more than two notes (obviously with different times), the teleport stutter for that note will change linearly according to the start/end values. For example, if your start SV %% (start) is 100%%, and your start SV %% (end) is 0%%, then a note in the very middle of your selection would have a teleport stutter with start SV %% of 50%%. We will use this to create some dynamic effects.")
     imgui.TextColored(INSTRUCTION_COLOR,
         "Set the Start SV %% (start) to 100%%, the main SV (start) to 0.00x,\nand main SV (end) to whichever value it must be such that the\nnote lines up with the receptor. HINT: 0%% + ?.??x = 1.00x")
     ForceHeight(820)
@@ -70,6 +70,6 @@ function showYourSecondEffectTutorial()
     imgui.BulletText("0%%, 100%%, 1.00x, 0.00x")
     imgui.BulletText("100%%, 100%%, -1.00x, 0.00x")
     imgui.BulletText("100%%, 0%%, -1.00x, 1.00x")
-    imgui.TextWrapped('Fun fact: the above effect is used in the popular SV map Hypnotizer.')
+    imgui.TextWrapped("Fun fact: the above effect is used in the popular SV map Hypnotizer.")
     ForceHeight(1120)
 end

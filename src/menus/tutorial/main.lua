@@ -46,8 +46,8 @@ function showTutorialWindow()
                 ["The calculus of SV"] = incompleteFn,
                 ["Why do we call them shapes?"] = incompleteFn,
                 ["Analogies to Physics"] = incompleteFn,
-            }
-        }
+            },
+        },
     }
 
     imgui.Columns(2)

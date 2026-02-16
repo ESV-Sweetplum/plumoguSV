@@ -7,7 +7,7 @@ function renderMeasureDataWidget()
         nsvDistance = 0,
         roundedSVDistance = 0,
         roundedAvgSV = 0,
-        tgName = ""
+        tgName = "",
     }
 
     cache.loadTable("measureWidget", widgetVars)
