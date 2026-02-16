@@ -477,7 +477,7 @@ hotkeyList:
 - Ctrl+Alt+E
 - O
 ignoreNotesOutsideTg: false
-maxDisplacementMultiplierExponent: 0
+maxDisplacementMultiplierExponent: 6
 performanceMode: false
 placeTypeIndex: 1
 presets:

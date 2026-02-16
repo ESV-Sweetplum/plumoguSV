@@ -40,4 +40,6 @@ function awake()
             "Your ImGui scale is set to " ..
             printedScale .. "% instead of 100%. For visual purposes, please set it back to 100%.")
     end
+
+    getUsableDisplacementMultiplier(map.TrackLength) -- To initialize cache.displacementExponent
 end
