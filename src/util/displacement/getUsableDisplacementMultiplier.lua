@@ -12,7 +12,15 @@
 -- Parameters
 --    offset: time in milliseconds [Int]
 function getUsableDisplacementMultiplier(offset)
-    local exponent = math.clamp(23 - math.floor(math.log(math.abs(offset) + 1, 2)), 0,
-        globalVars.maxDisplacementMultiplierExponent)
-    return 2 ^ exponent
+    local exponent
+    if (globalVars.useMinDisplacementMultiplier) then
+        if (not cache.displacementExponent) then
+            cache.displacementExponent = 23 - math.floor(math.log(math.abs(map.TrackLength) + 1, 2))
+        end
+        return 2 ^ math.clamp(cache.displacementExponent, 0, 6)
+    else
+        exponent = math.clamp(23 - math.floor(math.log(math.abs(offset) + 1, 2)), 0,
+            globalVars.maxDisplacementMultiplierExponent)
+        return 2 ^ exponent
+    end
 end
