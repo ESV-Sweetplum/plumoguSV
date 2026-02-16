@@ -17,8 +17,8 @@ function printLegacyLNMessage()
     if (not globalVars.printLegacyLNMessage or cache.disablePrintLegacyLNMessage) then return end
     if (not checkNotesForLNs(state.SelectedHitObjects) or map.LegacyLNRendering) then return end
 
-    print("w!",
-        "Using any sort of displacements with LNs while Legacy LN rendering is highly discouraged. Consider turning on Legacy LN Rendering in the F1 menu. You can permanently disable this message in the plumoguSV settings.")
+    print('w!',
+        'Using any sort of displacements with LNs while Legacy LN rendering is highly discouraged. Consider turning on Legacy LN Rendering in the F1 menu. You can permanently disable this message in the plumoguSV settings.')
 
     cache.disablePrintLegacyLNMessage = true
 end

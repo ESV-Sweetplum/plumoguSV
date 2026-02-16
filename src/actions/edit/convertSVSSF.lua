@@ -33,7 +33,7 @@ function convertSVSSF(menuVars)
         table.insert(editorActions, createEA(action_type.AddScrollVelocityBatch, createTable))
     end
     actions.PerformBatch(editorActions)
-    toggleablePrint("s!", "Successfully converted.")
+    toggleablePrint('s!', 'Successfully converted.')
 end
 
 function swapSVSSF(menuVars)
@@ -60,5 +60,5 @@ function swapSVSSF(menuVars)
         createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
     })
 
-    toggleablePrint("s!", "Successfully swapped.")
+    toggleablePrint('s!', 'Successfully swapped.')
 end

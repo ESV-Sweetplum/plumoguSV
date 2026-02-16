@@ -12,19 +12,19 @@ end
 function checkPresetValidity(preset)
     if (not table.contains(CREATE_TYPES, preset.type)) then return false, nil end
     local validMenus = {}
-    if (preset.type == "Standard" or preset.type == "Still") then
+    if (preset.type == 'Standard' or preset.type == 'Still') then
         validMenus = table.duplicate(STANDARD_SVS)
     end
-    if (preset.type == "Special") then
+    if (preset.type == 'Special') then
         validMenus = table.duplicate(SPECIAL_SVS)
     end
-    if (preset.type == "Vibrato") then
+    if (preset.type == 'Vibrato') then
         validMenus = table.duplicate(VIBRATO_SVS)
     end
     if (not isTruthy(validMenus)) then return false, nil end
     if (not table.includes(validMenus, preset.menu)) then return false, nil end
 
-    local realType = "place" .. preset.type
+    local realType = 'place' .. preset.type
 
     return true, preset.data
 end

@@ -7,11 +7,11 @@ function setPluginAppearance()
 end
 
 function setPluginAppearanceStyles(styleTheme)
-    local cornerRoundnessvalue = (styleTheme == "Boxed" or
-        styleTheme == "Boxed + Border") and 0 or 5 -- up to 12, 14 for WindowRounding and 16 for ChildRounding
+    local cornerRoundnessvalue = (styleTheme == 'Boxed' or
+        styleTheme == 'Boxed + Border') and 0 or 5 -- up to 12, 14 for WindowRounding and 16 for ChildRounding
 
-    local borderSize = tn(styleTheme == "Rounded + Border" or
-        styleTheme == "Boxed + Border")
+    local borderSize = tn(styleTheme == 'Rounded + Border' or
+        styleTheme == 'Boxed + Border')
 
     imgui.PushStyleVar(imgui_style_var.FrameBorderSize, borderSize)
     imgui.PushStyleVar(imgui_style_var.WindowPadding, vector.New(PADDING_WIDTH, 8))
@@ -36,24 +36,24 @@ end
 function setPluginAppearanceColors(colorTheme, hideBorder)
     local borderColor = nil
 
-    if colorTheme == "Original" or not colorTheme then borderColor = setOriginalColors() end
-    if colorTheme == "Strawberry" then borderColor = setStrawberryColors() end
-    if colorTheme == "Amethyst" then borderColor = setAmethystColors() end
-    if colorTheme == "Tree" then borderColor = setTreeColors() end
-    if colorTheme == "Barbie" then borderColor = setBarbieColors() end
-    if colorTheme == "Incognito" then borderColor = setIncognitoColors() end
-    if colorTheme == "Incognito + RGB" then borderColor = setIncognitoRGBColors(globalVars.rgbPeriod) end
-    if colorTheme == "otingocnI" then borderColor = setInvertedIncognitoColors() end
-    if colorTheme == "BGR + otingocnI" then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
-    if colorTheme == "Glass" then borderColor = setGlassColors() end
-    if colorTheme == "Glass + RGB" then borderColor = setGlassRGBColors(globalVars.rgbPeriod) end
-    if colorTheme == "RGB Gamer Mode" then borderColor = setRGBGamerColors(globalVars.rgbPeriod) end
-    if colorTheme == "edom remag BGR" then borderColor = setInvertedRGBGamerColors(globalVars.rgbPeriod) end
+    if colorTheme == 'Original' or not colorTheme then borderColor = setOriginalColors() end
+    if colorTheme == 'Strawberry' then borderColor = setStrawberryColors() end
+    if colorTheme == 'Amethyst' then borderColor = setAmethystColors() end
+    if colorTheme == 'Tree' then borderColor = setTreeColors() end
+    if colorTheme == 'Barbie' then borderColor = setBarbieColors() end
+    if colorTheme == 'Incognito' then borderColor = setIncognitoColors() end
+    if colorTheme == 'Incognito + RGB' then borderColor = setIncognitoRGBColors(globalVars.rgbPeriod) end
+    if colorTheme == 'otingocnI' then borderColor = setInvertedIncognitoColors() end
+    if colorTheme == 'BGR + otingocnI' then borderColor = setInvertedIncognitoRGBColors(globalVars.rgbPeriod) end
+    if colorTheme == 'Glass' then borderColor = setGlassColors() end
+    if colorTheme == 'Glass + RGB' then borderColor = setGlassRGBColors(globalVars.rgbPeriod) end
+    if colorTheme == 'RGB Gamer Mode' then borderColor = setRGBGamerColors(globalVars.rgbPeriod) end
+    if colorTheme == 'edom remag BGR' then borderColor = setInvertedRGBGamerColors(globalVars.rgbPeriod) end
     if colorTheme == "7xbi's Glass" then borderColor = set7xbiGlassColors() end
     if colorTheme == "7xbi's RGB Glass" then borderColor = set7xbiRGBGlassColors(globalVars.rgbPeriod) end
     if colorTheme == "aster's catppuccin" then borderColor = setAsterCatppuccinColors() end
     if colorTheme == "plum's purple palace" then borderColor = setPlumPurplePalaceColors() end
-    if colorTheme:sub(1, 7) == "custom_" then borderColor = setCustomColors() end
+    if colorTheme:sub(1, 7) == 'custom_' then borderColor = setCustomColors() end
 
     if not borderColor then borderColor = setOriginalColors() end
 

@@ -2,7 +2,7 @@ function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
 
-    PLUGIN_NAME = "plumoguSV-dev"
+    PLUGIN_NAME = 'plumoguSV-dev'
 
     state.IsWindowHovered = imgui.IsWindowHovered()
 
@@ -21,7 +21,7 @@ function draw()
     end
 
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
-    imgui.BeginTabBar("SV tabs")
+    imgui.BeginTabBar('SV tabs')
     for i = 1, #TAB_MENUS do
         createMenuTab(TAB_MENUS[i])
     end
@@ -29,7 +29,7 @@ function draw()
 
     if (not performanceMode) then
         if (globalVars.showVibratoWidget) then
-            imgui.Begin("plumoguSV-vibrato", imgui_window_flags.AlwaysAutoResize)
+            imgui.Begin('plumoguSV-vibrato', imgui_window_flags.AlwaysAutoResize)
             imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
             placeVibratoSVMenu(true)
             imgui.End()

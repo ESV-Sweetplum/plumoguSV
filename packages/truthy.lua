@@ -4,16 +4,16 @@
 ---@return boolean truthy The truthy value of the parameter.
 function isTruthy(param, assumeTrue)
     local t = type(param)
-    if t == "string" then
-        return param:lower() == "true"
+    if t == 'string' then
+        return param:lower() == 'true'
     end
-    if t == "number" then
+    if t == 'number' then
         return param > 0
     end
-    if t == "table" or t == "userdata" then
+    if t == 'table' or t == 'userdata' then
         return #param > 0
     end
-    if t == "boolean" then
+    if t == 'boolean' then
         return param
     end
     return assumeTrue or false

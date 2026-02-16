@@ -8,7 +8,7 @@ function flickerSVs(menuVars)
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local numTeleports = 2 * menuVars.numFlickers
-    local isDelayedFlicker = FLICKER_TYPES[menuVars.flickerTypeIndex] == "Delayed"
+    local isDelayedFlicker = FLICKER_TYPES[menuVars.flickerTypeIndex] == 'Delayed'
     for i = 1, (#offsets - 1) do
         local flickerStartOffset = offsets[i]
         local flickerEndOffset = offsets[i + 1]

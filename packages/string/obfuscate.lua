@@ -1,9 +1,9 @@
-require("packages.kbm.numToKey")
+require('packages.kbm.numToKey')
 
 function string.obfuscate(str)
-    local newStr = ""
+    local newStr = ''
     local originalSize = imgui.CalcTextSize(str).x
-    local unchangingLetters = { " ", "#" }
+    local unchangingLetters = { ' ', '#' }
     for i = 1, str:len() do
         if (table.includes(unchangingLetters, str:charAt(i)) or math.random() < 0.5) then
             newStr = newStr .. str:charAt(i)

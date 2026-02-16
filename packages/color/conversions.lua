@@ -1,10 +1,10 @@
-HEXADECIMAL = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" }
+HEXADECIMAL = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' }
 
-NONDUA = { "!", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7",
-    "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
-    "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f",
-    "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}",
-    "~" }
+NONDUA = { '!', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+    'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f',
+    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}',
+    '~' }
 
 ---Converts rgba to an unsigned integer (0-4294967295).
 ---@param r integer
@@ -45,7 +45,7 @@ end
 ---@return string
 function color.rgbaToHexa(r, g, b, a)
     local flr = math.floor
-    local hexaStr = ""
+    local hexaStr = ''
     for _, col in ipairs({ r, g, b, a }) do
         hexaStr = hexaStr .. HEXADECIMAL[flr(col / 16) + 1] .. HEXADECIMAL[flr(col) % 16 + 1]
     end
@@ -72,7 +72,7 @@ end
 ---@return string
 function color.rgbaToNdua(r, g, b, a)
     local uint = color.rgbaToUint(r, g, b, a)
-    local str = ""
+    local str = ''
 
     for i = 0, 4 do
         str = str .. NONDUA[math.floor(uint / (92 ^ i)) % 92 + 1]
@@ -101,7 +101,7 @@ end
 ---@return string
 function color.rgbaToStr(vctr)
     local flr = math.floor
-    return table.concat({ flr(vctr.x * 255), flr(vctr.y * 255), flr(vctr.z * 255) }, ",")
+    return table.concat({ flr(vctr.x * 255), flr(vctr.y * 255), flr(vctr.z * 255) }, ',')
 end
 
 ---Converts hsl to an rgba `Vector4`, where `hue` is in degrees. The abstract formula comes from [Wikipedia](https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB_alternative).

@@ -15,7 +15,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
     local lastOffset = offsets[#offsets]
     if placingStillSVs then offsets = { firstOffset, lastOffset } end
     local svsToAdd = {}
-    local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == 'Override')
     if (not placingStillSVs) and globalVars.dontReplaceSV then
         svsToRemove = {}
     end
@@ -39,7 +39,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
                 sort(svsToAdd, sortAscendingStartTime), svsToAdd)
             svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
         end
-        addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == "Override")
+        addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
         removeAndAddSVs(svsToRemove, svsToAdd)
         return
     end

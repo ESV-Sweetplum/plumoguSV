@@ -12,7 +12,7 @@ function placeTeleportStutterSVs(settingVars)
     local lastOffset = offsets[#offsets]
     local numTeleportSets = #offsets - 1
     local svsToAdd = {}
-    local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == 'Override')
     local svPercents = generateLinearSet(svPercent, lastSVPercent, numTeleportSets)
     local mainSVs = generateLinearSet(settingVars.mainSV, lastMainSV, numTeleportSets)
 
@@ -47,9 +47,9 @@ function placeTeleportStutterSVs(settingVars)
         end
     end
     local finalMultiplier = settingVars.avgSV
-    if finalSVType ~= "Normal" then
+    if finalSVType ~= 'Normal' then
         finalMultiplier = settingVars.customSV
     end
-    addFinalSV(svsToAdd, lastOffset, finalMultiplier, finalSVType == "Override")
+    addFinalSV(svsToAdd, lastOffset, finalMultiplier, finalSVType == 'Override')
     removeAndAddSVs(svsToRemove, svsToAdd)
 end

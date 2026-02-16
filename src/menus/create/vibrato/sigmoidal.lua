@@ -1,6 +1,6 @@
 function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
-        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Start/End##Vibrato", " msx", 0, 7 / 8)
+        SwappableNegatableInputFloat2(settingVars, 'startMsx', 'endMsx', 'Start/End##Vibrato', ' msx', 0, 7 / 8)
         chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local func = function(t)
@@ -22,12 +22,12 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
             return settingVars.startMsx + t * (settingVars.endMsx - settingVars.startMsx)
         end
 
-        simpleActionMenu("Vibrate", 2, function(v)
+        simpleActionMenu('Vibrate', 2, function(v)
             svVibrato(v, func)
         end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     else
-        SwappableNegatableInputFloat2(settingVars, "lowerStart", "lowerEnd", "Lower S/E SSFs##Vibrato", "x")
-        SwappableNegatableInputFloat2(settingVars, "higherStart", "higherEnd", "Higher S/E SSFs##Vibrato", "x")
+        SwappableNegatableInputFloat2(settingVars, 'lowerStart', 'lowerEnd', 'Lower S/E SSFs##Vibrato', 'x')
+        SwappableNegatableInputFloat2(settingVars, 'higherStart', 'higherEnd', 'Higher S/E SSFs##Vibrato', 'x')
         chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
 
@@ -68,7 +68,7 @@ function sigmoidalVibratoMenu(menuVars, settingVars, separateWindow)
             return settingVars.higherStart + t * (settingVars.higherEnd - settingVars.higherStart)
         end
 
-        simpleActionMenu("Vibrate", 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
+        simpleActionMenu('Vibrate', 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
             separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     end
 end

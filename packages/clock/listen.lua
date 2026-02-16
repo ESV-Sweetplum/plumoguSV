@@ -1,4 +1,4 @@
-require("packages.cache.initialize.priority")
+require('packages.cache.initialize.priority')
 
 ---Returns true every `interval` ms.
 ---@param id string The unique identifier of the clock.
@@ -25,5 +25,5 @@ end
 ---@return boolean ev True if the clock has reached its interval time.
 function clock.temp(interval)
     tempClockCount = tempClockCount + 1
-    return clock.listen("temporary" .. tempClockCount, interval)
+    return clock.listen('temporary' .. tempClockCount, interval)
 end

@@ -17,11 +17,11 @@ end
 
 function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
-    local multButtonPressed = imgui.Button("x2##" .. label)
-    HoverToolTip("Double this value.")
+    local multButtonPressed = imgui.Button('x2##' .. label)
+    HoverToolTip('Double this value.')
     KeepSameLine()
-    local divButtonPressed = imgui.Button("/2##" .. label)
-    HoverToolTip("Half this value.")
+    local divButtonPressed = imgui.Button('/2##' .. label)
+    HoverToolTip('Half this value.')
     KeepSameLine()
     imgui.PushItemWidth(91.5)
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)

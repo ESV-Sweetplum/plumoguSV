@@ -1,10 +1,10 @@
 function verticalShiftMenu()
-    local menuVars = getMenuVars("verticalShift")
+    local menuVars = getMenuVars('verticalShift')
 
     verticalShiftSettingsMenu(menuVars)
-    cache.saveTable("verticalShiftMenu", menuVars)
+    cache.saveTable('verticalShiftMenu', menuVars)
 
-    simpleActionMenu("Vertically shift SVs between selected notes", 2, verticalShiftSVs, menuVars)
+    simpleActionMenu('Vertically shift SVs between selected notes', 2, verticalShiftSVs, menuVars)
 end
 
 function verticalShiftSettingsMenu(menuVars)

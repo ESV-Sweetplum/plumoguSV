@@ -1,7 +1,7 @@
 function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
-        SwappableNegatableInputFloat2(settingVars, "startMsx", "endMsx", "Bounds##Vibrato", " msx", 0, 0.875)
-        BasicInputInt(settingVars, "controlPointCount", "Control Points", { 1, 10 })
+        SwappableNegatableInputFloat2(settingVars, 'startMsx', 'endMsx', 'Bounds##Vibrato', ' msx', 0, 0.875)
+        BasicInputInt(settingVars, 'controlPointCount', 'Control Points', { 1, 10 })
         AddSeparator()
 
         local size = 220
@@ -14,11 +14,11 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
                 settingVars.endMsx -- Reversed due to the way imgui draws
         end
 
-        simpleActionMenu("Vibrate", 2, function(v)
+        simpleActionMenu('Vibrate', 2, function(v)
             svVibrato(v, func)
         end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     else
-        imgui.TextColored(color.vctr.red, "This mode is not supported.")
+        imgui.TextColored(color.vctr.red, 'This mode is not supported.')
     end
 end
 
@@ -48,8 +48,8 @@ function PolynomialEditor(size, settingVars, separateWindow)
 
 
     imgui.SetCursorPosX(26)
-    imgui.BeginChild("Polynomial Vibrato Interactive Window" .. tostring(separateWindow), vctr2(size), 67, 31)
-    local ctx, changedPoints = renderGraph("Polynomial Vibrato Menu" .. tostring(separateWindow), vctr2(size),
+    imgui.BeginChild('Polynomial Vibrato Interactive Window' .. tostring(separateWindow), vctr2(size), 67, 31)
+    local ctx, changedPoints = renderGraph('Polynomial Vibrato Menu' .. tostring(separateWindow), vctr2(size),
         pointList, false, 11,
         vector.New(settingVars.startMsx, settingVars.endMsx))
 
@@ -110,7 +110,7 @@ function PolynomialEditor(size, settingVars, separateWindow)
         local opacityFactor = 0.7 - math.sin(20 * i / #settingVars.plotPoints - clock.getTime() * 5) / 2
         ctx.AddLine(topLeft + settingVars.plotPoints[i],
             vector.Clamp(topLeft + settingVars.plotPoints[i + 1], topLeft, topLeft + dim - vctr2(1)),
-            imgui.GetColorU32("PlotLines", opacityFactor), 3)
+            imgui.GetColorU32('PlotLines', opacityFactor), 3)
     end
 
     imgui.EndChild()

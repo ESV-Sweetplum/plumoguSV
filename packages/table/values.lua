@@ -1,4 +1,4 @@
-require("packages.table.construct")
+require('packages.table.construct')
 ---Returns a table of values from a table.
 ---@param tbl { [string]: any } The table to search in.
 ---@return string[] values A list of values.

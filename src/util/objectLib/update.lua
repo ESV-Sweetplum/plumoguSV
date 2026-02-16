@@ -31,16 +31,16 @@ function updateFinalSV(finalSVIndex, svMultipliers, customSV, skipFinalSV)
     end
 
     local finalSVType = FINAL_SV_TYPES[finalSVIndex]
-    if finalSVType == "Normal" then return end
+    if finalSVType == 'Normal' then return end
     svMultipliers[#svMultipliers] = customSV
 end
 
 function updateStutterMenuSVs(settingVars)
-    settingVars.svMultipliers = generateSVMultipliers("Stutter1", settingVars, nil)
+    settingVars.svMultipliers = generateSVMultipliers('Stutter1', settingVars, nil)
     local svMultipliersNoEndSV = table.duplicate(settingVars.svMultipliers)
     table.remove(svMultipliersNoEndSV)
 
-    settingVars.svMultipliers2 = generateSVMultipliers("Stutter2", settingVars, nil)
+    settingVars.svMultipliers2 = generateSVMultipliers('Stutter2', settingVars, nil)
     local svMultipliersNoEndSV2 = table.duplicate(settingVars.svMultipliers2)
     table.remove(svMultipliersNoEndSV2)
 

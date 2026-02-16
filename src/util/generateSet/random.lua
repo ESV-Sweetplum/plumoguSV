@@ -28,10 +28,10 @@ end
 function generateRandomSet(numValues, randomType, randomScale)
     local randomSet = {}
     for _ = 1, numValues do
-        if randomType == "Uniform" then
+        if randomType == 'Uniform' then
             local randomValue = randomScale * 2 * (0.5 - math.random())
             table.insert(randomSet, randomValue)
-        elseif randomType == "Normal" then
+        elseif randomType == 'Normal' then
             -- Box-Muller transformation
             local u1 = math.random()
             local u2 = math.random()

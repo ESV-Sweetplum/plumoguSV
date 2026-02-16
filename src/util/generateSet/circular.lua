@@ -8,7 +8,7 @@
 --    dontNormalize : Whether or not to normalize values to the target average value [Boolean]
 function generateCircularSet(behavior, arcPercent, avgValue, verticalShift, numValues,
                              dontNormalize)
-    local increaseValues = (behavior == "Speed up")
+    local increaseValues = (behavior == 'Speed up')
     avgValue = avgValue - verticalShift
     local startingAngle = math.pi * (arcPercent * 0.01)
     local angles = generateLinearSet(startingAngle, 0, numValues)

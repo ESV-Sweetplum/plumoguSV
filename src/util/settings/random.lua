@@ -4,7 +4,7 @@ function randomSettingsMenu(settingVars, skipFinalSV, svPointsForce, disableRege
     settingsChanged = chooseRandomType(settingVars) or settingsChanged
     settingsChanged = chooseRandomScale(settingVars) or settingsChanged
     settingsChanged = chooseSVPoints(settingVars, svPointsForce) or settingsChanged
-    if not disableRegeneration and imgui.Button("Generate New Random Set", BEEG_BUTTON_SIZE) then
+    if not disableRegeneration and imgui.Button('Generate New Random Set', BEEG_BUTTON_SIZE) then
         generateRandomSetMenuSVs(settingVars)
         settingsChanged = true
     end

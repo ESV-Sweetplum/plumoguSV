@@ -7,7 +7,7 @@
 --    verticalShift : constant to add to each value in the set at very the end [Int/Float]
 function generateExponentialSet(behavior, numValues, avgValue, intensity, verticalShift)
     avgValue = avgValue - verticalShift
-    local exponentialIncrease = (behavior == "Speed up")
+    local exponentialIncrease = (behavior == 'Speed up')
     local exponentialSet = {}
     -- reduce intensity scaling to produce more useful/practical values
     intensity = intensity * 0.2
@@ -32,7 +32,7 @@ function generateExponentialSet2(behavior, numValues, startValue, endValue, inte
     local exponentialSet = {}
     -- reduce intensity scaling to produce more useful/practical values
     intensity = intensity * 0.2
-    if (behavior == "Slow down" and startValue ~= endValue) then
+    if (behavior == 'Slow down' and startValue ~= endValue) then
         startValue, endValue = endValue, startValue
     end
     for i = 0, numValues - 1 do
@@ -42,7 +42,7 @@ function generateExponentialSet2(behavior, numValues, startValue, endValue, inte
         fx = k * math.exp(intensity * x) + startValue - k
         table.insert(exponentialSet, fx)
     end
-    if (behavior == "Slow down" and startValue ~= endValue) then
+    if (behavior == 'Slow down' and startValue ~= endValue) then
         exponentialSet = table.reverse(exponentialSet)
     end
     return exponentialSet

@@ -5,7 +5,7 @@ function pulseController()
         pulsedThisFrame = false,
     }
 
-    cache.loadTable("pulseController", pulseVars)
+    cache.loadTable('pulseController', pulseVars)
 
     local timeOffset = 50 -- [`state.SongTime`](lua://state.SongTime) isn't entirely accurate while the song is playing, so this aims to correct that.
 
@@ -33,14 +33,14 @@ function pulseController()
     outputPulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
 
     local borderColor = cache.borderColor or vctr4(1)
-    if (type(borderColor) == "table") then borderColor = table.vectorize4(borderColor) end
+    if (type(borderColor) == 'table') then borderColor = table.vectorize4(borderColor) end
     local negatedBorderColor = vctr4(1) - borderColor
 
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
 
     imgui.PushStyleColor(imgui_col.Border, pulseColor * outputPulseStatus + borderColor * (1 - outputPulseStatus))
 
-    cache.saveTable("pulseController", pulseVars)
+    cache.saveTable('pulseController', pulseVars)
     cache.pulseValue = math.max(pulseVars.pulseStatus, 0)
     cache.pulsedThisFrame = pulseVars.pulsedThisFrame
 end

@@ -7,10 +7,10 @@ function renderMeasureDataWidget()
         nsvDistance = 0,
         roundedSVDistance = 0,
         roundedAvgSV = 0,
-        tgName = "",
+        tgName = '',
     }
 
-    cache.loadTable("measureWidget", widgetVars)
+    cache.loadTable('measureWidget', widgetVars)
 
     local uniqueDict = {}
     for _, ho in ipairs(state.SelectedHitObjects) do -- game.get.uniqueSelectedNoteOffsets was not used here because this approach exits the function faster
@@ -40,14 +40,14 @@ function renderMeasureDataWidget()
         widgetVars.tgName = state.SelectedScrollGroupId
     end
     imgui.BeginTooltip()
-    imgui.Text("Measure Info:")
-    imgui.Text("NSV Distance = " .. widgetVars.nsvDistance .. " ms")
-    imgui.Text("SV Distance = " .. widgetVars.roundedSVDistance .. " msx")
-    imgui.Text("Avg SV = " .. widgetVars.roundedAvgSV .. "x")
+    imgui.Text('Measure Info:')
+    imgui.Text('NSV Distance = ' .. widgetVars.nsvDistance .. ' ms')
+    imgui.Text('SV Distance = ' .. widgetVars.roundedSVDistance .. ' msx')
+    imgui.Text('Avg SV = ' .. widgetVars.roundedAvgSV .. 'x')
     imgui.EndTooltip()
 
     widgetVars.oldStartOffset = startOffset
     widgetVars.oldEndOffset = endOffset
 
-    cache.saveTable("measureWidget", widgetVars)
+    cache.saveTable('measureWidget', widgetVars)
 end

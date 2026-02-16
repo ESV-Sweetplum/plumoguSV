@@ -12,9 +12,9 @@
 function generateComboSet(values1, values2, comboPhase, comboType, comboMultiplier1,
                           comboMultiplier2, dontNormalize, avgValue, verticalShift)
     local comboValues = {}
-    if comboType == "SV Type 1 Only" then
+    if comboType == 'SV Type 1 Only' then
         comboValues = table.duplicate(values1)
-    elseif comboType == "SV Type 2 Only" then
+    elseif comboType == 'SV Type 2 Only' then
         comboValues = table.duplicate(values2)
     else
         local lastValue1 = table.remove(values1)
@@ -32,7 +32,7 @@ function generateComboSet(values1, values2, comboPhase, comboType, comboMultipli
             table.insert(comboValues, values2[i])
         end
 
-        if comboType ~= "Remove" then
+        if comboType ~= 'Remove' then
             local comboValues1StartIndex = endIndex1 + 1
             local comboValues1EndIndex = startIndex2 - 1
             local comboValues2StartIndex = endIndex2 + 1
@@ -50,13 +50,13 @@ function generateComboSet(values1, values2, comboPhase, comboType, comboMultipli
                 local comboValue1 = comboValues1[i]
                 local comboValue2 = comboValues2[i]
                 local finalValue
-                if comboType == "Add" then
+                if comboType == 'Add' then
                     finalValue = comboMultiplier1 * comboValue1 + comboMultiplier2 * comboValue2
-                elseif comboType == "Cross Multiply" then
+                elseif comboType == 'Cross Multiply' then
                     finalValue = comboValue1 * comboValue2
-                elseif comboType == "Min" then
+                elseif comboType == 'Min' then
                     finalValue = math.min(comboValue1, comboValue2)
-                elseif comboType == "Max" then
+                elseif comboType == 'Max' then
                     finalValue = math.max(comboValue1, comboValue2)
                 end
                 table.insert(comboValues, finalValue)

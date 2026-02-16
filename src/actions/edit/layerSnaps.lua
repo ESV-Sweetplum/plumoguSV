@@ -1,14 +1,14 @@
 COLOR_MAP = {
-    [1] = "Red",
-    [2] = "Blue",
-    [3] = "Purple",
-    [4] = "Yellow",
-    [5] = "White",
-    [6] = "Pink",
+    [1] = 'Red',
+    [2] = 'Blue',
+    [3] = 'Purple',
+    [4] = 'Yellow',
+    [5] = 'White',
+    [6] = 'Pink',
     [8] =
-    "Orange",
-    [12] = "Cyan",
-    [16] = "Green",
+    'Orange',
+    [12] = 'Cyan',
+    [16] = 'Green',
 }
 
 REVERSE_COLOR_MAP = {
@@ -25,21 +25,21 @@ REVERSE_COLOR_MAP = {
 
 function layerSnaps()
     local layerDict = {}
-    local originalLayerNames = table.property(map.EditorLayers, "Name")
+    local originalLayerNames = table.property(map.EditorLayers, 'Name')
     local layerNames = table.duplicate(originalLayerNames)
     local notes = map.HitObjects
     for _, ho in ipairs(notes) do
         local color = COLOR_MAP[game.get.snapAt(ho.StartTime)]
         if (ho.EditorLayer == 0) then
-            layer = { Name = "Default", ColorRgb = "255,255,255", Hidden = false }
+            layer = { Name = 'Default', ColorRgb = '255,255,255', Hidden = false }
         else
             layer = map.EditorLayers[ho.EditorLayer]
         end
-        local newLayerName = layer.Name .. "-plumoguSV-snap-" .. color
+        local newLayerName = layer.Name .. '-plumoguSV-snap-' .. color
         if (table.contains(layerNames, newLayerName)) then
             if (table.contains(originalLayerNames, newLayerName)) then
-                print("e!",
-                    "Existing plumoguSV snap layers have been detected. Please remove them before trying to layer snaps again.")
+                print('e!',
+                    'Existing plumoguSV snap layers have been detected. Please remove them before trying to layer snaps again.')
                 return
             end
             table.insert(layerDict[newLayerName].hos, ho)
@@ -80,13 +80,13 @@ function collapseSnaps()
             if tp.StartTime > ho.StartTime + snapInterval then break end
         end
         if (ho.EditorLayer == 0) then
-            hoLayer = { Name = "Default", ColorRgb = "255,255,255", Hidden = false }
+            hoLayer = { Name = 'Default', ColorRgb = '255,255,255', Hidden = false }
         else
             hoLayer = map.EditorLayers[ho.EditorLayer]
         end
-        if (not hoLayer.Name:find("plumoguSV")) then goto nextLayer end
+        if (not hoLayer.Name:find('plumoguSV')) then goto nextLayer end
         do
-            local color = hoLayer.Name:match("-([a-zA-Z]+)$")
+            local color = hoLayer.Name:match('-([a-zA-Z]+)$')
             local snap = REVERSE_COLOR_MAP[color]
             local mostRecentTP = game.get.timingPointAt(ho.StartTime)
             if snap == 1 then
@@ -100,11 +100,11 @@ function collapseSnaps()
                     utils.CreateTimingPoint(ho.StartTime + snapInterval,
                         mostRecentTP.Bpm, mostRecentTP.Signature, true))
             end
-            local originalLayerName = hoLayer.Name:match("^([^-]+)-")
+            local originalLayerName = hoLayer.Name:match('^([^-]+)-')
 
             table.insert(moveNoteActions,
                 createEA(action_type.MoveToLayer,
-                    map.EditorLayers[table.indexOf(table.property(map.EditorLayers, "Name"), originalLayerName)], { ho }))
+                    map.EditorLayers[table.indexOf(table.property(map.EditorLayers, 'Name'), originalLayerName)], { ho }))
             table.insert(removeLayerActions,
                 createEA(action_type.RemoveLayer, hoLayer))
         end
@@ -112,7 +112,7 @@ function collapseSnaps()
     end
     actions.PerformBatch(moveNoteActions)
     if (not isTruthy(#normalTpsToAdd + #snapTpsToAdd + #tpsToRemove)) then
-        print("w!", "There were no generated layers you nonce")
+        print('w!', 'There were no generated layers you nonce')
         return
     end
     actions.PerformBatch({
@@ -125,12 +125,12 @@ end
 function clearSnappedLayers()
     local removeLayerActions = {}
     for _, layer in ipairs(map.EditorLayers) do
-        if layer.Name:find("plumoguSV") then
+        if layer.Name:find('plumoguSV') then
             table.insert(removeLayerActions, createEA(action_type.RemoveLayer, layer))
         end
     end
     if (not isTruthy(removeLayerActions)) then
-        print("w!", "There were no generated layers you nonce")
+        print('w!', 'There were no generated layers you nonce')
         return
     end
     actions.PerformBatch(removeLayerActions)

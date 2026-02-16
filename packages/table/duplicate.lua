@@ -1,4 +1,4 @@
-require("packages.table.keys")
+require('packages.table.keys')
 ---Returns a deep copy of a table.
 ---@generic T : table
 ---@param tbl T The original table.
@@ -8,12 +8,12 @@ function table.duplicate(tbl)
     local dupeTbl = {}
     if (tbl[1]) then
         for _, value in ipairs(tbl) do
-            table.insert(dupeTbl, type(value) == "table" and table.duplicate(value) or value)
+            table.insert(dupeTbl, type(value) == 'table' and table.duplicate(value) or value)
         end
     else
         for _, key in ipairs(table.keys(tbl)) do
             local value = tbl[key]
-            dupeTbl[key] = type(value) == "table" and table.duplicate(value) or value
+            dupeTbl[key] = type(value) == 'table' and table.duplicate(value) or value
         end
     end
     return dupeTbl

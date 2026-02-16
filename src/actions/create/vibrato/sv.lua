@@ -24,7 +24,7 @@ function svVibrato(menuVars, heightFn)
         local teleportCount = math.floor((nextVibro - startVibro) / 1000 * fps / roundingFactor) * roundingFactor
 
         if teleportCount < 2 then
-            print("e!", "Some notes are too close together to place vibrato. Check for notes that are 1ms apart.")
+            print('e!', 'Some notes are too close together to place vibrato. Check for notes that are 1ms apart.')
             return
         end
 

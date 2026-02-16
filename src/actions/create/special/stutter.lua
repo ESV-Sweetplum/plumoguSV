@@ -14,7 +14,7 @@ function placeStutterSVs(settingVars)
     local firstStutterSVs = generateLinearSet(settingVars.startSV, lastFirstStutter,
         totalNumStutters)
     local svsToAdd = {}
-    local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == "Override")
+    local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == 'Override')
     local stutterIndex = 1
     for i = 1, #offsets - 1 do
         local startOffset = offsets[i]
@@ -43,6 +43,6 @@ function placeStutterSVs(settingVars)
             stutterIndex = stutterIndex + 1
         end
     end
-    addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == "Override")
+    addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
     removeAndAddSVs(svsToRemove, svsToAdd)
 end

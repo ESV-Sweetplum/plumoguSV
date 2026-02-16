@@ -14,7 +14,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     hiddenGroups = hiddenGroups or {}
 
     if (colorList and isTruthy(colorList)) then
-        colorList[newListIndex]:gsub("(%d+)", function(c)
+        colorList[newListIndex]:gsub('(%d+)', function(c)
             table.insert(rgb, c)
         end)
         local alpha = math.floor(imgui.GetColorU32(imgui_col.Text) / 16777216) / 255 or 1
@@ -31,7 +31,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     for i = 1, #list do
         rgb = {}
         if (colorList and isTruthy(colorList)) then
-            colorList[i]:gsub("(%d+)", function(c)
+            colorList[i]:gsub('(%d+)', function(c)
                 table.insert(rgb, c)
             end)
             imgui.PushStyleColor(imgui_col.Text, vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, 1))

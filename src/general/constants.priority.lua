@@ -21,69 +21,69 @@ MAX_ANIMATION_FRAMES = 999                                             -- maximu
 MAX_IMPORT_CHARACTER_LIMIT = 999999                                    -- maximum number of characters allowed for import text
 
 CHINCHILLA_TYPES = {
-    "Exponential",
-    "Polynomial",
-    "Circular",
-    "Sine Power",
-    "Arc Sine Power",
-    "Inverse Power",
-    "Peter Stock",
+    'Exponential',
+    'Polynomial',
+    'Circular',
+    'Sine Power',
+    'Arc Sine Power',
+    'Inverse Power',
+    'Peter Stock',
 }
 
 THEME_TREE = {
     Classic = {
         {
-            id = "Original",
+            id = 'Original',
             textColor = { 170, 170, 255 },
         },
         {
-            id = "Strawberry",
+            id = 'Strawberry',
             textColor = { { 251, 41, 67 }, { 255, 100, 150 } },
         },
         {
-            id = "Amethyst",
+            id = 'Amethyst',
             textColor = { { 153, 102, 204 }, { 170, 120, 255 } },
         },
         {
-            id = "Tree",
+            id = 'Tree',
             textColor = { 150, 111, 51 },
         },
         {
-            id = "Barbie",
+            id = 'Barbie',
             textColor = { { 227, 5, 173 }, { 100, 255, 255 } },
         },
     },
     Modern = {
         {
-            id = "Incognito",
+            id = 'Incognito',
             textColor = { { 150, 150, 150 }, { 200, 200, 200 } },
         },
         {
-            id = "Incognito + RGB",
+            id = 'Incognito + RGB',
             textColor = { { 150, 50, 50 }, { 50, 150, 50 }, { 50, 50, 150 } },
         },
         {
-            id = "otingocnI",
+            id = 'otingocnI',
             textColor = { { 255, 255, 255 }, { 200, 200, 200 } },
         },
         {
-            id = "BGR + otingocnI",
+            id = 'BGR + otingocnI',
             textColor = { { 255, 150, 150 }, { 150, 255, 150 }, { 150, 150, 255 } },
         },
         {
-            id = "Glass",
+            id = 'Glass',
             textColor = { { 200, 200, 200 }, { 255, 255, 255 }, { 200, 200, 200 } },
         },
         {
-            id = "Glass + RGB",
+            id = 'Glass + RGB',
             textColor = { { 150, 255, 255 }, { 255, 150, 255 }, { 255, 255, 150 } },
         },
         {
-            id = "RGB Gamer Mode",
+            id = 'RGB Gamer Mode',
             textColor = { { 255, 0, 0 }, { 0, 255, 0 }, { 0, 0, 255 } },
         },
         {
-            id = "edom remag BGR",
+            id = 'edom remag BGR',
             textColor = { { 255, 100, 0 }, { 0, 255, 100 }, { 100, 0, 255 } },
         },
     },
@@ -107,166 +107,166 @@ THEME_TREE = {
     },
     Custom = {
         {
-            id = "CUSTOM",
+            id = 'CUSTOM',
             textColor = { 0, 0, 0 },
         },
     },
 }
 
 DYNAMIC_BACKGROUND_TYPES = {
-    "None",
-    "Reactive Stars",
-    "Reactive Singularity",
-    "Dynamic Connection",
+    'None',
+    'Reactive Stars',
+    'Reactive Singularity',
+    'Dynamic Connection',
 }
 
 COMBO_SV_TYPE = {
-    "Add",
-    "Cross Multiply",
-    "Remove",
-    "Min",
-    "Max",
-    "SV Type 1 Only",
-    "SV Type 2 Only",
+    'Add',
+    'Cross Multiply',
+    'Remove',
+    'Min',
+    'Max',
+    'SV Type 1 Only',
+    'SV Type 2 Only',
 }
 
 CURSOR_TRAILS = {
-    "None",
-    "Snake",
-    "Dust",
-    "Sparkle",
+    'None',
+    'Snake',
+    'Dust',
+    'Sparkle',
 }
 
 DISPLACE_SCALE_SPOTS = {
-    "Start",
-    "End",
+    'Start',
+    'End',
 }
 
 SPLIT_MODES = {
-    "Column",
-    "Time",
-    "Individual",
+    'Column',
+    'Time',
+    'Individual',
 }
 
 EMOTICONS = {
-    "( - _ - )",
-    "( e . e )",
-    "( * o * )",
-    "( h . m )",
-    "( ~ _ ~ )",
-    "( - . - )",
-    "( C | D )",
-    "( w . w )",
-    "( ^ w ^ )",
-    "( > . < )",
-    "( + x + )",
-    "( o _ 0 )",
-    "[ ^ . ^ ]",
-    "( v . ^ )",
-    "( ^ o v )",
-    "( ^ o v )",
-    "( ; A ; )",
-    "[ . _ . ]",
+    '( - _ - )',
+    '( e . e )',
+    '( * o * )',
+    '( h . m )',
+    '( ~ _ ~ )',
+    '( - . - )',
+    '( C | D )',
+    '( w . w )',
+    '( ^ w ^ )',
+    '( > . < )',
+    '( + x + )',
+    '( o _ 0 )',
+    '[ ^ . ^ ]',
+    '( v . ^ )',
+    '( ^ o v )',
+    '( ^ o v )',
+    '( ; A ; )',
+    '[ . _ . ]',
     "[ ' = ' ]",
 }
 
 FINAL_SV_TYPES = {
-    "Normal",
-    "Custom",
-    "Override",
+    'Normal',
+    'Custom',
+    'Override',
 }
 
 FLICKER_TYPES = {
-    "Normal",
-    "Delayed",
+    'Normal',
+    'Delayed',
 }
 
 NOTE_SKIN_TYPES = {
-    "Bar",
-    "Circle",
+    'Bar',
+    'Circle',
 }
 
 RANDOM_TYPES = {
-    "Normal",
-    "Uniform",
+    'Normal',
+    'Uniform',
 }
 
 SCALE_TYPES = {
-    "Average SV",
-    "Absolute Distance",
-    "Relative Ratio",
+    'Average SV',
+    'Absolute Distance',
+    'Relative Ratio',
 }
 
 STANDARD_SVS_NO_COMBO = {
-    "Linear",
-    "Exponential",
-    "Bezier",
-    "Hermite",
-    "Sinusoidal",
-    "Circular",
-    "Random",
-    "Custom",
-    "Chinchilla",
+    'Linear',
+    'Exponential',
+    'Bezier',
+    'Hermite',
+    'Sinusoidal',
+    'Circular',
+    'Random',
+    'Custom',
+    'Chinchilla',
 }
 
 STILL_TYPES = {
-    "No",
-    "Start",
-    "End",
-    "Auto",
-    "Otua",
+    'No',
+    'Start',
+    'End',
+    'Auto',
+    'Otua',
 }
 
 VIBRATO_DEVIATION_TYPES = {
-    "None",
-    "Linear",
-    "Gaussian",
+    'None',
+    'Linear',
+    'Gaussian',
 }
 
 STUTTER_CONTROLS = {
-    "First SV",
-    "Second SV",
+    'First SV',
+    'Second SV',
 }
 
 STYLE_THEMES = {
-    "Rounded",
-    "Boxed",
-    "Rounded + Border",
-    "Boxed + Border",
+    'Rounded',
+    'Boxed',
+    'Rounded + Border',
+    'Boxed + Border',
 }
 
 SV_BEHAVIORS = {
-    "Slow down",
-    "Speed up",
+    'Slow down',
+    'Speed up',
 }
 
 TRAIL_SHAPES = {
-    "Circles",
-    "Triangles",
+    'Circles',
+    'Triangles',
 }
 
 STILL_BEHAVIOR_TYPES = {
-    "Entire Region",
-    "Per Note Group",
+    'Entire Region',
+    'Per Note Group',
 }
 
 DISTANCE_TYPES = {
-    "Average SV + Shift",
-    "Distance + Shift",
-    "Start / End",
+    'Average SV + Shift',
+    'Distance + Shift',
+    'Start / End',
 }
 
 VIBRATO_TYPES = {
-    "SV (msx)",
-    "SSF (x)",
+    'SV (msx)',
+    'SSF (x)',
 }
 
 VIBRATO_QUALITIES = {
-    "Low",
-    "Medium",
-    "High",
-    "Ultra",
-    "Omega",
+    'Low',
+    'Medium',
+    'High',
+    'Ultra',
+    'Omega',
 }
 
 VIBRATO_FRAME_RATES = { 60, 90, 150, 210, 270 }
@@ -274,7 +274,7 @@ VIBRATO_FRAME_RATES = { 60, 90, 150, 210, 270 }
 VIBRATO_DETAILED_QUALITIES = {} -- what actually shows up in-game
 
 for i, v in pairs(VIBRATO_QUALITIES) do
-    table.insert(VIBRATO_DETAILED_QUALITIES, v .. "  (~" .. VIBRATO_FRAME_RATES[i] .. "fps)")
+    table.insert(VIBRATO_DETAILED_QUALITIES, v .. '  (~' .. VIBRATO_FRAME_RATES[i] .. 'fps)')
 end
 
 VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
@@ -340,12 +340,12 @@ DEFAULT_STYLE = {
     loadupBgBr = vector.New(0.62, 0.76, 1, 1.00),
 }
 
-DEFAULT_HOTKEY_LIST = { "T", "Shift+T", "S", "N", "R", "B", "M", "V", "G", "Ctrl+Alt+L", "Ctrl+Alt+E", "O" }
+DEFAULT_HOTKEY_LIST = { 'T', 'Shift+T', 'S', 'N', 'R', 'B', 'M', 'V', 'G', 'Ctrl+Alt+L', 'Ctrl+Alt+E', 'O' }
 
-HOTKEY_LABELS = { "Execute Primary Action", "Execute Secondary Action", "Swap Primary Inputs",
-    "Negate Primary Inputs", "Reset Secondary Input", "Go To Prev. Scroll Group", "Go To Next Scroll Group",
-    "Execute Vibrato Separately", "Go To TG of Selected Note", "Toggle Note Lock Mode", "Toggle Use End Offsets",
-    "Move Selection To TG" }
+HOTKEY_LABELS = { 'Execute Primary Action', 'Execute Secondary Action', 'Swap Primary Inputs',
+    'Negate Primary Inputs', 'Reset Secondary Input', 'Go To Prev. Scroll Group', 'Go To Next Scroll Group',
+    'Execute Vibrato Separately', 'Go To TG of Selected Note', 'Toggle Note Lock Mode', 'Toggle Use End Offsets',
+    'Move Selection To TG' }
 
 ---@enum hotkeys
 hotkeys_enum = {

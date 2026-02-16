@@ -21,7 +21,7 @@ function renderDynamicConnection()
         table.insert(nodes_distsToNearestEdge, 67000)
     end
 
-    local mainCol = imgui.GetColorU32("TabSelected", 6742069)
+    local mainCol = imgui.GetColorU32('TabSelected', 6742069)
     local maxDist = (math.min(dim.x * 0.6, dim.y * 0.6)) ^ 2
     local circleBuffer = 10
 

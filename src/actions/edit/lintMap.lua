@@ -10,7 +10,7 @@ function alignTimingLines()
     local mspb = 60000 / bpm
     local msptl = mspb * signature
 
-    local noteTimes = table.property(map.HitObjects, "StartTime")
+    local noteTimes = table.property(map.HitObjects, 'StartTime')
 
     local times = {}
     local tpsToAdd = {}
@@ -40,10 +40,10 @@ function alignTimingLines()
         createEA(action_type.RemoveTimingPointBatch, tpsToRemove),
     })
 
-    toggleablePrint("s!", "Created " .. #tpsToAdd .. pluralize(" timing point.", #tpsToAdd, -2))
+    toggleablePrint('s!', 'Created ' .. #tpsToAdd .. pluralize(' timing point.', #tpsToAdd, -2))
     if (isTruthy(tpsToRemove)) then
-        toggleablePrint("e!",
-            "Deleted " .. #tpsToRemove .. pluralize(" timing point.", #tpsToRemove, -2))
+        toggleablePrint('e!',
+            'Deleted ' .. #tpsToRemove .. pluralize(' timing point.', #tpsToRemove, -2))
     end
 end
 
@@ -88,8 +88,8 @@ function fixFlippedLNEnds()
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
 
-    local type = isTruthy(fixedLNEndsCount) and "s!" or "w!"
-    print(type, "Fixed " .. fixedLNEndsCount .. pluralize(" flipped LN end.", fixedLNEndsCount, -2))
+    local type = isTruthy(fixedLNEndsCount) and 's!' or 'w!'
+    print(type, 'Fixed ' .. fixedLNEndsCount .. pluralize(' flipped LN end.', fixedLNEndsCount, -2))
     state.SelectedScrollGroupId = ogTg
 end
 
@@ -129,10 +129,10 @@ function mergeSVsAndSSFs()
     end
 
     if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
-    local type = isTruthy(svSum + ssfSum) and "s!" or "w!"
+    local type = isTruthy(svSum + ssfSum) and 's!' or 'w!'
     print(type,
-        table.concat({ "Removed ", svSum, pluralize(" SV", svSum), " and ", ssfSum, pluralize(
-            " SSF.", ssfSum, -2) }))
+        table.concat({ 'Removed ', svSum, pluralize(' SV', svSum), ' and ', ssfSum, pluralize(
+            ' SSF.', ssfSum, -2) }))
 
     state.SelectedScrollGroupId = ogTg
 end
@@ -152,8 +152,8 @@ function mergeNotes()
         end
     end
     if (isTruthy(notesToRemove)) then actions.RemoveHitObjectBatch(notesToRemove) end
-    local type = isTruthy(notesToRemove) and "s!" or "w!"
-    print(type, "Removed " .. #notesToRemove .. pluralize(" note.", #notesToRemove, -2))
+    local type = isTruthy(notesToRemove) and 's!' or 'w!'
+    print(type, 'Removed ' .. #notesToRemove .. pluralize(' note.', #notesToRemove, -2))
 end
 
 function removeUnnecessarySVsAndSSFs()
@@ -192,9 +192,9 @@ function removeUnnecessarySVsAndSSFs()
         ssfSum = ssfSum + #ssfsToRemove
     end
     if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
-    local type = isTruthy(svSum + ssfSum) and "s!" or "w!"
+    local type = isTruthy(svSum + ssfSum) and 's!' or 'w!'
     print(type,
-        table.concat({ "Removed ", svSum, pluralize(" SV", svSum), " and ", ssfSum, pluralize(" SSF.", ssfSum, -2) }))
+        table.concat({ 'Removed ', svSum, pluralize(' SV', svSum), ' and ', ssfSum, pluralize(' SSF.', ssfSum, -2) }))
     state.SelectedScrollGroupId = ogTG
 end
 
@@ -202,7 +202,7 @@ function removeAllHitSounds()
     local hitsoundActions = {}
     local objs = {}
     if (not isTruthy(#state.SelectedHitObjects)) then
-        print("e!", "You are not currently selecting anything.")
+        print('e!', 'You are not currently selecting anything.')
         return
     end
     local hos = game.get.uniqueNotesBetweenSelected()
@@ -210,15 +210,15 @@ function removeAllHitSounds()
         local hs = tonumber(ho.HitSound)
         if hs > 1 then
             table.insert(hitsoundActions, createEA(action_type.RemoveHitsound, { ho }, hs))
-            table.insert(objs, ho.StartTime .. "|" .. ho.Lane)
+            table.insert(objs, ho.StartTime .. '|' .. ho.Lane)
         end
     end
-    local type = isTruthy(hitsoundActions) and "s!" or "w!"
+    local type = isTruthy(hitsoundActions) and 's!' or 'w!'
     print(type,
-        "Removed " ..
-        #hitsoundActions .. pluralize(" hitsound.", #hitsoundActions, -2))
-    print("w!", "Note that the Quaver hitsound system is funky and some hitsounds exist that aren't audible.")
-    imgui.SetClipboardText(table.concat(objs, ","))
+        'Removed ' ..
+        #hitsoundActions .. pluralize(' hitsound.', #hitsoundActions, -2))
+    print('w!', "Note that the Quaver hitsound system is funky and some hitsounds exist that aren't audible.")
+    imgui.SetClipboardText(table.concat(objs, ','))
     actions.PerformBatch(hitsoundActions)
 end
 
@@ -263,8 +263,8 @@ function removePostTGSVsAndSSFs()
         ::nextTG::
     end
     if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
-    local type = isTruthy(svSum + ssfSum) and "s!" or "w!"
+    local type = isTruthy(svSum + ssfSum) and 's!' or 'w!'
     print(type,
-        table.concat({ "Removed ", svSum, pluralize(" SV", svSum), " and ", ssfSum, pluralize(" SSF.", ssfSum, -2) }))
+        table.concat({ 'Removed ', svSum, pluralize(' SV', svSum), ' and ', ssfSum, pluralize(' SSF.', ssfSum, -2) }))
     state.SelectedScrollGroupId = ogTG
 end

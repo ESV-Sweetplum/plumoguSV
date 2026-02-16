@@ -3,7 +3,7 @@ function placeStillSVsParent(menuVars)
     local svsToRemove = {}
     local svsToAdd = {}
     if (menuVars.stillBehavior == 1) then
-        if (STANDARD_SVS[menuVars.svTypeIndex] == "Exponential" and menuVars.settingVars.distanceMode == 2) then
+        if (STANDARD_SVS[menuVars.svTypeIndex] == 'Exponential' and menuVars.settingVars.distanceMode == 2) then
             placeSVs(menuVars, nil, nil, nil, menuVars.settingVars.distance)
         else
             placeSVs(menuVars)
@@ -13,7 +13,7 @@ function placeStillSVsParent(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not isTruthy(offsets)) then return end
     for i = 1, (#offsets - 1) do
-        if (STANDARD_SVS[menuVars.svTypeIndex] == "Exponential" and menuVars.settingVars.distanceMode == 2) then
+        if (STANDARD_SVS[menuVars.svTypeIndex] == 'Exponential' and menuVars.settingVars.distanceMode == 2) then
             tbl = placeSVs(menuVars, false, offsets[i], offsets[i + 1], menuVars.settingVars.distance, svsToAdd)
         else
             tbl = placeSVs(menuVars, false, offsets[i], offsets[i + 1], nil, svsToAdd)
@@ -22,7 +22,7 @@ function placeStillSVsParent(menuVars)
         svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
     end
     addFinalSV(svsToAdd, offsets[#offsets], menuVars.svMultipliers[#menuVars.svMultipliers],
-        FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex] == "Override")
+        FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex] == 'Override')
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 
@@ -36,13 +36,13 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
     local lastOffset = noteOffsets[#noteOffsets]
     local svMultFn = isTruthy(queuedSVs) and function(t) return getHypotheticalSVMultiplierAt(queuedSVs, t) end or
         game.get.svMultiplierAt
-    if stillType == "Auto" then
+    if stillType == 'Auto' then
         local multiplier = getUsableDisplacementMultiplier(firstOffset)
         local duration = 1 / multiplier
         local timeBefore = firstOffset - duration
         multiplierBefore = svMultFn(timeBefore)
         stillDistance = multiplierBefore * duration
-    elseif stillType == "Otua" then
+    elseif stillType == 'Otua' then
         local multiplier = getUsableDisplacementMultiplier(lastOffset)
         local duration = 1 / multiplier
         local timeAt = lastOffset

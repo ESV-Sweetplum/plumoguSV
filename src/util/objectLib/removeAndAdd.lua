@@ -15,7 +15,7 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
         createEA(action_type.AddScrollVelocityBatch, svsToAdd),
     }
     actions.PerformBatch(editorActions)
-    toggleablePrint("s!", "Created " .. #svsToAdd .. pluralize(" SV.", #svsToAdd, -2))
+    toggleablePrint('s!', 'Created ' .. #svsToAdd .. pluralize(' SV.', #svsToAdd, -2))
 end
 
 function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
@@ -25,5 +25,5 @@ function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
         createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
     }
     actions.PerformBatch(editorActions)
-    toggleablePrint("s!", "Created " .. #ssfsToAdd .. pluralize(" SSF.", #ssfsToAdd, -2))
+    toggleablePrint('s!', 'Created ' .. #ssfsToAdd .. pluralize(' SSF.', #ssfsToAdd, -2))
 end

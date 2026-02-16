@@ -1,8 +1,8 @@
 function changeGroups(menuVars)
     if (state.SelectedScrollGroupId == menuVars.designatedTimingGroup) then
-        print("w!",
-            table.concat({ menuVars.clone and "Cloning" or "Moving",
-                " from one timing group to the same timing group will do nothing." }))
+        print('w!',
+            table.concat({ menuVars.clone and 'Cloning' or 'Moving',
+                ' from one timing group to the same timing group will do nothing.' }))
         return
     end
     local offsets = game.get.uniqueSelectedNoteOffsets()
@@ -50,13 +50,13 @@ function changeGroups(menuVars)
 
     actions.PerformBatch(actionList)
     if willChangeSVs then
-        toggleablePrint("s!",
-            "Successfully moved " .. #svsToRemove ..
-            pluralize(" SV", #svsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
+        toggleablePrint('s!',
+            'Successfully moved ' .. #svsToRemove ..
+            pluralize(' SV', #svsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
     end
     if willChangeSSFs then
-        toggleablePrint("s!",
-            "Successfully moved " .. #ssfsToRemove ..
-            pluralize(" SSF", #ssfsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
+        toggleablePrint('s!',
+            'Successfully moved ' .. #ssfsToRemove ..
+            pluralize(' SSF', #ssfsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
     end
 end

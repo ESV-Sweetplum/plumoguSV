@@ -1,4 +1,4 @@
-require("packages.string.charAt")
+require('packages.string.charAt')
 
 ---Capitalizes the first letter of the given string. If `forceLowercase` is true, then all other letters will be forced into lowercase.
 ---@param str string

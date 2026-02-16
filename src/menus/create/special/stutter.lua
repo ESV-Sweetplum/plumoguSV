@@ -4,7 +4,7 @@ function stutterMenu(settingVars)
     if settingsChanged then updateStutterMenuSVs(settingVars) end
     displayStutterSVWindows(settingVars)
 
-    simpleActionMenu("Place SVs between selected notes", 2, placeStutterSVs, settingVars)
+    simpleActionMenu('Place SVs between selected notes', 2, placeStutterSVs, settingVars)
 end
 
 function stutterSettingsMenu(settingVars)
@@ -14,17 +14,17 @@ function stutterSettingsMenu(settingVars)
     if (not settingVars.linearlyChange) then
         settingsChanged = chooseStutterDuration(settingVars) or settingsChanged
     else
-        settingsChanged = SwappableNegatableInputFloat2(settingVars, "stutterDuration", "stutterDuration2",
-            "S/E % Duration",
-            "%%", 0)
+        settingsChanged = SwappableNegatableInputFloat2(settingVars, 'stutterDuration', 'stutterDuration2',
+            'S/E % Duration',
+            '%%', 0)
         settingVars.stutterDuration = math.clamp(settingVars.stutterDuration, 1, 99)
         settingVars.stutterDuration2 = math.clamp(settingVars.stutterDuration2, 1, 99)
     end
-    settingsChanged = BasicCheckbox(settingVars, "linearlyChange", "Change stutter over time") or settingsChanged
+    settingsChanged = BasicCheckbox(settingVars, 'linearlyChange', 'Change stutter over time') or settingsChanged
     HoverToolTip(
-        "Affects the stutter within two offsets; does not affect the stutter over the duration of several notes.")
+        'Affects the stutter within two offsets; does not affect the stutter over the duration of several notes.')
     AddSeparator()
-    settingsChanged = BasicInputInt(settingVars, "stuttersPerSection", "Stutters", { 1, 1000 }) or settingsChanged
+    settingsChanged = BasicInputInt(settingVars, 'stuttersPerSection', 'Stutters', { 1, 1000 }) or settingsChanged
     settingsChanged = chooseAverageSV(settingVars) or settingsChanged
     settingsChanged = chooseFinalSV(settingVars, false) or settingsChanged
 

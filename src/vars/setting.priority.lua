@@ -69,8 +69,8 @@ end]],
         curvatureIndex = 5,
     },
     customVibratoSSF = {
-        code1 = "return function (x) return 0.69 end",
-        code2 = "return function (x) return 1.420 end",
+        code1 = 'return function (x) return 0.69 end',
+        code2 = 'return function (x) return 1.420 end',
     },
     linear = {
         startSV = 1.5,
@@ -245,7 +245,7 @@ end]],
         optimizeTGs = true,
     },
     animationPalette = {
-        instructions = "",
+        instructions = '',
     },
 }
 
@@ -257,7 +257,7 @@ function getSettingVars(svType, label)
     menuKey = svType:identify()
     local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[menuKey])
 
-    local labelText = svType .. label .. "Settings"
+    local labelText = svType .. label .. 'Settings'
     cache.loadTable(labelText, settingVars)
     return settingVars
 end

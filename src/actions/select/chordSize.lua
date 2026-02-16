@@ -48,11 +48,11 @@ function selectByChordSizes(menuVars)
     local notesToSelect = {}
 
     for idx = 1, game.keyCount do
-        if (menuVars["select" .. idx]) then
+        if (menuVars['select' .. idx]) then
             notesToSelect = table.combine(notesToSelect, sizeDict[idx])
         end
     end
 
     actions.SetHitObjectSelection(notesToSelect)
-    print(isTruthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
+    print(isTruthy(notesToSelect) and 's!' or 'w!', #notesToSelect .. ' notes selected')
 end

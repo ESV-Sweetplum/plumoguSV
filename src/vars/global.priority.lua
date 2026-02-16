@@ -1,6 +1,6 @@
 globalVars = {
     advancedMode = false,
-    colorThemeName = "Original",
+    colorThemeName = 'Original',
     comboizeSelect = false,
     cursorTrailGhost = false,
     cursorTrailIndex = 1,
@@ -53,7 +53,7 @@ DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 
 function setGlobalVars(tempGlobalVars)
     globalVars.advancedMode = isTruthy(tempGlobalVars.advancedMode)
-    globalVars.colorThemeName = tempGlobalVars.colorThemeName or "Original"
+    globalVars.colorThemeName = tempGlobalVars.colorThemeName or 'Original'
     globalVars.comboizeSelect = isTruthy(tempGlobalVars.comboizeSelect)
     globalVars.cursorTrailGhost = isTruthy(tempGlobalVars.cursorTrailGhost)
     globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
@@ -96,8 +96,8 @@ function setGlobalVars(tempGlobalVars)
     globalVars.useMinDisplacementMultiplier = isTruthy(tempGlobalVars.useMinDisplacementMultiplier, true)
 
     -- All fields below are colors that must be vectorized to properly perform color arithmetic.
-    local forceVectorizeList = { "border", "loadupOpeningTextColor", "loadupPulseTextColorLeft",
-        "loadupPulseTextColorRight", "loadupBgTl", "loadupBgTr", "loadupBgBl", "loadupBgBr" }
+    local forceVectorizeList = { 'border', 'loadupOpeningTextColor', 'loadupPulseTextColorLeft',
+        'loadupPulseTextColorRight', 'loadupBgTl', 'loadupBgTr', 'loadupBgBl', 'loadupBgBr' }
 
     if (tempGlobalVars.customStyles) then
         for themeName, themeData in pairs(globalVars.customStyles) do
@@ -113,7 +113,7 @@ function setGlobalVars(tempGlobalVars)
     end
 
     -- All fields below are not settings, but menu operators that need to be kept on hot-reload.
-    globalVars.placeTypeIndex = state.GetValue("global.placeTypeIndex", globalVars.placeTypeIndex)
-    globalVars.editToolIndex = state.GetValue("global.editToolIndex", globalVars.editToolIndex)
-    globalVars.selectTypeIndex = state.GetValue("global.selectTypeIndex", globalVars.selectTypeIndex)
+    globalVars.placeTypeIndex = state.GetValue('global.placeTypeIndex', globalVars.placeTypeIndex)
+    globalVars.editToolIndex = state.GetValue('global.editToolIndex', globalVars.editToolIndex)
+    globalVars.selectTypeIndex = state.GetValue('global.selectTypeIndex', globalVars.selectTypeIndex)
 end

@@ -6,7 +6,7 @@
 ---@return Vector4 vctr The output vector.
 function table.vectorize4(tbl)
     if (not tbl) then return vctr4(0) end
-    if (type(tbl) == "userdata") then return tbl end
+    if (type(tbl) == 'userdata') then return tbl end
     if (tbl[1] and tbl[2] and tbl[3] and tbl[4]) then return vector.New(tbl[1], tbl[2], tbl[3], tbl[4]) end
     return vector.New(tbl.x, tbl.y, tbl.z, tbl.w)
 end
@@ -16,7 +16,7 @@ end
 ---@return Vector3 vctr The output vector.
 function table.vectorize3(tbl)
     if (not tbl) then return vctr3(0) end
-    if (type(tbl) == "userdata") then return tbl end
+    if (type(tbl) == 'userdata') then return tbl end
     if (tbl[1] and tbl[2] and tbl[3]) then return vector.New(tbl[1], tbl[2], tbl[3]) end
     return vector.New(tbl.x, tbl.y, tbl.z)
 end
@@ -26,7 +26,7 @@ end
 ---@return Vector2 vctr The output vector.
 function table.vectorize2(tbl)
     if (not tbl) then return vctr2(0) end
-    if (type(tbl) == "userdata") then return tbl end
+    if (type(tbl) == 'userdata') then return tbl end
     if (tbl[1] and tbl[2]) then return vector.New(tbl[1], tbl[2]) end
     return vector.New(tbl.x, tbl.y)
 end

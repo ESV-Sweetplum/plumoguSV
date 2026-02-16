@@ -7,7 +7,7 @@ function string.fixToSize(str, targetSize)
     if size <= targetSize then return str end
     while (str:len() > 3 and size > targetSize) do
         str = str:sub(1, -2)
-        size = imgui.CalcTextSize(str .. "...").x
+        size = imgui.CalcTextSize(str .. '...').x
     end
-    return str .. "..."
+    return str .. '...'
 end

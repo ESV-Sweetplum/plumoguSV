@@ -3,10 +3,10 @@ function showTutorialWindow()
     imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
     imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
 
-    startNextWindowNotCollapsed("plumoguSV Tutorial Menu")
+    startNextWindowNotCollapsed('plumoguSV Tutorial Menu')
 
-    _, tutorialOpened = imgui.Begin("plumoguSV Tutorial Menu", true, 26)
-    local tutorialWindowName = cache.tutorialWindowName or ""
+    _, tutorialOpened = imgui.Begin('plumoguSV Tutorial Menu', true, 26)
+    local tutorialWindowName = cache.tutorialWindowName or ''
 
     if (not tutorialOpened) then
         cache.windows.showTutorialWindow = false
@@ -15,37 +15,37 @@ function showTutorialWindow()
     local navigatorWidth = 200
 
     local nullFn = function()
-        imgui.Text("Select a tutorial on the left to view it.")
+        imgui.Text('Select a tutorial on the left to view it.')
     end
     local incompleteFn = function()
-        imgui.TextWrapped("Sorry, this tutorial is not ready yet. Please come back when a new version comes out.")
+        imgui.TextWrapped('Sorry, this tutorial is not ready yet. Please come back when a new version comes out.')
     end
 
     local tree = {
-        ["For Beginners"] = {
-            ["Start Here"] = showStartingTutorial,
-            ["Placing Basic SVs"] = {
-                ["Your First Effect"] = showYourFirstEffectTutorial,
-                ["Your Second Effect"] = showYourSecondEffectTutorial,
-                ["Working With Shapes"] = showWorkingWithShapesTutorial,
-                ["Editing/Removing SVs"] = showEditingRemovingSVTutorial,
-                ["Stills and Displacement"] = showStillsAndDisplacementTutorial,
-                ["Composite Effects"] = showCompositeEffectsTutorial,
+        ['For Beginners'] = {
+            ['Start Here'] = showStartingTutorial,
+            ['Placing Basic SVs'] = {
+                ['Your First Effect'] = showYourFirstEffectTutorial,
+                ['Your Second Effect'] = showYourSecondEffectTutorial,
+                ['Working With Shapes'] = showWorkingWithShapesTutorial,
+                ['Editing/Removing SVs'] = showEditingRemovingSVTutorial,
+                ['Stills and Displacement'] = showStillsAndDisplacementTutorial,
+                ['Composite Effects'] = showCompositeEffectsTutorial,
             },
-            ["Adding Effects"] = {
-                ["Flickers"] = incompleteFn,
-                ["Vibrato"] = incompleteFn,
+            ['Adding Effects'] = {
+                ['Flickers'] = incompleteFn,
+                ['Vibrato'] = incompleteFn,
             },
         },
-        ["Helpful Info"] = {
-            ["Plugin Efficiency Tips"] = {
-                ["Hotkeys"] = showHotkeyTutorial,
+        ['Helpful Info'] = {
+            ['Plugin Efficiency Tips'] = {
+                ['Hotkeys'] = showHotkeyTutorial,
             },
-            ["The Math Behind SV"] = {
-                ["What IS msx?"] = showWhatIsMsxTutorial,
-                ["The calculus of SV"] = incompleteFn,
-                ["Why do we call them shapes?"] = incompleteFn,
-                ["Analogies to Physics"] = incompleteFn,
+            ['The Math Behind SV'] = {
+                ['What IS msx?'] = showWhatIsMsxTutorial,
+                ['The calculus of SV'] = incompleteFn,
+                ['Why do we call them shapes?'] = incompleteFn,
+                ['Analogies to Physics'] = incompleteFn,
             },
         },
     }
@@ -54,12 +54,12 @@ function showTutorialWindow()
     imgui.SetColumnWidth(0, 200)
     imgui.SetColumnWidth(1, 400)
 
-    imgui.BeginChild("Tutorial Navigator")
+    imgui.BeginChild('Tutorial Navigator')
 
     function renderBranch(branch, branchName)
         for text, data in pairs(branch) do
-            local leafName = table.concat({ branchName, ".", text })
-            if (type(data) == "table") then
+            local leafName = table.concat({ branchName, '.', text })
+            if (type(data) == 'table') then
                 if (imgui.TreeNode(text)) then
                     renderBranch(data, leafName)
                     imgui.TreePop()
@@ -83,19 +83,19 @@ function showTutorialWindow()
     imgui.EndChild()
     imgui.NextColumn()
 
-    imgui.BeginChild("Tutorial Data", vector.New(380, 500), imgui_child_flags
+    imgui.BeginChild('Tutorial Data', vector.New(380, 500), imgui_child_flags
         .AlwaysUseWindowPadding)
 
     imgui.SetCursorPosY(0)
 
     function ForceHeight(h)
         imgui.SetCursorPosY(h)
-        imgui.TextColored(vctr4(0), "penis")
+        imgui.TextColored(vctr4(0), 'penis')
     end
 
     if (game.keyCount ~= 4) then
-        imgui.SeparatorText("This tutorial does not support this key mode.")
-        imgui.Text("Please go to a 4K map to continue.")
+        imgui.SeparatorText('This tutorial does not support this key mode.')
+        imgui.Text('Please go to a 4K map to continue.')
         goto tutorialRenderSkip
     end
 
@@ -104,12 +104,12 @@ function showTutorialWindow()
         cache.tutorialWindowQueue = nil
     end
 
-    if (tutorialWindowName == "") then
+    if (tutorialWindowName == '') then
         nullFn()
         goto tutorialRenderSkip
     end
 
-    table.nestedValue(tree, tutorialWindowName:split("."))()
+    table.nestedValue(tree, tutorialWindowName:split('.'))()
 
     ::tutorialRenderSkip::
     imgui.EndChild()

@@ -6,7 +6,7 @@ function automateCopySVs(settingVars)
     local endOffset = offsets[#offsets]
     local svs = game.get.svsBetweenOffsets(startOffset, endOffset)
     if (not isTruthy(svs)) then
-        toggleablePrint("w!", "No SVs found within the copiable region.")
+        toggleablePrint('w!', 'No SVs found within the copiable region.')
         return
     end
     local firstSVTime = svs[1].StartTime
@@ -18,8 +18,8 @@ function automateCopySVs(settingVars)
         table.insert(settingVars.copiedSVs, copiedSV)
     end
     if (#settingVars.copiedSVs > 0) then
-        toggleablePrint("s!",
-            "Copied " .. #settingVars.copiedSVs .. pluralize(" SV.", #settingVars.copiedSVs, -2))
+        toggleablePrint('s!',
+            'Copied ' .. #settingVars.copiedSVs .. pluralize(' SV.', #settingVars.copiedSVs, -2))
     end
     if (settingVars.deleteCopiedSVs) then actions.RemoveScrollVelocityBatch(svs) end
 end
@@ -32,7 +32,7 @@ function automateSVs(settingVars)
     local selected = state.SelectedHitObjects
     local actionList = {}
 
-    local ids = utils.GenerateTimingGroupIds(#selected, "automate_")
+    local ids = utils.GenerateTimingGroupIds(#selected, 'automate_')
     local neededIds = {}
     local timeSinceLastObject = 0
     local idIndex = 0
@@ -85,7 +85,7 @@ function automateSVs(settingVars)
         local g = math.random(255)
         local b = math.random(255)
 
-        local tg = createSG(data.svs, settingVars.initialSV or 1, table.concat({ r, g, b }, ","))
+        local tg = createSG(data.svs, settingVars.initialSV or 1, table.concat({ r, g, b }, ','))
         local action = createEA(action_type.CreateTimingGroup, id, tg, data.hos)
 
         table.insert(actionList, action)
@@ -93,5 +93,5 @@ function automateSVs(settingVars)
 
     actions.PerformBatch(actionList)
 
-    toggleablePrint("w!", "Automated.")
+    toggleablePrint('w!', 'Automated.')
 end

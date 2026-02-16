@@ -1,5 +1,5 @@
-require("packages.table.dedupe")
-require("packages.table.sort")
+require('packages.table.dedupe')
+require('packages.table.sort')
 
 ---Finds and returns a list of all unique offsets of notes between selected notes [Table]
 ---@param includeLN? boolean
@@ -7,16 +7,16 @@ require("packages.table.sort")
 function game.get.uniqueNoteOffsetsBetweenSelected(includeLN)
     local selectedNoteOffsets = game.get.uniqueSelectedNoteOffsets()
     if (not selectedNoteOffsets) then
-        toggleablePrint("e!",
-            "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
+        toggleablePrint('e!',
+            'Warning: There are not enough notes in the current selection (within this timing group) to perform the action.')
         return {}
     end
     local startOffset = selectedNoteOffsets[1]
     local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
     local offsets = game.get.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
     if (#offsets < 2) then
-        toggleablePrint("e!",
-            "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
+        toggleablePrint('e!',
+            'Warning: There are not enough notes in the current selection (within this timing group) to perform the action.')
         return {}
     end
     return offsets
@@ -41,16 +41,16 @@ end
 function game.get.uniqueNotesBetweenSelected()
     local selectedNoteOffsets = game.get.uniqueSelectedNoteOffsets()
     if (not selectedNoteOffsets) then
-        toggleablePrint("e!",
-            "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
+        toggleablePrint('e!',
+            'Warning: There are not enough notes in the current selection (within this timing group) to perform the action.')
         return {}
     end
     local startOffset = selectedNoteOffsets[1]
     local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
     local hos = game.get.notesBetweenOffsets(startOffset, endOffset)
     if (#hos < 2) then
-        toggleablePrint("e!",
-            "Warning: There are not enough notes in the current selection (within this timing group) to perform the action.")
+        toggleablePrint('e!',
+            'Warning: There are not enough notes in the current selection (within this timing group) to perform the action.')
         return {}
     end
     return hos

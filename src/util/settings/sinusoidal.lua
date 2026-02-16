@@ -1,6 +1,6 @@
 function sinusoidalSettingsMenu(settingVars, skipFinalSV)
     local settingsChanged = false
-    imgui.Text("Amplitude:")
+    imgui.Text('Amplitude:')
     settingsChanged = chooseStartEndSVs(settingVars) or settingsChanged
     settingsChanged = chooseCurveSharpness(settingVars) or settingsChanged
     settingsChanged = chooseConstantShift(settingVars, 1) or settingsChanged

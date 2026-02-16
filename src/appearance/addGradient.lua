@@ -3,8 +3,8 @@ function addGradient()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
 
-    local buttonColor = imgui.GetColorU32("Button")
-    local bgColor = imgui.GetColorU32("WindowBg")
+    local buttonColor = imgui.GetColorU32('Button')
+    local bgColor = imgui.GetColorU32('WindowBg')
 
     local buttonFactor = 0.3
     local scalingFactor = 2.5

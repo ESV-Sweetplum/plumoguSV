@@ -1,18 +1,18 @@
 function drawCursorTrail()
     local cursorTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
-    if cursorTrail == "None" then return end
+    if cursorTrail == 'None' then return end
 
     local o = imgui.GetForegroundDrawList()
     local m = imgui.GetMousePos()
     local t = clock.getTime()
     local sz = state.WindowSize
-    if cursorTrail ~= "Snake" then cache.boolean.snakeTrailInitialized = false end
-    if cursorTrail ~= "Dust" then cache.boolean.dustParticlesInitialized = false end
-    if cursorTrail ~= "Sparkle" then cache.boolean.sparkleParticlesInitialized = false end
+    if cursorTrail ~= 'Snake' then cache.boolean.snakeTrailInitialized = false end
+    if cursorTrail ~= 'Dust' then cache.boolean.dustParticlesInitialized = false end
+    if cursorTrail ~= 'Sparkle' then cache.boolean.sparkleParticlesInitialized = false end
 
-    if cursorTrail == "Snake" then drawSnakeTrail(o, m, t) end
-    if cursorTrail == "Dust" then drawDustTrail(o, m, t, sz) end
-    if cursorTrail == "Sparkle" then drawSparkleTrail(o, m, t, sz) end
+    if cursorTrail == 'Snake' then drawSnakeTrail(o, m, t) end
+    if cursorTrail == 'Dust' then drawDustTrail(o, m, t, sz) end
+    if cursorTrail == 'Sparkle' then drawSparkleTrail(o, m, t, sz) end
 end
 
 --    o          : [imgui overlay drawlist]
@@ -22,11 +22,11 @@ function drawSnakeTrail(o, m, t)
     local trailPoints = globalVars.cursorTrailPoints
     local snakeTrailPoints = {}
     initializeSnakeTrailPoints(snakeTrailPoints, m, MAX_CURSOR_TRAIL_POINTS)
-    cache.loadTable("snakeTrailPoints", snakeTrailPoints)
-    local needTrailUpdate = clock.listen("snakeTrail", 1000 / globalVars.effectFPS)
+    cache.loadTable('snakeTrailPoints', snakeTrailPoints)
+    local needTrailUpdate = clock.listen('snakeTrail', 1000 / globalVars.effectFPS)
     updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoints,
         globalVars.snakeSpringConstant)
-    cache.saveTable("snakeTrailPoints", snakeTrailPoints)
+    cache.saveTable('snakeTrailPoints', snakeTrailPoints)
     local trailShape = TRAIL_SHAPES[globalVars.cursorTrailShapeIndex]
     renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, globalVars.cursorTrailSize,
         globalVars.cursorTrailGhost, trailShape)
@@ -48,7 +48,7 @@ function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
         snakeTrailPoints[i] = m
     end
     cache.boolean.snakeTrailInitialized = true
-    cache.saveTable("snakeTrailPoints", snakeTrailPoints)
+    cache.saveTable('snakeTrailPoints', snakeTrailPoints)
 end
 
 -- Updates the points of the snake trail
@@ -91,9 +91,9 @@ function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrail
             alpha = math.floor(255 * (trailPoints - i) / (trailPoints - 1))
         end
         local color = color.int.whiteMask * 255 + math.floor(alpha) * color.int.alphaMask
-        if trailShape == "Circles" then
+        if trailShape == 'Circles' then
             o.AddCircleFilled(point, cursorTrailSize, color)
-        elseif trailShape == "Triangles" then
+        elseif trailShape == 'Triangles' then
             drawTriangleTrailPoint(o, m, point, cursorTrailSize, color)
         end
     end
@@ -127,9 +127,9 @@ function drawDustTrail(o, m, t, sz)
     local numDustParticles = 20
     local dustParticles = {}
     initializeDustParticles(sz, t, dustParticles, numDustParticles, dustDuration)
-    cache.loadTable("dustParticles", dustParticles)
+    cache.loadTable('dustParticles', dustParticles)
     updateDustParticles(t, m, dustParticles, dustDuration, dustSize)
-    cache.saveTable("dustParticles", dustParticles)
+    cache.saveTable('dustParticles', dustParticles)
     renderDustParticles(globalVars.rgbPeriod, o, t, dustParticles, dustDuration, dustSize)
 end
 
@@ -153,7 +153,7 @@ function initializeDustParticles(_, t, dustParticles, numDustParticles, dustDura
         dustParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
     cache.boolean.dustParticlesInitialized = true
-    cache.saveTable("dustParticles", dustParticles)
+    cache.saveTable('dustParticles', dustParticles)
 end
 
 -- Updates the particles of the dust trail
@@ -212,9 +212,9 @@ function drawSparkleTrail(o, m, t, sz)
     local numSparkleParticles = 10
     local sparkleParticles = {}
     initializeSparkleParticles(sz, t, sparkleParticles, numSparkleParticles, sparkleDuration)
-    cache.loadTable("sparkleParticles", sparkleParticles)
+    cache.loadTable('sparkleParticles', sparkleParticles)
     updateSparkleParticles(t, m, sparkleParticles, sparkleDuration, sparkleSize)
-    cache.saveTable("sparkleParticles", sparkleParticles)
+    cache.saveTable('sparkleParticles', sparkleParticles)
     renderSparkleParticles(o, t, sparkleParticles, sparkleDuration, sparkleSize)
 end
 
@@ -238,7 +238,7 @@ function initializeSparkleParticles(_, t, sparkleParticles, numSparkleParticles,
         sparkleParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
     cache.boolean.sparkleParticlesInitialized = true
-    cache.saveTable("sparkleParticles", sparkleParticles)
+    cache.saveTable('sparkleParticles', sparkleParticles)
 end
 
 -- Updates the particles of the sparkle trail

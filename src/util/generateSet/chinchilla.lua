@@ -28,36 +28,36 @@ end
 
 function scalePercent(settingVars, percent)
     local behaviorType = SV_BEHAVIORS[settingVars.behaviorIndex]
-    local slowDownType = behaviorType == "Slow down"
+    local slowDownType = behaviorType == 'Slow down'
     local workingPercent = percent
     if slowDownType then workingPercent = 1 - percent end
     local newPercent
     local a = settingVars.chinchillaIntensity
     local scaleType = CHINCHILLA_TYPES[settingVars.chinchillaTypeIndex]
-    if scaleType == "Exponential" then
+    if scaleType == 'Exponential' then
         local exponent = a * (workingPercent - 1)
         newPercent = (workingPercent * math.exp(exponent))
-    elseif scaleType == "Polynomial" then
+    elseif scaleType == 'Polynomial' then
         local exponent = a + 1
         newPercent = workingPercent ^ exponent
-    elseif scaleType == "Circular" then
+    elseif scaleType == 'Circular' then
         if a == 0 then return percent end
 
         local b = 1 / (a ^ (a + 1))
         local radicand = (b + 1) ^ 2 + b ^ 2 - (workingPercent + b) ^ 2
         newPercent = b + 1 - math.sqrt(radicand)
-    elseif scaleType == "Sine Power" then
+    elseif scaleType == 'Sine Power' then
         local exponent = math.log(a + 1)
         local base = math.sin(math.pi * (workingPercent - 1) * 0.5) + 1
         newPercent = workingPercent * (base ^ exponent)
-    elseif scaleType == "Arc Sine Power" then
+    elseif scaleType == 'Arc Sine Power' then
         local exponent = math.log(a + 1)
         local base = 2 * math.asin(workingPercent) / math.pi
         newPercent = workingPercent * (base ^ exponent)
-    elseif scaleType == "Inverse Power" then
+    elseif scaleType == 'Inverse Power' then
         local denominator = 1 + (workingPercent ^ -a)
         newPercent = 2 * workingPercent / denominator
-    elseif "Peter Stock" then
+    elseif 'Peter Stock' then
         --[[
         Algorithm based on a modified version of Peter Stock's StackExchange answer.
         Peter Stock (https://math.stackexchange.com/users/1246531/peter-stock)

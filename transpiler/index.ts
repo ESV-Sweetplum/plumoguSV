@@ -1,11 +1,4 @@
-import {
-    readFileSync,
-    writeFileSync,
-    rmSync,
-    existsSync,
-    renameSync,
-    copyFileSync,
-} from "fs";
+import { readFileSync, writeFileSync, rmSync, existsSync, renameSync, copyFileSync } from "fs";
 import { getFilesRecursively } from "./lib/getFilesRecursively.js";
 import getFunctionList from "./lib/getFunctionList.js";
 import getUnusedFunctions from "./lib/getUnusedFunctions.js";
@@ -34,20 +27,14 @@ export default async function transpiler(
     const ignoredFiles = ["intellisense.lua", join("packages", "tests")];
     if (devMode) output = `${output}${lineSeparator}devMode = true`;
 
-    const files = getFilesRecursively("packages").sort(
-        (a, b) => +b.includes(".priority.") - +a.includes(".priority."),
-    );
+    const files = getFilesRecursively("packages").sort((a, b) => +b.includes(".priority.") - +a.includes(".priority."));
 
-    files.push(
-        ...getFilesRecursively("src").sort(
-            (a, b) => +b.includes(".priority.") - +a.includes(".priority."),
-        ),
-    ); // Force priority functions towards the top to avoid hot-reload error.
+    files.push(...getFilesRecursively("src").sort((a, b) => +b.includes(".priority.") - +a.includes(".priority."))); // Force priority functions towards the top to avoid hot-reload error.
 
     let splicedFileCount = 0;
 
     const entryFiles: string[] = [...files].reduce((arr, cur, idx) => {
-        if (entryPoints.some((e) => cur.includes(e))) {
+        if (entryPoints.some(e => cur.includes(e))) {
             files.splice(idx - splicedFileCount, 1);
             arr.push(cur);
             splicedFileCount++;
@@ -61,20 +48,10 @@ export default async function transpiler(
     }, {});
 
     files.forEach((file: string) => {
-        if (
-            [...ignoredFiles, ...entryPoints].some((f) => file.includes(f)) ||
-            !file.endsWith(".lua")
-        )
-            return;
-        let fileData = readAndLintLua(file).map((l) => {
-            l = l.replaceAll(
-                /^([^\-\r\n]*)[\-]{2}([\-]{2,})?[^\-\r\n].+[ \r\n]*/g,
-                "$1",
-            ); // Removes <const> tag, removes --[[ --]] comments, removes double dash comments (not triple dash) from lines with code
-            l = l.replaceAll(
-                /table\.insert\(([a-zA-Z0-9\[\]_]+), ([^,\r\n]+)\)( end)?$/g,
-                "$1[#$1 + 1] = $2$3",
-            ); // Replace table insert for performance (only on tables of 1ply)
+        if ([...ignoredFiles, ...entryPoints].some(f => file.includes(f)) || !file.endsWith(".lua")) return;
+        let fileData = readAndLintLua(file).map(l => {
+            l = l.replaceAll(/^([^\-\r\n]*)[\-]{2}([\-]{2,})?[^\-\r\n].+[ \r\n]*/g, "$1"); // Removes <const> tag, removes --[[ --]] comments, removes double dash comments (not triple dash) from lines with code
+            l = l.replaceAll(/table\.insert\(([a-zA-Z0-9\[\]_]+), ([^,\r\n]+)\)( end)?$/g, "$1[#$1 + 1] = $2$3"); // Replace table insert for performance (only on tables of 1ply)
             return l;
         });
 
@@ -82,25 +59,18 @@ export default async function transpiler(
 
         // Insert whitespace for nested functions
 
-        Object.entries(entryFileData).forEach(
-            ([path, data]: [string, string[]]) => {
-                if (!file.includes(`.${path}`)) return;
-                const whitespace =
-                    entryFileData[path][data.length - 2].match(/^([ ]*)/)[0];
-                entryFileData[path].splice(
-                    data.length - 1,
-                    0,
-                    ...fileData.map((d) => `${whitespace}${d}`),
-                );
-                fileIsInsert = true;
-            },
-        );
+        Object.entries(entryFileData).forEach(([path, data]: [string, string[]]) => {
+            if (!file.includes(`.${path}`)) return;
+            const whitespace = entryFileData[path][data.length - 2].match(/^([ ]*)/)[0];
+            entryFileData[path].splice(data.length - 1, 0, ...fileData.map(d => `${whitespace}${d}`));
+            fileIsInsert = true;
+        });
 
         if (fileIsInsert) return;
 
         output = `${output}${lineSeparator}${fileData
-            .map((str) => str.replace(/\s+$/, ""))
-            .filter((str) => str)
+            .map(str => str.replace(/\s+$/, ""))
+            .filter(str => str)
             .join(lineSeparator)}`;
         fileCount++;
     });
@@ -111,22 +81,15 @@ export default async function transpiler(
 
     output = output.replaceAll(/---@meta [a-zA-Z0-9\-]+\n/g, ""); // Remove meta tags from packages
 
-    output = output.replaceAll(
-        /"([^"]+?)" \.\. (.+) \.\. "([^"]+?)"/g,
-        'table.concat({"$1", $2, "$3"})',
-    ); // Remove double string concats with table
+    output = output.replaceAll(/"([^"]+?)" \.\. (.+) \.\. "([^"]+?)"/g, 'table.concat({"$1", $2, "$3"})'); // Remove double string concats with table
 
     output = output.replaceAll(
         /(p|P)rint\(("[a-z]{1,7}!"), "([^"]+?)" \.\. (.+) \.\. (.+)\)/g,
         '$1rint($2, table.concat({"$3", $4, $5}))',
     ); // Same as above, but with notification type parameter for print statements
 
-    const ipairMatches = [
-        ...output.matchAll(
-            /for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_, ]+)\) do\n( *)/g,
-        ),
-    ];
-    ipairMatches.forEach((match) => {
+    const ipairMatches = [...output.matchAll(/for _, ([a-zA-Z0-9_]+) in ipairs\(([a-zA-Z0-9_, ]+)\) do\n( *)/g)];
+    ipairMatches.forEach(match => {
         const idx = getCounterAndIncrement();
         output = output.replace(
             match[0],
@@ -154,9 +117,7 @@ export default async function transpiler(
             "g",
         );
         const assignmentRegex = new RegExp(
-            `(?<!; )cache${"\\.([a-zA-Z0-9_]+)".repeat(
-                i,
-            )} = ([a-z ]{0,4}(?:[^ \n,]|, | [\\+\\-\\*\\/\\%\\^] )+)`,
+            `(?<!; )cache${"\\.([a-zA-Z0-9_]+)".repeat(i)} = ([a-z ]{0,4}(?:[^ \n,]|, | [\\+\\-\\*\\/\\%\\^] )+)`,
             "g",
         );
         output = output.replaceAll(
@@ -192,28 +153,20 @@ export default async function transpiler(
                 }
             });
 
-            spliceIndices.forEach((idx) => {
+            spliceIndices.forEach(idx => {
                 functions.splice(idx, 1);
                 fnIndices.splice(idx, 1);
             });
 
-            const [_, unusedIndexes] = getUnusedFunctions(
-                splitOutput,
-                functions,
-                fnIndices,
-            );
+            const [_, unusedIndexes] = getUnusedFunctions(splitOutput, functions, fnIndices);
 
             const listLength = unusedIndexes.length;
             if (listLength > 1) linted = true;
 
-            unusedIndexes.reverse().forEach((idx) => {
+            unusedIndexes.reverse().forEach(idx => {
                 let startIdx = idx;
                 let endIdx = idx;
-                while (
-                    splitOutput[startIdx - 1].startsWith("---") &&
-                    startIdx > 0
-                )
-                    startIdx--;
+                while (splitOutput[startIdx - 1].startsWith("---") && startIdx > 0) startIdx--;
                 while (!splitOutput[endIdx].startsWith("end")) endIdx++;
                 splitOutput.splice(startIdx, endIdx - startIdx + 1);
             });
@@ -224,8 +177,7 @@ export default async function transpiler(
     if (existsSync("plugin.lua")) rmSync("plugin.lua");
     writeFileSync("temp.lua", output);
     renameSync("temp.lua", "plugin.lua");
-    if (existsSync("quinsight/intellisense.lua"))
-        copyFileSync("quinsight/intellisense.lua", "intellisense.lua");
+    if (existsSync("quinsight/intellisense.lua")) copyFileSync("quinsight/intellisense.lua", "intellisense.lua");
 
     return fileCount;
 }

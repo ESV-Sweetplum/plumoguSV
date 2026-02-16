@@ -49,30 +49,30 @@ function copyItems(menuVars)
     local printed = false
     if (#menuVars.copied.BMs[menuVars.curSlot] > 0) then
         printed = true
-        toggleablePrint("s!",
-            "Copied " ..
-            #menuVars.copied.BMs[menuVars.curSlot] .. pluralize(" Bookmark.", #menuVars.copied.BMs[menuVars.curSlot], -2))
+        toggleablePrint('s!',
+            'Copied ' ..
+            #menuVars.copied.BMs[menuVars.curSlot] .. pluralize(' Bookmark.', #menuVars.copied.BMs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.SSFs[menuVars.curSlot] > 0) then
         printed = true
-        toggleablePrint("s!",
-            "Copied " ..
-            #menuVars.copied.SSFs[menuVars.curSlot] .. pluralize(" SSF.", #menuVars.copied.SSFs[menuVars.curSlot], -2))
+        toggleablePrint('s!',
+            'Copied ' ..
+            #menuVars.copied.SSFs[menuVars.curSlot] .. pluralize(' SSF.', #menuVars.copied.SSFs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.SVs[menuVars.curSlot] > 0) then
         printed = true
-        toggleablePrint("s!",
-            "Copied " ..
-            #menuVars.copied.SVs[menuVars.curSlot] .. pluralize(" SV.", #menuVars.copied.SVs[menuVars.curSlot], -2))
+        toggleablePrint('s!',
+            'Copied ' ..
+            #menuVars.copied.SVs[menuVars.curSlot] .. pluralize(' SV.', #menuVars.copied.SVs[menuVars.curSlot], -2))
     end
     if (#menuVars.copied.lines[menuVars.curSlot] > 0) then
         printed = true
-        toggleablePrint("s!",
-            "Copied " ..
-            #menuVars.copied.lines[menuVars.curSlot] .. pluralize(" Line.", #menuVars.copied.lines[menuVars.curSlot], -2))
+        toggleablePrint('s!',
+            'Copied ' ..
+            #menuVars.copied.lines[menuVars.curSlot] .. pluralize(' Line.', #menuVars.copied.lines[menuVars.curSlot], -2))
     end
     if (not printed) then
-        print("w!", "There were no items to copy.")
+        print('w!', 'There were no items to copy.')
     end
 end
 
@@ -115,7 +115,7 @@ function pasteItems(menuVars)
     local svsToAdd = {}
     local ssfsToAdd = {}
     local bmsToAdd = {}
-    local hitObjectTimes = table.dedupe(table.property(map.HitObjects, "StartTime"))
+    local hitObjectTimes = table.dedupe(table.property(map.HitObjects, 'StartTime'))
     for i = 1, #offsets do
         local pasteOffset = offsets[i]
         local nextOffset = offsets[math.clamp(i + 1, 1, #offsets)]
@@ -167,32 +167,32 @@ function pasteItems(menuVars)
         createEA(action_type.AddBookmarkBatch, bmsToAdd),
     })
     if (isTruthy(linesToRemove)) then
-        toggleablePrint("e!", "Deleted " .. #linesToRemove .. pluralize(" timing point.", #linesToRemove, -2))
+        toggleablePrint('e!', 'Deleted ' .. #linesToRemove .. pluralize(' timing point.', #linesToRemove, -2))
     end
     if (isTruthy(svsToRemove)) then
-        toggleablePrint("e!",
-            "Deleted " .. #svsToRemove .. pluralize(" scroll velocity.", #svsToRemove, -2))
+        toggleablePrint('e!',
+            'Deleted ' .. #svsToRemove .. pluralize(' scroll velocity.', #svsToRemove, -2))
     end
     if (isTruthy(ssfsToRemove)) then
-        toggleablePrint("e!",
-            "Deleted " .. #ssfsToRemove .. pluralize(" scroll speed factor.", #ssfsToRemove, -2))
+        toggleablePrint('e!',
+            'Deleted ' .. #ssfsToRemove .. pluralize(' scroll speed factor.', #ssfsToRemove, -2))
     end
     if (isTruthy(bmsToRemove)) then
-        toggleablePrint("e!", "Deleted " .. #bmsToRemove .. pluralize(" bookmark.", #bmsToRemove, -2))
+        toggleablePrint('e!', 'Deleted ' .. #bmsToRemove .. pluralize(' bookmark.', #bmsToRemove, -2))
     end
     if (isTruthy(linesToAdd)) then
-        toggleablePrint("s!", "Created " .. #linesToAdd .. pluralize(" timing point.", #linesToAdd, -2))
+        toggleablePrint('s!', 'Created ' .. #linesToAdd .. pluralize(' timing point.', #linesToAdd, -2))
     end
     if (isTruthy(svsToAdd)) then
-        toggleablePrint("s!",
-            "Created " .. #svsToAdd .. pluralize(" scroll velocity.", #svsToAdd, -2))
+        toggleablePrint('s!',
+            'Created ' .. #svsToAdd .. pluralize(' scroll velocity.', #svsToAdd, -2))
     end
     if (isTruthy(ssfsToAdd)) then
-        toggleablePrint("s!",
-            "Created " .. #ssfsToAdd .. pluralize(" scroll speed factor.", #ssfsToAdd, -2))
+        toggleablePrint('s!',
+            'Created ' .. #ssfsToAdd .. pluralize(' scroll speed factor.', #ssfsToAdd, -2))
     end
     if (isTruthy(bmsToAdd)) then
-        toggleablePrint("s!", "Created " .. #bmsToAdd .. pluralize(" bookmark.", #bmsToAdd, -2))
+        toggleablePrint('s!', 'Created ' .. #bmsToAdd .. pluralize(' bookmark.', #bmsToAdd, -2))
     end
 end
 

@@ -14,7 +14,7 @@
 ---@return boolean changed
 function renderGraph(label, size, points, preferForeground, gridSize, yScale)
     local gray = color.int.whiteMask * 100 + color.int.alphaMask * 255
-    local tableLabel = "graph_points_" .. label
+    local tableLabel = 'graph_points_' .. label
     local initDragList = {}
     local initPointList = {}
     for i = 1, #points do
@@ -33,10 +33,10 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
         imgui.SetCursorPos(point.pos - vctr2(point.size))
         imgui.InvisibleButton(tableLabel .. i, vctr2(point.size * 2))
 
-        if (imgui.IsMouseDown("Left") and imgui.IsItemActive()) then
+        if (imgui.IsMouseDown('Left') and imgui.IsItemActive()) then
             dragList[i] = true
         end
-        if (imgui.IsMouseDragging("Left") and dragList[i]) then
+        if (imgui.IsMouseDragging('Left') and dragList[i]) then
             point.pos = point.pos + kbm.mouseDelta()
         end
 
@@ -49,7 +49,7 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
 
     gridSize = gridSize or 1
 
-    if (not imgui.IsMouseDown("Left")) then
+    if (not imgui.IsMouseDown('Left')) then
         for i = 1, #points do
             dragList[i] = false
             local roundedX = math.round(points[i].pos.x / gridSize) * gridSize

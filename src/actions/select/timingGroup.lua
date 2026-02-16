@@ -17,5 +17,5 @@ function selectByTimingGroup(menuVars)
     end
 
     actions.SetHitObjectSelection(notesToSelect)
-    print(isTruthy(notesToSelect) and "s!" or "w!", #notesToSelect .. " notes selected")
+    print(isTruthy(notesToSelect) and 's!' or 'w!', #notesToSelect .. ' notes selected')
 end

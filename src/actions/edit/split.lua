@@ -20,24 +20,24 @@ function splitNotes(menuVars)
         end
     else
         for _, note in ipairs(notes) do
-            noteDict[note.StartTime .. "_" .. note.Lane] = { note }
+            noteDict[note.StartTime .. '_' .. note.Lane] = { note }
         end
     end
 
-    local prefix = "col"
+    local prefix = 'col'
 
     if (menuVars.modeIndex == 2) then
-        prefix = "time"
+        prefix = 'time'
     elseif (menuVars.modeIndex == 3) then
-        prefix = "solo"
+        prefix = 'solo'
     end
 
     local editorActions = {}
     local existingIds = table.keys(map.TimingGroups)
 
     for name, noteList in pairs(noteDict) do
-        local id = table.concat({ "splitter_", prefix, "_", name })
-        local startTimeTbl = table.unpack(table.property(noteList, "StartTime"))
+        local id = table.concat({ 'splitter_', prefix, '_', name })
+        local startTimeTbl = table.unpack(table.property(noteList, 'StartTime'))
         local minStartTime = math.min(startTimeTbl)
         local maxStartTime = math.max(startTimeTbl)
         local svs = menuVars.cloneSVs and

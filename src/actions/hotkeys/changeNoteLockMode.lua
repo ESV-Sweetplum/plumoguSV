@@ -3,22 +3,22 @@ function changeNoteLockMode()
 
     mode = (mode + 1) % 4
     if mode == 0 then
-        print("s", "Notes have been unlocked.")
+        print('s', 'Notes have been unlocked.')
     end
     if mode == 1 then
-        print("e",
-            "Notes have been fully locked. To change the lock mode, press " ..
-            globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. ".")
+        print('e',
+            'Notes have been fully locked. To change the lock mode, press ' ..
+            globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. '.')
     end
     if mode == 2 then
-        print("w",
-            "Notes can no longer be placed, only moved. To change the lock mode, press " ..
-            globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. ".")
+        print('w',
+            'Notes can no longer be placed, only moved. To change the lock mode, press ' ..
+            globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. '.')
     end
     if mode == 3 then
-        print("w",
-            "Notes can no longer be moved, only placed and deleted. To change the lock mode, press " ..
-            globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. ".")
+        print('w',
+            'Notes can no longer be moved, only placed and deleted. To change the lock mode, press ' ..
+            globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. '.')
     end
 
     cache.noteLockMode = mode

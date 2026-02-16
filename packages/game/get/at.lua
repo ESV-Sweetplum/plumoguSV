@@ -1,4 +1,4 @@
-require("packages.table.searchClosest")
+require('packages.table.searchClosest')
 
 ---Gets the most recent timing point, or a dummy timing point if none exists.
 ---@param offset number

@@ -1,9 +1,9 @@
 TAB_MENUS = { -- names of the tab menus
-    "Info",
-    "Select",
-    "Create",
-    "Edit",
-    "Delete",
+    'Info',
+    'Select',
+    'Create',
+    'Edit',
+    'Delete',
 }
 
 ---Creates a menu tab.
@@ -11,10 +11,10 @@ TAB_MENUS = { -- names of the tab menus
 function createMenuTab(tabName)
     if not imgui.BeginTabItem(tabName) then return end
     AddPadding()
-    if tabName == "Info" then infoTab() end
-    if tabName == "Select" then selectTab() end
-    if tabName == "Create" then createSVTab() end
-    if tabName == "Edit" then editSVTab() end
-    if tabName == "Delete" then deleteTab() end
+    if tabName == 'Info' then infoTab() end
+    if tabName == 'Select' then selectTab() end
+    if tabName == 'Create' then createSVTab() end
+    if tabName == 'Edit' then editSVTab() end
+    if tabName == 'Delete' then deleteTab() end
     imgui.EndTabItem()
 end

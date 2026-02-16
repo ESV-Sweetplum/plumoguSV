@@ -1,12 +1,12 @@
 function addTeleportMenu()
-    local menuVars = getMenuVars("addTeleport")
+    local menuVars = getMenuVars('addTeleport')
     addTeleportSettingsMenu(menuVars)
-    cache.saveTable("addTeleportMenu", menuVars)
+    cache.saveTable('addTeleportMenu', menuVars)
 
-    simpleActionMenu("Add teleport SVs at selected notes", 1, addTeleportSVs, menuVars)
+    simpleActionMenu('Add teleport SVs at selected notes', 1, addTeleportSVs, menuVars)
 end
 
 function addTeleportSettingsMenu(menuVars)
     chooseDistance(menuVars)
-    BasicCheckbox(menuVars, "teleportBeforeHand", "Add teleport before note")
+    BasicCheckbox(menuVars, 'teleportBeforeHand', 'Add teleport before note')
 end

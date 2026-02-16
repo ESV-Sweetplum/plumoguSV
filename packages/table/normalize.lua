@@ -1,5 +1,5 @@
-require("packages.table.average")
-require("packages.table.construct")
+require('packages.table.average')
+require('packages.table.construct')
 ---Normalizes a table of numbers to achieve a target average.
 ---@param values number[] The table to normalize.
 ---@param targetAverage number The desired average value.

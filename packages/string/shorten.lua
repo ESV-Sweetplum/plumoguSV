@@ -1,5 +1,5 @@
-require("packages.string.removeVowels")
-require("packages.string.charAt")
+require('packages.string.removeVowels')
+require('packages.string.charAt')
 
 ---Shortens a string to three consonants; the first, the second, and the last.
 ---@param str string

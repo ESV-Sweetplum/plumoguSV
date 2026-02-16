@@ -39,7 +39,7 @@ DEFAULT_STARTING_MENU_VARS = {
         teleportBeforeHand = false,
     },
     changeGroups = {
-        designatedTimingGroup = "$Default",
+        designatedTimingGroup = '$Default',
         changeSVs = true,
         changeSSFs = true,
         clone = false,
@@ -103,12 +103,12 @@ DEFAULT_STARTING_MENU_VARS = {
     },
     measure = {
         unrounded = false,
-        nsvDistance = "",
-        svDistance = "",
-        avgSV = "",
-        startDisplacement = "",
-        endDisplacement = "",
-        avgSVDisplaceless = "",
+        nsvDistance = '',
+        svDistance = '',
+        avgSV = '',
+        startDisplacement = '',
+        endDisplacement = '',
+        avgSVDisplaceless = '',
         roundedNSVDistance = 0,
         roundedSVDistance = 0,
         roundedAvgSV = 0,
@@ -120,8 +120,8 @@ DEFAULT_STARTING_MENU_VARS = {
         distance = 400,
     },
     scaleBookmark = {
-        searchTerm = "",
-        filterTerm = "",
+        searchTerm = '',
+        filterTerm = '',
     },
     scaleDisplace = {
         scaleSpotIndex = 1,
@@ -149,11 +149,11 @@ DEFAULT_STARTING_MENU_VARS = {
         offset = 0,
     },
     selectBookmark = {
-        searchTerm = "",
-        filterTerm = "",
+        searchTerm = '',
+        filterTerm = '',
     },
     selectByTimingGroup = {
-        designatedTimingGroup = "$Default",
+        designatedTimingGroup = '$Default',
     },
     selectChordSize = {
         select1 = true,
@@ -183,11 +183,11 @@ DEFAULT_STARTING_MENU_VARS = {
 ---@param menuType string The menu type.
 ---@return table
 function getMenuVars(menuType, optionalLabel)
-    optionalLabel = optionalLabel or ""
+    optionalLabel = optionalLabel or ''
     menuKey = menuType:identify()
     local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuKey])
 
-    local labelText = menuType .. optionalLabel .. "Menu"
+    local labelText = menuType .. optionalLabel .. 'Menu'
     cache.loadTable(labelText, menuVars)
 
     return menuVars

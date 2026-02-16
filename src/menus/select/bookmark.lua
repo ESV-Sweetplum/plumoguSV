@@ -1,24 +1,24 @@
 function selectBookmarkMenu()
     local bookmarks = map.Bookmarks
 
-    local menuVars = getMenuVars("selectBookmark")
+    local menuVars = getMenuVars('selectBookmark')
     local times = {}
 
     if (not isTruthy(bookmarks)) then
-        imgui.TextWrapped("There are no bookmarks! Add one to navigate.")
+        imgui.TextWrapped('There are no bookmarks! Add one to navigate.')
     else
         imgui.PushItemWidth(70)
-        _, menuVars.searchTerm = imgui.InputText("Search", menuVars.searchTerm, 4096)
+        _, menuVars.searchTerm = imgui.InputText('Search', menuVars.searchTerm, 4096)
         KeepSameLine()
-        _, menuVars.filterTerm = imgui.InputText("Ignore", menuVars.filterTerm, 4096)
+        _, menuVars.filterTerm = imgui.InputText('Ignore', menuVars.filterTerm, 4096)
 
         imgui.Columns(3)
 
-        imgui.Text("Time")
+        imgui.Text('Time')
         imgui.NextColumn()
-        imgui.Text("Bookmark Label")
+        imgui.Text('Bookmark Label')
         imgui.NextColumn()
-        imgui.Text("Leap")
+        imgui.Text('Leap')
         imgui.NextColumn()
 
         imgui.Separator()
@@ -58,7 +58,7 @@ function selectBookmarkMenu()
 
             imgui.NextColumn()
 
-            buttonText = "Go to #" .. idx - skippedIndices
+            buttonText = 'Go to #' .. idx - skippedIndices
 
             if (imgui.Button(buttonText, vector.New(imgui.CalcTextSize(buttonText).x + 20, 24))) then
                 actions.GoToObjects(bm.StartTime)
@@ -79,5 +79,5 @@ function selectBookmarkMenu()
         imgui.Columns(1)
     end
 
-    cache.saveTable("selectBookmarkMenu", menuVars)
+    cache.saveTable('selectBookmarkMenu', menuVars)
 end

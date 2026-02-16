@@ -1,7 +1,7 @@
-require("packages.table.duplicate")
-require("packages.math.matrix.findZeroRow")
-require("packages.math.matrix.rowLinComb")
-require("packages.math.matrix.scaleRow")
+require('packages.table.duplicate')
+require('packages.math.matrix.findZeroRow')
+require('packages.math.matrix.rowLinComb')
+require('packages.math.matrix.scaleRow')
 ---Given a square matrix A and equally-sized vector B, returns a vector x such that Ax=B.
 ---@param mtrx number[][]
 ---@param vctr number[]

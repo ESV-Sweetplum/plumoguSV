@@ -11,12 +11,12 @@ end
 
 function importCustomSVs(settingVars)
     local svsParsed = false
-    local customSVText = state.GetValue("import_customText") or "Import SV values here"
+    local customSVText = state.GetValue('import_customText') or 'Import SV values here'
     local imguiFlag = imgui_input_text_flags.AutoSelectAll
-    _, customSVText = imgui.InputText("##customSVs", customSVText, 99999, imguiFlag)
+    _, customSVText = imgui.InputText('##customSVs', customSVText, 99999, imguiFlag)
     KeepSameLine()
-    if imgui.Button("Parse##customSVs", SECONDARY_BUTTON_SIZE) then
-        local regex = "(-?%d*%.?%d+)"
+    if imgui.Button('Parse##customSVs', SECONDARY_BUTTON_SIZE) then
+        local regex = '(-?%d*%.?%d+)'
         local values = {}
         for value, _ in string.gmatch(customSVText, regex) do
             table.insert(values, tn(value))
@@ -27,10 +27,10 @@ function importCustomSVs(settingVars)
             settingVars.svPoints = #values
             svsParsed = true
         end
-        customSVText = "Import SV values here"
+        customSVText = 'Import SV values here'
     end
-    state.SetValue("import_customText", customSVText)
-    HelpMarker("Paste custom SV values in the box then hit the parse button (ex. 2 -1 2 -1)")
+    state.SetValue('import_customText', customSVText)
+    HelpMarker('Paste custom SV values in the box then hit the parse button (ex. 2 -1 2 -1)')
     return svsParsed
 end
 

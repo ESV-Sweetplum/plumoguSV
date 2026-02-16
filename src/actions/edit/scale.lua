@@ -6,7 +6,7 @@ function scaleDisplaceSVs(menuVars)
     if (not isTruthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
-    local isStartDisplace = DISPLACE_SCALE_SPOTS[menuVars.scaleSpotIndex] == "Start"
+    local isStartDisplace = DISPLACE_SCALE_SPOTS[menuVars.scaleSpotIndex] == 'Start'
     for i = 1, (#offsets - 1) do
         local note1Offset = offsets[i]
         local note2Offset = offsets[i + 1]
@@ -16,13 +16,13 @@ function scaleDisplaceSVs(menuVars)
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, note1Offset,
             note2Offset)
         local scalingDistance
-        if scaleType == "Average SV" then
+        if scaleType == 'Average SV' then
             local targetDistance = menuVars.avgSV * (note2Offset - note1Offset)
             scalingDistance = targetDistance - currentDistance
             print(scalingDistance)
-        elseif scaleType == "Absolute Distance" then
+        elseif scaleType == 'Absolute Distance' then
             scalingDistance = menuVars.distance - currentDistance
-        elseif scaleType == "Relative Ratio" then
+        elseif scaleType == 'Relative Ratio' then
             scalingDistance = (menuVars.ratio - 1) * currentDistance
         end
         if isStartDisplace then
@@ -52,10 +52,10 @@ function scaleMultiplySVs(menuVars)
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
             endOffset)
         local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
-        if scaleType == "Average SV" then
+        if scaleType == 'Average SV' then
             local currentAvgSV = currentDistance / (endOffset - startOffset)
             scalingFactor = menuVars.avgSV / currentAvgSV
-        elseif scaleType == "Absolute Distance" then
+        elseif scaleType == 'Absolute Distance' then
             scalingFactor = menuVars.distance / currentDistance
         end
         for _, sv in ipairs(svsBetweenOffsets) do

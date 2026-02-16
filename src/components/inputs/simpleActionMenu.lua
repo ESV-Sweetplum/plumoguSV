@@ -10,7 +10,7 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
                           optionalKeyOverride)
     if (not hideNoteReq) then AddSeparator() end
     local enoughSelectedNotes = checkEnoughSelectedNotes(minimumNotes)
-    local infoText = table.concat({ "Select ", minimumNotes, " or more ", pluralize("note", minimumNotes) })
+    local infoText = table.concat({ 'Select ', minimumNotes, ' or more ', pluralize('note', minimumNotes) })
     if (not enoughSelectedNotes) then
         if (not hideNoteReq) then imgui.Text(infoText) end
         return
@@ -18,8 +18,8 @@ function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNo
     FunctionButton(buttonText, ACTION_BUTTON_SIZE, actionfunc, menuVars)
     if disableKeyInput then return end
     local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + tn(hideNoteReq)]
-    local tooltip = HoverToolTip("Press \'" .. keyCombo ..
-        "\' on your keyboard to do the same thing as this button")
+    local tooltip = HoverToolTip('Press \'' .. keyCombo ..
+        '\' on your keyboard to do the same thing as this button')
     executeFunctionIfTrue(kbm.pressedKeyCombo(keyCombo), actionfunc, menuVars)
 end
 

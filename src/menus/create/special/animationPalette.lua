@@ -7,5 +7,5 @@ function animationPaletteMenu(settingVars)
     -- xx should be the starting frame and the ending frame. for example:
     -- 1/2-path-11-44
     -- 2/3-show-44
-    CodeInput(settingVars, "instructions", "", "Write instructions here.")
+    CodeInput(settingVars, 'instructions', '', 'Write instructions here.')
 end

@@ -60,7 +60,7 @@ end
 ---@param maxScale number
 function plotSVMotion(noteDistances, minScale, maxScale)
     local plotSize = PLOT_GRAPH_SIZE
-    imgui.PlotLines("##motion", noteDistances, #noteDistances, 0, "", minScale, maxScale, plotSize)
+    imgui.PlotLines('##motion', noteDistances, #noteDistances, 0, '', minScale, maxScale, plotSize)
 end
 
 ---Creates a histogram of SV values.
@@ -69,7 +69,7 @@ end
 ---@param maxScale number
 function plotSVs(svVals, minScale, maxScale)
     local plotSize = PLOT_GRAPH_SIZE
-    imgui.PlotHistogram("##svplot", svVals, #svVals, 0, "", minScale, maxScale, plotSize)
+    imgui.PlotHistogram('##svplot', svVals, #svVals, 0, '', minScale, maxScale, plotSize)
 end
 
 function plotExponentialCurvature(settingVars)
@@ -93,7 +93,7 @@ function plotExponentialCurvature(settingVars)
         end
         values:insert(value)
     end
-    imgui.PlotLines("##CurvaturePlot", values, #values, 0, "", 0, 1)
+    imgui.PlotLines('##CurvaturePlot', values, #values, 0, '', 0, 1)
     imgui.PopStyleColor()
     imgui.PopItemWidth()
 end
@@ -128,7 +128,7 @@ function plotSigmoidalCurvature(settingVars)
         end
         values:insert(value)
     end
-    imgui.PlotLines("##CurvaturePlot", values, #values, 0, "", 0, 1)
+    imgui.PlotLines('##CurvaturePlot', values, #values, 0, '', 0, 1)
     imgui.PopStyleColor()
     imgui.PopItemWidth()
 end
@@ -218,21 +218,21 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
         end
     end
     if not skipDistGraph then
-        imgui.Text("Projected Note Motion:")
-        HelpMarker("Distance vs Time graph of notes")
+        imgui.Text('Projected Note Motion:')
+        HelpMarker('Distance vs Time graph of notes')
         plotSVMotion(svDistances, svGraphStats.distMinScale, svGraphStats.distMaxScale)
-        if imgui.CollapsingHeader("New All -w-") then
+        if imgui.CollapsingHeader('New All -w-') then
             for i = 1, #svDistances do
                 local svDistance = svDistances[i]
                 local content = tostring(svDistance)
                 imgui.PushItemWidth(imgui.GetContentRegionAvailWidth())
-                imgui.InputText("##" .. i, content, #content, imgui_input_text_flags.AutoSelectAll)
+                imgui.InputText('##' .. i, content, #content, imgui_input_text_flags.AutoSelectAll)
                 imgui.PopItemWidth()
             end
         end
     end
-    local projectedText = "Projected SVs:"
-    if skipDistGraph then projectedText = "Projected Scaling (Avg SVs):" end
+    local projectedText = 'Projected SVs:'
+    if skipDistGraph then projectedText = 'Projected Scaling (Avg SVs):' end
     imgui.Text(projectedText)
     plotSVs(svMultipliers, svGraphStats.minScale, svGraphStats.maxScale)
     if stutterDuration then
@@ -253,12 +253,12 @@ function displayStutterSVStats(svMultipliers, stutterDuration)
     local secondSV = math.round(svMultipliers[2], 3)
     local firstDuration = stutterDuration
     local secondDuration = 100 - stutterDuration
-    imgui.Columns(2, "SV Stutter Stats", false)
-    imgui.Text("First SV:")
-    imgui.Text("Second SV:")
+    imgui.Columns(2, 'SV Stutter Stats', false)
+    imgui.Text('First SV:')
+    imgui.Text('Second SV:')
     imgui.NextColumn()
-    imgui.Text(firstSV .. "x  (" .. firstDuration .. "%% duration)")
-    imgui.Text(secondSV .. "x  (" .. secondDuration .. "%% duration)")
+    imgui.Text(firstSV .. 'x  (' .. firstDuration .. '%% duration)')
+    imgui.Text(secondSV .. 'x  (' .. secondDuration .. '%% duration)')
     imgui.Columns(1)
 end
 
@@ -266,15 +266,15 @@ end
 -- Parameters
 --    svStats : list of stats for the current menu [Table]
 function displaySVStats(svStats)
-    imgui.Columns(2, "SV Stats", false)
-    imgui.Text("Max SV:")
-    imgui.Text("Min SV:")
-    imgui.Text("Average SV:")
+    imgui.Columns(2, 'SV Stats', false)
+    imgui.Text('Max SV:')
+    imgui.Text('Min SV:')
+    imgui.Text('Average SV:')
     imgui.NextColumn()
-    imgui.Text(svStats.maxSV .. "x")
-    imgui.Text(svStats.minSV .. "x")
-    imgui.Text(svStats.avgSV .. "x")
-    HelpMarker("Rounded to 3 decimal places")
+    imgui.Text(svStats.maxSV .. 'x')
+    imgui.Text(svStats.minSV .. 'x')
+    imgui.Text(svStats.avgSV .. 'x')
+    HelpMarker('Rounded to 3 decimal places')
     imgui.Columns(1)
 end
 
@@ -289,17 +289,17 @@ end
 
 function displayStutterSVWindows(settingVars)
     if settingVars.linearlyChange then
-        startNextWindowNotCollapsed("SV Info (Starting first SV)")
-        makeSVInfoWindow("SV Info (Starting first SV)", settingVars.svGraphStats, nil,
+        startNextWindowNotCollapsed('SV Info (Starting first SV)')
+        makeSVInfoWindow('SV Info (Starting first SV)', settingVars.svGraphStats, nil,
             settingVars.svDistances, settingVars.svMultipliers,
             settingVars.stutterDuration, false)
-        startNextWindowNotCollapsed("SV Info (Ending first SV)")
-        makeSVInfoWindow("SV Info (Ending first SV)", settingVars.svGraph2Stats, nil,
+        startNextWindowNotCollapsed('SV Info (Ending first SV)')
+        makeSVInfoWindow('SV Info (Ending first SV)', settingVars.svGraph2Stats, nil,
             settingVars.svDistances2, settingVars.svMultipliers2,
             settingVars.stutterDuration, false)
     else
-        startNextWindowNotCollapsed("SV Info")
-        makeSVInfoWindow("SV Info", settingVars.svGraphStats, nil, settingVars.svDistances,
+        startNextWindowNotCollapsed('SV Info')
+        makeSVInfoWindow('SV Info', settingVars.svGraphStats, nil, settingVars.svDistances,
             settingVars.svMultipliers, settingVars.stutterDuration, false)
     end
 end

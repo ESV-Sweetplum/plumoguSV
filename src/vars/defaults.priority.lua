@@ -32,16 +32,16 @@ function loadDefaultProperties(defaultProperties)
 end
 
 function parseDefaultProperty(v, default)
-    if (default == nil or type(default) == "table" or type(default) == "userdata") then
+    if (default == nil or type(default) == 'table' or type(default) == 'userdata') then
         return nil
     end
-    if (type(default) == "number") then
+    if (type(default) == 'number') then
         return tn(v)
     end
-    if (type(default) == "boolean") then
+    if (type(default) == 'boolean') then
         return isTruthy(v)
     end
-    if (type(default) == "string") then
+    if (type(default) == 'string') then
         return v
     end
     return v
