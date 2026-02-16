@@ -3,3 +3,4 @@ dist
 builds
 .DS_store
 bezier/out
+config.yaml
