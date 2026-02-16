@@ -1,5 +1,5 @@
-DISTRO="steam"
-ENVIRONMENT = "production"
+ENVIRONMENT = "development"
+devMode = true
 cache = {
     boolean = {},
     windows = {},
@@ -840,7 +840,7 @@ end
 ---@return string[]
 function string.split(str, sep)
     local tbl = {}
-    for s in str:gmatch('([^' .. sep .. ']+)') do
+    for s in str:gmatch(table.concat({'([^', sep, ']+)'})) do
         tbl[#tbl + 1] = s
     end
     return tbl
@@ -1181,7 +1181,7 @@ end
 ---@return string
 function table.stringify(var)
     if (type(var) == 'boolean') then return var and 'TRUE' or 'FALSE' end
-    if (type(var) == 'string') then return '"' .. var .. '"' end
+    if (type(var) == 'string') then return table.concat({'"', var, '"'}) end
     if (type(var) == 'number') then return var end
     if (type(var) ~= 'table') then return 'UNKNOWN' end
     if (var[1] ~= nil) then
@@ -1195,7 +1195,7 @@ function table.stringify(var)
     if (not isTruthy(table.keys(var))) then return '[]' end
     local str = '{'
     for k, v in pairs(var) do
-        str = str .. k .. '=' .. table.stringify(v) .. ','
+        str = str .. k .. table.concat({'=', table.stringify(v), ','})
     end
     return str:sub(1, -2) .. '}'
 end
@@ -1549,7 +1549,7 @@ VIBRATO_QUALITIES = {
 VIBRATO_FRAME_RATES = { 60, 90, 150, 210, 270 }
 VIBRATO_DETAILED_QUALITIES = {}
 for i, v in pairs(VIBRATO_QUALITIES) do
-    VIBRATO_DETAILED_QUALITIES[#VIBRATO_DETAILED_QUALITIES + 1] = v .. '  (~' .. VIBRATO_FRAME_RATES[i] .. 'fps)'
+    VIBRATO_DETAILED_QUALITIES[#VIBRATO_DETAILED_QUALITIES + 1] = v .. table.concat({'  (~', VIBRATO_FRAME_RATES[i], 'fps)'})
 end
 VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
 DEFAULT_STYLE = {
@@ -2723,7 +2723,7 @@ function ssfVibrato(menuVars, func1, func2)
     actions.PerformBatch({
         createEA(action_type.AddScrollSpeedFactorBatch, ssfs),
     })
-    toggleablePrint('s!', 'Created ' .. #ssfs .. pluralize(' SSF.', #ssfs, -2))
+    toggleablePrint('s!', table.concat({'Created ', #ssfs, pluralize(' SSF.', #ssfs, -2)}))
 end
 ---comment
 ---@param menuVars any
@@ -2845,7 +2845,7 @@ function deleteItems(menuVars)
                 action_type.RemoveBookmarkBatch, bmsToRemove) })
     end
     if (isTruthy(linesToRemove)) then
-        toggleablePrint('e!', 'Deleted ' .. #linesToRemove .. pluralize(' timing point.', #linesToRemove, -2))
+        toggleablePrint('e!', table.concat({'Deleted ', #linesToRemove, pluralize(' timing point.', #linesToRemove, -2)}))
     end
     if (isTruthy(svsToRemove)) then
         toggleablePrint('e!',
@@ -2856,7 +2856,7 @@ function deleteItems(menuVars)
             'Deleted ' .. #ssfsToRemove .. pluralize(' scroll speed factor.', #ssfsToRemove, -2))
     end
     if (isTruthy(bmsToRemove)) then
-        toggleablePrint('e!', 'Deleted ' .. #bmsToRemove .. pluralize(' bookmark.', #bmsToRemove, -2))
+        toggleablePrint('e!', table.concat({'Deleted ', #bmsToRemove, pluralize(' bookmark.', #bmsToRemove, -2)}))
     end
 end
 function addTeleportSVs(menuVars)
@@ -2931,12 +2931,12 @@ function changeGroups(menuVars)
     if willChangeSVs then
         toggleablePrint('s!',
             'Successfully moved ' .. #svsToRemove ..
-            pluralize(' SV', #svsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
+            pluralize(' SV', #svsToRemove) .. table.concat({' to "', menuVars.designatedTimingGroup, '".'}))
     end
     if willChangeSSFs then
         toggleablePrint('s!',
             'Successfully moved ' .. #ssfsToRemove ..
-            pluralize(' SSF', #ssfsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
+            pluralize(' SSF', #ssfsToRemove) .. table.concat({' to "', menuVars.designatedTimingGroup, '".'}))
     end
 end
 function storeDuplicateItems(menuVars)
@@ -3262,7 +3262,7 @@ function pasteItems(menuVars)
         createEA(action_type.AddBookmarkBatch, bmsToAdd),
     })
     if (isTruthy(linesToRemove)) then
-        toggleablePrint('e!', 'Deleted ' .. #linesToRemove .. pluralize(' timing point.', #linesToRemove, -2))
+        toggleablePrint('e!', table.concat({'Deleted ', #linesToRemove, pluralize(' timing point.', #linesToRemove, -2)}))
     end
     if (isTruthy(svsToRemove)) then
         toggleablePrint('e!',
@@ -3273,10 +3273,10 @@ function pasteItems(menuVars)
             'Deleted ' .. #ssfsToRemove .. pluralize(' scroll speed factor.', #ssfsToRemove, -2))
     end
     if (isTruthy(bmsToRemove)) then
-        toggleablePrint('e!', 'Deleted ' .. #bmsToRemove .. pluralize(' bookmark.', #bmsToRemove, -2))
+        toggleablePrint('e!', table.concat({'Deleted ', #bmsToRemove, pluralize(' bookmark.', #bmsToRemove, -2)}))
     end
     if (isTruthy(linesToAdd)) then
-        toggleablePrint('s!', 'Created ' .. #linesToAdd .. pluralize(' timing point.', #linesToAdd, -2))
+        toggleablePrint('s!', table.concat({'Created ', #linesToAdd, pluralize(' timing point.', #linesToAdd, -2)}))
     end
     if (isTruthy(svsToAdd)) then
         toggleablePrint('s!',
@@ -3287,7 +3287,7 @@ function pasteItems(menuVars)
             'Created ' .. #ssfsToAdd .. pluralize(' scroll speed factor.', #ssfsToAdd, -2))
     end
     if (isTruthy(bmsToAdd)) then
-        toggleablePrint('s!', 'Created ' .. #bmsToAdd .. pluralize(' bookmark.', #bmsToAdd, -2))
+        toggleablePrint('s!', table.concat({'Created ', #bmsToAdd, pluralize(' bookmark.', #bmsToAdd, -2)}))
     end
 end
 function tryAlignToHitObjects(time, hitObjectTimes, alignWindow)
@@ -3613,7 +3613,7 @@ function alignTimingLines()
         createEA(action_type.AddTimingPointBatch, tpsToAdd),
         createEA(action_type.RemoveTimingPointBatch, tpsToRemove),
     })
-    toggleablePrint('s!', 'Created ' .. #tpsToAdd .. pluralize(' timing point.', #tpsToAdd, -2))
+    toggleablePrint('s!', table.concat({'Created ', #tpsToAdd, pluralize(' timing point.', #tpsToAdd, -2)}))
     if (isTruthy(tpsToRemove)) then
         toggleablePrint('e!',
             'Deleted ' .. #tpsToRemove .. pluralize(' timing point.', #tpsToRemove, -2))
@@ -4207,11 +4207,11 @@ function getMapStats()
     print('s!',
         "That's an average of " ..
         math.round(svSum * 1000 / map.TrackLength, 2) ..
-        ' SVs per second, or ' .. math.round(ssfSum * 1000 / map.TrackLength, 2) .. ' SSFs per second.')
-    print('s!', 'This map also contains ' .. #map.TimingPoints .. pluralize(' timing point.', #map.TimingPoints, -2))
+        table.concat({' SVs per second, or ', math.round(ssfSum * 1000 / map.TrackLength, 2), ' SSFs per second.'}))
+    print('s!', table.concat({'This map also contains ', #map.TimingPoints, pluralize(' timing point.', #map.TimingPoints, -2)}))
     print('s!',
         'This map has ' ..
-        svSum .. ' SVs and ' .. ssfSum .. ' SSFs across ' .. #tgList .. pluralize(' timing group.', #tgList, -2))
+        svSum .. table.concat({' SVs and ', ssfSum, ' SSFs across '}) .. #tgList .. pluralize(' timing group.', #tgList, -2))
     print('w!',
         'Remember that the quality of map has no correlation with the object count! Try to be optimal in your object usage.')
     state.SelectedScrollGroupId = currentTG
@@ -7229,7 +7229,7 @@ end
 function ComputableInputFloat(label, value, decimalPlaces, suffix)
     local previousvalue = value
     local output = value
-    local fmt = '%.' .. decimalPlaces .. 'f'
+    local fmt = table.concat({'%.', decimalPlaces, 'f'})
     if suffix then fmt = fmt .. suffix end
     _, value = imgui.InputTextWithHint(label, '2, 4/3 + 1, etc.',
         string.format(fmt, value), 4096,
@@ -7296,7 +7296,7 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * widthFactor - SAMELINE_SPACING)
-    local _, newValues = imgui.InputFloat2(label, oldValues, '%.' .. digits .. 'f' .. suffix)
+    local _, newValues = imgui.InputFloat2(label, oldValues, table.concat({'%.', digits, 'f'}) .. suffix)
     imgui.PopItemWidth()
     varsTable[lowerName] = newValues.x
     varsTable[higherName] = newValues.y
@@ -7704,7 +7704,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             local data = table.parse(preset.data)
             globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
             cache.saveTable(preset.menu .. preset.type .. 'Settings', data.settingVars)
-            cache.saveTable('place' .. preset.type .. 'Menu', data.menuVars)
+            cache.saveTable(table.concat({'place', preset.type, 'Menu'}), data.menuVars)
             globalVars.showPresetMenu = false
         end
         if (imgui.IsItemClicked('Right')) then
@@ -8198,7 +8198,7 @@ function placeVibratoSVMenu(separateWindow)
     if currentSVType == 'Custom##Vibrato' then customVibratoMenu(menuVars, settingVars, separateWindow) end
     cache.saveTable(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
         settingVars)
-    cache.saveTable('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
+    cache.saveTable(table.concat({'placeVibrato', tostring(separateWindow), 'Menu'}), menuVars)
 end
 function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
@@ -8911,7 +8911,7 @@ function infoTab()
     imgui.BulletText('Choose an SV tool in the Create tab.')
     imgui.BulletText("Adjust the tool's settings to your liking.")
     imgui.BulletText('Select notes to use the tool at.')
-    imgui.BulletText(table.concat({"Press the '", globalVars.hotkeyList[hotkeys_enum.exec_primary], "' hotkey."}))
+    imgui.BulletText("Press the '" .. globalVars.hotkeyList[hotkeys_enum.exec_primary] .. "' hotkey.")
     AddPadding()
     imgui.SeparatorText('Special thanks to:')
     AddPadding()
@@ -11746,7 +11746,7 @@ function selectChordSizeMenu()
     local menuVars = getMenuVars('selectChordSize')
     for idx = 1, game.keyCount do
         local varLabel = 'select' .. idx
-        local label = table.concat({ 'Size ' .. idx .. ' Chord' })
+        local label = table.concat({ table.concat({'Size ', idx, ' Chord'}) })
         _, menuVars[varLabel] = imgui.Checkbox(label, menuVars[varLabel])
         if (idx % 2 == 1) then KeepSameLine() end
     end
@@ -11809,7 +11809,7 @@ function selectBySnapMenu()
     BasicInputInt(menuVars, 'snap', 'Snap', { 1, 100 })
     cache.saveTable('selectBySnapMenu', menuVars)
     simpleActionMenu(
-        'Select notes with 1/' .. menuVars.snap .. ' snap',
+        table.concat({'Select notes with 1/', menuVars.snap, ' snap'}),
         2,
         selectBySnap, menuVars)
 end
@@ -12122,7 +12122,7 @@ local customStyleNames = {
 }
 function showCustomThemeSettings()
     local settingsChanged = false
-    imgui.SeparatorText(table.concat({"Editing '", globalVars.colorThemeName:gsub('custom_', ''), "'"}))
+    imgui.SeparatorText("Editing '" .. globalVars.colorThemeName:gsub('custom_', '') .. "'")
     if (imgui.Button('Reset')) then
         globalCustomStyle = table.duplicate(DEFAULT_STYLE)
         globalVars.colorThemeName = 'Original'
@@ -12249,13 +12249,13 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
                 k:gsub('loadup', '') ..
                 ' = vector.New(' ..
                 math.round(v.x, 2) ..
-                ', ' .. math.round(v.y, 2) .. ', ' .. math.round(v.z, 2) .. ', ' .. math.round(v.w, 2) .. ')\n'
+                table.concat({', ', math.round(v.y, 2) .. ', ' .. math.round(v.z, 2) .. ', ' .. math.round(v.w, 2), ')\n'})
         else
             outStr = outStr .. 'imgui.PushStyleColor(imgui_col.' ..
                 k:capitalize() ..
                 ', vector.New(' ..
                 math.round(v.x, 2) ..
-                ', ' .. math.round(v.y, 2) .. ', ' .. math.round(v.z, 2) .. ', ' .. math.round(v.w, 2) .. '))\n'
+                table.concat({', ', math.round(v.y, 2) .. ', ' .. math.round(v.z, 2) .. ', ' .. math.round(v.w, 2), '))\n'})
         end
     end
     imgui.SetClipboardText(outStr)
@@ -12414,7 +12414,7 @@ function showDefaultPropertiesSettings()
         local menuVars = getMenuVars('selectChordSize', 'Property')
         for idx = 1, game.keyCount do
             local varLabel = 'select' .. idx
-            local label = table.concat({ 'Size ' .. idx .. ' Chord' })
+            local label = table.concat({ table.concat({'Size ', idx, ' Chord'}) })
             _, menuVars[varLabel] = imgui.Checkbox(label, menuVars[varLabel])
             if (idx % 2 == 1) then KeepSameLine() end
         end
@@ -13042,8 +13042,8 @@ function showHotkeyTutorial()
     imgui.TextWrapped(
         'The most basic hotkeys are ones that can simply speed up your SV making process; whether that be placing SVs/SSFs or quickly editing settings.')
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[hotkeys_enum.exec_primary] .. '" to quickly place SVs.')
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[hotkeys_enum.exec_secondary] .. '" to quickly place SSFs.')
+    imgui.BulletText(table.concat({'Press "', globalVars.hotkeyList[hotkeys_enum.exec_primary], '" to quickly place SVs.'}))
+    imgui.BulletText(table.concat({'Press "', globalVars.hotkeyList[hotkeys_enum.exec_secondary], '" to quickly place SSFs.'}))
     imgui.BulletText('If you have a vibrato window, press "' ..
         globalVars.hotkeyList[hotkeys_enum.exec_vibrato] .. '" to quickly place vibrato.')
     imgui.BulletText('Press "' ..
@@ -13068,7 +13068,7 @@ function showHotkeyTutorial()
     imgui.TextWrapped(
         'Sometimes, typing letters/numbers on your keyboard will unintentionally interact with the editor in ways you don\'t want. You can remedy this by using the built-in "NOTE LOCK" feature.')
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
-    imgui.BulletText('Press "' .. globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. '" to change the locking mode.')
+    imgui.BulletText(table.concat({'Press "', globalVars.hotkeyList[hotkeys_enum.toggle_note_lock], '" to change the locking mode.'}))
     imgui.PopStyleColor()
 end
 function showWhatIsMsxTutorial()
@@ -13231,9 +13231,9 @@ function renderMeasureDataWidget()
     end
     imgui.BeginTooltip()
     imgui.Text('Measure Info:')
-    imgui.Text('NSV Distance = ' .. widgetVars.nsvDistance .. ' ms')
-    imgui.Text('SV Distance = ' .. widgetVars.roundedSVDistance .. ' msx')
-    imgui.Text('Avg SV = ' .. widgetVars.roundedAvgSV .. 'x')
+    imgui.Text(table.concat({'NSV Distance = ', widgetVars.nsvDistance, ' ms'}))
+    imgui.Text(table.concat({'SV Distance = ', widgetVars.roundedSVDistance, ' msx'}))
+    imgui.Text(table.concat({'Avg SV = ', widgetVars.roundedAvgSV, 'x'}))
     imgui.EndTooltip()
     widgetVars.oldStartOffset = startOffset
     widgetVars.oldEndOffset = endOffset
@@ -13244,15 +13244,15 @@ function renderNoteDataWidget()
     imgui.BeginTooltip()
     imgui.Text('Note Info:')
     local selectedNote = state.SelectedHitObjects[1]
-    imgui.Text('StartTime = ' .. selectedNote.StartTime .. ' ms')
+    imgui.Text(table.concat({'StartTime = ', selectedNote.StartTime, ' ms'}))
     local noteIsNotLN = selectedNote.EndTime == 0
     if noteIsNotLN then
         imgui.EndTooltip()
         return
     end
     local lnLength = selectedNote.EndTime - selectedNote.StartTime
-    imgui.Text('EndTime = ' .. selectedNote.EndTime .. ' ms')
-    imgui.Text('LN Length = ' .. lnLength .. ' ms')
+    imgui.Text(table.concat({'EndTime = ', selectedNote.EndTime, ' ms'}))
+    imgui.Text(table.concat({'LN Length = ', lnLength, ' ms'}))
     imgui.EndTooltip()
 end
 function chooseAddComboMultipliers(settingVars)
@@ -13316,8 +13316,8 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         normalizedPos2 = pos2 / 150
         imgui.Text('\n         Point 1:\n      (' ..
             string.format('%.2f', normalizedPos1.x) ..
-            ', ' .. string.format('%.2f', normalizedPos1.y) .. ')\n         Point 2:\n      (' ..
-            string.format('%.2f', normalizedPos2.x) .. ', ' .. string.format('%.2f', normalizedPos2.y) .. ')\n')
+            table.concat({', ', string.format('%.2f', normalizedPos1.y), ')\n         Point 2:\n      ('}) ..
+            string.format('%.2f', normalizedPos2.x) .. table.concat({', ', string.format('%.2f', normalizedPos2.y), ')\n'}))
         imgui.SetCursorPosY(80)
         imgui.SetCursorPosX(5)
         _, settingVars.freeMode = imgui.Checkbox('Free Mode##Bezier', settingVars.freeMode)
@@ -14529,7 +14529,7 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
         createEA(action_type.AddScrollVelocityBatch, svsToAdd),
     }
     actions.PerformBatch(editorActions)
-    toggleablePrint('s!', 'Created ' .. #svsToAdd .. pluralize(' SV.', #svsToAdd, -2))
+    toggleablePrint('s!', table.concat({'Created ', #svsToAdd, pluralize(' SV.', #svsToAdd, -2)}))
 end
 function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
     if not isTruthy(ssfsToAdd) then return end
@@ -14538,7 +14538,7 @@ function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
         createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
     }
     actions.PerformBatch(editorActions)
-    toggleablePrint('s!', 'Created ' .. #ssfsToAdd .. pluralize(' SSF.', #ssfsToAdd, -2))
+    toggleablePrint('s!', table.concat({'Created ', #ssfsToAdd, pluralize(' SSF.', #ssfsToAdd, -2)}))
 end
 function addFinalSV(svsToAdd, endOffset, svMultiplier, force)
     local sv = map.GetScrollVelocityAt(endOffset)
@@ -14886,8 +14886,8 @@ function displayStutterSVStats(svMultipliers, stutterDuration)
     imgui.Text('First SV:')
     imgui.Text('Second SV:')
     imgui.NextColumn()
-    imgui.Text(firstSV .. 'x  (' .. firstDuration .. '%% duration)')
-    imgui.Text(secondSV .. 'x  (' .. secondDuration .. '%% duration)')
+    imgui.Text(firstSV .. table.concat({'x  (', firstDuration, '%% duration)'}))
+    imgui.Text(secondSV .. table.concat({'x  (', secondDuration, '%% duration)'}))
     imgui.Columns(1)
 end
 function displaySVStats(svStats)
@@ -15173,7 +15173,7 @@ end
 function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
-    PLUGIN_NAME = 'plumoguSV v2.1.0'
+    PLUGIN_NAME = 'plumoguSV-dev'
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed(PLUGIN_NAME)
     imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
