@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "sumneko.lua",
-        "adamraichu.zip-viewer"
+        "adamraichu.zip-viewer",
+        "EditorConfig.EditorConfig"
     ]
 }

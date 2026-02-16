@@ -3,9 +3,15 @@ root = true
 [*]
 indent_style = space
 indent_size = 4
-tab_width = 4
 end_of_line = crlf
 charset = utf-8
 spelling_language = en-us
 trim_trailing_whitespace = true
 insert_final_newline = true
+
+[*.lua]
+max_line_length = 120
+quote_style = double
+continuation_indent = 4
+call_arg_parentheses = keep
+trailing_table_separator = smart

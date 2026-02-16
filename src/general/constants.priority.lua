@@ -27,97 +27,97 @@ CHINCHILLA_TYPES = {
     "Sine Power",
     "Arc Sine Power",
     "Inverse Power",
-    "Peter Stock"
+    "Peter Stock",
 }
 
 THEME_TREE = {
     Classic = {
         {
             id = "Original",
-            textColor = { 170, 170, 255 }
+            textColor = { 170, 170, 255 },
         },
         {
             id = "Strawberry",
-            textColor = { { 251, 41, 67 }, { 255, 100, 150 } }
+            textColor = { { 251, 41, 67 }, { 255, 100, 150 } },
         },
         {
             id = "Amethyst",
-            textColor = { { 153, 102, 204 }, { 170, 120, 255 } }
+            textColor = { { 153, 102, 204 }, { 170, 120, 255 } },
         },
         {
             id = "Tree",
-            textColor = { 150, 111, 51 }
+            textColor = { 150, 111, 51 },
         },
         {
             id = "Barbie",
-            textColor = { { 227, 5, 173 }, { 100, 255, 255 } }
-        }
+            textColor = { { 227, 5, 173 }, { 100, 255, 255 } },
+        },
     },
     Modern = {
         {
             id = "Incognito",
-            textColor = { { 150, 150, 150 }, { 200, 200, 200 } }
+            textColor = { { 150, 150, 150 }, { 200, 200, 200 } },
         },
         {
             id = "Incognito + RGB",
-            textColor = { { 150, 50, 50 }, { 50, 150, 50 }, { 50, 50, 150 } }
+            textColor = { { 150, 50, 50 }, { 50, 150, 50 }, { 50, 50, 150 } },
         },
         {
             id = "otingocnI",
-            textColor = { { 255, 255, 255 }, { 200, 200, 200 } }
+            textColor = { { 255, 255, 255 }, { 200, 200, 200 } },
         },
         {
             id = "BGR + otingocnI",
-            textColor = { { 255, 150, 150 }, { 150, 255, 150 }, { 150, 150, 255 } }
+            textColor = { { 255, 150, 150 }, { 150, 255, 150 }, { 150, 150, 255 } },
         },
         {
             id = "Glass",
-            textColor = { { 200, 200, 200 }, { 255, 255, 255 }, { 200, 200, 200 } }
+            textColor = { { 200, 200, 200 }, { 255, 255, 255 }, { 200, 200, 200 } },
         },
         {
             id = "Glass + RGB",
-            textColor = { { 150, 255, 255 }, { 255, 150, 255 }, { 255, 255, 150 } }
+            textColor = { { 150, 255, 255 }, { 255, 150, 255 }, { 255, 255, 150 } },
         },
         {
             id = "RGB Gamer Mode",
-            textColor = { { 255, 0, 0 }, { 0, 255, 0 }, { 0, 0, 255 } }
+            textColor = { { 255, 0, 0 }, { 0, 255, 0 }, { 0, 0, 255 } },
         },
         {
             id = "edom remag BGR",
-            textColor = { { 255, 100, 0 }, { 0, 255, 100 }, { 100, 0, 255 } }
-        }
+            textColor = { { 255, 100, 0 }, { 0, 255, 100 }, { 100, 0, 255 } },
+        },
     },
     ["Mappers' Picks"] = {
         {
             id = "7xbi's Glass",
-            textColor = { { 150, 150, 150 }, { 200, 200, 200 } }
+            textColor = { { 150, 150, 150 }, { 200, 200, 200 } },
         },
         {
             id = "7xbi's RGB Glass",
-            textColor = { { 255, 100, 255 }, { 255, 255, 100 }, { 100, 255, 255 } }
+            textColor = { { 255, 100, 255 }, { 255, 255, 100 }, { 100, 255, 255 } },
         },
         {
             id = "aster's catppuccin",
-            textColor = { { 136, 57, 239 }, { 186, 187, 241 }, { 203, 166, 247 } }
+            textColor = { { 136, 57, 239 }, { 186, 187, 241 }, { 203, 166, 247 } },
         },
         {
             id = "plum's purple palace",
-            textColor = { { 100, 0, 255 }, { 255, 0, 255 } }
-        }
+            textColor = { { 100, 0, 255 }, { 255, 0, 255 } },
+        },
     },
     Custom = {
         {
             id = "CUSTOM",
-            textColor = { 0, 0, 0 }
-        }
-    }
+            textColor = { 0, 0, 0 },
+        },
+    },
 }
 
 DYNAMIC_BACKGROUND_TYPES = {
     "None",
     "Reactive Stars",
     "Reactive Singularity",
-    "Dynamic Connection"
+    "Dynamic Connection",
 }
 
 COMBO_SV_TYPE = {
@@ -127,25 +127,25 @@ COMBO_SV_TYPE = {
     "Min",
     "Max",
     "SV Type 1 Only",
-    "SV Type 2 Only"
+    "SV Type 2 Only",
 }
 
 CURSOR_TRAILS = {
     "None",
     "Snake",
     "Dust",
-    "Sparkle"
+    "Sparkle",
 }
 
 DISPLACE_SCALE_SPOTS = {
     "Start",
-    "End"
+    "End",
 }
 
 SPLIT_MODES = {
     "Column",
     "Time",
-    "Individual"
+    "Individual",
 }
 
 EMOTICONS = {
@@ -173,28 +173,28 @@ EMOTICONS = {
 FINAL_SV_TYPES = {
     "Normal",
     "Custom",
-    "Override"
+    "Override",
 }
 
 FLICKER_TYPES = {
     "Normal",
-    "Delayed"
+    "Delayed",
 }
 
 NOTE_SKIN_TYPES = {
     "Bar",
-    "Circle"
+    "Circle",
 }
 
 RANDOM_TYPES = {
     "Normal",
-    "Uniform"
+    "Uniform",
 }
 
 SCALE_TYPES = {
     "Average SV",
     "Absolute Distance",
-    "Relative Ratio"
+    "Relative Ratio",
 }
 
 STANDARD_SVS_NO_COMBO = {
@@ -206,7 +206,7 @@ STANDARD_SVS_NO_COMBO = {
     "Circular",
     "Random",
     "Custom",
-    "Chinchilla"
+    "Chinchilla",
 }
 
 STILL_TYPES = {
@@ -214,7 +214,7 @@ STILL_TYPES = {
     "Start",
     "End",
     "Auto",
-    "Otua"
+    "Otua",
 }
 
 VIBRATO_DEVIATION_TYPES = {
@@ -225,24 +225,24 @@ VIBRATO_DEVIATION_TYPES = {
 
 STUTTER_CONTROLS = {
     "First SV",
-    "Second SV"
+    "Second SV",
 }
 
 STYLE_THEMES = {
     "Rounded",
     "Boxed",
     "Rounded + Border",
-    "Boxed + Border"
+    "Boxed + Border",
 }
 
 SV_BEHAVIORS = {
     "Slow down",
-    "Speed up"
+    "Speed up",
 }
 
 TRAIL_SHAPES = {
     "Circles",
-    "Triangles"
+    "Triangles",
 }
 
 STILL_BEHAVIOR_TYPES = {
@@ -253,7 +253,7 @@ STILL_BEHAVIOR_TYPES = {
 DISTANCE_TYPES = {
     "Average SV + Shift",
     "Distance + Shift",
-    "Start / End"
+    "Start / End",
 }
 
 VIBRATO_TYPES = {
@@ -266,7 +266,7 @@ VIBRATO_QUALITIES = {
     "Medium",
     "High",
     "Ultra",
-    "Omega"
+    "Omega",
 }
 
 VIBRATO_FRAME_RATES = { 60, 90, 150, 210, 270 }

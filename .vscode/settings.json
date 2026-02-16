@@ -1,30 +1,3 @@
 {
-    "zipViewer.textFileAssociations": [
-        {
-            "zipPath": "\\builds\\plumoguSV-v2.0.0.zip",
-            "subfilePath": "plumoguSV-v2.0.0/settings.ini"
-        }
-    ],
     "editor.defaultFormatter": "sumneko.lua",
-    "Lua.addonManager.enable": false,
-    "Lua.diagnostics.groupSeverity": {
-        "type-check": "Error",
-        "unused": "Warning",
-        "strict": "Error",
-        "duplicate": "Warning",
-        "ambiguity": "Error",
-        "luadoc": "Warning",
-        "await": "Error",
-        "codestyle": "Error",
-        "conventions": "Fallback",
-        "global": "Fallback",
-        "redefined": "Fallback",
-        "strong": "Warning",
-        "unbalanced": "Error"
-    },
-    "Lua.diagnostics.libraryFiles": "Disable",
-    "Lua.runtime.version": "Lua 5.2",
-    "Lua.type.castNumberToInteger": false,
-    "Lua.type.inferParamType": true,
-    "Lua.type.checkTableShape": true
 }

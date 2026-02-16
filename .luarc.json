@@ -19,5 +19,22 @@
     "workspace.useGitIgnore": true,
     "diagnostics.globals": [
         "devMode"
-    ]
+    ],
+    "addonManager.enable": false,
+    "diagnostics.groupSeverity": {
+        "type-check": "Error",
+        "unused": "Warning",
+        "strict": "Error",
+        "duplicate": "Warning",
+        "ambiguity": "Error",
+        "luadoc": "Warning",
+        "await": "Error",
+        "codestyle": "Error",
+        "conventions": "Fallback",
+        "global": "Fallback",
+        "redefined": "Fallback",
+        "strong": "Warning",
+        "unbalanced": "Error"
+    },
+    "diagnostics.libraryFiles": "Disable"
 }
