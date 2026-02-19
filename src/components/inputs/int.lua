@@ -28,10 +28,10 @@ function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipTex
     imgui.PopItemWidth()
     if tooltipText then HelpMarker(tooltipText) end
     if (multButtonPressed) then
-        oldValue = oldValue * 2
+        varsTable[parameterName] = varsTable[parameterName] * 2
     end
     if (divButtonPressed) then
-        oldValue = oldValue / 2
+        varsTable[parameterName] = varsTable[parameterName] / 2
     end
     if (bounds and bounds[1] and bounds[2]) then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
