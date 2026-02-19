@@ -744,7 +744,7 @@ state.SongTime                 = 0.0 ---@type number
 state.SelectedHitObjects       = {} ---@type HitObject[]
 
 ---#### The `id`, or name, of the current selected [scroll group](lua://ScrollGroup).
-state.SelectedScrollGroupId    = "$Default" ---@type string
+state.SelectedScrollGroupId    = '$Default' ---@type string
 
 ---##### (READ-ONLY) (EXISTS BEFORE RUNTIME)
 ---#### The current selected [scroll group](lua://ScrollGroup).
@@ -833,9 +833,10 @@ function utils.CreateScrollSpeedFactor(startTime, multiplier) end
 ---@param endTime? integer If given and non-zero, the note becomes a long note. This parameter determines when the long note will end.
 ---@param hitsounds? HitSounds The hitsounds that should be applied to the note.
 ---@param editorLayer? integer The index of the [editor layer](lua://EditorLayer) that this note should be added to.
+---@param type? HitObjectType The type of the note (normal or mine).
 ---@return HitObject ho The requested note.
 ---@nodiscard
-function utils.CreateHitObject(startTime, lane, endTime, hitsounds, editorLayer) end
+function utils.CreateHitObject(startTime, lane, endTime, hitsounds, editorLayer, type) end
 
 ---##### (READ-ONLY)
 ---#### Creates a [timing point](lua://TimingPoint), to later be placed into an [`EditorAction`](lua://utils.CreateEditorAction) and executed.
@@ -1285,13 +1286,13 @@ action_type    = {
     ChangeScrollSpeedFactorLaneMaskBatch = 55,
     ChangeScrollSpeedFactorOffsetBatch = 56,
     RemoveScrollSpeedFactor = 57,
-    RemoveScrollSpeedFactorBatch = 58
+    RemoveScrollSpeedFactorBatch = 58,
 }
 
 ---@enum HitObjectType
 hitobject_type = {
     Normal = 0,
-    Mine = 1
+    Mine = 1,
 }
 
 ---@enum Key
@@ -1463,7 +1464,7 @@ keys           = {
     Kanji = 0x19,              -- Kanji key on Japanese keyboards.
     OemAuto = 0xf3,            -- OEM Auto key.
     OemCopy = 0xf2,            -- OEM Copy key.
-    OemEnlW = 0xf4             -- OEM Enlarge Window key.
+    OemEnlW = 0xf4,            -- OEM Enlarge Window key.
 }
 
 ---@enum HistoryType

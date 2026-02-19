@@ -2,6 +2,7 @@ local stars_xList = {}
 local stars_yList = {}
 local stars_vxList = {}
 local stars_szList = {}
+local stars_listSize = 0
 
 function renderReactiveStars()
     local ctx = imgui.GetWindowDrawList()
@@ -18,7 +19,7 @@ function renderReactiveStars()
     createStar(dimX, dimY, 100)
     updateStars(dimX, dimY, state.DeltaTime)
 
-    for i = 1, #stars_xList do
+    for i = 1, stars_listSize do
         local x = stars_xList[i]
         local y = stars_yList[i]
         local sz = stars_szList[i]
@@ -29,18 +30,19 @@ function renderReactiveStars()
         if brightness < 0 then goto nextStar end
 
         -- ctx.AddCircleFilled(pos, sz * 2, color.alterOpacity(color.int.white, (255 - math.floor(brightness * 255)) - 255))
-        ctx.AddCircleFilled(pos, sz * 2, color.int.whiteMask * 255 + color.int.alphaMask * 255 * brightness / 10)
-        ctx.AddCircleFilled(pos, sz, color.alterOpacity(color.int.white, math.floor(brightness * 255) - 255))
+        ctx.AddCircleFilled(pos, sz * 2, color.int.white + color.int.alphaMask * 255 * (brightness / 10 - 1))
+        ctx.AddCircleFilled(pos, sz, color.int.white + color.int.alphaMask * 255 * (brightness - 1))
         ::nextStar::
     end
 end
 
 function createStar(dimX, dimY, n)
-    if (#stars_xList >= n) then return end
-    stars_xList[#stars_xList + 1] = math.random() * dimX
-    stars_yList[#stars_yList + 1] = math.random() * dimY
-    stars_vxList[#stars_vxList + 1] = math.random() * 3 + 1
-    stars_szList[#stars_szList + 1] = math.random(3) * 0.5
+    if (stars_listSize >= n) then return end
+    stars_xList[stars_listSize + 1] = math.random() * dimX
+    stars_yList[stars_listSize + 1] = math.random() * dimY
+    stars_vxList[stars_listSize + 1] = math.random() * 3 + 1
+    stars_szList[stars_listSize + 1] = math.random(3) * 0.5
+    stars_listSize = stars_listSize + 1
 end
 
 function updateStars(dimX, dimY, dt)
@@ -49,7 +51,7 @@ function updateStars(dimX, dimY, dt)
 
     local m = game.get.svMultiplierAt(state.SongTime)
 
-    for i = 1, #stars_xList do
+    for i = 1, stars_listSize do
         local starWrapped = false
 
         local x = stars_xList[i]

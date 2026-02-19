@@ -104,6 +104,17 @@ function color.rgbaToStr(vctr)
     return table.concat({ flr(vctr.x * 255), flr(vctr.y * 255), flr(vctr.z * 255) }, ',')
 end
 
+---Converts a Quaver-compatible string to an rgba Vector4.
+---@param str string
+---@return Vector4
+function color.strToRgba(str)
+    local rgb = {}
+    str:gsub('(%d+)', function(c)
+        table.insert(rgb, c)
+    end)
+    return vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, 1)
+end
+
 ---Converts hsl to an rgba `Vector4`, where `hue` is in degrees. The abstract formula comes from [Wikipedia](https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB_alternative).
 ---@param hue integer The hue in degrees.
 ---@param saturation number The saturation, within [0, 1].

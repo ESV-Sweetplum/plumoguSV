@@ -118,6 +118,7 @@ DYNAMIC_BACKGROUND_TYPES = {
     'Reactive Stars',
     'Reactive Singularity',
     'Dynamic Connection',
+    'SV Spectrogram',
 }
 
 COMBO_SV_TYPE = {

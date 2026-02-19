@@ -65,17 +65,6 @@ function clock.listen(id, interval)
     end
     return false
 end
----Alters opacity of a given color.
----@param col integer
----@param additiveOpacity integer
----@return number
----@overload fun(col: Vector4, additiveOpacity: number): Vector4
-function color.alterOpacity(col, additiveOpacity)
-    if (type(col) ~= 'number') then
-        return col + vector.New(0, 0, 0, additiveOpacity)
-    end
-    return col + math.floor(additiveOpacity) * 16777216
-end
 color.vctr.white = vector.New(1, 1, 1, 1)
 color.vctr.black = vector.New(0, 0, 0, 1)
 color.vctr.transparent = vector.New(0, 0, 0, 0)
@@ -173,6 +162,16 @@ function color.rgbaToStr(vctr)
     local flr = math.floor
     return table.concat({ flr(vctr.x * 255), flr(vctr.y * 255), flr(vctr.z * 255) }, ',')
 end
+---Converts a Quaver-compatible string to an rgba Vector4.
+---@param str string
+---@return Vector4
+function color.strToRgba(str)
+    local rgb = {}
+    str:gsub('(%d+)', function(c)
+        rgb[#rgb + 1] = c
+    end)
+    return vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, 1)
+end
 ---Converts hsl to an rgba `Vector4`, where `hue` is in degrees. The abstract formula comes from [Wikipedia](https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB_alternative).
 ---@param hue integer The hue in degrees.
 ---@param saturation number The saturation, within [0, 1].
@@ -238,6 +237,15 @@ function game.get.snapAt(time, dontPrintInaccuracy)
     if (math.floor(MAX_SNAP / divisor) ~= MAX_SNAP / divisor) then return 5 end
     if (MAX_SNAP / divisor > 16) then return 5 end
     return MAX_SNAP / divisor
+end
+---Gets the start time of the most recent SSF, or returns -1 if there is no SSF before the given offset.
+---@param offset number
+---@param tgId? string
+---@return number
+function game.get.ssfStartTimeAt(offset, tgId)
+    local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
+    if ssf then return ssf.StartTime end
+    return -1
 end
 ---Gets the multiplier of the most recent SSF, or returns 1 if there is no SSF before the given offset.
 ---@param offset number
@@ -528,6 +536,26 @@ function math.clamp(number, lowerBound, upperBound)
     if number > upperBound then return upperBound end
     return number
 end
+function math.createKernel(kernelType, parameters)
+    kernelType = kernelType:lower()
+    if (kernelType == 'gaussian') then
+        local sigma = parameters.sigma
+        local radius = math.ceil(sigma * 3)
+        local kernel = {}
+        local sum = 0
+        for i = -radius, radius do
+            local val = math.exp(-(i * i) / (2 * sigma * sigma))
+            kernel[i + radius + 1] = val
+            sum = sum + val
+        end
+        local max_val = kernel[radius + 1]
+        if (parameters.normalize) then max_val = sum end
+        for i = 1, #kernel do
+            kernel[i] = kernel[i] / max_val
+        end
+        return kernel, radius
+    end
+end
 ---Evaluates a polynomial (specified by the coefficient array) at a value `x`.
 ---@param ceff number[] The coefficients of the polynomial in descending order; for example, the polynomial x^3+3x^2-3x+4 is represented as `{1, 3, -3, 4}`.
 ---@param x number
@@ -623,6 +651,30 @@ function matrix.findZeroRow(mtrx)
         if zeroRow then return idx end
     end
     return nil
+end
+function matrix.multiply(m1, m2)
+    local p1 = type(m1[1]) == 'table' and #m1 or 1
+    local p2 = type(m1[1]) == 'table' and #m1[1] or #m1
+    local q1 = type(m2[1]) == 'table' and #m1 or 1
+    local q2 = type(m2[1]) == 'table' and #m2[1] or #m2
+    if (p2 ~= q1) then error('Incompatible matrices were told to be multiplied', 69) end
+    local result = {}
+    local rowCount = p1
+    local columnCount = q2
+    for i = 1, rowCount do
+        local row = {}
+        for j = 1, columnCount do
+            local sum = 0
+            for k = 1, #m2 do
+                local m1Factor = p2 == 1 and m1[k] or m1[i][k]
+                local m2Factor = q2 == 1 and m2[j] or m1[k][j]
+                sum = sum + m1[i][k] * m2[k][j]
+            end
+            row[#row + 1] = sum
+        end
+        result[#result + 1] = row
+    end
+    return result
 end
 function matrix.rowLinComb(mtrx, rowIdx1, rowIdx2, row2Factor)
     for k, v in pairs(mtrx[rowIdx1]) do
@@ -1417,6 +1469,7 @@ DYNAMIC_BACKGROUND_TYPES = {
     'Reactive Stars',
     'Reactive Singularity',
     'Dynamic Connection',
+    'SV Spectrogram',
 }
 COMBO_SV_TYPE = {
     'Add',
@@ -4540,6 +4593,7 @@ local stars_xList = {}
 local stars_yList = {}
 local stars_vxList = {}
 local stars_szList = {}
+local stars_listSize = 0
 function renderReactiveStars()
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
@@ -4550,7 +4604,7 @@ function renderReactiveStars()
     if (dimX < 100 or clock.getTime() < 0.3) then return end
     createStar(dimX, dimY, 100)
     updateStars(dimX, dimY, state.DeltaTime)
-    for i = 1, #stars_xList do
+    for i = 1, stars_listSize do
         local x = stars_xList[i]
         local y = stars_yList[i]
         local sz = stars_szList[i]
@@ -4558,23 +4612,24 @@ function renderReactiveStars()
         local brightness = clamp(-8 * progress * (progress - 1), -1, 1)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
         if brightness < 0 then goto nextStar end
-        ctx.AddCircleFilled(pos, sz * 2, color.int.whiteMask * 255 + color.int.alphaMask * 255 * brightness / 10)
-        ctx.AddCircleFilled(pos, sz, color.alterOpacity(color.int.white, math.floor(brightness * 255) - 255))
+        ctx.AddCircleFilled(pos, sz * 2, color.int.white + color.int.alphaMask * 255 * (brightness / 10 - 1))
+        ctx.AddCircleFilled(pos, sz, color.int.white + color.int.alphaMask * 255 * (brightness - 1))
         ::nextStar::
     end
 end
 function createStar(dimX, dimY, n)
-    if (#stars_xList >= n) then return end
-    stars_xList[#stars_xList + 1] = math.random() * dimX
-    stars_yList[#stars_yList + 1] = math.random() * dimY
-    stars_vxList[#stars_vxList + 1] = math.random() * 3 + 1
-    stars_szList[#stars_szList + 1] = math.random(3) * 0.5
+    if (stars_listSize >= n) then return end
+    stars_xList[stars_listSize + 1] = math.random() * dimX
+    stars_yList[stars_listSize + 1] = math.random() * dimY
+    stars_vxList[stars_listSize + 1] = math.random() * 3 + 1
+    stars_szList[stars_listSize + 1] = math.random(3) * 0.5
+    stars_listSize = stars_listSize + 1
 end
 function updateStars(dimX, dimY, dt)
     local random = math.random
     local clamp = math.clamp
     local m = game.get.svMultiplierAt(state.SongTime)
-    for i = 1, #stars_xList do
+    for i = 1, stars_listSize do
         local starWrapped = false
         local x = stars_xList[i]
         local y = stars_yList[i]
@@ -4597,6 +4652,91 @@ function updateStars(dimX, dimY, dt)
                 clamp(2 * m, -50, 50)
         end
     end
+end
+function renderSVSpectrogram()
+    local binCount = 12
+    local doubleBinCount = binCount * 2
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos() + vector.New(0, 50)
+    local dim = imgui.GetWindowSize() - vector.New(0, 50)
+    local bottomLeft = topLeft + vector.New(0, dim.y)
+    local binWidth = dim.x / binCount
+    local binScalingFactor = 1.1
+    local taperMinTime = 50
+    local taperMaxTime = 2000
+    local tgCount = #state.GetValue("tgList")
+    for tgId, tg in pairs(map.TimingGroups) do
+        local col
+        local binValues = {}
+        local m = game.get.svMultiplierAt(state.SongTime, tgId)
+        local ssf = math.abs(game.get.ssfMultiplierAt(state.SongTime, tgId))
+        local startTime = math.max(game.get.svStartTimeAt(state.SongTime, tgId),
+            game.get.ssfStartTimeAt(state.SongTime, tgId))
+        local afterTime = state.SongTime - startTime
+        if (math.abs(afterTime) > taperMaxTime) then
+            binValues = table.constructRepeating(0.1, binCount)
+            goto nextTg
+        end
+        for side = -1, 1, 2 do
+            for i = -binCount / 2, binCount / 2 - 1 do
+                local binLower = ((binScalingFactor ^ (i + binCount / 2)) ^ binScalingFactor - 1) * side
+                local binHigher = binLower * binScalingFactor + (binScalingFactor - 1) * side
+                local str = math.max(1 - math.abs((m * ssf - (binLower + binHigher) / 2) / (binHigher - binLower)), 0) *
+                    0.99 +
+                    0.01
+                str = str *
+                    math.pow((1 - math.clamp((afterTime - taperMinTime) / (taperMaxTime - taperMinTime), 0, 1)), 4)
+                if (side == -1) then
+                    table.insert(binValues, 1, str)
+                else
+                    binValues[#binValues + 1] = str
+                end
+            end
+        end
+        binValues = smoothenSpectrogram(binValues)
+        col = color.vrgbaToUint(color.strToRgba(tg.ColorRgb or '255,255,255')) - color.int.alphaMask * 200
+        if (tgCount == 2) then
+            col = imgui.GetColorU32(imgui_col.Text, 0.5)
+            rCol = imgui.GetColorU32(imgui_col.CheckMark, 0.5)
+        end
+        for i, value in ipairs(binValues) do
+            if (tgCount == 2) then
+                thisCol = color.vrgbaToUint(color.uintToRgba(col) * (doubleBinCount - i + 1) / (doubleBinCount + 1) +
+                    color.uintToRgba(rCol) * (i - 1) / (doubleBinCount + 1))
+                nextCol = color.vrgbaToUint(color.uintToRgba(col) * (doubleBinCount - i) / (doubleBinCount + 1) +
+                    color.uintToRgba(rCol) * i / (doubleBinCount + 1))
+                ctx.AddRectFilledMultiColor(bottomLeft + (i - 1) / doubleBinCount * vector.New(dim.x, 0),
+                    bottomLeft + vector.New((i) / doubleBinCount * dim.x, -dim.y * value),
+                    thisCol, nextCol, nextCol, thisCol)
+            else
+                ctx.AddRectFilled(bottomLeft + (i - 1) / doubleBinCount * vector.New(dim.x, 0),
+                    bottomLeft + vector.New((i) / doubleBinCount * dim.x, -dim.y * value),
+                    col)
+            end
+        end
+        ::nextTg::
+    end
+end
+function smoothenSpectrogram(data)
+    if (not state.GetValue("gaussianKernel")) then
+        local k, r = math.createKernel('gaussian', { sigma = 2.6 })
+        state.SetValue("gaussianKernel", k)
+        state.SetValue("gaussianRadius", r)
+    end
+    local kernel = state.GetValue("gaussianKernel")
+    local radius = state.GetValue("gaussianRadius")
+    local result = {}
+    for i = 1, #data do
+        local acc = 0
+        for k = -radius, radius do
+            local idx = i + k
+            if idx < 1 then idx = 1 end
+            if idx > #data then idx = #data end
+            acc = acc + data[idx] * kernel[k + radius + 1]
+        end
+        result[i] = acc
+    end
+    return result
 end
 function drawCapybaraParent()
     drawCapybara()
@@ -6209,6 +6349,9 @@ function renderBackground()
     end
     if (DYNAMIC_BACKGROUND_TYPES[idx] == 'Dynamic Connection') then
         renderDynamicConnection()
+    end
+    if (DYNAMIC_BACKGROUND_TYPES[idx] == 'SV Spectrogram') then
+        renderSVSpectrogram()
     end
 end
 function setPluginAppearance()
@@ -13255,6 +13398,81 @@ function renderNoteDataWidget()
     imgui.Text(table.concat({'LN Length = ', lnLength, ' ms'}))
     imgui.EndTooltip()
 end
+function runTest()
+    local ctx = imgui.GetWindowDrawList()
+    local topLeft = imgui.GetWindowPos()
+    local dim = imgui.GetWindowSize()
+    local fov = 90
+    local fovRad = fov / 180 * math.pi
+    local f = 1 / math.tan(fovRad / 2)
+    local screenWidth = dim.x
+    local screenHeight = dim.y
+    local aspectRatio = screenWidth / screenHeight
+    local zNear = 0.1
+    local zFar = 1000
+    local q = zFar / (zFar - zNear)
+    local absMinM = math.min(math.abs(game.get.svMultiplierAt(state.SongTime) ^ 2), 5)
+    local speed = absMinM * state.DeltaTime / 300
+    local projectionMatrix = {
+        { f / aspectRatio, 0, 0,          0 },
+        { 0,               f, 0,          0 },
+        { 0,               0, q,          1 },
+        { 0,               0, -zNear * q, 0 },
+    }
+    local inputPoints = {
+        { -(math.sqrt(absMinM / 4) * 0.9 + 0.1), -(math.sqrt(absMinM / 4) * 0.9 + 0.1), -(math.sqrt(absMinM / 4) * 0.9 + 0.1), 1 },
+        { (math.sqrt(absMinM / 4) * 0.9 + 0.1), -(math.sqrt(absMinM / 4) * 0.9 + 0.1), -(math.sqrt(absMinM / 4) * 0.9 + 0.1), 1 },
+        { -(math.sqrt(absMinM / 4) * 0.9 + 0.1), (math.sqrt(absMinM / 4) * 0.9 + 0.1), -(math.sqrt(absMinM / 4) * 0.9 + 0.1), 1 },
+        { (math.sqrt(absMinM / 4) * 0.9 + 0.1), (math.sqrt(absMinM / 4) * 0.9 + 0.1), -(math.sqrt(absMinM / 4) * 0.9 + 0.1), 1 },
+        { -(math.sqrt(absMinM / 4) * 0.9 + 0.1), -(math.sqrt(absMinM / 4) * 0.9 + 0.1), (math.sqrt(absMinM / 4) * 0.9 + 0.1), 1 },
+        { (math.sqrt(absMinM / 4) * 0.9 + 0.1), -(math.sqrt(absMinM / 4) * 0.9 + 0.1), (math.sqrt(absMinM / 4) * 0.9 + 0.1), 1 },
+        { -(math.sqrt(absMinM / 4) * 0.9 + 0.1), (math.sqrt(absMinM / 4) * 0.9 + 0.1), (math.sqrt(absMinM / 4) * 0.9 + 0.1), 1 },
+        { (math.sqrt(absMinM / 4) * 0.9 + 0.1), (math.sqrt(absMinM / 4) * 0.9 + 0.1), (math.sqrt(absMinM / 4) * 0.9 + 0.1), 1 },
+    }
+    local edgeIndices = {
+        { 1, 2 }, { 1, 3 }, { 1, 5 }, { 4, 2 }, { 4, 3 }, { 4, 8 },
+        { 6, 5 }, { 6, 8 }, { 6, 2 }, { 7, 5 }, { 7, 8 }, { 7, 3 },
+    }
+    local outputPoints = {}
+    if (not state.GetValue("theta")) then state.SetValue("theta", 0) end
+    state.SetValue("theta", state.GetValue("theta") + speed)
+    local theta = state.GetValue("theta")
+    local matRotZ = {
+        { math.cos(theta),  math.sin(theta), 0, 0 },
+        { -math.sin(theta), math.cos(theta), 0, 0 },
+        { 0,                0,               1, 0 },
+        { 0,                0,               0, 1 },
+    }
+    local matRotX = {
+        { 1, 0,                               0,                              0 },
+        { 0, math.cos(theta / math.sqrt(2)),  math.sin(theta / math.sqrt(2)), 0 },
+        { 0, -math.sin(theta / math.sqrt(2)), math.cos(theta / math.sqrt(2)), 0 },
+        { 0, 0,                               0,                              1 },
+    }
+    for idx, point in pairs(inputPoints) do
+        local inputPoint = table.map(point, function(i) return table.duplicate({ i }) end)
+        inputPoint = matrix.multiply(matRotZ, inputPoint)
+        inputPoint = matrix.multiply(matRotX, inputPoint)
+        inputPoint[3][1] = inputPoint[3][1] + 5
+        local outputPoint = matrix.multiply(projectionMatrix, inputPoint)
+        outputPoint = table.vectorize4(table.map(outputPoint, function(t) return t[1] end)) / 3 * 2
+        outputPoint = outputPoint * (outputPoint.w ~= 0 and outputPoint.w or 1)
+        outputPoint = (outputPoint + vector.New(1, 1, 1, 0)) / 2 *
+            vector.New(screenWidth, screenHeight, 1, 1)
+        local output2D = vector.New(outputPoint.x, outputPoint.y)
+        outputPoints[#outputPoints + 1] = output2D
+        if (idx <= 8) then
+            ctx.AddCircleFilled(topLeft + output2D, 5,
+                color.int.white)
+        end
+    end
+    for k48 = 1, #edgeIndices do
+        local pair = edgeIndices[k48]
+        local p1 = outputPoints[pair[1]]
+        local p2 = outputPoints[pair[2]]
+        ctx.AddLine(topLeft + p1, topLeft + p2, color.int.white)
+    end
+end
 function chooseAddComboMultipliers(settingVars)
     local oldValues = vector.New(settingVars.comboMultiplier1, settingVars.comboMultiplier2)
     local _, newValues = imgui.InputFloat2('ax + by', oldValues, '%.2f')
@@ -14618,8 +14836,8 @@ end
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for k48 = 1, #svs do
-        local sv = svs[k48]
+    for k49 = 1, #svs do
+        local sv = svs[k49]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
         if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
     end
@@ -15216,6 +15434,7 @@ function draw()
     if (state.GetValue("windows.showPatchNotesWindow")) then
         showPatchNotesWindow()
     end
+    -- runTest()
     imgui.End()
     logoThread()
     state.SetValue("boolean.changeOccurred", false)

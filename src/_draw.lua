@@ -51,6 +51,8 @@ function draw()
         showPatchNotesWindow()
     end
 
+    -- runTest()
+
     imgui.End()
 
     logoThread()

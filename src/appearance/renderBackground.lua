@@ -9,4 +9,7 @@ function renderBackground()
     if (DYNAMIC_BACKGROUND_TYPES[idx] == 'Dynamic Connection') then
         renderDynamicConnection()
     end
+    if (DYNAMIC_BACKGROUND_TYPES[idx] == 'SV Spectrogram') then
+        renderSVSpectrogram()
+    end
 end
