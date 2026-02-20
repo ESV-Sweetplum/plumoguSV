@@ -1,5 +1,6 @@
 function placeStillSVsParent(menuVars)
     printLegacyLNMessage()
+    local finalSVType = FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex]
     local svsToRemove = {}
     local svsToAdd = {}
     if (menuVars.stillBehavior == 1) then
@@ -21,8 +22,10 @@ function placeStillSVsParent(menuVars)
         svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
         svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
     end
-    addFinalSV(svsToAdd, offsets[#offsets], menuVars.svMultipliers[#menuVars.svMultipliers],
-        FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex] == 'Override')
+    if (finalSVType ~= 'None') then
+        addFinalSV(svsToAdd, offsets[#offsets], menuVars.svMultipliers[#menuVars.svMultipliers],
+            finalSVType == 'Override')
+    end
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 

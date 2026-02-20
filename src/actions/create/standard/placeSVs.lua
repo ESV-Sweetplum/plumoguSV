@@ -39,7 +39,9 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
                 sort(svsToAdd, sortAscendingStartTime), svsToAdd)
             svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
         end
-        addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
+        if (finalSVType ~= 'None') then
+            addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
+        end
         removeAndAddSVs(svsToRemove, svsToAdd)
         return
     end

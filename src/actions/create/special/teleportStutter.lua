@@ -50,6 +50,8 @@ function placeTeleportStutterSVs(settingVars)
     if finalSVType ~= 'Normal' then
         finalMultiplier = settingVars.customSV
     end
-    addFinalSV(svsToAdd, lastOffset, finalMultiplier, finalSVType == 'Override')
+    if (finalSVType ~= 'None') then
+        addFinalSV(svsToAdd, lastOffset, finalMultiplier, finalSVType == 'Override')
+    end
     removeAndAddSVs(svsToRemove, svsToAdd)
 end

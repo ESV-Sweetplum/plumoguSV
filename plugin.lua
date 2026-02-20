@@ -1520,6 +1520,7 @@ FINAL_SV_TYPES = {
     'Normal',
     'Custom',
     'Override',
+    'None',
 }
 FLICKER_TYPES = {
     'Normal',
@@ -2529,7 +2530,9 @@ function placeStutterSVs(settingVars)
             stutterIndex = stutterIndex + 1
         end
     end
-    addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
+    if (finalSVType ~= 'None') then
+        addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
+    end
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function placeTeleportStutterSVs(settingVars)
@@ -2583,7 +2586,9 @@ function placeTeleportStutterSVs(settingVars)
     if finalSVType ~= 'Normal' then
         finalMultiplier = settingVars.customSV
     end
-    addFinalSV(svsToAdd, lastOffset, finalMultiplier, finalSVType == 'Override')
+    if (finalSVType ~= 'None') then
+        addFinalSV(svsToAdd, lastOffset, finalMultiplier, finalSVType == 'Override')
+    end
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function placeExponentialSpecialSVs(menuVars)
@@ -2658,7 +2663,9 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
                 sort(svsToAdd, sortAscendingStartTime), svsToAdd)
             svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
         end
-        addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
+        if (finalSVType ~= 'None') then
+            addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
+        end
         removeAndAddSVs(svsToRemove, svsToAdd)
         return
     end
@@ -2669,6 +2676,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
 end
 function placeStillSVsParent(menuVars)
     printLegacyLNMessage()
+    local finalSVType = FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex]
     local svsToRemove = {}
     local svsToAdd = {}
     if (menuVars.stillBehavior == 1) then
@@ -2690,8 +2698,10 @@ function placeStillSVsParent(menuVars)
         svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
         svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
     end
-    addFinalSV(svsToAdd, offsets[#offsets], menuVars.svMultipliers[#menuVars.svMultipliers],
-        FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex] == 'Override')
+    if (finalSVType ~= 'None') then
+        addFinalSV(svsToAdd, offsets[#offsets], menuVars.svMultipliers[#menuVars.svMultipliers],
+            finalSVType == 'Override')
+    end
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRemovalTable, queuedSVs)
@@ -14861,7 +14871,7 @@ function updateFinalSV(finalSVIndex, svMultipliers, customSV, skipFinalSV)
         return
     end
     local finalSVType = FINAL_SV_TYPES[finalSVIndex]
-    if finalSVType == 'Normal' then return end
+    if finalSVType == 'Normal' or finalSVType == 'None' then return end
     svMultipliers[#svMultipliers] = customSV
 end
 function updateStutterMenuSVs(settingVars)

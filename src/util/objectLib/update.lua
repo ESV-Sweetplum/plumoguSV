@@ -31,7 +31,7 @@ function updateFinalSV(finalSVIndex, svMultipliers, customSV, skipFinalSV)
     end
 
     local finalSVType = FINAL_SV_TYPES[finalSVIndex]
-    if finalSVType == 'Normal' then return end
+    if finalSVType == 'Normal' or finalSVType == 'None' then return end
     svMultipliers[#svMultipliers] = customSV
 end
 

@@ -43,6 +43,8 @@ function placeStutterSVs(settingVars)
             stutterIndex = stutterIndex + 1
         end
     end
-    addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
+    if (finalSVType ~= 'None') then
+        addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
+    end
     removeAndAddSVs(svsToRemove, svsToAdd)
 end

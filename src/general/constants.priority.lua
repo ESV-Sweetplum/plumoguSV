@@ -175,6 +175,7 @@ FINAL_SV_TYPES = {
     'Normal',
     'Custom',
     'Override',
+    'None',
 }
 
 FLICKER_TYPES = {
