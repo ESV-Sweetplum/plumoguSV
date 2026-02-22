@@ -1,6 +1,6 @@
 require('packages.table.slice')
 
----Navigates a tree with dot notation and returns the corresponding value. For example, if you had a table { foo = { bar = 1}}, then this returns 1 if the given value is "foo.bar".
+---Navigates a tree with dot notation and returns the corresponding value. For example, if you had a table { foo = { bar = 1 } }, then this returns 1 if the given value is "foo.bar".
 ---@param tree { [string]: any }
 ---@param value string[]
 ---@return any
