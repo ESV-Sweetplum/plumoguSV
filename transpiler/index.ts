@@ -1,9 +1,9 @@
 import { readFileSync, writeFileSync, rmSync, existsSync, renameSync, copyFileSync } from 'fs';
 import { getFilesRecursively } from './lib/getFilesRecursively.js';
 import getFunctionList from './lib/getFunctionList.js';
-import getUnusedFunctions from './lib/getUnusedFunctions.js';
 import { join, sep } from 'path';
 import readAndLintLua from './lib/readAndLintLua.js';
+import * as acBuilder from 'ahocorasick';
 
 let counter = 0;
 
@@ -136,18 +136,18 @@ export default async function transpiler(
         );
     } // Change all cache assignments and cache calls to use state instead
 
-    output = output.replaceAll('\n\n', lineSeparator).trimStart();
+    output = output.replaceAll(/(\r\n|\n{2,})/g, lineSeparator).trimStart();
     if (lint) {
-        let linted = true;
+        let linted = false;
         const splitOutput = output.split(lineSeparator);
 
-        while (linted) {
-            linted = false;
+        while (!linted) {
+            linted = true;
             let [functions, fnIndices] = getFunctionList(splitOutput);
             const spliceIndices = [];
 
             functions.forEach((fn, i) => {
-                const cond = fn.startsWith('string') || fn.startsWith('table');
+                const cond = fn.startsWith('string') || fn.startsWith('table') || ['awake', 'draw'].includes(fn);
                 if (cond) {
                     spliceIndices.unshift(i);
                 }
@@ -158,20 +158,53 @@ export default async function transpiler(
                 fnIndices.splice(idx, 1);
             });
 
-            const [_, unusedIndexes] = getUnusedFunctions(splitOutput, functions, fnIndices);
+            const ac = new acBuilder(functions.map(fn => [`${fn}(`, `${fn},`, `${fn})`]).flat());
+            const acResult = ac.search(output).reduce((obj, arr) => {
+                const target = arr[1][0].replaceAll(/[\(,\)]/g, '');
+                if (obj[target]) {
+                    obj[target].push(arr[0]);
+                } else {
+                    obj[target] = [arr[0]];
+                }
+                return obj;
+            }, {});
 
-            const listLength = unusedIndexes.length;
-            if (listLength > 1) linted = true;
+            Object.entries(acResult).forEach(([k, v]: [string, number[]]) => {
+                if (v.length > 1) {
+                    delete acResult[k];
+                } else {
+                    acResult[k] = v[0];
+                }
+            });
 
-            unusedIndexes.reverse().forEach(idx => {
-                let startIdx = idx;
-                let endIdx = idx;
-                while (splitOutput[startIdx - 1].startsWith('---') && startIdx > 0) startIdx--;
-                while (!splitOutput[endIdx].startsWith('end')) endIdx++;
-                splitOutput.splice(startIdx, endIdx - startIdx + 1);
+            const finalEntries = Object.entries(acResult);
+
+            if (finalEntries.length !== 0) {
+                linted = false;
+            }
+
+            const outputLength = output.length;
+
+            finalEntries.reverse().forEach(([k, v]: [string, number]) => {
+                let startIdx = output.lastIndexOf(lineSeparator, v - k.length - 11); // 1 from \n, 9 from `function `, 1 extra to compensate
+                let prevStartIdx = startIdx + 4;
+                let endIdx = v;
+                let endFound = false;
+
+                while (startIdx >= 0) {
+                    if (output.slice(startIdx + 1, startIdx + 4) !== '---') break;
+                    prevStartIdx = startIdx;
+                    startIdx = output.lastIndexOf(lineSeparator, startIdx - 1);
+                }
+
+                while (endIdx < outputLength && !endFound) {
+                    if (output.slice(endIdx + 1, endIdx + 4) === 'end') endFound = true;
+                    endIdx = output.indexOf(lineSeparator, endIdx + 1);
+                }
+
+                output = output.replace(output.slice(prevStartIdx, endIdx), '');
             });
         }
-        output = splitOutput.join(lineSeparator);
     }
 
     if (existsSync('plugin.lua')) rmSync('plugin.lua');
