@@ -1792,6 +1792,7 @@ globalVars = {
     showPresetMenu = false,
     showSVInfoVisualizer = true,
     showVibratoWidget = false,
+    simultaneousDeleteModes = false,
     snakeSpringConstant = 1,
     stepSize = 5,
     styleThemeIndex = 1,
@@ -8556,17 +8557,39 @@ end
 function deleteTab()
     if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
     local menuVars = getMenuVars('delete')
-    _, menuVars.deleteTable[1] = imgui.Checkbox('Delete Lines', menuVars.deleteTable[1])
-    KeepSameLine()
-    _, menuVars.deleteTable[2] = imgui.Checkbox('Delete SVs', menuVars.deleteTable[2])
-    _, menuVars.deleteTable[3] = imgui.Checkbox('Delete SSFs', menuVars.deleteTable[3])
-    imgui.SameLine(0, SAMELINE_SPACING + 3.5)
-    _, menuVars.deleteTable[4] = imgui.Checkbox('Delete Bookmarks', menuVars.deleteTable[4])
-    cache.saveTable('deleteMenu', menuVars)
-    for i = 1, 4 do
-        if (menuVars.deleteTable[i]) then
-            simpleActionMenu('Delete items between selected notes', 2, deleteItems, menuVars)
+    if (globalVars.simultaneousDeleteModes) then
+        _, menuVars.deleteTable[1] = imgui.Checkbox('Delete Lines', menuVars.deleteTable[1])
+        KeepSameLine()
+        _, menuVars.deleteTable[2] = imgui.Checkbox('Delete SVs', menuVars.deleteTable[2])
+        _, menuVars.deleteTable[3] = imgui.Checkbox('Delete SSFs', menuVars.deleteTable[3])
+        imgui.SameLine(0, SAMELINE_SPACING + 3.5)
+        _, menuVars.deleteTable[4] = imgui.Checkbox('Delete Bookmarks', menuVars.deleteTable[4])
+        cache.saveTable('deleteMenu', menuVars)
+        for i = 1, 4 do
+            if (menuVars.deleteTable[i]) then
+                simpleActionMenu('Delete items between selected notes', 2, deleteItems, menuVars)
+                return
+            end
+        end
+    else
+        local enoughSelectedNotes = checkEnoughSelectedNotes(2)
+        if (not enoughSelectedNotes) then
+            imgui.Text('Select 2 or more notes to specify deletion.')
             return
+        end
+        if (imgui.Button('Delete Lines', HALF_ACTION_BUTTON_SIZE)) then
+            deleteItems({ deleteTable = { true, false, false, false } })
+        end
+        KeepSameLine()
+        if (imgui.Button('Delete SVs', HALF_ACTION_BUTTON_SIZE)) then
+            deleteItems({ deleteTable = { false, true, false, false } })
+        end
+        if (imgui.Button('Delete SSFs', HALF_ACTION_BUTTON_SIZE)) then
+            deleteItems({ deleteTable = { false, false, true, false } })
+        end
+        KeepSameLine()
+        if (imgui.Button('Delete Bookmarks', HALF_ACTION_BUTTON_SIZE)) then
+            deleteItems({ deleteTable = { false, false, false, true } })
         end
     end
 end
@@ -12688,20 +12711,22 @@ function showGeneralSettings()
         'Advanced mode enables a few features that simplify SV creation, at the cost of making the plugin more cluttered.')
     GlobalCheckbox('disableKofiMessage', 'Disable Ko-Fi Message',
         "Removes the text at the bottom of the 'Info' section requesting a donation.")
-    AddSeparator()
+    imgui.SeparatorText('Menu Settings')
     chooseUpscroll()
-    AddSeparator()
-    GlobalCheckbox('dontReplaceSV', "Don't Replace Existing SVs",
-        'Self-explanatory, but applies only to base SVs made with Standard, Special, or Still. Highly recommended to keep this setting disabled.')
-    chooseStepSize()
-    GlobalCheckbox('dontPrintCreation', "Don't Print SV Creation Messages",
-        'Disables printing "Created __ SVs" messages.')
     GlobalCheckbox('equalizeLinear', 'Equalize Linear SV',
         'Forces the standard > linear option to have an average sv of 0 if the start and end SVs are equal. For beginners, this should be enabled.')
+    GlobalCheckbox('dontPrintCreation', "Don't Print SV Creation Messages",
+        'Disables printing "Created __ SVs" messages.')
+    chooseStepSize()
     GlobalCheckbox('restrictSinusoidalPeriod', 'Restrict Sinusoidal Period',
         'If true, restricts the sinusoidal period shift parameter to be the nearest 4th.')
     GlobalCheckbox('comboizeSelect', 'Select Using Already Selected Notes',
         'Changes the behavior of the SELECT tab to select notes that are already selected, instead of all notes between the start/end selection.')
+    GlobalCheckbox('simultaneousDeleteModes', 'Enable Simultaneous Delete Modes',
+        'If enabled, changes the delete menu to use checkboxes, allowing you to delete multiple types of objects at the same time.')
+    imgui.SeparatorText('Placement Settings')
+    GlobalCheckbox('dontReplaceSV', "Don't Replace Existing SVs",
+        'Self-explanatory, but applies only to base SVs made with Standard, Special, or Still. Highly recommended to keep this setting disabled.')
     GlobalCheckbox('printLegacyLNMessage', 'Print Legacy LN Recommendation',
         'When true, prints a warning to enable legacy LN when the following conditions are met:\n1. Legacy LN Rendering is currently turned off.\n2: When placing stills, or using certain features that can displace, such as flicker, displace note, and displace view.')
 end

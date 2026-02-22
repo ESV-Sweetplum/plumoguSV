@@ -40,6 +40,7 @@ globalVars = {
     showPresetMenu = false,
     showSVInfoVisualizer = true,
     showVibratoWidget = false,
+    simultaneousDeleteModes = false,
     snakeSpringConstant = 1,
     stepSize = 5,
     styleThemeIndex = 1,
