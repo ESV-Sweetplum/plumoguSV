@@ -1,6 +1,5 @@
 # plumoguSV v2.1.0
 
-
 <img src="./assets/logo.png" alt="plumoguSV Logo">
 
 > "The ultimate community-driven and open-source competitive SV plugin. Remastered with many new features."
@@ -42,21 +41,16 @@ Also, some cursor effects were inspired (stolen) from https://github.com/tholman
 
 ## Related Links
 
--   [Quaver Plugin Guide](https://github.com/IceDynamix/QuaverPluginGuide/blob/master/quaver_plugin_guide.md) by IceDynamix
--   [iceSV](https://github.com/IceDynamix/iceSV) by IceDynamix
--   [KeepStill](https://github.com/Illuminati-CRAZ/KeepStill) by Illuminati-CRAZ
--   [Vibrato](https://github.com/Illuminati-CRAZ/Vibrato) by Illuminati-CRAZ
--   [Displacer](https://github.com/Illuminati-CRAZ/Displacer) by Illuminati-CRAZ
--   [AFFINE](https://github.com/ESV-Sweetplum/AFFINE) by ESV-Sweetplum
--   [mulch](https://github.com/Emik03/mulch) by Emik03
+- [Quaver Plugin Guide](https://github.com/IceDynamix/QuaverPluginGuide/blob/master/quaver_plugin_guide.md) by IceDynamix
+- [iceSV](https://github.com/IceDynamix/iceSV) by IceDynamix
+- [KeepStill](https://github.com/Illuminati-CRAZ/KeepStill) by Illuminati-CRAZ
+- [Vibrato](https://github.com/Illuminati-CRAZ/Vibrato) by Illuminati-CRAZ
+- [Displacer](https://github.com/Illuminati-CRAZ/Displacer) by Illuminati-CRAZ
+- [AFFINE](https://github.com/ESV-Sweetplum/AFFINE) by ESV-Sweetplum
+- [mulch](https://github.com/Emik03/mulch) by Emik03
 
 ## Support
 
 If you want any custom features or rush orders, check out the link below.
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X11IU1C3)
-
-## TO-DO
-
--   Animation palette generator (v2.1)
--   Allow for dynamic sv fps instead of static sv points (v2.1)
