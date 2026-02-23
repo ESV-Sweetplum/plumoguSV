@@ -7,7 +7,7 @@ As plumoguSV uses a multifile structure, there will be a few extra steps to star
 
     2a. If TypeScript is not globally installed, run `npm i -g typescript`. This is necessary as the previous step assumes your TypeScript installation is global.
 
-3. To start developing, type `npm run watch` into the terminal. This will start the watcher.
+3. To start developing, type `npm run watch` or `npm run dev` into the terminal. This will start the watcher.
 4. Now, any time you make a change to a file in the `src/` directory, `plugin.lua` will automatically recompile and will be hot-reloaded in game.
 
 Please refer to `CODESTYLE.md` for repository-based specifics.
