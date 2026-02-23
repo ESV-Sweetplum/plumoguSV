@@ -1,21 +1,21 @@
 ## Lua-specific code styling
 
--   The indent width in this codebase is 4.
--   Use `camelCase` whenever possible. While many other projects use `snake_case` for Lua, since the exposed globals from Quaver use `camelCase`, it makes sense to follow this paradigm.
--   The exception to the above rule is when your function is strictly for display purposes only (such as an imgui component). In this case, use `UpperCamelCase` for clarity.
--   Avoid using `k` or `v` as parameters in `pairs(tbl)`, unless iterating over a generic table.
--   Acronyms that are not game objects, like SVs, SSFs, or TGs, should only have their first letter capitalized (like `scrollGroupId`)
--   Any variable with `UPPER_SNAKE_CASE` is a constant. Treat it as such.
--   Avoid anonymous functions unless passing them as the parameter to another function.
--   Any variable prefixed with `_` is not meant to be used.
--   Avoid writing comments explaining code unless the logic within the code is unclear.
--   Use double quotes for strings, unless they contain a double quote themselves; in that case, use single quotes.
--   Avoid using bracket notation for tables unless the key is not known beforehand (e.g. during runtime) or if the key must be surrounded by quotations.
--   Try to either have all variables necessary assigned at the top of a function, or have their first assignment be as close to their next call as possible.
--   Use the existing conventions within the repository if they're not listed here.
--   When printing a particular type of message, the format that should be used is `i!`, `w!`, `s!`, or `e!`.
--   Any function that will be solely used in an `if` statement should be of the "question" variety (such as `isTruthy`).
--   Do not use temporary variables to swap other variables; use destructuring instead.
+- The indent width in this codebase is 4.
+- Use `camelCase` whenever possible. While many other projects use `snake_case` for Lua, since the exposed globals from Quaver use `camelCase`, it makes sense to follow this paradigm.
+- The exception to the above rule is when your function is strictly for display purposes only (such as an imgui component). In this case, use `UpperCamelCase` for clarity.
+- Avoid using `k` or `v` as parameters in `pairs(tbl)`, unless iterating over a generic table.
+- Acronyms that are not game objects, like SVs, SSFs, or TGs, should only have their first letter capitalized (like `scrollGroupId`). Exceptions to this are well-known programming acronyms like `RGB`.
+- Any variable with `UPPER_SNAKE_CASE` is a constant. Treat it as such.
+- Avoid anonymous functions unless passing them as the parameter to another function.
+- Any variable prefixed with `_` is not meant to be used.
+- Avoid writing comments explaining code unless the logic within the code is unclear.
+- Use double quotes for strings, unless they contain a double quote themselves; in that case, use single quotes.
+- Avoid using bracket notation for tables unless the key is not known beforehand (e.g. during runtime) or if the key must be surrounded by quotations.
+- Try to either have all variables necessary assigned at the top of a function, or have their first assignment be as close to their next call as possible.
+- Use the existing conventions within the repository if they're not listed here.
+- When printing a particular type of message, the format that should be used is `i!`, `w!`, `s!`, or `e!`.
+- Any function that will be solely used in an `if` statement should be of the "question" variety (such as `isTruthy`).
+- Do not use temporary variables to swap other variables; use destructuring instead.
 
 ## Creating a new window/feature steps
 
@@ -44,13 +44,13 @@
 
 ## Notes on general codebase specifics
 
--   Most constants defined in the root of the file should be located in the file it's needed, unless one of the following are met:
-    -   The constant is used in a `chooseFunction`.
-    -   The constant is used in multiple files.
-    -   The constant is linked to other constants that follow one of the above rules.
-    -   The constant is a table with functions linking from it, without the table itself being defined.
--   All files that must have higher priority (like defined constants or widespread functions that do not rely on anything within the plugin itself) should be marked using the `*.priority.lua` suffix. As packages are loaded before priority functions, priority functions should not depend on each other, and only rely on the packages. A rare exception of this is state handling for variables.
--   Notifications should always include the `!` flag (not including the plugin name) if it comes from clicking a button (such as Place SVs) or is triggered by a keybind that could be triggered via a non-settings button. Notifications should never include the `!` flag when it is from a action hotkey.
+- Most constants defined in the root of the file should be located in the file it's needed, unless one of the following are met:
+    - The constant is used in a `chooseFunction`.
+    - The constant is used in multiple files.
+    - The constant is linked to other constants that follow one of the above rules.
+    - The constant is a table with functions linking from it, without the table itself being defined.
+- All files that must have higher priority (like defined constants or widespread functions that do not rely on anything within the plugin itself) should be marked using the `*.priority.lua` suffix. As packages are loaded before priority functions, priority functions should not depend on each other, and only rely on the packages. A rare exception of this is state handling for variables.
+- Notifications should always include the `!` flag (not including the plugin name) if it comes from clicking a button (such as Place SVs) or is triggered by a keybind that could be triggered via a non-settings button. Notifications should never include the `!` flag when it is from a action hotkey.
 
 ## Rendering Bezier Text In-Game
 
