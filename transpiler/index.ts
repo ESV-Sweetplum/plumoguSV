@@ -8,6 +8,7 @@ import * as acBuilder from 'ahocorasick';
 let counter = 0;
 
 const lineSeparator = '\n';
+const separatorLength = lineSeparator.length;
 
 export function getCounterAndIncrement() {
     counter++;
@@ -182,13 +183,13 @@ export default async function transpiler(
                 let endFound = false;
 
                 while (startIdx >= 0) {
-                    if (output.slice(startIdx + 1, startIdx + 4) !== '---') break;
+                    if (output.slice(startIdx + separatorLength, startIdx + separatorLength + 3) !== '---') break;
                     prevStartIdx = startIdx;
                     startIdx = output.lastIndexOf(lineSeparator, startIdx - 1);
                 }
 
                 while (endIdx < outputLength && !endFound) {
-                    if (output.slice(endIdx + 1, endIdx + 4) === 'end') endFound = true;
+                    if (output.slice(endIdx + separatorLength, endIdx + separatorLength + 3) === 'end') endFound = true;
                     endIdx = output.indexOf(lineSeparator, endIdx + 1);
                 }
 
