@@ -169,7 +169,7 @@ export default async function transpiler(
 
             const finalEntries = Object.entries(acResult);
 
-            if (finalEntries.length !== 0) {
+            if (finalEntries.length) {
                 linted = false;
             }
 
