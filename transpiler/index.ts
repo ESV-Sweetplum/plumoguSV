@@ -143,20 +143,10 @@ export default async function transpiler(
 
         while (!linted) {
             linted = true;
-            let [functions, fnIndices] = getFunctionList(splitOutput);
-            const spliceIndices = [];
 
-            functions.forEach((fn, i) => {
-                const cond = fn.startsWith('string') || fn.startsWith('table') || ['awake', 'draw'].includes(fn);
-                if (cond) {
-                    spliceIndices.unshift(i);
-                }
-            });
-
-            spliceIndices.forEach(idx => {
-                functions.splice(idx, 1);
-                fnIndices.splice(idx, 1);
-            });
+            let functions = getFunctionList(splitOutput).filter(
+                name => !name.startsWith('string') && !name.startsWith('table') && !['awake', 'draw'].includes(name),
+            );
 
             const ac = new acBuilder(functions.map(fn => [`${fn}(`, `${fn},`, `${fn})`]).flat());
             const acResult = ac.search(output).reduce((obj, arr) => {
