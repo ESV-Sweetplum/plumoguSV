@@ -1,5 +1,5 @@
-DISTRO="steam"
-ENVIRONMENT = "production"
+ENVIRONMENT = "development"
+devMode = true
 cache = {
     boolean = {},
     windows = {},
@@ -15638,7 +15638,7 @@ end
 function draw()
     if (not state.CurrentTimingPoint) then return end
     local performanceMode = globalVars.performanceMode
-    PLUGIN_NAME = 'plumoguSV v2.1.1'
+    PLUGIN_NAME = 'plumoguSV-dev'
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed(PLUGIN_NAME)
     imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
