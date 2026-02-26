@@ -1,4 +1,4 @@
-import chalk = require("chalk");
+import chalk = require('chalk');
 
 export default function checkDuplicatedLines(plugin: string[], toleratedLength: number) {
     const hashmap = {};
@@ -7,10 +7,10 @@ export default function checkDuplicatedLines(plugin: string[], toleratedLength: 
 
     plugin.forEach((line, idx) => {
         const trimmedLine = line.trim();
-        if (trimmedLine.startsWith("--")) return;
-        if (trimmedLine.startsWith("return")) return;
-        if (trimmedLine.startsWith("imgui")) return;
-        if (trimmedLine.startsWith("}")) return;
+        if (trimmedLine.startsWith('--')) return;
+        if (trimmedLine.startsWith('return')) return;
+        if (trimmedLine.startsWith('imgui')) return;
+        if (trimmedLine.startsWith('}')) return;
         if (trimmedLine.startsWith('"')) return;
         if (/^[a-zA-Z0-9_]+ = [-a-zA-Z0-9_\.\[\(\)\{\}]+,$/.test(trimmedLine)) return;
         if (!hashmap[trimmedLine]) hashmap[trimmedLine] = { indices: [], count: 0, trueLine: line };
@@ -54,7 +54,7 @@ export default function checkDuplicatedLines(plugin: string[], toleratedLength: 
             savedLines.push(lines[trueIdx]);
         } else {
             if (savedLines.length > toleratedLength) {
-                dupeArr.push(savedLines.join("\n"));
+                dupeArr.push(savedLines.join('\n'));
                 failedTests++;
             }
             testCount++;
@@ -66,7 +66,7 @@ export default function checkDuplicatedLines(plugin: string[], toleratedLength: 
     dupeArr = [...new Set(dupeArr)];
 
     dupeArr.forEach(dupe => {
-        console.log(chalk.bgCyanBright(chalk.black("\nThe following code block has been repeated in code:\n")));
+        console.log(chalk.bgCyanBright(chalk.black('\nThe following code block has been repeated in code:\n')));
         console.log(chalk.bgRedBright(dupe));
     });
 
