@@ -29,6 +29,9 @@ function placeVibratoSVMenu(separateWindow)
         'Vibrato' .. tostring(separateWindow))
     if globalVars.showPresetMenu then
         renderPresetMenu('Vibrato', menuVars, settingVars)
+        cache.saveTable(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
+            settingVars)
+        cache.saveTable('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
         return
     end
 
