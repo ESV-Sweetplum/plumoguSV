@@ -28,10 +28,12 @@ function placeVibratoSVMenu(separateWindow)
     local settingVars = getSettingVars(currentSVType .. modeText,
         'Vibrato' .. tostring(separateWindow))
     if globalVars.showPresetMenu then
-        renderPresetMenu('Vibrato', menuVars, settingVars)
-        cache.saveTable(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
-            settingVars)
-        cache.saveTable('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
+        local presetSelected = renderPresetMenu('Vibrato', menuVars, settingVars)
+        if (not presetSelected) then
+            cache.saveTable(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
+                settingVars)
+            cache.saveTable('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
+        end
         return
     end
 

@@ -15,9 +15,11 @@ function placeSpecialSVMenu()
     local currentSVType = SPECIAL_SVS[menuVars.svTypeIndex]
     local settingVars = getSettingVars(currentSVType, 'Special')
     if globalVars.showPresetMenu then
-        renderPresetMenu('Special', menuVars, settingVars)
-        cache.saveTable(currentSVType .. 'SpecialSettings', settingVars)
-        cache.saveTable('placeSpecialMenu', menuVars)
+        local presetSelected = renderPresetMenu('Special', menuVars, settingVars)
+        if (not presetSelected) then
+            cache.saveTable(currentSVType .. 'SpecialSettings', settingVars)
+            cache.saveTable('placeSpecialMenu', menuVars)
+        end
         return
     end
 

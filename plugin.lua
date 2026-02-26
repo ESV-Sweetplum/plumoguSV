@@ -7802,7 +7802,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         preset = {}
         preset.name = newPresetName
         newPresetName = ''
-        preset.data = json.serialize({ menuVars = menuVars, settingVars = settingVars })
+        preset.data = table.stringify({ menuVars = menuVars, settingVars = settingVars })
         preset.type = menuLabel
         if (menuLabel == 'Standard' or menuLabel == 'Still') then
             preset.menu = STANDARD_SVS[menuVars.svTypeIndex]
@@ -7828,7 +7828,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     imgui.PopItemWidth()
     imgui.SameLine()
     if (imgui.Button('Import##CustomPreset')) then
-        local parsedTable = json.parse(importCustomPreset)
+        local parsedTable = table.parse(importCustomPreset)
         if (table.includes(table.property(globalVars.presets, 'name'), parsedTable.name)) then
             print('e!',
                 'A preset with this name already exists. Please remove it or change the name in the import string.')
@@ -7858,14 +7858,15 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         imgui.Text(table.concat({ preset.type:shorten(), ' > ', removeTrailingTag(preset.menu):sub(1, 3) }))
         imgui.NextColumn()
         if (imgui.Button('Select##Preset' .. idx)) then
-            local data = json.parse(preset.data)
+            local data = table.parse(preset.data)
             globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
             cache.saveTable(preset.menu .. preset.type .. 'Settings', data.settingVars)
             cache.saveTable(table.concat({'place', preset.type, 'Menu'}), data.menuVars)
             globalVars.showPresetMenu = false
+            return true
         end
         if (imgui.IsItemClicked('Right')) then
-            imgui.SetClipboardText(json.serialize(preset))
+            imgui.SetClipboardText(table.stringify(preset))
             print('i!', 'Exported preset to your clipboard.')
         end
         HoverToolTip('Left-click to select this preset. Right-click to copy this preset to your clipboard.')
@@ -8083,9 +8084,11 @@ function placeSpecialSVMenu()
     local currentSVType = SPECIAL_SVS[menuVars.svTypeIndex]
     local settingVars = getSettingVars(currentSVType, 'Special')
     if globalVars.showPresetMenu then
-        renderPresetMenu('Special', menuVars, settingVars)
-        cache.saveTable(currentSVType .. 'SpecialSettings', settingVars)
-        cache.saveTable('placeSpecialMenu', menuVars)
+        local presetSelected = renderPresetMenu('Special', menuVars, settingVars)
+        if (not presetSelected) then
+            cache.saveTable(currentSVType .. 'SpecialSettings', settingVars)
+            cache.saveTable('placeSpecialMenu', menuVars)
+        end
         return
     end
     if currentSVType == 'Stutter' then stutterMenu(settingVars) end
@@ -8179,9 +8182,11 @@ function placeStandardSVMenu()
     local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
     local settingVars = getSettingVars(currentSVType, 'Standard')
     if globalVars.showPresetMenu then
-        renderPresetMenu('Standard', menuVars, settingVars)
-        cache.saveTable(currentSVType .. 'StandardSettings', settingVars)
-        cache.saveTable('placeStandardMenu', menuVars)
+        local presetSelected = renderPresetMenu('Standard', menuVars, settingVars)
+        if (not presetSelected) then
+            cache.saveTable(currentSVType .. 'StandardSettings', settingVars)
+            cache.saveTable('placeStandardMenu', menuVars)
+        end
         return
     end
     needSVUpdate = showSettingsMenu(currentSVType, settingVars, false, nil, 'Standard') or needSVUpdate
@@ -8210,9 +8215,11 @@ function placeStillSVMenu()
     local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
     local settingVars = getSettingVars(currentSVType, 'Still')
     if globalVars.showPresetMenu then
-        renderPresetMenu('Still', menuVars, settingVars)
-        cache.saveTable(currentSVType .. 'StillSettings', settingVars)
-        cache.saveTable('placeStillMenu', menuVars)
+        local presetSelected = renderPresetMenu('Still', menuVars, settingVars)
+        if (not presetSelected) then
+            cache.saveTable(currentSVType .. 'StillSettings', settingVars)
+            cache.saveTable('placeStillMenu', menuVars)
+        end
         return
     end
     imgui.Text('Still Settings:')
@@ -8347,10 +8354,12 @@ function placeVibratoSVMenu(separateWindow)
     local settingVars = getSettingVars(currentSVType .. modeText,
         'Vibrato' .. tostring(separateWindow))
     if globalVars.showPresetMenu then
-        renderPresetMenu('Vibrato', menuVars, settingVars)
-        cache.saveTable(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
-            settingVars)
-        cache.saveTable(table.concat({'placeVibrato', tostring(separateWindow), 'Menu'}), menuVars)
+        local presetSelected = renderPresetMenu('Vibrato', menuVars, settingVars)
+        if (not presetSelected) then
+            cache.saveTable(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
+                settingVars)
+            cache.saveTable(table.concat({'placeVibrato', tostring(separateWindow), 'Menu'}), menuVars)
+        end
         return
     end
     AddSeparator()

@@ -8,9 +8,11 @@ function placeStillSVMenu()
     local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
     local settingVars = getSettingVars(currentSVType, 'Still')
     if globalVars.showPresetMenu then
-        renderPresetMenu('Still', menuVars, settingVars)
-        cache.saveTable(currentSVType .. 'StillSettings', settingVars)
-        cache.saveTable('placeStillMenu', menuVars)
+        local presetSelected = renderPresetMenu('Still', menuVars, settingVars)
+        if (not presetSelected) then
+            cache.saveTable(currentSVType .. 'StillSettings', settingVars)
+            cache.saveTable('placeStillMenu', menuVars)
+        end
         return
     end
     imgui.Text('Still Settings:')

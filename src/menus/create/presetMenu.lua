@@ -11,7 +11,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         preset = {}
         preset.name = newPresetName
         newPresetName = ''
-        preset.data = json.serialize({ menuVars = menuVars, settingVars = settingVars })
+        preset.data = table.stringify({ menuVars = menuVars, settingVars = settingVars })
         preset.type = menuLabel
         if (menuLabel == 'Standard' or menuLabel == 'Still') then
             preset.menu = STANDARD_SVS[menuVars.svTypeIndex]
@@ -39,7 +39,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     imgui.PopItemWidth()
     imgui.SameLine()
     if (imgui.Button('Import##CustomPreset')) then
-        local parsedTable = json.parse(importCustomPreset)
+        local parsedTable = table.parse(importCustomPreset)
         if (table.includes(table.property(globalVars.presets, 'name'), parsedTable.name)) then
             print('e!',
                 'A preset with this name already exists. Please remove it or change the name in the import string.')
@@ -74,14 +74,15 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         imgui.Text(table.concat({ preset.type:shorten(), ' > ', removeTrailingTag(preset.menu):sub(1, 3) }))
         imgui.NextColumn()
         if (imgui.Button('Select##Preset' .. idx)) then
-            local data = json.parse(preset.data)
+            local data = table.parse(preset.data)
             globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
             cache.saveTable(preset.menu .. preset.type .. 'Settings', data.settingVars)
             cache.saveTable('place' .. preset.type .. 'Menu', data.menuVars)
             globalVars.showPresetMenu = false
+            return true
         end
         if (imgui.IsItemClicked('Right')) then
-            imgui.SetClipboardText(json.serialize(preset))
+            imgui.SetClipboardText(table.stringify(preset))
             print('i!', 'Exported preset to your clipboard.')
         end
         HoverToolTip('Left-click to select this preset. Right-click to copy this preset to your clipboard.')

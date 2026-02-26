@@ -22,9 +22,11 @@ function placeStandardSVMenu()
     local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
     local settingVars = getSettingVars(currentSVType, 'Standard')
     if globalVars.showPresetMenu then
-        renderPresetMenu('Standard', menuVars, settingVars)
-        cache.saveTable(currentSVType .. 'StandardSettings', settingVars)
-        cache.saveTable('placeStandardMenu', menuVars)
+        local presetSelected = renderPresetMenu('Standard', menuVars, settingVars)
+        if (not presetSelected) then
+            cache.saveTable(currentSVType .. 'StandardSettings', settingVars)
+            cache.saveTable('placeStandardMenu', menuVars)
+        end
         return
     end
 
