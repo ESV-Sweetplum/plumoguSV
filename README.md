@@ -54,3 +54,5 @@ Also, some cursor effects were inspired (stolen) from https://github.com/tholman
 If you want any custom features or rush orders, check out the link below.
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X11IU1C3)
+
+To ask for help, or to request anything plugin-related, please join the [Discord](https://discord.gg/gU4P5nPAMF)!
