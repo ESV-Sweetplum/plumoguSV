@@ -11869,6 +11869,7 @@ end
 function showPatchNotesV211(lc, rc)
     local bugFixes = {
         'Fixed the x2 and /2 buttons not working.',
+        "Fixed the preset menu's columns not correctly rendering.",
     }
     local newFeatures = {
         'Added a new dynamic background, the SV Spectrogram.',
