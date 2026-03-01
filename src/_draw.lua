@@ -51,7 +51,9 @@ function draw()
         showPatchNotesWindow()
     end
 
-    -- runTest()
+    if (map.ToString() == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES [DJ 7XBI BRINGS BACK (NEWGEN SV) VIBES]') then
+        runTest()
+    end
 
     imgui.End()
 
