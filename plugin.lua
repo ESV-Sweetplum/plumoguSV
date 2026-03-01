@@ -14934,6 +14934,10 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
                     settingVars.endSV,
                     settingVars.svPoints + 1, true)
             else
+                local startSV = 2 * settingVars.avgSV - settingVars.endSV
+                multipliers = generateLinearSet(
+                    startSV, settingVars.endSV + startSV / (settingVars.svPoints - 1),
+                    settingVars.svPoints + 1, true)
             end
         end
     elseif svType == 'Exponential' then
