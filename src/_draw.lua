@@ -51,7 +51,7 @@ function draw()
         showPatchNotesWindow()
     end
 
-    if (map.ToString() == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES [DJ 7XBI BRINGS BACK (NEWGEN SV) VIBES]') then
+    if (map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ') then
         runTest()
     end
 
