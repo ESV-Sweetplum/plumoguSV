@@ -252,7 +252,13 @@ STILL_BEHAVIOR_TYPES = {
     'Per Note Group',
 }
 
-DISTANCE_TYPES = {
+LINEAR_DISTANCE_TYPES = {
+    'Start SV / End SV',
+    'Start SV / Average SV',
+    'Average SV / End SV',
+}
+
+EXPONENTIAL_DISTANCE_TYPES = {
     'Average SV + Shift',
     'Distance + Shift',
     'Start / End',

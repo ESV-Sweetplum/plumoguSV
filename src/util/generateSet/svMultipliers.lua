@@ -6,8 +6,29 @@
 function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
     local multipliers = { 727, 69 } ---@type number[]
     if svType == 'Linear' then
-        multipliers = generateLinearSet(settingVars.startSV, settingVars.endSV,
-            settingVars.svPoints + 1, true)
+        if (settingVars.distanceMode == 1) then
+            multipliers = generateLinearSet(settingVars.startSV, settingVars.endSV,
+                settingVars.svPoints + 1, true)
+        elseif (settingVars.distanceMode == 2) then
+            if (globalVars.equalizeLinear) then
+                multipliers = generateLinearSet(settingVars.startSV, 2 * settingVars.avgSV - settingVars.startSV,
+                    settingVars.svPoints + 1, true)
+            else
+                multipliers = generateLinearSet(settingVars.startSV,
+                    2 * settingVars.avgSV - settingVars.startSV +
+                    2 * (settingVars.avgSV - settingVars.startSV) / (settingVars.svPoints - 1),
+                    settingVars.svPoints + 1, true)
+            end
+        else
+            if (globalVars.equalizeLinear) then
+                multipliers = generateLinearSet(
+                    2 * settingVars.avgSV - settingVars.endSV,
+                    settingVars.endSV,
+                    settingVars.svPoints + 1, true)
+            else
+                ---- WORK ON THIS LATER
+            end
+        end
     elseif svType == 'Exponential' then
         local behavior = SV_BEHAVIORS[settingVars.behaviorIndex]
         if (settingVars.distanceMode == 3) then

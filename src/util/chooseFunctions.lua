@@ -687,9 +687,15 @@ function chooseSVPoints(settingVars, svPointsForce)
     return ExponentialInputInt(settingVars, 'svPoints', 'SV Points##regular', { 1, MAX_SV_POINTS })
 end
 
-function chooseDistanceMode(menuVars)
+function chooseLinearDistanceMode(menuVars)
     local oldMode = menuVars.distanceMode
-    menuVars.distanceMode = Combo('Distance Type', DISTANCE_TYPES, menuVars.distanceMode)
+    menuVars.distanceMode = Combo('Distance Type', LINEAR_DISTANCE_TYPES, menuVars.distanceMode)
+    return oldMode ~= menuVars.distanceMode
+end
+
+function chooseExponentialDistanceMode(menuVars)
+    local oldMode = menuVars.distanceMode
+    menuVars.distanceMode = Combo('Distance Type', EXPONENTIAL_DISTANCE_TYPES, menuVars.distanceMode)
     return oldMode ~= menuVars.distanceMode
 end
 

@@ -25,7 +25,7 @@ end
 function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
     local oldValue = value
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
-    local negateButtonPressed = imgui.Button('Neg.', SECONDARY_BUTTON_SIZE)
+    local negateButtonPressed = imgui.Button('Neg.##' .. label, SECONDARY_BUTTON_SIZE)
     HoverToolTip('Negate this value.')
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))

@@ -1584,7 +1584,12 @@ STILL_BEHAVIOR_TYPES = {
     'Entire Region',
     'Per Note Group',
 }
-DISTANCE_TYPES = {
+LINEAR_DISTANCE_TYPES = {
+    'Start SV / End SV',
+    'Start SV / Average SV',
+    'Average SV / End SV',
+}
+EXPONENTIAL_DISTANCE_TYPES = {
     'Average SV + Shift',
     'Distance + Shift',
     'Start / End',
@@ -2157,9 +2162,11 @@ end]],
     linear = {
         startSV = 1.5,
         endSV = 0.5,
+        avgSV = 0,
         svPoints = 16,
         finalSVIndex = 2,
         customSV = 1,
+        distanceMode = 1,
     },
     exponential = {
         behaviorIndex = 1,
@@ -7399,7 +7406,7 @@ end
 function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
     local oldValue = value
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
-    local negateButtonPressed = imgui.Button('Neg.', SECONDARY_BUTTON_SIZE)
+    local negateButtonPressed = imgui.Button('Neg.##' .. label, SECONDARY_BUTTON_SIZE)
     HoverToolTip('Negate this value.')
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
@@ -14396,9 +14403,14 @@ function chooseSVPoints(settingVars, svPointsForce)
     end
     return ExponentialInputInt(settingVars, 'svPoints', 'SV Points##regular', { 1, MAX_SV_POINTS })
 end
-function chooseDistanceMode(menuVars)
+function chooseLinearDistanceMode(menuVars)
     local oldMode = menuVars.distanceMode
-    menuVars.distanceMode = Combo('Distance Type', DISTANCE_TYPES, menuVars.distanceMode)
+    menuVars.distanceMode = Combo('Distance Type', LINEAR_DISTANCE_TYPES, menuVars.distanceMode)
+    return oldMode ~= menuVars.distanceMode
+end
+function chooseExponentialDistanceMode(menuVars)
+    local oldMode = menuVars.distanceMode
+    menuVars.distanceMode = Combo('Distance Type', EXPONENTIAL_DISTANCE_TYPES, menuVars.distanceMode)
     return oldMode ~= menuVars.distanceMode
 end
 function choosePulseCoefficient()
@@ -14902,8 +14914,28 @@ end
 function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
     local multipliers = { 727, 69 } ---@type number[]
     if svType == 'Linear' then
-        multipliers = generateLinearSet(settingVars.startSV, settingVars.endSV,
-            settingVars.svPoints + 1, true)
+        if (settingVars.distanceMode == 1) then
+            multipliers = generateLinearSet(settingVars.startSV, settingVars.endSV,
+                settingVars.svPoints + 1, true)
+        elseif (settingVars.distanceMode == 2) then
+            if (globalVars.equalizeLinear) then
+                multipliers = generateLinearSet(settingVars.startSV, 2 * settingVars.avgSV - settingVars.startSV,
+                    settingVars.svPoints + 1, true)
+            else
+                multipliers = generateLinearSet(settingVars.startSV,
+                    2 * settingVars.avgSV - settingVars.startSV +
+                    2 * (settingVars.avgSV - settingVars.startSV) / (settingVars.svPoints - 1),
+                    settingVars.svPoints + 1, true)
+            end
+        else
+            if (globalVars.equalizeLinear) then
+                multipliers = generateLinearSet(
+                    2 * settingVars.avgSV - settingVars.endSV,
+                    settingVars.endSV,
+                    settingVars.svPoints + 1, true)
+            else
+            end
+        end
     elseif svType == 'Exponential' then
         local behavior = SV_BEHAVIORS[settingVars.behaviorIndex]
         if (settingVars.distanceMode == 3) then
@@ -15602,7 +15634,7 @@ function exponentialSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     settingsChanged = chooseSVBehavior(settingVars) or settingsChanged
     settingsChanged = chooseIntensity(settingVars) or settingsChanged
     if (globalVars.advancedMode) then
-        settingsChanged = chooseDistanceMode(settingVars) or settingsChanged
+        settingsChanged = chooseExponentialDistanceMode(settingVars) or settingsChanged
     end
     if (settingVars.distanceMode ~= 3) then
         settingsChanged = chooseConstantShift(settingVars, 0) or settingsChanged
@@ -15629,7 +15661,22 @@ function hermiteSettingsMenu(settingVars, skipFinalSV, svPointsForce)
 end
 function linearSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     local settingsChanged = false
-    settingsChanged = chooseStartEndSVs(settingVars) or settingsChanged
+    if (globalVars.advancedMode) then
+        settingsChanged = chooseLinearDistanceMode(settingVars) or settingsChanged
+    end
+    if (settingVars.distanceMode == 1) then
+        settingsChanged = chooseStartEndSVs(settingVars) or settingsChanged
+    end
+    if (settingVars.distanceMode == 2) then
+        local startChanged = false
+        settingVars.startSV, startChanged = NegatableComputableInputFloat('Start SV', settingVars.startSV, 2, 'x')
+        settingsChanged = chooseAverageSV(settingVars) or settingsChanged or startChanged
+    end
+    if (settingVars.distanceMode == 3) then
+        local endChanged = false
+        settingVars.endSV, endChanged = NegatableComputableInputFloat('End SV', settingVars.endSV, 2, 'x')
+        settingsChanged = chooseAverageSV(settingVars) or settingsChanged or endChanged
+    end
     settingsChanged = chooseSVPoints(settingVars, svPointsForce) or settingsChanged
     settingsChanged = chooseFinalSV(settingVars, skipFinalSV) or settingsChanged
     return settingsChanged

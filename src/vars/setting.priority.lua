@@ -75,9 +75,11 @@ end]],
     linear = {
         startSV = 1.5,
         endSV = 0.5,
+        avgSV = 0,
         svPoints = 16,
         finalSVIndex = 2,
         customSV = 1,
+        distanceMode = 1,
     },
     exponential = {
         behaviorIndex = 1,
