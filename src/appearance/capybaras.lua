@@ -221,8 +221,7 @@ function drawCapybara312()
     if not globalVars.drawCapybara312 then return end
     local o = imgui.GetForegroundDrawList()
     --local sz = state.WindowSize
-    local rgbColors = getCurrentRGBColors(globalVars.rgbPeriod)
-    local outlineColor = color.rgbaToUint(rgbColors.red * 255, rgbColors.green * 255, rgbColors.blue * 255, 255)
+    local outlineColor = color.vrgbaToUint(getCurrentRGBColors(globalVars.rgbPeriod, 1))
 
     local p1 = vector.New(42, 32)
     local p2 = vector.New(100, 78)

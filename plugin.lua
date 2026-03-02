@@ -4950,8 +4950,7 @@ end
 function drawCapybara312()
     if not globalVars.drawCapybara312 then return end
     local o = imgui.GetForegroundDrawList()
-    local rgbColors = getCurrentRGBColors(globalVars.rgbPeriod)
-    local outlineColor = color.rgbaToUint(rgbColors.red * 255, rgbColors.green * 255, rgbColors.blue * 255, 255)
+    local outlineColor = color.vrgbaToUint(getCurrentRGBColors(globalVars.rgbPeriod, 1))
     local p1 = vector.New(42, 32)
     local p2 = vector.New(100, 78)
     local p3 = vector.New(141, 32)
@@ -6211,8 +6210,7 @@ function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustS
             local dustY = dustParticle.y + dy
             local dustCoords = vector.New(dustX, dustY)
             local alpha = math.round(255 * (1 - time), 0)
-            local dustColor = color.rgbaToUint(currentRGBColors.red * 255, currentRGBColors.green * 255,
-                currentRGBColors.blue * 255, alpha)
+            local dustColor = color.vrgbaToUint(currentRGBColors) - (255 - alpha) * color.int.alphaMask
             o.AddCircleFilled(dustCoords, dustSize, dustColor)
         end
     end
@@ -6678,8 +6676,7 @@ function setIncognitoRGBColors(rgbPeriod)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     local grey = vector.New(0.20, 0.20, 0.20, 1.00)
     local whiteTint = vector.New(1.00, 1.00, 1.00, 0.40)
-    local currentRGB = getCurrentRGBColors(rgbPeriod)
-    local rgbColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.8)
+    local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
     imgui.PushStyleColor(imgui_col.WindowBg, black)
     imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.08, 0.08, 0.08, 0.94))
     imgui.PushStyleColor(imgui_col.FrameBg, grey)
@@ -6768,9 +6765,8 @@ end
 function set7xbiRGBGlassColors(rgbPeriod)
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.85)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
-    local currentRGB = getCurrentRGBColors(rgbPeriod)
-    local rgbColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.8)
-    local colorTint = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.3)
+    local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
+    local colorTint = rgbColor - vector.New(0, 0, 0, 0.5)
     local buttonColor = vector.New(0.10, 0.18, 0.21, 0.80)
     imgui.PushStyleColor(imgui_col.WindowBg, transparentBlack)
     imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.08, 0.08, 0.08, 0.94))
@@ -6856,9 +6852,8 @@ function setGlassColors()
     return transparentWhite
 end
 function setGlassRGBColors(rgbPeriod)
-    local currentRGB = getCurrentRGBColors(rgbPeriod)
-    local rgbColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.8)
-    local colorTint = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.3)
+    local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
+    local colorTint = rgbColor - vector.New(0, 0, 0, 0.5)
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.25)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     imgui.PushStyleColor(imgui_col.WindowBg, transparentBlack)
@@ -6901,9 +6896,8 @@ function setGlassRGBColors(rgbPeriod)
     return rgbColor
 end
 function setRGBGamerColors(rgbPeriod)
-    local currentRGB = getCurrentRGBColors(rgbPeriod)
-    local rgbColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.8)
-    local inactiveColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.5)
+    local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
+    local inactiveColor = rgbColor - vector.New(0, 0, 0, 0.3)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     local clearWhite = vector.New(1.00, 1.00, 1.00, 0.40)
     local black = vector.New(0.00, 0.00, 0.00, 1.00)
@@ -6947,9 +6941,8 @@ function setRGBGamerColors(rgbPeriod)
     return inactiveColor
 end
 function setInvertedRGBGamerColors(rgbPeriod)
-    local currentRGB = getCurrentRGBColors(rgbPeriod)
-    local rgbColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.8)
-    local inactiveColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.5)
+    local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
+    local inactiveColor = rgbColor - vector.New(0, 0, 0, 0.3)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     local clearBlack = vector.New(0.00, 0.00, 0.00, 0.40)
     local black = vector.New(0.00, 0.00, 0.00, 1.00)
@@ -7042,8 +7035,7 @@ function setInvertedIncognitoRGBColors(rgbPeriod)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     local grey = vector.New(0.80, 0.80, 0.80, 1.00)
     local blackTint = vector.New(0.00, 0.00, 0.00, 0.40)
-    local currentRGB = getCurrentRGBColors(rgbPeriod)
-    local rgbColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.8)
+    local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
     imgui.PushStyleColor(imgui_col.WindowBg, white)
     imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.92, 0.92, 0.92, 0.94))
     imgui.PushStyleColor(imgui_col.FrameBg, grey)
@@ -7219,7 +7211,11 @@ function setCustomColors()
     loadup.BgBr = globalCustomStyle.loadupBgBr
     return borderColor
 end
-function getCurrentRGBColors(rgbPeriod)
+---Returns RGB coors based on the current time.
+---@param rgbPeriod number The length (in seconds) for one complete RGB cycle.
+---@param alpha? number
+---@return Vector4
+function getCurrentRGBColors(rgbPeriod, alpha)
     local currentTime = clock.getTime()
     local percentIntoRGBCycle = (currentTime % rgbPeriod) / rgbPeriod
     local stagesElapsed = 6 * percentIntoRGBCycle
@@ -7247,7 +7243,7 @@ function getCurrentRGBColors(rgbPeriod)
         blue = percentIntoStage
         green = 1
     end
-    return { red = red, green = green, blue = blue }
+    return vector.New(red, green, blue, alpha or 1)
 end
 ---Similar to [`imgui.PushStyleColor`](lua://imgui.PushStyleColor), but pushes a changing color instead.
 ---@param color1 Vector4 The first color.

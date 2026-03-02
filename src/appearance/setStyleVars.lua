@@ -345,8 +345,7 @@ function setIncognitoRGBColors(rgbPeriod)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     local grey = vector.New(0.20, 0.20, 0.20, 1.00)
     local whiteTint = vector.New(1.00, 1.00, 1.00, 0.40)
-    local currentRGB = getCurrentRGBColors(rgbPeriod)
-    local rgbColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.8)
+    local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
 
     imgui.PushStyleColor(imgui_col.WindowBg, black)
     imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.08, 0.08, 0.08, 0.94))
@@ -446,9 +445,8 @@ end
 function set7xbiRGBGlassColors(rgbPeriod)
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.85)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
-    local currentRGB = getCurrentRGBColors(rgbPeriod)
-    local rgbColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.8)
-    local colorTint = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.3)
+    local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
+    local colorTint = rgbColor - vector.New(0, 0, 0, 0.5)
     local buttonColor = vector.New(0.10, 0.18, 0.21, 0.80)
 
     imgui.PushStyleColor(imgui_col.WindowBg, transparentBlack)
@@ -545,9 +543,8 @@ end
 -- Parameters
 --    rgbPeriod : length in seconds of one RGB color cycle [Int/Float]
 function setGlassRGBColors(rgbPeriod)
-    local currentRGB = getCurrentRGBColors(rgbPeriod)
-    local rgbColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.8)
-    local colorTint = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.3)
+    local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
+    local colorTint = rgbColor - vector.New(0, 0, 0, 0.5)
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.25)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
 
@@ -597,9 +594,8 @@ end
 -- Parameters
 --    rgbPeriod : length in seconds of one RGB color cycle [Int/Float]
 function setRGBGamerColors(rgbPeriod)
-    local currentRGB = getCurrentRGBColors(rgbPeriod)
-    local rgbColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.8)
-    local inactiveColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.5)
+    local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
+    local inactiveColor = rgbColor - vector.New(0, 0, 0, 0.3)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     local clearWhite = vector.New(1.00, 1.00, 1.00, 0.40)
     local black = vector.New(0.00, 0.00, 0.00, 1.00)
@@ -650,9 +646,8 @@ end
 -- Parameters
 --    rgbPeriod : length in seconds of one RGB color cycle [Int/Float]
 function setInvertedRGBGamerColors(rgbPeriod)
-    local currentRGB = getCurrentRGBColors(rgbPeriod)
-    local rgbColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.8)
-    local inactiveColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.5)
+    local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
+    local inactiveColor = rgbColor - vector.New(0, 0, 0, 0.3)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     local clearBlack = vector.New(0.00, 0.00, 0.00, 0.40)
     local black = vector.New(0.00, 0.00, 0.00, 1.00)
@@ -756,8 +751,7 @@ function setInvertedIncognitoRGBColors(rgbPeriod)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     local grey = vector.New(0.80, 0.80, 0.80, 1.00)
     local blackTint = vector.New(0.00, 0.00, 0.00, 0.40)
-    local currentRGB = getCurrentRGBColors(rgbPeriod)
-    local rgbColor = vector.New(currentRGB.red, currentRGB.green, currentRGB.blue, 0.8)
+    local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
 
     imgui.PushStyleColor(imgui_col.WindowBg, white)
     imgui.PushStyleColor(imgui_col.PopupBg, vector.New(0.92, 0.92, 0.92, 0.94))
@@ -948,7 +942,11 @@ end
 -- Returns the RGB colors based on the current time [Table]
 -- Parameters
 --    rgbPeriod : length in seconds for one complete RGB cycle (i.e. period) [Int/Float]
-function getCurrentRGBColors(rgbPeriod)
+---Returns RGB coors based on the current time.
+---@param rgbPeriod number The length (in seconds) for one complete RGB cycle.
+---@param alpha? number
+---@return Vector4
+function getCurrentRGBColors(rgbPeriod, alpha)
     local currentTime = clock.getTime()
     local percentIntoRGBCycle = (currentTime % rgbPeriod) / rgbPeriod
     local stagesElapsed = 6 * percentIntoRGBCycle
@@ -977,5 +975,5 @@ function getCurrentRGBColors(rgbPeriod)
         blue = percentIntoStage
         green = 1
     end
-    return { red = red, green = green, blue = blue }
+    return vector.New(red, green, blue, alpha or 1)
 end
