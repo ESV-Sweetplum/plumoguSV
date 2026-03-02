@@ -4951,7 +4951,7 @@ function drawCapybara312()
     if not globalVars.drawCapybara312 then return end
     local o = imgui.GetForegroundDrawList()
     local rgbColors = getCurrentRGBColors(globalVars.rgbPeriod)
-    local outlineColor = color.rgbaToUint(rgbColors.red, rgbColors.green, rgbColors.blue, 255)
+    local outlineColor = color.rgbaToUint(rgbColors.red * 255, rgbColors.green * 255, rgbColors.blue * 255, 255)
     local p1 = vector.New(42, 32)
     local p2 = vector.New(100, 78)
     local p3 = vector.New(141, 32)
@@ -6211,7 +6211,8 @@ function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustS
             local dustY = dustParticle.y + dy
             local dustCoords = vector.New(dustX, dustY)
             local alpha = math.round(255 * (1 - time), 0)
-            local dustColor = color.rgbaToUint(currentRGBColors.red, currentRGBColors.green, currentRGBColors.blue, alpha)
+            local dustColor = color.rgbaToUint(currentRGBColors.red * 255, currentRGBColors.green * 255,
+                currentRGBColors.blue * 255, alpha)
             o.AddCircleFilled(dustCoords, dustSize, dustColor)
         end
     end
