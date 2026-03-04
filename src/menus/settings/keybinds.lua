@@ -1,12 +1,25 @@
 function showKeybindSettings()
     local awaitingIndex = state.GetValue('hotkey_awaitingIndex', 0)
+    local keybindHashmap = state.GetValue('hotkey_keybindHashmap', nil)
+    if (not keybindHashmap) then keybindHashmap = reconstructKeybindHashmap() end
     for hotkeyIndex, hotkeyCombo in pairs(globalVars.hotkeyList) do
-        if imgui.Button(awaitingIndex == hotkeyIndex and 'Listening...##listening' or hotkeyCombo .. '##' .. hotkeyIndex) then
+        local keyOccurrences = keybindHashmap.counts[hotkeyCombo]
+        if (keyOccurrences > 1) then
+            imgui.PushStyleColor(imgui_col.Text,
+                color.int.redMask * 200 + color.int.whiteMask * 55 + color.int.alphaMask * 255)
+        end
+        if imgui.Button(awaitingIndex == hotkeyIndex and 'Listening...##listening' or hotkeyCombo:fixToSize(70) .. '##' .. hotkeyIndex) then
             if awaitingIndex == hotkeyIndex then
                 awaitingIndex = 0
             else
                 awaitingIndex = hotkeyIndex
             end
+        end
+        if (keyOccurrences > 1) then
+            HoverToolTip('This key is used in multiple keybind options:\n- ' ..
+                table.concat(keybindHashmap.names[hotkeyCombo], '\n- ') ..
+                '\nPlease change a keybind to avoid collisions.')
+            imgui.PopStyleColor()
         end
         KeepSameLine()
         imgui.SetCursorPosX(90)
@@ -15,6 +28,7 @@ function showKeybindSettings()
     simpleActionMenu('Reset Hotkey Settings', 0, function()
         globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
         write(globalVars)
+        reconstructKeybindHashmap()
         awaitingIndex = 0
     end, nil, true, true)
     state.SetValue('hotkey_awaitingIndex', awaitingIndex)
@@ -25,5 +39,26 @@ function showKeybindSettings()
         (isTruthy(prefixes) and '+' or '') .. kbm.numToKey(key)
     awaitingIndex = 0
     write(globalVars)
+    reconstructKeybindHashmap()
     state.SetValue('hotkey_awaitingIndex', awaitingIndex)
+end
+
+function reconstructKeybindHashmap()
+    local keybindHashmap = {
+        counts = {},
+        names = {},
+    }
+    for hotkeyIndex, hotkeyCombo in pairs(globalVars.hotkeyList) do
+        local existingHotkeyComboValue = keybindHashmap.counts[hotkeyCombo]
+        if (existingHotkeyComboValue) then
+            keybindHashmap.counts[hotkeyCombo] = existingHotkeyComboValue + 1
+            table.insert(keybindHashmap.names[hotkeyCombo], HOTKEY_LABELS[hotkeyIndex])
+        else
+            keybindHashmap.counts[hotkeyCombo] = 1
+            keybindHashmap.names[hotkeyCombo] = { HOTKEY_LABELS[hotkeyIndex] }
+        end
+    end
+
+    state.SetValue('hotkey_keybindHashmap', keybindHashmap)
+    return keybindHashmap
 end

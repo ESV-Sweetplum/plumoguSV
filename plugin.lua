@@ -1085,6 +1085,7 @@ function table.parse(str)
     if (str:charAt(1) == '"') then return str:sub(2, -2) end
     if (str:match('^[%d%.]+$')) then return math.toNumber(str) end
     if (not table.contains({ '{', '[' }, str:charAt(1))) then return str end
+    if (str:charAt(1) == "{" and str:charAt(2) == "}") or (str:charAt(1) == "[" and str:charAt(2) == "]") then return {} end
     local tableType = str:charAt(1) == '[' and 'arr' or 'dict'
     local tbl = {}
     local terms = {}
@@ -1489,11 +1490,6 @@ CURSOR_TRAILS = {
 DISPLACE_SCALE_SPOTS = {
     'Start',
     'End',
-}
-SPLIT_MODES = {
-    'Column',
-    'Time',
-    'Individual',
 }
 EMOTICONS = {
     '( - _ - )',
@@ -2052,10 +2048,9 @@ DEFAULT_STARTING_MENU_VARS = {
 ---@param menuType string The menu type.
 ---@return table
 function getMenuVars(menuType, optionalLabel)
-    optionalLabel = optionalLabel or ''
-    menuKey = menuType:identify()
-    local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuKey])
-    local labelText = menuType .. optionalLabel .. 'Menu'
+    local menuKey = menuType:identify()
+    local menuVars = DEFAULT_STARTING_MENU_VARS[menuKey]
+    local labelText = table.concat({ menuType, optionalLabel or '', 'Menu' })
     cache.loadTable(labelText, menuVars)
     return menuVars
 end
@@ -2341,8 +2336,8 @@ end]],
 ---@param label string A delineator to separate two categories with similar SV types (Standard/Still, etc).
 ---@return table
 function getSettingVars(svType, label)
-    menuKey = svType:identify()
-    local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[menuKey])
+    local settingKey = svType:identify()
+    local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[settingKey])
     local labelText = svType .. label .. 'Settings'
     cache.loadTable(labelText, settingVars)
     return settingVars
@@ -4241,6 +4236,7 @@ function jumpToTg()
     state.SelectedScrollGroupId = tgId
 end
 function checkForGlobalHotkeys()
+    if (isTruthy(state.GetValue('hotkey_awaitingIndex', 0))) then return end
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_note_tg])) then jumpToTg() end
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.toggle_note_lock])) then changeNoteLockMode() end
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.toggle_end_offset])) then toggleUseEndOffsets() end
@@ -9090,6 +9086,11 @@ function splitSettingsMenu(menuVars)
             'SVs that are further than THIS amount of ms away will be ignored.')
     end
 end
+SPLIT_MODES = {
+    'Column',
+    'Time',
+    'Individual',
+}
 function swapNotesMenu()
     imgui.TextWrapped("Doesn't swap note temporal positions; instead, swaps their spatial positions with two displaces.")
     simpleActionMenu('Swap selected notes using SVs', 2, swapNoteSVs, nil)
@@ -12165,21 +12166,22 @@ function selectTab()
     if toolName == 'Chord Size' then selectChordSizeMenu() end
     if toolName == 'Note Type' then selectNoteTypeMenu() end
 end
+SELECT_TAB_TOOLTIP_LIST = {
+    'Skip over notes then select one, and repeat.',
+    'Jump to a bookmark.',
+    'Select all notes with a certain snap color.',
+    'Select all notes within a certain timing group.',
+    'Select all notes with a certain chord size.',
+    'Select rice/ln notes.',
+}
 function chooseSelectTool()
-    local tooltipList = {
-        'Skip over notes then select one, and repeat.',
-        'Jump to a bookmark.',
-        'Select all notes with a certain snap color.',
-        'Select all notes within a certain timing group.',
-        'Select all notes with a certain chord size.',
-        'Select rice/ln notes.',
-    }
     imgui.AlignTextToFramePadding()
     imgui.Text('  Current Type:')
     KeepSameLine()
     local oldSelectTypeIndex = globalVars.selectTypeIndex
-    globalVars.selectTypeIndex = Combo('##selecttool', SELECT_TOOLS, oldSelectTypeIndex, nil, nil, tooltipList)
-    HoverToolTip(tooltipList[globalVars.selectTypeIndex])
+    globalVars.selectTypeIndex = Combo('##selecttool', SELECT_TOOLS, oldSelectTypeIndex, nil, nil,
+        SELECT_TAB_TOOLTIP_LIST)
+    HoverToolTip(SELECT_TAB_TOOLTIP_LIST[globalVars.selectTypeIndex])
     return oldSelectTypeIndex ~= globalVars.selectTypeIndex
 end
 function selectNoteTypeMenu()
@@ -12968,13 +12970,26 @@ function chooseStepSize()
 end
 function showKeybindSettings()
     local awaitingIndex = state.GetValue('hotkey_awaitingIndex', 0)
+    local keybindHashmap = state.GetValue('hotkey_keybindHashmap', nil)
+    if (not keybindHashmap) then keybindHashmap = reconstructKeybindHashmap() end
     for hotkeyIndex, hotkeyCombo in pairs(globalVars.hotkeyList) do
-        if imgui.Button(awaitingIndex == hotkeyIndex and 'Listening...##listening' or hotkeyCombo .. '##' .. hotkeyIndex) then
+        local keyOccurrences = keybindHashmap.counts[hotkeyCombo]
+        if (keyOccurrences > 1) then
+            imgui.PushStyleColor(imgui_col.Text,
+                color.int.redMask * 200 + color.int.whiteMask * 55 + color.int.alphaMask * 255)
+        end
+        if imgui.Button(awaitingIndex == hotkeyIndex and 'Listening...##listening' or hotkeyCombo:fixToSize(70) .. '##' .. hotkeyIndex) then
             if awaitingIndex == hotkeyIndex then
                 awaitingIndex = 0
             else
                 awaitingIndex = hotkeyIndex
             end
+        end
+        if (keyOccurrences > 1) then
+            HoverToolTip('This key is used in multiple keybind options:\n- ' ..
+                table.concat(keybindHashmap.names[hotkeyCombo], '\n- ') ..
+                '\nPlease change a keybind to avoid collisions.')
+            imgui.PopStyleColor()
         end
         KeepSameLine()
         imgui.SetCursorPosX(90)
@@ -12983,6 +12998,7 @@ function showKeybindSettings()
     simpleActionMenu('Reset Hotkey Settings', 0, function()
         globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
         write(globalVars)
+        reconstructKeybindHashmap()
         awaitingIndex = 0
     end, nil, true, true)
     state.SetValue('hotkey_awaitingIndex', awaitingIndex)
@@ -12993,7 +13009,26 @@ function showKeybindSettings()
         (isTruthy(prefixes) and '+' or '') .. kbm.numToKey(key)
     awaitingIndex = 0
     write(globalVars)
+    reconstructKeybindHashmap()
     state.SetValue('hotkey_awaitingIndex', awaitingIndex)
+end
+function reconstructKeybindHashmap()
+    local keybindHashmap = {
+        counts = {},
+        names = {},
+    }
+    for hotkeyIndex, hotkeyCombo in pairs(globalVars.hotkeyList) do
+        local existingHotkeyComboValue = keybindHashmap.counts[hotkeyCombo]
+        if (existingHotkeyComboValue) then
+            keybindHashmap.counts[hotkeyCombo] = existingHotkeyComboValue + 1
+            table.insert(keybindHashmap.names[hotkeyCombo], HOTKEY_LABELS[hotkeyIndex])
+        else
+            keybindHashmap.counts[hotkeyCombo] = 1
+            keybindHashmap.names[hotkeyCombo] = { HOTKEY_LABELS[hotkeyIndex] }
+        end
+    end
+    state.SetValue('hotkey_keybindHashmap', keybindHashmap)
+    return keybindHashmap
 end
 SETTING_TYPES = {
     'General',

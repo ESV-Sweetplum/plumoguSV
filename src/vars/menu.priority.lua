@@ -183,11 +183,11 @@ DEFAULT_STARTING_MENU_VARS = {
 ---@param menuType string The menu type.
 ---@return table
 function getMenuVars(menuType, optionalLabel)
-    optionalLabel = optionalLabel or ''
-    menuKey = menuType:identify()
-    local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuKey])
+    local menuKey = menuType:identify()
+    -- local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuKey])
+    local menuVars = DEFAULT_STARTING_MENU_VARS[menuKey]
 
-    local labelText = menuType .. optionalLabel .. 'Menu'
+    local labelText = table.concat({ menuType, optionalLabel or '', 'Menu' })
     cache.loadTable(labelText, menuVars)
 
     return menuVars

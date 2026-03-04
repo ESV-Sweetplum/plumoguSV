@@ -20,21 +20,23 @@ function selectTab()
     if toolName == 'Note Type' then selectNoteTypeMenu() end
 end
 
+SELECT_TAB_TOOLTIP_LIST = {
+    'Skip over notes then select one, and repeat.',
+    'Jump to a bookmark.',
+    'Select all notes with a certain snap color.',
+    'Select all notes within a certain timing group.',
+    'Select all notes with a certain chord size.',
+    'Select rice/ln notes.',
+}
+
 function chooseSelectTool()
-    local tooltipList = {
-        'Skip over notes then select one, and repeat.',
-        'Jump to a bookmark.',
-        'Select all notes with a certain snap color.',
-        'Select all notes within a certain timing group.',
-        'Select all notes with a certain chord size.',
-        'Select rice/ln notes.',
-    }
     imgui.AlignTextToFramePadding()
     imgui.Text('  Current Type:')
     KeepSameLine()
     local oldSelectTypeIndex = globalVars.selectTypeIndex
-    globalVars.selectTypeIndex = Combo('##selecttool', SELECT_TOOLS, oldSelectTypeIndex, nil, nil, tooltipList)
+    globalVars.selectTypeIndex = Combo('##selecttool', SELECT_TOOLS, oldSelectTypeIndex, nil, nil,
+        SELECT_TAB_TOOLTIP_LIST)
 
-    HoverToolTip(tooltipList[globalVars.selectTypeIndex])
+    HoverToolTip(SELECT_TAB_TOOLTIP_LIST[globalVars.selectTypeIndex])
     return oldSelectTypeIndex ~= globalVars.selectTypeIndex
 end

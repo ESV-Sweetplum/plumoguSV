@@ -256,8 +256,8 @@ end]],
 ---@param label string A delineator to separate two categories with similar SV types (Standard/Still, etc).
 ---@return table
 function getSettingVars(svType, label)
-    menuKey = svType:identify()
-    local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[menuKey])
+    local settingKey = svType:identify()
+    local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[settingKey])
 
     local labelText = svType .. label .. 'Settings'
     cache.loadTable(labelText, settingVars)

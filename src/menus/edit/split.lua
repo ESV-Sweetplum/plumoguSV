@@ -21,3 +21,9 @@ function splitSettingsMenu(menuVars)
             'SVs that are further than THIS amount of ms away will be ignored.')
     end
 end
+
+SPLIT_MODES = {
+    'Column',
+    'Time',
+    'Individual',
+}
