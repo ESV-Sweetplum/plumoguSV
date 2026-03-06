@@ -2600,6 +2600,7 @@ function placeExponentialSpecialSVs(menuVars)
     end
 end
 function placeSSFs(menuVars)
+    local finalSVType = FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex]
     local numMultipliers = #menuVars.svMultipliers
     local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not isTruthy(offsets)) then return end
@@ -2621,7 +2622,9 @@ function placeSSFs(menuVars)
         end
     end
     local lastMultiplier = menuVars.svMultipliers[numMultipliers]
-    addFinalSSF(ssfsToAdd, lastOffset, lastMultiplier)
+    if (finalSVType ~= 'None') then
+        addFinalSSF(ssfsToAdd, lastOffset, lastMultiplier)
+    end
     addInitialSSF(ssfsToAdd, firstOffset - 1 / getUsableDisplacementMultiplier(firstOffset))
     removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
 end
@@ -14096,7 +14099,7 @@ function chooseFinalSV(settingVars, skipFinalSV)
     local oldIndex = settingVars.finalSVIndex
     local oldCustomSV = settingVars.customSV
     local finalSVType = FINAL_SV_TYPES[settingVars.finalSVIndex]
-    if finalSVType ~= 'Normal' then
+    if finalSVType ~= 'Normal' and finalSVType ~= 'None' then
         imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.35)
         _, settingVars.customSV = imgui.InputFloat('SV', settingVars.customSV, 0, 0, '%.2fx')
         KeepSameLine()
@@ -14107,7 +14110,7 @@ function chooseFinalSV(settingVars, skipFinalSV)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.5)
     settingVars.finalSVIndex = Combo('Final SV', FINAL_SV_TYPES, settingVars.finalSVIndex)
     HelpMarker("Final SV won't be placed if there's already an SV at the end time")
-    if finalSVType == 'Normal' then
+    if finalSVType == 'Normal' or finalSVType == 'None' then
         imgui.Unindent(DEFAULT_WIDGET_WIDTH * 0.35 + 25)
     end
     imgui.PopItemWidth()
@@ -15845,7 +15848,7 @@ function draw()
     if (state.GetValue("windows.showPatchNotesWindow")) then
         showPatchNotesWindow()
     end
-    if (map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ') then
+    if (not performanceMode and map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ') then
         runTest()
     end
     imgui.End()

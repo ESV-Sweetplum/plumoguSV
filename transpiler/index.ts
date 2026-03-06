@@ -4,6 +4,7 @@ import getFunctionList from './lib/getFunctionList.js';
 import { join, sep } from 'path';
 import readAndLintLua from './lib/readAndLintLua.js';
 import * as acBuilder from 'ahocorasick';
+import * as luaParser from 'luaparse';
 
 let counter = 0;
 
@@ -57,6 +58,10 @@ export default async function transpiler(
         });
 
         let fileIsInsert = false;
+
+        luaParser.parse(fileData.join(lineSeparator), {
+            luaVersion: '5.2',
+        });
 
         // Insert whitespace for nested functions
 
