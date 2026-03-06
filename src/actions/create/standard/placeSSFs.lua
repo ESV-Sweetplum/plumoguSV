@@ -1,4 +1,5 @@
 function placeSSFs(menuVars)
+    local finalSVType = FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex]
     local numMultipliers = #menuVars.svMultipliers
     local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not isTruthy(offsets)) then return end
@@ -20,7 +21,9 @@ function placeSSFs(menuVars)
         end
     end
     local lastMultiplier = menuVars.svMultipliers[numMultipliers]
-    addFinalSSF(ssfsToAdd, lastOffset, lastMultiplier)
+    if (finalSVType ~= 'None') then
+        addFinalSSF(ssfsToAdd, lastOffset, lastMultiplier)
+    end
     addInitialSSF(ssfsToAdd, firstOffset - 1 / getUsableDisplacementMultiplier(firstOffset))
     removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
 end
