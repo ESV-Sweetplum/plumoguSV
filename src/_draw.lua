@@ -87,6 +87,6 @@ ballSize = 25
 ballPos = vector.New(150, 150)
 ballVelocity = vector.New(15, 0)
 ballAcceleration = vector.New(0, 1)
-speedFactor = 0.3
+speedFactor = 0.1
 
 creatingPlatform = false
