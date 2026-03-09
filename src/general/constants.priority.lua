@@ -316,6 +316,7 @@ DEFAULT_STYLE = {
     headerActive =
         vector.New(0.81, 0.88, 1.00, 0.54),
     separator = vector.New(0.81, 0.88, 1.00, 0.30),
+    tableBorderLight = vector.New(0.81, 0.88, 1.00, 0.30),
     text = vector.New(1.00, 1.00, 1.00, 1.00),
     textSelectedBg =
         vector.New(0.81, 0.88, 1.00, 0.40),

@@ -77,17 +77,15 @@ function directSVMenu()
         menuVars.pageNumber = math.clamp(menuVars.pageNumber + 1, 1, math.ceil(#svs * 0.1))
     end
 
-    imgui.Separator()
-    imgui.Text('Start Time')
-    KeepSameLine()
-    imgui.SetCursorPosX(150)
-    imgui.Text('Multiplier')
-    KeepSameLine()
-    imgui.Separator()
-
     local startingPoint = 10 * menuVars.pageNumber - 10
 
-    imgui.BeginTable('Test', 2)
+    imgui.BeginTable('Test', 2, imgui_table_flags.BordersInner)
+
+    imgui.TableSetupColumn('Start Time', imgui_table_column_flags.WidthFixed, 130)
+    imgui.TableSetupColumn('Multiplier', imgui_table_column_flags.WidthStretch)
+
+    imgui.TableHeadersRow()
+
     for idx, v in pairs(table.slice(svs, startingPoint + 1, startingPoint + 10)) do
         imgui.PushID(idx)
         imgui.TableNextRow()
@@ -98,7 +96,6 @@ function directSVMenu()
             menuVars.selectableIndex = idx + startingPoint
         end
         imgui.TableSetColumnIndex(1)
-        imgui.SetCursorPosX(150)
         imgui.Text(string.format('%.2f', v.Multiplier));
         imgui.PopID()
     end

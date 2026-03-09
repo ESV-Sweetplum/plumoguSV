@@ -52,7 +52,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
 
     AddSeparator()
 
-    imgui.Columns(3)
+    imgui.Columns(3, 'PresetColumns', false)
 
     imgui.SetColumnWidth(0, 90)
     imgui.SetColumnWidth(1, 73)
@@ -71,7 +71,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         imgui.Text(preset.name)
         imgui.NextColumn()
         imgui.AlignTextToFramePadding()
-        imgui.Text(table.concat({ preset.type:shorten(), ' > ', removeTrailingTag(preset.menu):sub(1, 3) }))
+        imgui.Text(table.concat({ preset.type:shorten(), ' > ', preset.menu:removeTrailingTag():sub(1, 3) }))
         imgui.NextColumn()
         if (imgui.Button('Select##Preset' .. idx)) then
             local data = table.parse(preset.data)
