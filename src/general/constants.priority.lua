@@ -338,7 +338,7 @@ DEFAULT_STYLE = {
     loadupPulseTextColorLeft = vector.New(0.00, 0.50, 1.00, 1.00),
     loadupPulseTextColorRight = vector.New(0.00, 0.00, 1.00, 1.00),
     loadupBgTl = vector.New(0.00, 0.00, 0.00, 0.39),
-    loadupBgTr = vector.New(0.31, 0.38, 0.50, 0.67), -- RAHHHH 6 7 6 7 6 7 6 7 6 7
+    loadupBgTr = vector.New(0.31, 0.38, 0.50, 0.67),
     loadupBgBl = vector.New(0.31, 0.38, 0.50, 0.67),
     loadupBgBr = vector.New(0.62, 0.76, 1, 1.00),
 }
