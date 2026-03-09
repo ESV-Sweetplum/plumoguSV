@@ -11,16 +11,7 @@ function placeVibratoSVMenu(separateWindow)
     PresetButton()
     local menuVars = getMenuVars('placeVibrato', tostring(separateWindow))
     chooseVibratoSVType(menuVars)
-
     AddSeparator()
-    imgui.Text('Vibrato Settings:')
-    menuVars.vibratoMode = Combo('Vibrato Mode', VIBRATO_TYPES, menuVars.vibratoMode)
-
-    chooseVibratoQuality(menuVars)
-    if (menuVars.vibratoMode ~= 2) then
-        chooseVibratoDeviance(menuVars)
-        chooseVibratoSides(menuVars)
-    end
 
     local modeText = menuVars.vibratoMode == 1 and 'SV' or 'SSF'
 
@@ -35,6 +26,15 @@ function placeVibratoSVMenu(separateWindow)
             cache.saveTable('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
         end
         return
+    end
+
+    imgui.Text('Vibrato Settings:')
+    menuVars.vibratoMode = Combo('Vibrato Mode', VIBRATO_TYPES, menuVars.vibratoMode)
+
+    chooseVibratoQuality(menuVars)
+    if (menuVars.vibratoMode ~= 2) then
+        chooseVibratoDeviance(menuVars)
+        chooseVibratoSides(menuVars)
     end
 
     AddSeparator()

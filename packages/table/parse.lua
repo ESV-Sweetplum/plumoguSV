@@ -8,7 +8,12 @@ function table.parse(str)
     if (str == 'FALSE' or str == 'TRUE') then return str == 'TRUE' end
     if (str:charAt(1) == '"') then return str:sub(2, -2) end
     if (str:match('^%-?[%d%.]+$')) then return math.toNumber(str) end
-    if (not table.contains({ '{', '[' }, str:charAt(1))) then return str end
+    if (not table.contains({ '{', '[' }, str:charAt(1))) then
+        print('e!',
+            'Something really bad has happened with the parsing algorithm weewooweewoo please report this to the Discord thanks!!!!!!!!!')
+        error('POO')
+        return str
+    end
     if (str:charAt(1) == '{' and str:charAt(2) == '}') or (str:charAt(1) == '[' and str:charAt(2) == ']') then return {} end
     local tableType = str:charAt(1) == '[' and 'arr' or 'dict'
     local tbl = {}

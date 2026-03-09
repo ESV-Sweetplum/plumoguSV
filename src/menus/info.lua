@@ -48,4 +48,13 @@ function infoTab()
         imgui.SetWindowPos('plumoguSV Tutorial Menu', coordinatesToCenter)
     end
     HoverToolTip('New to SV? View interactive tutorials that will help you navigate the plugin for your first time.')
+    imgui.Dummy(vctr2(5))
+
+    imgui.SetCursorPosX(30)
+    imgui.Text('To report issues, please join the')
+    imgui.SameLine(0, 2)
+    imgui.TextLinkOpenURL('Discord', 'https://discord.com/invite/gU4P5nPAMF')
+    imgui.SameLine(0, 0)
+    imgui.Text('.')
+    imgui.Dummy(vctr2(3))
 end

@@ -1084,7 +1084,12 @@ function table.parse(str)
     if (str == 'FALSE' or str == 'TRUE') then return str == 'TRUE' end
     if (str:charAt(1) == '"') then return str:sub(2, -2) end
     if (str:match('^%-?[%d%.]+$')) then return math.toNumber(str) end
-    if (not table.contains({ '{', '[' }, str:charAt(1))) then return str end
+    if (not table.contains({ '{', '[' }, str:charAt(1))) then
+        print('e!',
+            'Something really bad has happened with the parsing algorithm weewooweewoo please report this to the Discord thanks!!!!!!!!!')
+        error('POO')
+        return str
+    end
     if (str:charAt(1) == '{' and str:charAt(2) == '}') or (str:charAt(1) == '[' and str:charAt(2) == ']') then return {} end
     local tableType = str:charAt(1) == '[' and 'arr' or 'dict'
     local tbl = {}
@@ -8388,13 +8393,6 @@ function placeVibratoSVMenu(separateWindow)
     local menuVars = getMenuVars('placeVibrato', tostring(separateWindow))
     chooseVibratoSVType(menuVars)
     AddSeparator()
-    imgui.Text('Vibrato Settings:')
-    menuVars.vibratoMode = Combo('Vibrato Mode', VIBRATO_TYPES, menuVars.vibratoMode)
-    chooseVibratoQuality(menuVars)
-    if (menuVars.vibratoMode ~= 2) then
-        chooseVibratoDeviance(menuVars)
-        chooseVibratoSides(menuVars)
-    end
     local modeText = menuVars.vibratoMode == 1 and 'SV' or 'SSF'
     local currentSVType = VIBRATO_SVS[menuVars.svTypeIndex]
     local settingVars = getSettingVars(currentSVType .. modeText,
@@ -8407,6 +8405,13 @@ function placeVibratoSVMenu(separateWindow)
             cache.saveTable(table.concat({'placeVibrato', tostring(separateWindow), 'Menu'}), menuVars)
         end
         return
+    end
+    imgui.Text('Vibrato Settings:')
+    menuVars.vibratoMode = Combo('Vibrato Mode', VIBRATO_TYPES, menuVars.vibratoMode)
+    chooseVibratoQuality(menuVars)
+    if (menuVars.vibratoMode ~= 2) then
+        chooseVibratoDeviance(menuVars)
+        chooseVibratoSides(menuVars)
     end
     AddSeparator()
     if currentSVType == 'Linear##Vibrato' then linearVibratoMenu(menuVars, settingVars, separateWindow) end
@@ -9193,6 +9198,14 @@ function infoTab()
         imgui.SetWindowPos('plumoguSV Tutorial Menu', coordinatesToCenter)
     end
     HoverToolTip('New to SV? View interactive tutorials that will help you navigate the plugin for your first time.')
+    imgui.Dummy(vctr2(5))
+    imgui.SetCursorPosX(30)
+    imgui.Text('To report issues, please join the')
+    imgui.SameLine(0, 2)
+    imgui.TextLinkOpenURL('Discord', 'https://discord.com/invite/gU4P5nPAMF')
+    imgui.SameLine(0, 0)
+    imgui.Text('.')
+    imgui.Dummy(vctr2(3))
 end
 ---@diagnostic disable: redefined-local
 function showPatchNotesWindow()
