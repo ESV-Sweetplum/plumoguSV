@@ -6414,6 +6414,7 @@ function setPluginAppearanceColors(colorTheme, hideBorder)
     if colorTheme == "aster's catppuccin" then borderColor = setAsterCatppuccinColors() end
     if colorTheme == "plum's purple palace" then borderColor = setPlumPurplePalaceColors() end
     if colorTheme:sub(1, 7) == 'custom_' then borderColor = setCustomColors() end
+    imgui.PushStyleColor(imgui_col.TableHeaderBg, imgui.GetColorU32(imgui_col.Button, 0.3))
     if not borderColor then borderColor = setOriginalColors() end
     if hideBorder then return end
     state.SetValue("borderColor", borderColor)
@@ -7676,6 +7677,26 @@ function executeFunctionIfTrue(condition, fn, menuVars)
     end
     fn()
 end
+---Alias of `imgui.BeginTable` with some extra features.
+---@param str_id string
+---@param columnCount integer
+---@param tableFlags ImGuiTableFlags
+---@param columnNames string[]
+---@param columnFlags (ImGuiTableColumnFlags | [ImGuiTableColumnFlags, number])[]
+---@param showHeaderRow? boolean
+function InitializeTable(str_id, columnCount, tableFlags, columnNames, columnFlags, showHeaderRow)
+    imgui.BeginTable(str_id, columnCount, tableFlags)
+    for i = 1, columnCount do
+        local name = columnNames[i]
+        local flags = columnFlags[i]
+        if (type(flags) == 'table') then
+            imgui.TableSetupColumn(name, flags[1], flags[2])
+        else
+            imgui.TableSetupColumn(name, flags)
+        end
+    end
+    if (showHeaderRow) then imgui.TableHeadersRow() end
+end
 function KeepSameLine()
     imgui.SameLine(0, SAMELINE_SPACING)
 end
@@ -7805,9 +7826,10 @@ function chooseCreateTool()
         'Make notes vibrate or appear to duplicate.',
     }
     imgui.AlignTextToFramePadding()
-    imgui.Text('  Type:  ')
+    imgui.Text('  Type: ')
     KeepSameLine()
     local oldPlaceTypeIndex = globalVars.placeTypeIndex
+    imgui.SetCursorPosX(imgui.GetCursorPosX() + 2)
     globalVars.placeTypeIndex = Combo('##placeType', CREATE_TYPES, oldPlaceTypeIndex, nil, nil, tooltipList)
     HoverToolTip(tooltipList[globalVars.placeTypeIndex])
     return oldPlaceTypeIndex ~= globalVars.placeTypeIndex
@@ -7861,25 +7883,26 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             write(globalVars)
         end
     end
-    AddSeparator()
-    imgui.Columns(3, 'PresetColumns', false)
-    imgui.SetColumnWidth(0, 90)
-    imgui.SetColumnWidth(1, 73)
-    imgui.SetColumnWidth(2, 95)
-    imgui.Text('Name')
-    imgui.NextColumn()
-    imgui.Text('Menu')
-    imgui.NextColumn()
-    imgui.Text('Actions')
-    imgui.NextColumn()
-    imgui.Separator()
+    AddPadding()
+    InitializeTable('Preset Columns', 3, imgui_table_flags.BordersInner, { '  Name', ' Menu', ' Actions' }, {
+        { imgui_table_column_flags.WidthFixed, 80 },
+        { imgui_table_column_flags.WidthFixed, 63 },
+        { imgui_table_column_flags.WidthFixed, 85 },
+    }, true)
     for idx, preset in pairs(globalVars.presets) do
+        imgui.PushID(idx)
+        imgui.TableNextRow(0, 34)
+        imgui.TableSetColumnIndex(0)
         imgui.AlignTextToFramePadding()
-        imgui.Text(preset.name)
-        imgui.NextColumn()
+        imgui.SetCursorPosY(imgui.GetCursorPosY() + 2)
+        imgui.Text('  ' .. preset.name)
+        imgui.TableSetColumnIndex(1)
         imgui.AlignTextToFramePadding()
-        imgui.Text(table.concat({ preset.type:shorten(), ' > ', preset.menu:removeTrailingTag():sub(1, 3) }))
-        imgui.NextColumn()
+        imgui.SetCursorPosY(imgui.GetCursorPosY() + 3.4)
+        imgui.Text(table.concat({ '  ', preset.type:shorten(), ' > ', preset.menu:removeTrailingTag():sub(1, 3) }))
+        imgui.TableSetColumnIndex(2)
+        imgui.SetCursorPosX(imgui.GetCursorPosX() + 2)
+        imgui.SetCursorPosY(imgui.GetCursorPosY() + 3.4)
         if (imgui.Button('Select##Preset' .. idx)) then
             local data = table.parse(preset.data)
             globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
@@ -7900,7 +7923,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         end
         imgui.NextColumn()
     end
-    imgui.Columns(1)
+    imgui.EndTable()
 end
 function animationFramesSetupMenu(settingVars)
     chooseMenuStep(settingVars)
@@ -8803,10 +8826,8 @@ function directSVMenu()
         menuVars.pageNumber = math.clamp(menuVars.pageNumber + 1, 1, math.ceil(#svs * 0.1))
     end
     local startingPoint = 10 * menuVars.pageNumber - 10
-    imgui.BeginTable('Test', 2, imgui_table_flags.BordersInner)
-    imgui.TableSetupColumn('Start Time', imgui_table_column_flags.WidthFixed, 130)
-    imgui.TableSetupColumn('Multiplier', imgui_table_column_flags.WidthStretch)
-    imgui.TableHeadersRow()
+    InitializeTable('Direct SV', 2, imgui_table_flags.BordersInner, { 'Start Time', 'Multiplier' },
+        { { imgui_table_column_flags.WidthFixed, 130 }, imgui_table_column_flags.WidthStretch }, true)
     for idx, v in pairs(table.slice(svs, startingPoint + 1, startingPoint + 10)) do
         imgui.PushID(idx)
         imgui.TableNextRow()
@@ -14509,7 +14530,7 @@ function chooseVibratoDeviance(menuVars)
         KeepSameLine()
         imgui.PopItemWidth()
     end
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.53)
+    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.53 + 1)
     menuVars.deviationFunctionIndex = Combo('Deviance Type', VIBRATO_DEVIATION_TYPES, menuVars.deviationFunctionIndex, {},
         {},
         tooltipList)
@@ -15825,7 +15846,7 @@ function draw()
     PLUGIN_NAME = 'plumoguSV-dev'
     state.IsWindowHovered = imgui.IsWindowHovered()
     startNextWindowNotCollapsed(PLUGIN_NAME)
-    imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(600)))
+    imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
     imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
     if (not performanceMode) then
         addGradient()

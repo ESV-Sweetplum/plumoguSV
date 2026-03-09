@@ -79,12 +79,8 @@ function directSVMenu()
 
     local startingPoint = 10 * menuVars.pageNumber - 10
 
-    imgui.BeginTable('Test', 2, imgui_table_flags.BordersInner)
-
-    imgui.TableSetupColumn('Start Time', imgui_table_column_flags.WidthFixed, 130)
-    imgui.TableSetupColumn('Multiplier', imgui_table_column_flags.WidthStretch)
-
-    imgui.TableHeadersRow()
+    InitializeTable('Direct SV', 2, imgui_table_flags.BordersInner, { 'Start Time', 'Multiplier' },
+        { { imgui_table_column_flags.WidthFixed, 130 }, imgui_table_column_flags.WidthStretch }, true)
 
     for idx, v in pairs(table.slice(svs, startingPoint + 1, startingPoint + 10)) do
         imgui.PushID(idx)

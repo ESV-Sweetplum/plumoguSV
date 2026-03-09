@@ -747,7 +747,7 @@ function chooseVibratoDeviance(menuVars)
         KeepSameLine()
         imgui.PopItemWidth()
     end
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.53)
+    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.53 + 1)
     menuVars.deviationFunctionIndex = Combo('Deviance Type', VIBRATO_DEVIATION_TYPES, menuVars.deviationFunctionIndex, {},
         {},
         tooltipList)

@@ -50,29 +50,28 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         end
     end
 
-    AddSeparator()
+    AddPadding()
 
-    imgui.Columns(3, 'PresetColumns', false)
+    InitializeTable('Preset Columns', 3, imgui_table_flags.BordersInner, { '  Name', ' Menu', ' Actions' }, {
+        { imgui_table_column_flags.WidthFixed, 80 },
+        { imgui_table_column_flags.WidthFixed, 63 },
+        { imgui_table_column_flags.WidthFixed, 85 },
+    }, true)
 
-    imgui.SetColumnWidth(0, 90)
-    imgui.SetColumnWidth(1, 73)
-    imgui.SetColumnWidth(2, 95)
-
-    imgui.Text('Name')
-    imgui.NextColumn()
-    imgui.Text('Menu')
-    imgui.NextColumn()
-    imgui.Text('Actions')
-    imgui.NextColumn()
-
-    imgui.Separator()
     for idx, preset in pairs(globalVars.presets) do
+        imgui.PushID(idx)
+        imgui.TableNextRow(0, 34)
+        imgui.TableSetColumnIndex(0)
         imgui.AlignTextToFramePadding()
-        imgui.Text(preset.name)
-        imgui.NextColumn()
+        imgui.SetCursorPosY(imgui.GetCursorPosY() + 2)
+        imgui.Text('  ' .. preset.name)
+        imgui.TableSetColumnIndex(1)
         imgui.AlignTextToFramePadding()
-        imgui.Text(table.concat({ preset.type:shorten(), ' > ', preset.menu:removeTrailingTag():sub(1, 3) }))
-        imgui.NextColumn()
+        imgui.SetCursorPosY(imgui.GetCursorPosY() + 3.4)
+        imgui.Text(table.concat({ '  ', preset.type:shorten(), ' > ', preset.menu:removeTrailingTag():sub(1, 3) }))
+        imgui.TableSetColumnIndex(2)
+        imgui.SetCursorPosX(imgui.GetCursorPosX() + 2)
+        imgui.SetCursorPosY(imgui.GetCursorPosY() + 3.4)
         if (imgui.Button('Select##Preset' .. idx)) then
             local data = table.parse(preset.data)
             globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
@@ -94,5 +93,5 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         imgui.NextColumn()
     end
 
-    imgui.Columns(1)
+    imgui.EndTable()
 end

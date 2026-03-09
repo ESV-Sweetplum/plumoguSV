@@ -55,6 +55,8 @@ function setPluginAppearanceColors(colorTheme, hideBorder)
     if colorTheme == "plum's purple palace" then borderColor = setPlumPurplePalaceColors() end
     if colorTheme:sub(1, 7) == 'custom_' then borderColor = setCustomColors() end
 
+    imgui.PushStyleColor(imgui_col.TableHeaderBg, imgui.GetColorU32(imgui_col.Button, 0.3))
+
     if not borderColor then borderColor = setOriginalColors() end
 
     if hideBorder then return end
