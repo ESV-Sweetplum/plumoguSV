@@ -1,5 +1,5 @@
 function draw()
-    if (not state.CurrentTimingPoint) then return end
+    if (not state.CurrentTimingPoint or not imgui or not state) then return end
     local performanceMode = globalVars.performanceMode
 
     PLUGIN_NAME = 'plumoguSV-dev'
@@ -64,29 +64,4 @@ function draw()
     if (state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex]) then
         globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
     end
-
-    local ctx = imgui.GetForegroundDrawList()
-
-    ctx.AddCircleFilled(ballPos, ballSize, color.vrgbaToUint(getCurrentRGBColors(0.5)))
-
-    ballVelocity = ballVelocity + ballAcceleration * state.DeltaTime * speedFactor
-    ballPos = ballPos + ballVelocity * state.DeltaTime * speedFactor
-
-    if (ballPos.y + ballSize > state.WindowSize[2]) then
-        ballVelocity = ballVelocity * vector.New(1, -1)
-        ballPos.y = state.WindowSize[2] - ballSize - 1
-    end
-
-    if (ballPos.x + ballSize > state.WindowSize[1] or ballPos.x < 0) then
-        ballVelocity = ballVelocity * vector.New(-1, 1)
-        ballPos.x = math.clamp(ballPos.x, 1, state.WindowSize[1] - ballSize - 1)
-    end
 end
-
-ballSize = 25
-ballPos = vector.New(150, 150)
-ballVelocity = vector.New(15, 0)
-ballAcceleration = vector.New(0, 1)
-speedFactor = 0.1
-
-creatingPlatform = false
