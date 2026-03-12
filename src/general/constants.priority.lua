@@ -1,4 +1,5 @@
 imgui_disable_vector_packing = true                                    -- Use vectors instead of tables for imgui output
+math.randomseed(os.time())                                             -- Ensure semi-true randomization
 
 DEFAULT_WIDGET_HEIGHT = 26                                             -- value determining the height of GUI widgets
 DEFAULT_WIDGET_WIDTH = 160                                             -- value determining the width of GUI widgets

@@ -1361,6 +1361,7 @@ function vctr2(n)
     return vector.New(n, n)
 end
 imgui_disable_vector_packing = true
+math.randomseed(os.time())
 DEFAULT_WIDGET_HEIGHT = 26
 DEFAULT_WIDGET_WIDTH = 160
 PADDING_WIDTH = 8
