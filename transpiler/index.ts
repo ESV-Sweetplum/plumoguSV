@@ -183,7 +183,8 @@ export default async function transpiler(
 
             finalEntries.reverse().forEach(([k, v]: [string, number]) => {
                 let startIdx = output.lastIndexOf(lineSeparator, v - k.length - 11); // 1 from \n, 9 from `function `, 1 extra to compensate
-                let prevStartIdx = startIdx + 4;
+                let prevStartIdx = startIdx + 1;
+                while (output.charAt(prevStartIdx) !== lineSeparator) prevStartIdx++;
                 let endIdx = v;
                 let endFound = false;
 
