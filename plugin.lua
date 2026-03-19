@@ -1,6 +1,6 @@
 math.randomseed(os.time())
 imgui_disable_vector_packing=true
-PLUGIN_NAME="plumoguSV";PLUGIN_VERSION="2.1.1";PLUGIN_AUTHOR="plummyyummy, kloi34";PLUGIN_DESCRIPTION="Nothing The ultimate community-driven and open-source competitive SV plugin, remastered for the modern age."
+PLUGIN_NAME="plumoguSV";PLUGIN_VERSION="2.1.1";PLUGIN_AUTHOR="plummyyummy, kloi34";PLUGIN_DESCRIPTION="The ultimate community-driven and open-source competitive SV plugin, remastered for the modern age."
 ---@meta cache-class
 cache = {
     boolean = {},
@@ -30,999 +30,6 @@ game = {
 kbm = {}
 ---@meta matrix-class
 matrix = {}
-DEFAULT_WIDGET_HEIGHT = 26                                             -- value determining the height of GUI widgets
-DEFAULT_WIDGET_WIDTH = 160                                             -- value determining the width of GUI widgets
-PADDING_WIDTH = 8                                                      -- value determining window and frame padding
-RADIO_BUTTON_SPACING = 7.5                                             -- value determining spacing between radio buttons
-SAMELINE_SPACING = 5                                                   -- value determining spacing between GUI items on the same row
-ACTION_BUTTON_SIZE = vector.New(253, 42)                               -- dimensions of the button that does important things
-PLOT_GRAPH_SIZE = vector.New(253, 100)                                 -- dimensions of the plot graph for SVs and note motion
-HALF_ACTION_BUTTON_SIZE = vector.New((253 - SAMELINE_SPACING) / 2, 42) -- dimensions of a button that does kinda important things
-SECONDARY_BUTTON_SIZE = vector.New(48, 24)                             -- dimensions of a button that does less important things
-TERTIARY_BUTTON_SIZE = vector.New(21.5, 24)                            -- dimensions of a button that does much less important things
-EXPORT_BUTTON_SIZE = vector.New(40, 24)                                -- dimensions of the export menu settings button
-BEEG_BUTTON_SIZE = vector.New(253, 24)                                 -- beeg button
-MIN_RGB_CYCLE_TIME = 0.1                                               -- minimum seconds for one complete RGB color cycle
-MAX_RGB_CYCLE_TIME = 300                                               -- maximum seconds for one complete RGB color cycle
-MAX_CURSOR_TRAIL_POINTS = 100                                          -- maximum number of points for cursor trail effects
-MAX_SV_POINTS = 1024                                                   -- maximum number of SV points allowed
-MAX_ANIMATION_FRAMES = 999                                             -- maximum number of animation frames allowed
-MAX_IMPORT_CHARACTER_LIMIT = 999999                                    -- maximum number of characters allowed for import text
-CHINCHILLA_TYPES = {
-    'Exponential',
-    'Polynomial',
-    'Circular',
-    'Sine Power',
-    'Arc Sine Power',
-    'Inverse Power',
-    'Peter Stock',
-}
-THEME_TREE = {
-    Classic = {
-        {
-            id = 'Original',
-            textColor = { 170, 170, 255 },
-        },
-        {
-            id = 'Strawberry',
-            textColor = { { 251, 41, 67 }, { 255, 100, 150 } },
-        },
-        {
-            id = 'Amethyst',
-            textColor = { { 153, 102, 204 }, { 170, 120, 255 } },
-        },
-        {
-            id = 'Tree',
-            textColor = { 150, 111, 51 },
-        },
-        {
-            id = 'Barbie',
-            textColor = { { 227, 5, 173 }, { 100, 255, 255 } },
-        },
-    },
-    Modern = {
-        {
-            id = 'Incognito',
-            textColor = { { 150, 150, 150 }, { 200, 200, 200 } },
-        },
-        {
-            id = 'Incognito + RGB',
-            textColor = { { 150, 50, 50 }, { 50, 150, 50 }, { 50, 50, 150 } },
-        },
-        {
-            id = 'otingocnI',
-            textColor = { { 255, 255, 255 }, { 200, 200, 200 } },
-        },
-        {
-            id = 'BGR + otingocnI',
-            textColor = { { 255, 150, 150 }, { 150, 255, 150 }, { 150, 150, 255 } },
-        },
-        {
-            id = 'Glass',
-            textColor = { { 200, 200, 200 }, { 255, 255, 255 }, { 200, 200, 200 } },
-        },
-        {
-            id = 'Glass + RGB',
-            textColor = { { 150, 255, 255 }, { 255, 150, 255 }, { 255, 255, 150 } },
-        },
-        {
-            id = 'RGB Gamer Mode',
-            textColor = { { 255, 0, 0 }, { 0, 255, 0 }, { 0, 0, 255 } },
-        },
-        {
-            id = 'edom remag BGR',
-            textColor = { { 255, 100, 0 }, { 0, 255, 100 }, { 100, 0, 255 } },
-        },
-    },
-    ["Mappers' Picks"] = {
-        {
-            id = "7xbi's Glass",
-            textColor = { { 150, 150, 150 }, { 200, 200, 200 } },
-        },
-        {
-            id = "7xbi's RGB Glass",
-            textColor = { { 255, 100, 255 }, { 255, 255, 100 }, { 100, 255, 255 } },
-        },
-        {
-            id = "aster's catppuccin",
-            textColor = { { 136, 57, 239 }, { 186, 187, 241 }, { 203, 166, 247 } },
-        },
-        {
-            id = "plum's purple palace",
-            textColor = { { 100, 0, 255 }, { 255, 0, 255 } },
-        },
-    },
-    Custom = {
-        {
-            id = 'CUSTOM',
-            textColor = { 0, 0, 0 },
-        },
-    },
-}
-DYNAMIC_BACKGROUND_TYPES = {
-    'None',
-    'Reactive Stars',
-    'Reactive Singularity',
-    'Dynamic Connection',
-    'SV Spectrogram',
-}
-COMBO_SV_TYPE = {
-    'Add',
-    'Cross Multiply',
-    'Remove',
-    'Min',
-    'Max',
-    'SV Type 1 Only',
-    'SV Type 2 Only',
-}
-CURSOR_TRAILS = {
-    'None',
-    'Snake',
-    'Dust',
-    'Sparkle',
-}
-DISPLACE_SCALE_SPOTS = {
-    'Start',
-    'End',
-}
-EMOTICONS = {
-    '( - _ - )',
-    '( e . e )',
-    '( * o * )',
-    '( h . m )',
-    '( ~ _ ~ )',
-    '( - . - )',
-    '( C | D )',
-    '( w . w )',
-    '( ^ w ^ )',
-    '( > . < )',
-    '( + x + )',
-    '( o _ 0 )',
-    '[ ^ . ^ ]',
-    '( v . ^ )',
-    '( ^ o v )',
-    '( ^ o v )',
-    '( ; A ; )',
-    '[ . _ . ]',
-    "[ ' = ' ]",
-}
-FINAL_SV_TYPES = {
-    'Normal',
-    'Custom',
-    'Override',
-    'None',
-}
-FLICKER_TYPES = {
-    'Normal',
-    'Delayed',
-}
-NOTE_SKIN_TYPES = {
-    'Bar',
-    'Circle',
-}
-RANDOM_TYPES = {
-    'Normal',
-    'Uniform',
-}
-SCALE_TYPES = {
-    'Average SV',
-    'Absolute Distance',
-    'Relative Ratio',
-}
-STANDARD_SVS_NO_COMBO = {
-    'Linear',
-    'Exponential',
-    'Bezier',
-    'Hermite',
-    'Sinusoidal',
-    'Circular',
-    'Random',
-    'Custom',
-    'Chinchilla',
-}
-STILL_TYPES = {
-    'No',
-    'Start',
-    'End',
-    'Auto',
-    'Otua',
-}
-VIBRATO_DEVIATION_TYPES = {
-    'None',
-    'Linear',
-    'Gaussian',
-}
-STUTTER_CONTROLS = {
-    'First SV',
-    'Second SV',
-}
-STYLE_THEMES = {
-    'Rounded',
-    'Boxed',
-    'Rounded + Border',
-    'Boxed + Border',
-}
-SV_BEHAVIORS = {
-    'Slow down',
-    'Speed up',
-}
-TRAIL_SHAPES = {
-    'Circles',
-    'Triangles',
-}
-STILL_BEHAVIOR_TYPES = {
-    'Entire Region',
-    'Per Note Group',
-}
-LINEAR_DISTANCE_TYPES = {
-    'Start SV / End SV',
-    'Start SV / Average SV',
-    'Average SV / End SV',
-}
-EXPONENTIAL_DISTANCE_TYPES = {
-    'Average SV + Shift',
-    'Distance + Shift',
-    'Start / End',
-}
-VIBRATO_TYPES = {
-    'SV (msx)',
-    'SSF (x)',
-}
-VIBRATO_QUALITIES = {
-    'Low',
-    'Medium',
-    'High',
-    'Ultra',
-    'Omega',
-}
-VIBRATO_FRAME_RATES = { 60, 90, 150, 210, 270 }
-VIBRATO_DETAILED_QUALITIES = {} -- what actually shows up in-game
-for i, v in pairs(VIBRATO_QUALITIES) do
-    table.insert(VIBRATO_DETAILED_QUALITIES, v .. '  (~' .. VIBRATO_FRAME_RATES[i] .. 'fps)')
-end
-VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
-DEFAULT_STYLE = {
-    windowBg = vector.New(0.00, 0.00, 0.00, 1.00),
-    popupBg = vector.New(0.08, 0.08, 0.08, 0.94),
-    border = vector.New(0.00, 0.00, 0.00, 0.00),
-    frameBg = vector.New(0.14, 0.24, 0.28, 1.00),
-    frameBgHovered =
-        vector.New(0.24, 0.34, 0.38, 1.00),
-    frameBgActive =
-        vector.New(0.29, 0.39, 0.43, 1.00),
-    titleBg = vector.New(0.14, 0.24, 0.28, 1.00),
-    titleBgActive =
-        vector.New(0.51, 0.58, 0.75, 1.00),
-    titleBgCollapsed =
-        vector.New(0.51, 0.58, 0.75, 0.50),
-    checkMark = vector.New(0.81, 0.88, 1.00, 1.00),
-    sliderGrab =
-        vector.New(0.56, 0.63, 0.75, 1.00),
-    sliderGrabActive =
-        vector.New(0.61, 0.68, 0.80, 1.00),
-    button = vector.New(0.31, 0.38, 0.50, 1.00),
-    buttonHovered =
-        vector.New(0.41, 0.48, 0.60, 1.00),
-    buttonActive =
-        vector.New(0.51, 0.58, 0.70, 1.00),
-    tab = vector.New(0.31, 0.38, 0.50, 1.00),
-    tabHovered =
-        vector.New(0.51, 0.58, 0.75, 1.00),
-    tabActive =
-        vector.New(0.51, 0.58, 0.75, 1.00),
-    header = vector.New(0.81, 0.88, 1.00, 0.40),
-    headerHovered =
-        vector.New(0.81, 0.88, 1.00, 0.50),
-    headerActive =
-        vector.New(0.81, 0.88, 1.00, 0.54),
-    separator = vector.New(0.81, 0.88, 1.00, 0.30),
-    tableBorderLight = vector.New(0.81, 0.88, 1.00, 0.30),
-    text = vector.New(1.00, 1.00, 1.00, 1.00),
-    textSelectedBg =
-        vector.New(0.81, 0.88, 1.00, 0.40),
-    scrollbarGrab =
-        vector.New(0.31, 0.38, 0.50, 1.00),
-    scrollbarGrabHovered =
-        vector.New(0.41, 0.48, 0.60, 1.00),
-    scrollbarGrabActive =
-        vector.New(0.51, 0.58, 0.70, 1.00),
-    plotLines =
-        vector.New(0.61, 0.61, 0.61, 1.00),
-    plotLinesHovered =
-        vector.New(1.00, 0.43, 0.35, 1.00),
-    plotHistogram =
-        vector.New(0.90, 0.70, 0.00, 1.00),
-    plotHistogramHovered =
-        vector.New(1.00, 0.60, 0.00, 1.00),
-    loadupOpeningTextColor = vector.New(1.00, 1.00, 1.00, 1.00),
-    loadupPulseTextColorLeft = vector.New(0.00, 0.50, 1.00, 1.00),
-    loadupPulseTextColorRight = vector.New(0.00, 0.00, 1.00, 1.00),
-    loadupBgTl = vector.New(0.00, 0.00, 0.00, 0.39),
-    loadupBgTr = vector.New(0.31, 0.38, 0.50, 0.67),
-    loadupBgBl = vector.New(0.31, 0.38, 0.50, 0.67),
-    loadupBgBr = vector.New(0.62, 0.76, 1, 1.00),
-}
-DEFAULT_HOTKEY_LIST = { 'T', 'Shift+T', 'S', 'N', 'R', 'B', 'M', 'V', 'G', 'Ctrl+Alt+L', 'Ctrl+Alt+E', 'O' }
-HOTKEY_LABELS = { 'Execute Primary Action', 'Execute Secondary Action', 'Swap Primary Inputs',
-    'Negate Primary Inputs', 'Reset Secondary Input', 'Go To Prev. Scroll Group', 'Go To Next Scroll Group',
-    'Execute Vibrato Separately', 'Go To TG of Selected Note', 'Toggle Note Lock Mode', 'Toggle Use End Offsets',
-    'Move Selection To TG' }
----@enum hotkeys
-hotkeys_enum = {
-    exec_primary = 1,
-    exec_secondary = 2,
-    swap_primary = 3,
-    negate_primary = 4,
-    reset_secondary = 5,
-    go_to_prev_tg = 6,
-    go_to_next_tg = 7,
-    exec_vibrato = 8,
-    go_to_note_tg = 9,
-    toggle_note_lock = 10,
-    toggle_end_offset = 11,
-    move_selection_to_tg = 12,
-}
-function createSVGraphStats()
-    local svGraphStats = {
-        minScale = 0,
-        maxScale = 0,
-        distMinScale = 0,
-        distMaxScale = 0,
-    }
-    return svGraphStats
-end
-function createSVStats()
-    local svStats = {
-        minSV = 0,
-        maxSV = 0,
-        avgSV = 0,
-    }
-    return svStats
-end
-function loadDefaultProperties(defaultProperties)
-    if (not defaultProperties) then return end
-    if (not defaultProperties.menu) then goto skipMenu end
-    for label, tbl in pairs(defaultProperties.menu) do
-        for settingName, settingValue in pairs(tbl) do
-            local defaultTable = DEFAULT_STARTING_MENU_VARS[label]
-            if (not defaultTable) then break end
-            local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
-            if defaultSetting == nil then
-                goto nextSetting
-            end
-            DEFAULT_STARTING_MENU_VARS[label][settingName] = defaultSetting
-            ::nextSetting::
-        end
-    end
-    ::skipMenu::
-    if (not defaultProperties.settings) then goto skipSettings end
-    for label, tbl in pairs(defaultProperties.settings) do
-        for settingName, settingValue in pairs(tbl) do
-            local defaultTable = DEFAULT_STARTING_SETTING_VARS[label]
-            if (not defaultTable) then break end
-            local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
-            if defaultSetting == nil then
-                goto nextSetting
-            end
-            DEFAULT_STARTING_SETTING_VARS[label][settingName] = defaultSetting
-            ::nextSetting::
-        end
-    end
-    ::skipSettings::
-    globalVars.defaultProperties = { settings = DEFAULT_STARTING_SETTING_VARS, menu = DEFAULT_STARTING_MENU_VARS }
-end
-function parseDefaultProperty(v, default)
-    if (default == nil or type(default) == 'table' or type(default) == 'userdata') then
-        return nil
-    end
-    if (type(default) == 'number') then
-        return tn(v)
-    end
-    if (type(default) == 'boolean') then
-        return isTruthy(v)
-    end
-    if (type(default) == 'string') then
-        return v
-    end
-    return v
-end
-globalVars = {
-    advancedMode = false,
-    colorThemeName = 'Original',
-    comboizeSelect = false,
-    cursorTrailGhost = false,
-    cursorTrailIndex = 1,
-    cursorTrailPoints = 10,
-    cursorTrailShapeIndex = 1,
-    cursorTrailSize = 5,
-    customStyles = {},
-    defaultProperties = { settings = {}, menu = {} },
-    disableKofiMessage = false,
-    disableLoadup = false,
-    dontPrintCreation = false,
-    dontReplaceSV = false,
-    drawCapybara = false,
-    drawCapybara2 = false,
-    drawCapybara312 = false,
-    dynamicBackgroundIndex = 1,
-    editToolIndex = 1,
-    effectFPS = 90,
-    equalizeLinear = true,
-    hideAutomatic = false,
-    hideSVInfo = false,
-    hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST),
-    ignoreNotesOutsideTg = false,
-    maxDisplacementMultiplierExponent = 6,
-    performanceMode = false,
-    placeTypeIndex = 1,
-    presets = {},
-    printLegacyLNMessage = true,
-    pulseCoefficient = 0,
-    pulseColor = vector.New(0, 0, 0, 0),
-    restrictSinusoidalPeriod = true,
-    rgbPeriod = 3,
-    scrollGroupIndex = 1,
-    selectTypeIndex = 1,
-    showMeasureDataWidget = false,
-    showNoteDataWidget = false,
-    showPresetMenu = false,
-    showSVInfoVisualizer = true,
-    showVibratoWidget = false,
-    simultaneousDeleteModes = false,
-    snakeSpringConstant = 1,
-    stepSize = 5,
-    styleThemeIndex = 1,
-    upscroll = false,
-    useCustomPulseColor = false,
-    useEndTimeOffsets = false,
-    useMinDisplacementMultiplier = true,
-    useSelectionForNavigation = false,
-}
-DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
-function setGlobalVars(tempGlobalVars)
-    globalVars.advancedMode = isTruthy(tempGlobalVars.advancedMode)
-    globalVars.colorThemeName = tempGlobalVars.colorThemeName or 'Original'
-    globalVars.comboizeSelect = isTruthy(tempGlobalVars.comboizeSelect)
-    globalVars.cursorTrailGhost = isTruthy(tempGlobalVars.cursorTrailGhost)
-    globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
-    globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
-    globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
-    globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
-    -- `table.duplicate` must be used to prevent YAML issues; more specifically, when setting a table's value to nil (which should erase the key) and writing, the YAML file contains the key with a null parameter. To fix this, we iterate over the table and reconstruct it from scratch (which is what `table.duplicate` does).
-    globalVars.customStyles = table.duplicate(tempGlobalVars.customStyles)
-    globalVars.disableKofiMessage = isTruthy(tempGlobalVars.disableKofiMessage)
-    globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
-    globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)
-    globalVars.dontReplaceSV = isTruthy(tempGlobalVars.dontReplaceSV)
-    globalVars.drawCapybara = isTruthy(tempGlobalVars.drawCapybara)
-    globalVars.drawCapybara2 = isTruthy(tempGlobalVars.drawCapybara2)
-    globalVars.drawCapybara312 = isTruthy(tempGlobalVars.drawCapybara312)
-    globalVars.dynamicBackgroundIndex = tn(tempGlobalVars.dynamicBackgroundIndex)
-    globalVars.effectFPS = tn(tempGlobalVars.effectFPS)
-    globalVars.equalizeLinear = isTruthy(tempGlobalVars.equalizeLinear, true)
-    globalVars.hideAutomatic = isTruthy(tempGlobalVars.hideAutomatic)
-    globalVars.hideSVInfo = isTruthy(tempGlobalVars.hideSVInfo)
-    globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
-    globalVars.ignoreNotes = isTruthy(tempGlobalVars.ignoreNotesOutsideTg)
-    globalVars.maxDisplacementMultiplierExponent = tn(tempGlobalVars.maxDisplacementMultiplierExponent)
-    globalVars.performanceMode = isTruthy(tempGlobalVars.performanceMode)
-    globalVars.printLegacyLNMessage = isTruthy(tempGlobalVars.printLegacyLNMessage, true)
-    globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
-    globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
-    globalVars.restrictSinusoidalPeriod = isTruthy(tempGlobalVars.restrictSinusoidalPeriod, true)
-    globalVars.rgbPeriod = tn(tempGlobalVars.rgbPeriod)
-    globalVars.showMeasureDataWidget = isTruthy(tempGlobalVars.showMeasureDataWidget)
-    globalVars.showNoteDataWidget = isTruthy(tempGlobalVars.showNoteDataWidget)
-    globalVars.showSVInfoVisualizer = isTruthy(tempGlobalVars.showSVInfoVisualizer, true)
-    globalVars.showVibratoWidget = isTruthy(tempGlobalVars.showVibratoWidget)
-    globalVars.snakeSpringConstant = tn(tempGlobalVars.snakeSpringConstant)
-    globalVars.stepSize = tn(tempGlobalVars.stepSize)
-    globalVars.styleThemeIndex = tn(tempGlobalVars.styleThemeIndex)
-    globalVars.upscroll = isTruthy(tempGlobalVars.upscroll)
-    globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
-    globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
-    globalVars.useMinDisplacementMultiplier = isTruthy(tempGlobalVars.useMinDisplacementMultiplier, true)
-    globalVars.useSelectionForNavigation = isTruthy(tempGlobalVars.useSelectionForNavigation)
-    -- All fields below are colors that must be vectorized to properly perform color arithmetic.
-    local forceVectorizeList = { 'border', 'loadupOpeningTextColor', 'loadupPulseTextColorLeft',
-        'loadupPulseTextColorRight', 'loadupBgTl', 'loadupBgTr', 'loadupBgBl', 'loadupBgBr' }
-    if (tempGlobalVars.customStyles) then
-        for themeName, themeData in pairs(globalVars.customStyles) do
-            for k1 = 1, #forceVectorizeList do
-                local key = forceVectorizeList[k1]
-                if (themeData[key]) then
-                    globalVars.customStyles[themeName][key] = table.vectorize4(themeData[key])
-                end
-            end
-        end
-        globalCustomStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
-    else
-        globalCustomStyle = {}
-    end
-    -- All fields below are not settings, but menu operators that need to be kept on hot-reload.
-    globalVars.placeTypeIndex = state.GetValue('global.placeTypeIndex', globalVars.placeTypeIndex)
-    globalVars.editToolIndex = state.GetValue('global.editToolIndex', globalVars.editToolIndex)
-    globalVars.selectTypeIndex = state.GetValue('global.selectTypeIndex', globalVars.selectTypeIndex)
-end
-DEFAULT_STARTING_MENU_VARS = {
-    placeStandard = {
-        svTypeIndex = 1,
-        svMultipliers = {},
-        svDistances = {},
-        svGraphStats = createSVGraphStats(),
-        svStats = createSVStats(),
-        interlace = false,
-        interlaceRatio = -0.5,
-    },
-    placeSpecial = { svTypeIndex = 1 },
-    placeStill = {
-        svTypeIndex = 1,
-        noteSpacing = 1,
-        stillTypeIndex = 1,
-        stillDistance = 0,
-        stillBehavior = 1,
-        prePlaceDistances = {},
-        svMultipliers = {},
-        svDistances = {},
-        svGraphStats = createSVGraphStats(),
-        svStats = createSVStats(),
-        interlace = false,
-        interlaceRatio = -0.5,
-    },
-    placeVibrato = {
-        svTypeIndex = 1,
-        vibratoMode = 1,
-        vibratoQuality = 3,
-        sides = 2,
-        deviationFunctionIndex = 1,
-        deviationDistance = 0,
-    },
-    delete = {
-        deleteTable = { true, true, true, true },
-    },
-    addTeleport = {
-        distance = 10727,
-        teleportBeforeHand = false,
-    },
-    changeGroups = {
-        designatedTimingGroup = '$Default',
-        changeSVs = true,
-        changeSSFs = true,
-        clone = false,
-    },
-    completeDuplicate = {
-        objects = {},
-        svTbl = {},
-        ssfTbl = {},
-        msOffset = 0,
-        dontCloneHos = false,
-    },
-    convertSVSSF = {
-        conversionDirection = true,
-    },
-    copyPaste = {
-        copyLines = false,
-        copySVs = true,
-        copySSFs = true,
-        copyBMs = false,
-        copied = {
-            lines = { {} },
-            SVs = { {} },
-            SSFs = { {} },
-            BMs = { {} },
-        },
-        tryAlign = true,
-        alignWindow = 3,
-        curSlot = 1,
-    },
-    directSV = {
-        selectableIndex = 1,
-        startTime = 0,
-        multiplier = 0,
-        pageNumber = 1,
-    },
-    displaceNote = {
-        distance = 200,
-        distance1 = 0,
-        distance2 = 200,
-        linearlyChange = false,
-    },
-    displaceView = {
-        distance = 200,
-    },
-    dynamicScale = {
-        noteTimes = {},
-        svTypeIndex = 1,
-        svMultipliers = {},
-        svDistances = {},
-        svGraphStats = createSVGraphStats(),
-        svStats = createSVStats(),
-    },
-    flicker = {
-        flickerTypeIndex = 1,
-        distance = -69420.727,
-        distance1 = 0,
-        distance2 = -69420.727,
-        numFlickers = 1,
-        linearlyChange = false,
-        flickerPosition = 0.5,
-    },
-    measure = {
-        unrounded = false,
-        nsvDistance = '',
-        svDistance = '',
-        avgSV = '',
-        startDisplacement = '',
-        endDisplacement = '',
-        avgSVDisplaceless = '',
-        roundedNSVDistance = 0,
-        roundedSVDistance = 0,
-        roundedAvgSV = 0,
-        roundedStartDisplacement = 0,
-        roundedEndDisplacement = 0,
-        roundedAvgSVDisplaceless = 0,
-    },
-    reverseScroll = {
-        distance = 400,
-    },
-    scaleBookmark = {
-        searchTerm = '',
-        filterTerm = '',
-    },
-    scaleDisplace = {
-        scaleSpotIndex = 1,
-        scaleTypeIndex = 1,
-        avgSV = 0.6,
-        distance = 100,
-        ratio = 0.6,
-    },
-    scaleMultiply = {
-        scaleTypeIndex = 1,
-        avgSV = 0.6,
-        distance = 100,
-        ratio = 0.6,
-    },
-    split = {
-        modeIndex = 1,
-        cloneSVs = false,
-        cloneRadius = 1000,
-    },
-    verticalShift = {
-        verticalShift = 1,
-    },
-    selectAlternating = {
-        every = 1,
-        offset = 0,
-    },
-    selectBookmark = {
-        searchTerm = '',
-        filterTerm = '',
-    },
-    selectByTimingGroup = {
-        designatedTimingGroup = '$Default',
-    },
-    selectChordSize = {
-        select1 = true,
-        select2 = false,
-        select3 = false,
-        select4 = false,
-        select5 = false,
-        select6 = false,
-        select7 = false,
-        select8 = false,
-        select9 = false,
-        select10 = false,
-        laneSelector = 1,
-    },
-    selectNoteType = {
-        rice = true,
-        ln = false,
-        normal = true,
-        mine = false,
-    },
-    selectBySnap = {
-        snap = 1,
-    },
-}
----Gets the current menu's variables.
----@param menuType string The menu type.
----@return table
-function getMenuVars(menuType, optionalLabel)
-    local menuKey = menuType:identify()
-    -- local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuKey])
-    local menuVars = DEFAULT_STARTING_MENU_VARS[menuKey]
-    local labelText = table.concat({ menuType, optionalLabel or '', 'Menu' })
-    cache.loadTable(labelText, menuVars)
-    return menuVars
-end
-function setPresets(presetList)
-    globalVars.presets = {}
-    for _, preset in pairs(presetList) do
-        local presetIsvalid, presetData = checkPresetValidity(preset)
-        if (not presetIsvalid) then goto nextPreset end
-        table.insert(globalVars.presets,
-            { name = preset.name, type = preset.type, menu = preset.menu, data = presetData })
-        ::nextPreset::
-    end
-end
-function checkPresetValidity(preset)
-    if (not table.contains(CREATE_TYPES, preset.type)) then return false, nil end
-    local validMenus = {}
-    if (preset.type == 'Standard' or preset.type == 'Still') then
-        validMenus = table.duplicate(STANDARD_SVS)
-    end
-    if (preset.type == 'Special') then
-        validMenus = table.duplicate(SPECIAL_SVS)
-    end
-    if (preset.type == 'Vibrato') then
-        validMenus = table.duplicate(VIBRATO_SVS)
-    end
-    if (not isTruthy(validMenus)) then return false, nil end
-    if (not table.includes(validMenus, preset.menu)) then return false, nil end
-    local realType = 'place' .. preset.type
-    return true, preset.data
-end
-DEFAULT_STARTING_SETTING_VARS = {
-    linearVibratoSV = {
-        startMsx = 100,
-        endMsx = 0,
-    },
-    polynomialVibratoSV = {
-        startMsx = 0,
-        endMsx = 100,
-        controlPointCount = 3,
-        controlPoints = { vector.New(0.25, 0.25), vector.New(0.5, 0), vector.New(0.75, 0.25) },
-        plotPoints = {},
-        plotCoefficients = {},
-    },
-    exponentialVibratoSV = {
-        startMsx = 100,
-        endMsx = 0,
-        curvatureIndex = 5,
-    },
-    sinusoidalVibratoSV = {
-        startMsx = 100,
-        endMsx = 0,
-        verticalShift = 0,
-        periods = 1,
-        periodsShift = 0.25,
-    },
-    sigmoidalVibratoSV = {
-        startMsx = 100,
-        endMsx = 0,
-        curvatureIndex = 5,
-    },
-    customVibratoSV = {
-        code = [[return function (x)
-    local maxHeight = 150
-    heightFactor = maxHeight * math.exp((1 - math.sqrt(17)) * 0.5) / (31 - 7 * math.sqrt(17)) * 16
-    primaryCoefficient = (x^2 - x^3) * math.exp(2 * x)
-    sinusoidalCoefficient = math.sin(8 * math.pi * x)
-    return heightFactor * primaryCoefficient * sinusoidalCoefficient
-end]],
-    },
-    linearVibratoSSF = {
-        lowerStart = 0.5,
-        lowerEnd = 0.5,
-        higherStart = 1,
-        higherEnd = 1,
-    },
-    exponentialVibratoSSF = {
-        lowerStart = 0.5,
-        lowerEnd = 0.5,
-        higherStart = 1,
-        higherEnd = 1,
-        curvatureIndex = 5,
-    },
-    sinusoidalVibratoSSF = {
-        lowerStart = 0.5,
-        lowerEnd = 0.5,
-        higherStart = 1,
-        higherEnd = 1,
-        verticalShift = 0,
-        periods = 1,
-        periodsShift = 0.25,
-        applyToHigher = false,
-    },
-    sigmoidalVibratoSSF = {
-        lowerStart = 0.5,
-        lowerEnd = 0.5,
-        higherStart = 1,
-        higherEnd = 1,
-        curvatureIndex = 5,
-    },
-    customVibratoSSF = {
-        code1 = 'return function (x) return 0.69 end',
-        code2 = 'return function (x) return 1.420 end',
-    },
-    linear = {
-        startSV = 1.5,
-        endSV = 0.5,
-        avgSV = 0,
-        svPoints = 16,
-        finalSVIndex = 2,
-        customSV = 1,
-        distanceMode = 1,
-    },
-    exponential = {
-        behaviorIndex = 1,
-        intensity = 20,
-        verticalShift = 0,
-        distance = 100,
-        startSV = 0.01,
-        endSV = 1,
-        avgSV = 1,
-        svPoints = 16,
-        finalSVIndex = 2,
-        customSV = 1,
-        distanceMode = 1,
-    },
-    bezier = {
-        p1 = vector.New(0.1, 0.9),
-        p2 = vector.New(0.9, 0.1),
-        verticalShift = 0,
-        freeMode = false,
-        manualMode = false,
-        avgSV = 1,
-        svPoints = 16,
-        finalSVIndex = 2,
-        customSV = 1,
-    },
-    hermite = {
-        startSV = 0,
-        endSV = 0,
-        verticalShift = 0,
-        avgSV = 1,
-        svPoints = 16,
-        finalSVIndex = 2,
-        customSV = 1,
-    },
-    sinusoidal = {
-        startSV = 2,
-        endSV = 2,
-        curveSharpness = 50,
-        verticalShift = 1,
-        periods = 1,
-        periodsShift = 0.25,
-        svsPerQuarterPeriod = 8,
-        svPoints = 16,
-        finalSVIndex = 2,
-        customSV = 1,
-    },
-    circular = {
-        behaviorIndex = 1,
-        arcPercent = 50,
-        avgSV = 1,
-        verticalShift = 0,
-        svPoints = 16,
-        finalSVIndex = 2,
-        customSV = 1,
-        dontNormalize = false,
-    },
-    random = {
-        svMultipliers = {},
-        randomTypeIndex = 1,
-        randomScale = 2,
-        svPoints = 16,
-        finalSVIndex = 2,
-        customSV = 1,
-        dontNormalize = false,
-        avgSV = 1,
-        verticalShift = 0,
-    },
-    custom = {
-        svMultipliers = { 0 },
-        selectedMultiplierIndex = 1,
-        svPoints = 1,
-        finalSVIndex = 2,
-        customSV = 1,
-    },
-    chinchilla = {
-        behaviorIndex = 1,
-        chinchillaTypeIndex = 1,
-        chinchillaIntensity = 0.5,
-        avgSV = 1,
-        verticalShift = 0,
-        svPoints = 16,
-        finalSVIndex = 2,
-        customSV = 1,
-    },
-    combo = {
-        svType1Index = 1,
-        svType2Index = 2,
-        comboPhase = 0,
-        comboTypeIndex = 1,
-        comboMultiplier1 = 1,
-        comboMultiplier2 = 1,
-        finalSVIndex = 2,
-        customSV = 1,
-        dontNormalize = false,
-        avgSV = 1,
-        verticalShift = 0,
-    },
-    code = {
-        code = [[return function (x)
-    local startPeriod = 4
-    local endPeriod = -1
-    local height = 1.5
-    return height * math.sin(2 * math.pi * (startPeriod * x + (endPeriod - startPeriod) * 0.5 * x^2))
-end]],
-        svPoints = 64,
-        finalSVIndex = 2,
-        customSV = 1,
-    },
-    stutter = {
-        startSV = 1.5,
-        endSV = 0.5,
-        stutterDuration = 50,
-        stutterDuration2 = 0,
-        stuttersPerSection = 1,
-        avgSV = 1,
-        finalSVIndex = 2,
-        customSV = 1,
-        linearlyChange = false,
-        controlLastSV = false,
-        svMultipliers = {},
-        svDistances = {},
-        svGraphStats = createSVGraphStats(),
-        svMultipliers2 = {},
-        svDistances2 = {},
-        svGraph2Stats = createSVGraphStats(),
-    },
-    teleportStutter = {
-        svPercent = 50,
-        svPercent2 = 0,
-        distance = 50,
-        mainSV = 0.5,
-        mainSV2 = 0,
-        useDistance = false,
-        linearlyChange = false,
-        avgSV = 1,
-        finalSVIndex = 2,
-        customSV = 1,
-        stuttersPerSection = 1,
-    },
-    framesSetup = {
-        menuStep = 1,
-        numFrames = 5,
-        frameDistance = 2000,
-        distance = 2000,
-        reverseFrameOrder = false,
-        noteSkinTypeIndex = 1,
-        frameTimes = {},
-        selectedTimeIndex = 1,
-        currentFrame = 1,
-    },
-    penis = {
-        bWidth = 50,
-        sWidth = 100,
-        sCurvature = 100,
-        bCurvature = 100,
-    },
-    automate = {
-        copiedSVs = {},
-        deleteCopiedSVs = true,
-        maintainMs = true,
-        ms = 1000,
-        scaleSVs = false,
-        initialSV = 1,
-        optimizeTGs = true,
-    },
-    animationPalette = {
-        instructions = '',
-    },
-}
----Gets the current menu's setting variables.
----@param svType string The SV type - that is, the shape of the SV once plotted.
----@param label string A delineator to separate two categories with similar SV types (Standard/Still, etc).
----@return table
-function getSettingVars(svType, label)
-    local settingKey = svType:identify()
-    local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[settingKey])
-    local labelText = svType .. label .. 'Settings'
-    cache.loadTable(labelText, settingVars)
-    return settingVars
-end
 ---#### (NOTE: This function is impure and has no return value. This should be changed eventually.)
 ---Gets a list of variables.
 ---@param listName string An identifier to avoid state collisions.
@@ -1660,8 +667,8 @@ end
 function matrix.findZeroRow(mtrx)
     for idx, row in pairs(mtrx) do
         local zeroRow = true
-        for k2 = 1, #row do
-            local num = row[k2]
+        for k1 = 1, #row do
+            local num = row[k1]
             if num ~= 0 then
                 zeroRow = false
                 break
@@ -1954,8 +961,8 @@ end
 function table.average(values, includeLastValue)
     if not isTruthy(values) then return 0 end
     local sum = 0
-    for k3 = 1, #values do
-        local value = values[k3]
+    for k2 = 1, #values do
+        local value = values[k2]
         sum = sum + value
     end
     if not includeLastValue then
@@ -2006,8 +1013,8 @@ end
 ---@param item any The item to search for.
 ---@return boolean contains Whether or not the item given is within the table.
 function table.contains(tbl, item)
-    for k4 = 1, #tbl do
-        local v = tbl[k4]
+    for k3 = 1, #tbl do
+        local v = tbl[k3]
         if v == item then return true end
     end
     return false
@@ -2019,8 +1026,8 @@ table.includes = table.contains -- provide alias bc i'm a js user kekw
 function table.dedupe(tbl)
     local hash = {}
     local newTbl = {}
-    for k5 = 1, #tbl do
-        local value = tbl[k5]
+    for k4 = 1, #tbl do
+        local value = tbl[k4]
         if (not hash[value]) then
             newTbl[#newTbl + 1] = value
             hash[value] = true
@@ -2037,8 +1044,8 @@ function table.duplicate(tbl)
     if not tbl then return {} end
     local dupeTbl = {}
     if (tbl[1]) then
-        for k6 = 1, #tbl do
-            local value = tbl[k6]
+        for k5 = 1, #tbl do
+            local value = tbl[k5]
             table.insert(dupeTbl, type(value) == 'table' and table.duplicate(value) or value)
         end
     else
@@ -2162,13 +1169,13 @@ function table.parse(str)
         if (str:len() <= 1) then break end
     end
     if (tableType == 'arr') then
-        for k7 = 1, #terms do
-            local v = terms[k7]
+        for k6 = 1, #terms do
+            local v = terms[k6]
             table.insert(tbl, table.parse(v))
         end
     else
-        for k8 = 1, #terms do
-            local v = terms[k8]
+        for k7 = 1, #terms do
+            local v = terms[k7]
             local idx = v:find('=')
             tbl[v:sub(1, idx - 1)] = table.parse(v:sub(idx + 1))
         end
@@ -2196,8 +1203,8 @@ end
 ---@return V
 function table.reduce(tbl, fn, initialValue)
     local accumulator = initialValue
-    for k9 = 1, #tbl do
-        local v = tbl[k9]
+    for k8 = 1, #tbl do
+        local v = tbl[k8]
         accumulator = fn(accumulator, v)
     end
     return accumulator
@@ -2291,8 +1298,8 @@ function table.stringify(var)
     if (type(var) ~= 'table') then return 'UNKNOWN' end
     if (var[1] ~= nil) then
         local str = '['
-        for k10 = 1, #var do
-            local v = var[k10]
+        for k9 = 1, #var do
+            local v = var[k9]
             str = str .. table.stringify(v) .. ','
         end
         return str:sub(1, -2) .. ']'
@@ -2317,8 +1324,8 @@ function table.validate(checkList, tbl, extrapolateData, inferTypes)
     local validKeys = table.keys(checkList)
     local tableKeys = table.keys(tbl)
     local outputTable = {}
-    for k11 = 1, #validKeys do
-        local key = validKeys[k11]
+    for k10 = 1, #validKeys do
+        local key = validKeys[k10]
         if (table.contains(tableKeys, key)) then
             outputTable[key] = tbl[key]
         end
@@ -2337,8 +1344,8 @@ require('packages.table.construct')
 ---@return string[] values A list of values.
 function table.values(tbl)
     local resultsTbl = table.construct()
-    for k12 = 1, #tbl do
-        local v = tbl[k12]
+    for k11 = 1, #tbl do
+        local v = tbl[k11]
         table.insert(resultsTbl, v)
     end
     return resultsTbl
@@ -2409,6 +1416,999 @@ end
 ---@return Vector2 vctr The resultant vector of style `<n, n>`.
 function vctr2(n)
     return vector.New(n, n)
+end
+DEFAULT_WIDGET_HEIGHT = 26                                             -- value determining the height of GUI widgets
+DEFAULT_WIDGET_WIDTH = 160                                             -- value determining the width of GUI widgets
+PADDING_WIDTH = 8                                                      -- value determining window and frame padding
+RADIO_BUTTON_SPACING = 7.5                                             -- value determining spacing between radio buttons
+SAMELINE_SPACING = 5                                                   -- value determining spacing between GUI items on the same row
+ACTION_BUTTON_SIZE = vector.New(253, 42)                               -- dimensions of the button that does important things
+PLOT_GRAPH_SIZE = vector.New(253, 100)                                 -- dimensions of the plot graph for SVs and note motion
+HALF_ACTION_BUTTON_SIZE = vector.New((253 - SAMELINE_SPACING) / 2, 42) -- dimensions of a button that does kinda important things
+SECONDARY_BUTTON_SIZE = vector.New(48, 24)                             -- dimensions of a button that does less important things
+TERTIARY_BUTTON_SIZE = vector.New(21.5, 24)                            -- dimensions of a button that does much less important things
+EXPORT_BUTTON_SIZE = vector.New(40, 24)                                -- dimensions of the export menu settings button
+BEEG_BUTTON_SIZE = vector.New(253, 24)                                 -- beeg button
+MIN_RGB_CYCLE_TIME = 0.1                                               -- minimum seconds for one complete RGB color cycle
+MAX_RGB_CYCLE_TIME = 300                                               -- maximum seconds for one complete RGB color cycle
+MAX_CURSOR_TRAIL_POINTS = 100                                          -- maximum number of points for cursor trail effects
+MAX_SV_POINTS = 1024                                                   -- maximum number of SV points allowed
+MAX_ANIMATION_FRAMES = 999                                             -- maximum number of animation frames allowed
+MAX_IMPORT_CHARACTER_LIMIT = 999999                                    -- maximum number of characters allowed for import text
+CHINCHILLA_TYPES = {
+    'Exponential',
+    'Polynomial',
+    'Circular',
+    'Sine Power',
+    'Arc Sine Power',
+    'Inverse Power',
+    'Peter Stock',
+}
+THEME_TREE = {
+    Classic = {
+        {
+            id = 'Original',
+            textColor = { 170, 170, 255 },
+        },
+        {
+            id = 'Strawberry',
+            textColor = { { 251, 41, 67 }, { 255, 100, 150 } },
+        },
+        {
+            id = 'Amethyst',
+            textColor = { { 153, 102, 204 }, { 170, 120, 255 } },
+        },
+        {
+            id = 'Tree',
+            textColor = { 150, 111, 51 },
+        },
+        {
+            id = 'Barbie',
+            textColor = { { 227, 5, 173 }, { 100, 255, 255 } },
+        },
+    },
+    Modern = {
+        {
+            id = 'Incognito',
+            textColor = { { 150, 150, 150 }, { 200, 200, 200 } },
+        },
+        {
+            id = 'Incognito + RGB',
+            textColor = { { 150, 50, 50 }, { 50, 150, 50 }, { 50, 50, 150 } },
+        },
+        {
+            id = 'otingocnI',
+            textColor = { { 255, 255, 255 }, { 200, 200, 200 } },
+        },
+        {
+            id = 'BGR + otingocnI',
+            textColor = { { 255, 150, 150 }, { 150, 255, 150 }, { 150, 150, 255 } },
+        },
+        {
+            id = 'Glass',
+            textColor = { { 200, 200, 200 }, { 255, 255, 255 }, { 200, 200, 200 } },
+        },
+        {
+            id = 'Glass + RGB',
+            textColor = { { 150, 255, 255 }, { 255, 150, 255 }, { 255, 255, 150 } },
+        },
+        {
+            id = 'RGB Gamer Mode',
+            textColor = { { 255, 0, 0 }, { 0, 255, 0 }, { 0, 0, 255 } },
+        },
+        {
+            id = 'edom remag BGR',
+            textColor = { { 255, 100, 0 }, { 0, 255, 100 }, { 100, 0, 255 } },
+        },
+    },
+    ["Mappers' Picks"] = {
+        {
+            id = "7xbi's Glass",
+            textColor = { { 150, 150, 150 }, { 200, 200, 200 } },
+        },
+        {
+            id = "7xbi's RGB Glass",
+            textColor = { { 255, 100, 255 }, { 255, 255, 100 }, { 100, 255, 255 } },
+        },
+        {
+            id = "aster's catppuccin",
+            textColor = { { 136, 57, 239 }, { 186, 187, 241 }, { 203, 166, 247 } },
+        },
+        {
+            id = "plum's purple palace",
+            textColor = { { 100, 0, 255 }, { 255, 0, 255 } },
+        },
+    },
+    Custom = {
+        {
+            id = 'CUSTOM',
+            textColor = { 0, 0, 0 },
+        },
+    },
+}
+DYNAMIC_BACKGROUND_TYPES = {
+    'None',
+    'Reactive Stars',
+    'Reactive Singularity',
+    'Dynamic Connection',
+    'SV Spectrogram',
+}
+COMBO_SV_TYPE = {
+    'Add',
+    'Cross Multiply',
+    'Remove',
+    'Min',
+    'Max',
+    'SV Type 1 Only',
+    'SV Type 2 Only',
+}
+CURSOR_TRAILS = {
+    'None',
+    'Snake',
+    'Dust',
+    'Sparkle',
+}
+DISPLACE_SCALE_SPOTS = {
+    'Start',
+    'End',
+}
+EMOTICONS = {
+    '( - _ - )',
+    '( e . e )',
+    '( * o * )',
+    '( h . m )',
+    '( ~ _ ~ )',
+    '( - . - )',
+    '( C | D )',
+    '( w . w )',
+    '( ^ w ^ )',
+    '( > . < )',
+    '( + x + )',
+    '( o _ 0 )',
+    '[ ^ . ^ ]',
+    '( v . ^ )',
+    '( ^ o v )',
+    '( ^ o v )',
+    '( ; A ; )',
+    '[ . _ . ]',
+    "[ ' = ' ]",
+}
+FINAL_SV_TYPES = {
+    'Normal',
+    'Custom',
+    'Override',
+    'None',
+}
+FLICKER_TYPES = {
+    'Normal',
+    'Delayed',
+}
+NOTE_SKIN_TYPES = {
+    'Bar',
+    'Circle',
+}
+RANDOM_TYPES = {
+    'Normal',
+    'Uniform',
+}
+SCALE_TYPES = {
+    'Average SV',
+    'Absolute Distance',
+    'Relative Ratio',
+}
+STANDARD_SVS_NO_COMBO = {
+    'Linear',
+    'Exponential',
+    'Bezier',
+    'Hermite',
+    'Sinusoidal',
+    'Circular',
+    'Random',
+    'Custom',
+    'Chinchilla',
+}
+STILL_TYPES = {
+    'No',
+    'Start',
+    'End',
+    'Auto',
+    'Otua',
+}
+VIBRATO_DEVIATION_TYPES = {
+    'None',
+    'Linear',
+    'Gaussian',
+}
+STUTTER_CONTROLS = {
+    'First SV',
+    'Second SV',
+}
+STYLE_THEMES = {
+    'Rounded',
+    'Boxed',
+    'Rounded + Border',
+    'Boxed + Border',
+}
+SV_BEHAVIORS = {
+    'Slow down',
+    'Speed up',
+}
+TRAIL_SHAPES = {
+    'Circles',
+    'Triangles',
+}
+STILL_BEHAVIOR_TYPES = {
+    'Entire Region',
+    'Per Note Group',
+}
+LINEAR_DISTANCE_TYPES = {
+    'Start SV / End SV',
+    'Start SV / Average SV',
+    'Average SV / End SV',
+}
+EXPONENTIAL_DISTANCE_TYPES = {
+    'Average SV + Shift',
+    'Distance + Shift',
+    'Start / End',
+}
+VIBRATO_TYPES = {
+    'SV (msx)',
+    'SSF (x)',
+}
+VIBRATO_QUALITIES = {
+    'Low',
+    'Medium',
+    'High',
+    'Ultra',
+    'Omega',
+}
+VIBRATO_FRAME_RATES = { 60, 90, 150, 210, 270 }
+VIBRATO_DETAILED_QUALITIES = {} -- what actually shows up in-game
+for i, v in pairs(VIBRATO_QUALITIES) do
+    table.insert(VIBRATO_DETAILED_QUALITIES, v .. '  (~' .. VIBRATO_FRAME_RATES[i] .. 'fps)')
+end
+VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
+DEFAULT_STYLE = {
+    windowBg = vector.New(0.00, 0.00, 0.00, 1.00),
+    popupBg = vector.New(0.08, 0.08, 0.08, 0.94),
+    border = vector.New(0.00, 0.00, 0.00, 0.00),
+    frameBg = vector.New(0.14, 0.24, 0.28, 1.00),
+    frameBgHovered =
+        vector.New(0.24, 0.34, 0.38, 1.00),
+    frameBgActive =
+        vector.New(0.29, 0.39, 0.43, 1.00),
+    titleBg = vector.New(0.14, 0.24, 0.28, 1.00),
+    titleBgActive =
+        vector.New(0.51, 0.58, 0.75, 1.00),
+    titleBgCollapsed =
+        vector.New(0.51, 0.58, 0.75, 0.50),
+    checkMark = vector.New(0.81, 0.88, 1.00, 1.00),
+    sliderGrab =
+        vector.New(0.56, 0.63, 0.75, 1.00),
+    sliderGrabActive =
+        vector.New(0.61, 0.68, 0.80, 1.00),
+    button = vector.New(0.31, 0.38, 0.50, 1.00),
+    buttonHovered =
+        vector.New(0.41, 0.48, 0.60, 1.00),
+    buttonActive =
+        vector.New(0.51, 0.58, 0.70, 1.00),
+    tab = vector.New(0.31, 0.38, 0.50, 1.00),
+    tabHovered =
+        vector.New(0.51, 0.58, 0.75, 1.00),
+    tabActive =
+        vector.New(0.51, 0.58, 0.75, 1.00),
+    header = vector.New(0.81, 0.88, 1.00, 0.40),
+    headerHovered =
+        vector.New(0.81, 0.88, 1.00, 0.50),
+    headerActive =
+        vector.New(0.81, 0.88, 1.00, 0.54),
+    separator = vector.New(0.81, 0.88, 1.00, 0.30),
+    tableBorderLight = vector.New(0.81, 0.88, 1.00, 0.30),
+    text = vector.New(1.00, 1.00, 1.00, 1.00),
+    textSelectedBg =
+        vector.New(0.81, 0.88, 1.00, 0.40),
+    scrollbarGrab =
+        vector.New(0.31, 0.38, 0.50, 1.00),
+    scrollbarGrabHovered =
+        vector.New(0.41, 0.48, 0.60, 1.00),
+    scrollbarGrabActive =
+        vector.New(0.51, 0.58, 0.70, 1.00),
+    plotLines =
+        vector.New(0.61, 0.61, 0.61, 1.00),
+    plotLinesHovered =
+        vector.New(1.00, 0.43, 0.35, 1.00),
+    plotHistogram =
+        vector.New(0.90, 0.70, 0.00, 1.00),
+    plotHistogramHovered =
+        vector.New(1.00, 0.60, 0.00, 1.00),
+    loadupOpeningTextColor = vector.New(1.00, 1.00, 1.00, 1.00),
+    loadupPulseTextColorLeft = vector.New(0.00, 0.50, 1.00, 1.00),
+    loadupPulseTextColorRight = vector.New(0.00, 0.00, 1.00, 1.00),
+    loadupBgTl = vector.New(0.00, 0.00, 0.00, 0.39),
+    loadupBgTr = vector.New(0.31, 0.38, 0.50, 0.67),
+    loadupBgBl = vector.New(0.31, 0.38, 0.50, 0.67),
+    loadupBgBr = vector.New(0.62, 0.76, 1, 1.00),
+}
+DEFAULT_HOTKEY_LIST = { 'T', 'Shift+T', 'S', 'N', 'R', 'B', 'M', 'V', 'G', 'Ctrl+Alt+L', 'Ctrl+Alt+E', 'O' }
+HOTKEY_LABELS = { 'Execute Primary Action', 'Execute Secondary Action', 'Swap Primary Inputs',
+    'Negate Primary Inputs', 'Reset Secondary Input', 'Go To Prev. Scroll Group', 'Go To Next Scroll Group',
+    'Execute Vibrato Separately', 'Go To TG of Selected Note', 'Toggle Note Lock Mode', 'Toggle Use End Offsets',
+    'Move Selection To TG' }
+---@enum hotkeys
+hotkeys_enum = {
+    exec_primary = 1,
+    exec_secondary = 2,
+    swap_primary = 3,
+    negate_primary = 4,
+    reset_secondary = 5,
+    go_to_prev_tg = 6,
+    go_to_next_tg = 7,
+    exec_vibrato = 8,
+    go_to_note_tg = 9,
+    toggle_note_lock = 10,
+    toggle_end_offset = 11,
+    move_selection_to_tg = 12,
+}
+function createSVGraphStats()
+    local svGraphStats = {
+        minScale = 0,
+        maxScale = 0,
+        distMinScale = 0,
+        distMaxScale = 0,
+    }
+    return svGraphStats
+end
+function createSVStats()
+    local svStats = {
+        minSV = 0,
+        maxSV = 0,
+        avgSV = 0,
+    }
+    return svStats
+end
+function loadDefaultProperties(defaultProperties)
+    if (not defaultProperties) then return end
+    if (not defaultProperties.menu) then goto skipMenu end
+    for label, tbl in pairs(defaultProperties.menu) do
+        for settingName, settingValue in pairs(tbl) do
+            local defaultTable = DEFAULT_STARTING_MENU_VARS[label]
+            if (not defaultTable) then break end
+            local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
+            if defaultSetting == nil then
+                goto nextSetting
+            end
+            DEFAULT_STARTING_MENU_VARS[label][settingName] = defaultSetting
+            ::nextSetting::
+        end
+    end
+    ::skipMenu::
+    if (not defaultProperties.settings) then goto skipSettings end
+    for label, tbl in pairs(defaultProperties.settings) do
+        for settingName, settingValue in pairs(tbl) do
+            local defaultTable = DEFAULT_STARTING_SETTING_VARS[label]
+            if (not defaultTable) then break end
+            local defaultSetting = parseDefaultProperty(settingValue, defaultTable[settingName])
+            if defaultSetting == nil then
+                goto nextSetting
+            end
+            DEFAULT_STARTING_SETTING_VARS[label][settingName] = defaultSetting
+            ::nextSetting::
+        end
+    end
+    ::skipSettings::
+    globalVars.defaultProperties = { settings = DEFAULT_STARTING_SETTING_VARS, menu = DEFAULT_STARTING_MENU_VARS }
+end
+function parseDefaultProperty(v, default)
+    if (default == nil or type(default) == 'table' or type(default) == 'userdata') then
+        return nil
+    end
+    if (type(default) == 'number') then
+        return tn(v)
+    end
+    if (type(default) == 'boolean') then
+        return isTruthy(v)
+    end
+    if (type(default) == 'string') then
+        return v
+    end
+    return v
+end
+globalVars = {
+    advancedMode = false,
+    colorThemeName = 'Original',
+    comboizeSelect = false,
+    cursorTrailGhost = false,
+    cursorTrailIndex = 1,
+    cursorTrailPoints = 10,
+    cursorTrailShapeIndex = 1,
+    cursorTrailSize = 5,
+    customStyles = {},
+    defaultProperties = { settings = {}, menu = {} },
+    disableKofiMessage = false,
+    disableLoadup = false,
+    dontPrintCreation = false,
+    dontReplaceSV = false,
+    drawCapybara = false,
+    drawCapybara2 = false,
+    drawCapybara312 = false,
+    dynamicBackgroundIndex = 1,
+    editToolIndex = 1,
+    effectFPS = 90,
+    equalizeLinear = true,
+    hideAutomatic = false,
+    hideSVInfo = false,
+    hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST),
+    ignoreNotesOutsideTg = false,
+    maxDisplacementMultiplierExponent = 6,
+    performanceMode = false,
+    placeTypeIndex = 1,
+    presets = {},
+    printLegacyLNMessage = true,
+    pulseCoefficient = 0,
+    pulseColor = vector.New(0, 0, 0, 0),
+    restrictSinusoidalPeriod = true,
+    rgbPeriod = 3,
+    scrollGroupIndex = 1,
+    selectTypeIndex = 1,
+    showMeasureDataWidget = false,
+    showNoteDataWidget = false,
+    showPresetMenu = false,
+    showSVInfoVisualizer = true,
+    showVibratoWidget = false,
+    simultaneousDeleteModes = false,
+    snakeSpringConstant = 1,
+    stepSize = 5,
+    styleThemeIndex = 1,
+    upscroll = false,
+    useCustomPulseColor = false,
+    useEndTimeOffsets = false,
+    useMinDisplacementMultiplier = true,
+    useSelectionForNavigation = false,
+}
+DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
+function setGlobalVars(tempGlobalVars)
+    globalVars.advancedMode = isTruthy(tempGlobalVars.advancedMode)
+    globalVars.colorThemeName = tempGlobalVars.colorThemeName or 'Original'
+    globalVars.comboizeSelect = isTruthy(tempGlobalVars.comboizeSelect)
+    globalVars.cursorTrailGhost = isTruthy(tempGlobalVars.cursorTrailGhost)
+    globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
+    globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
+    globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
+    globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
+    -- `table.duplicate` must be used to prevent YAML issues; more specifically, when setting a table's value to nil (which should erase the key) and writing, the YAML file contains the key with a null parameter. To fix this, we iterate over the table and reconstruct it from scratch (which is what `table.duplicate` does).
+    globalVars.customStyles = table.duplicate(tempGlobalVars.customStyles)
+    globalVars.disableKofiMessage = isTruthy(tempGlobalVars.disableKofiMessage)
+    globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
+    globalVars.dontPrintCreation = isTruthy(tempGlobalVars.dontPrintCreation)
+    globalVars.dontReplaceSV = isTruthy(tempGlobalVars.dontReplaceSV)
+    globalVars.drawCapybara = isTruthy(tempGlobalVars.drawCapybara)
+    globalVars.drawCapybara2 = isTruthy(tempGlobalVars.drawCapybara2)
+    globalVars.drawCapybara312 = isTruthy(tempGlobalVars.drawCapybara312)
+    globalVars.dynamicBackgroundIndex = tn(tempGlobalVars.dynamicBackgroundIndex)
+    globalVars.effectFPS = tn(tempGlobalVars.effectFPS)
+    globalVars.equalizeLinear = isTruthy(tempGlobalVars.equalizeLinear, true)
+    globalVars.hideAutomatic = isTruthy(tempGlobalVars.hideAutomatic)
+    globalVars.hideSVInfo = isTruthy(tempGlobalVars.hideSVInfo)
+    globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
+    globalVars.ignoreNotes = isTruthy(tempGlobalVars.ignoreNotesOutsideTg)
+    globalVars.maxDisplacementMultiplierExponent = tn(tempGlobalVars.maxDisplacementMultiplierExponent)
+    globalVars.performanceMode = isTruthy(tempGlobalVars.performanceMode)
+    globalVars.printLegacyLNMessage = isTruthy(tempGlobalVars.printLegacyLNMessage, true)
+    globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
+    globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
+    globalVars.restrictSinusoidalPeriod = isTruthy(tempGlobalVars.restrictSinusoidalPeriod, true)
+    globalVars.rgbPeriod = tn(tempGlobalVars.rgbPeriod)
+    globalVars.showMeasureDataWidget = isTruthy(tempGlobalVars.showMeasureDataWidget)
+    globalVars.showNoteDataWidget = isTruthy(tempGlobalVars.showNoteDataWidget)
+    globalVars.showSVInfoVisualizer = isTruthy(tempGlobalVars.showSVInfoVisualizer, true)
+    globalVars.showVibratoWidget = isTruthy(tempGlobalVars.showVibratoWidget)
+    globalVars.snakeSpringConstant = tn(tempGlobalVars.snakeSpringConstant)
+    globalVars.stepSize = tn(tempGlobalVars.stepSize)
+    globalVars.styleThemeIndex = tn(tempGlobalVars.styleThemeIndex)
+    globalVars.upscroll = isTruthy(tempGlobalVars.upscroll)
+    globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
+    globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
+    globalVars.useMinDisplacementMultiplier = isTruthy(tempGlobalVars.useMinDisplacementMultiplier, true)
+    globalVars.useSelectionForNavigation = isTruthy(tempGlobalVars.useSelectionForNavigation)
+    -- All fields below are colors that must be vectorized to properly perform color arithmetic.
+    local forceVectorizeList = { 'border', 'loadupOpeningTextColor', 'loadupPulseTextColorLeft',
+        'loadupPulseTextColorRight', 'loadupBgTl', 'loadupBgTr', 'loadupBgBl', 'loadupBgBr' }
+    if (tempGlobalVars.customStyles) then
+        for themeName, themeData in pairs(globalVars.customStyles) do
+            for k12 = 1, #forceVectorizeList do
+                local key = forceVectorizeList[k12]
+                if (themeData[key]) then
+                    globalVars.customStyles[themeName][key] = table.vectorize4(themeData[key])
+                end
+            end
+        end
+        globalCustomStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
+    else
+        globalCustomStyle = {}
+    end
+    -- All fields below are not settings, but menu operators that need to be kept on hot-reload.
+    globalVars.placeTypeIndex = state.GetValue('global.placeTypeIndex', globalVars.placeTypeIndex)
+    globalVars.editToolIndex = state.GetValue('global.editToolIndex', globalVars.editToolIndex)
+    globalVars.selectTypeIndex = state.GetValue('global.selectTypeIndex', globalVars.selectTypeIndex)
+end
+DEFAULT_STARTING_MENU_VARS = {
+    placeStandard = {
+        svTypeIndex = 1,
+        svMultipliers = {},
+        svDistances = {},
+        svGraphStats = createSVGraphStats(),
+        svStats = createSVStats(),
+        interlace = false,
+        interlaceRatio = -0.5,
+    },
+    placeSpecial = { svTypeIndex = 1 },
+    placeStill = {
+        svTypeIndex = 1,
+        noteSpacing = 1,
+        stillTypeIndex = 1,
+        stillDistance = 0,
+        stillBehavior = 1,
+        prePlaceDistances = {},
+        svMultipliers = {},
+        svDistances = {},
+        svGraphStats = createSVGraphStats(),
+        svStats = createSVStats(),
+        interlace = false,
+        interlaceRatio = -0.5,
+    },
+    placeVibrato = {
+        svTypeIndex = 1,
+        vibratoMode = 1,
+        vibratoQuality = 3,
+        sides = 2,
+        deviationFunctionIndex = 1,
+        deviationDistance = 0,
+    },
+    delete = {
+        deleteTable = { true, true, true, true },
+    },
+    addTeleport = {
+        distance = 10727,
+        teleportBeforeHand = false,
+    },
+    changeGroups = {
+        designatedTimingGroup = '$Default',
+        changeSVs = true,
+        changeSSFs = true,
+        clone = false,
+    },
+    completeDuplicate = {
+        objects = {},
+        svTbl = {},
+        ssfTbl = {},
+        msOffset = 0,
+        dontCloneHos = false,
+    },
+    convertSVSSF = {
+        conversionDirection = true,
+    },
+    copyPaste = {
+        copyLines = false,
+        copySVs = true,
+        copySSFs = true,
+        copyBMs = false,
+        copied = {
+            lines = { {} },
+            SVs = { {} },
+            SSFs = { {} },
+            BMs = { {} },
+        },
+        tryAlign = true,
+        alignWindow = 3,
+        curSlot = 1,
+    },
+    directSV = {
+        selectableIndex = 1,
+        startTime = 0,
+        multiplier = 0,
+        pageNumber = 1,
+    },
+    displaceNote = {
+        distance = 200,
+        distance1 = 0,
+        distance2 = 200,
+        linearlyChange = false,
+    },
+    displaceView = {
+        distance = 200,
+    },
+    dynamicScale = {
+        noteTimes = {},
+        svTypeIndex = 1,
+        svMultipliers = {},
+        svDistances = {},
+        svGraphStats = createSVGraphStats(),
+        svStats = createSVStats(),
+    },
+    flicker = {
+        flickerTypeIndex = 1,
+        distance = -69420.727,
+        distance1 = 0,
+        distance2 = -69420.727,
+        numFlickers = 1,
+        linearlyChange = false,
+        flickerPosition = 0.5,
+    },
+    measure = {
+        unrounded = false,
+        nsvDistance = '',
+        svDistance = '',
+        avgSV = '',
+        startDisplacement = '',
+        endDisplacement = '',
+        avgSVDisplaceless = '',
+        roundedNSVDistance = 0,
+        roundedSVDistance = 0,
+        roundedAvgSV = 0,
+        roundedStartDisplacement = 0,
+        roundedEndDisplacement = 0,
+        roundedAvgSVDisplaceless = 0,
+    },
+    reverseScroll = {
+        distance = 400,
+    },
+    scaleBookmark = {
+        searchTerm = '',
+        filterTerm = '',
+    },
+    scaleDisplace = {
+        scaleSpotIndex = 1,
+        scaleTypeIndex = 1,
+        avgSV = 0.6,
+        distance = 100,
+        ratio = 0.6,
+    },
+    scaleMultiply = {
+        scaleTypeIndex = 1,
+        avgSV = 0.6,
+        distance = 100,
+        ratio = 0.6,
+    },
+    split = {
+        modeIndex = 1,
+        cloneSVs = false,
+        cloneRadius = 1000,
+    },
+    verticalShift = {
+        verticalShift = 1,
+    },
+    selectAlternating = {
+        every = 1,
+        offset = 0,
+    },
+    selectBookmark = {
+        searchTerm = '',
+        filterTerm = '',
+    },
+    selectByTimingGroup = {
+        designatedTimingGroup = '$Default',
+    },
+    selectChordSize = {
+        select1 = true,
+        select2 = false,
+        select3 = false,
+        select4 = false,
+        select5 = false,
+        select6 = false,
+        select7 = false,
+        select8 = false,
+        select9 = false,
+        select10 = false,
+        laneSelector = 1,
+    },
+    selectNoteType = {
+        rice = true,
+        ln = false,
+        normal = true,
+        mine = false,
+    },
+    selectBySnap = {
+        snap = 1,
+    },
+}
+---Gets the current menu's variables.
+---@param menuType string The menu type.
+---@return table
+function getMenuVars(menuType, optionalLabel)
+    local menuKey = menuType:identify()
+    -- local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuKey])
+    local menuVars = DEFAULT_STARTING_MENU_VARS[menuKey]
+    local labelText = table.concat({ menuType, optionalLabel or '', 'Menu' })
+    cache.loadTable(labelText, menuVars)
+    return menuVars
+end
+function setPresets(presetList)
+    globalVars.presets = {}
+    for _, preset in pairs(presetList) do
+        local presetIsvalid, presetData = checkPresetValidity(preset)
+        if (not presetIsvalid) then goto nextPreset end
+        table.insert(globalVars.presets,
+            { name = preset.name, type = preset.type, menu = preset.menu, data = presetData })
+        ::nextPreset::
+    end
+end
+function checkPresetValidity(preset)
+    if (not table.contains(CREATE_TYPES, preset.type)) then return false, nil end
+    local validMenus = {}
+    if (preset.type == 'Standard' or preset.type == 'Still') then
+        validMenus = table.duplicate(STANDARD_SVS)
+    end
+    if (preset.type == 'Special') then
+        validMenus = table.duplicate(SPECIAL_SVS)
+    end
+    if (preset.type == 'Vibrato') then
+        validMenus = table.duplicate(VIBRATO_SVS)
+    end
+    if (not isTruthy(validMenus)) then return false, nil end
+    if (not table.includes(validMenus, preset.menu)) then return false, nil end
+    local realType = 'place' .. preset.type
+    return true, preset.data
+end
+DEFAULT_STARTING_SETTING_VARS = {
+    linearVibratoSV = {
+        startMsx = 100,
+        endMsx = 0,
+    },
+    polynomialVibratoSV = {
+        startMsx = 0,
+        endMsx = 100,
+        controlPointCount = 3,
+        controlPoints = { vector.New(0.25, 0.25), vector.New(0.5, 0), vector.New(0.75, 0.25) },
+        plotPoints = {},
+        plotCoefficients = {},
+    },
+    exponentialVibratoSV = {
+        startMsx = 100,
+        endMsx = 0,
+        curvatureIndex = 5,
+    },
+    sinusoidalVibratoSV = {
+        startMsx = 100,
+        endMsx = 0,
+        verticalShift = 0,
+        periods = 1,
+        periodsShift = 0.25,
+    },
+    sigmoidalVibratoSV = {
+        startMsx = 100,
+        endMsx = 0,
+        curvatureIndex = 5,
+    },
+    customVibratoSV = {
+        code = [[return function (x)
+    local maxHeight = 150
+    heightFactor = maxHeight * math.exp((1 - math.sqrt(17)) * 0.5) / (31 - 7 * math.sqrt(17)) * 16
+    primaryCoefficient = (x^2 - x^3) * math.exp(2 * x)
+    sinusoidalCoefficient = math.sin(8 * math.pi * x)
+    return heightFactor * primaryCoefficient * sinusoidalCoefficient
+end]],
+    },
+    linearVibratoSSF = {
+        lowerStart = 0.5,
+        lowerEnd = 0.5,
+        higherStart = 1,
+        higherEnd = 1,
+    },
+    exponentialVibratoSSF = {
+        lowerStart = 0.5,
+        lowerEnd = 0.5,
+        higherStart = 1,
+        higherEnd = 1,
+        curvatureIndex = 5,
+    },
+    sinusoidalVibratoSSF = {
+        lowerStart = 0.5,
+        lowerEnd = 0.5,
+        higherStart = 1,
+        higherEnd = 1,
+        verticalShift = 0,
+        periods = 1,
+        periodsShift = 0.25,
+        applyToHigher = false,
+    },
+    sigmoidalVibratoSSF = {
+        lowerStart = 0.5,
+        lowerEnd = 0.5,
+        higherStart = 1,
+        higherEnd = 1,
+        curvatureIndex = 5,
+    },
+    customVibratoSSF = {
+        code1 = 'return function (x) return 0.69 end',
+        code2 = 'return function (x) return 1.420 end',
+    },
+    linear = {
+        startSV = 1.5,
+        endSV = 0.5,
+        avgSV = 0,
+        svPoints = 16,
+        finalSVIndex = 2,
+        customSV = 1,
+        distanceMode = 1,
+    },
+    exponential = {
+        behaviorIndex = 1,
+        intensity = 20,
+        verticalShift = 0,
+        distance = 100,
+        startSV = 0.01,
+        endSV = 1,
+        avgSV = 1,
+        svPoints = 16,
+        finalSVIndex = 2,
+        customSV = 1,
+        distanceMode = 1,
+    },
+    bezier = {
+        p1 = vector.New(0.1, 0.9),
+        p2 = vector.New(0.9, 0.1),
+        verticalShift = 0,
+        freeMode = false,
+        manualMode = false,
+        avgSV = 1,
+        svPoints = 16,
+        finalSVIndex = 2,
+        customSV = 1,
+    },
+    hermite = {
+        startSV = 0,
+        endSV = 0,
+        verticalShift = 0,
+        avgSV = 1,
+        svPoints = 16,
+        finalSVIndex = 2,
+        customSV = 1,
+    },
+    sinusoidal = {
+        startSV = 2,
+        endSV = 2,
+        curveSharpness = 50,
+        verticalShift = 1,
+        periods = 1,
+        periodsShift = 0.25,
+        svsPerQuarterPeriod = 8,
+        svPoints = 16,
+        finalSVIndex = 2,
+        customSV = 1,
+    },
+    circular = {
+        behaviorIndex = 1,
+        arcPercent = 50,
+        avgSV = 1,
+        verticalShift = 0,
+        svPoints = 16,
+        finalSVIndex = 2,
+        customSV = 1,
+        dontNormalize = false,
+    },
+    random = {
+        svMultipliers = {},
+        randomTypeIndex = 1,
+        randomScale = 2,
+        svPoints = 16,
+        finalSVIndex = 2,
+        customSV = 1,
+        dontNormalize = false,
+        avgSV = 1,
+        verticalShift = 0,
+    },
+    custom = {
+        svMultipliers = { 0 },
+        selectedMultiplierIndex = 1,
+        svPoints = 1,
+        finalSVIndex = 2,
+        customSV = 1,
+    },
+    chinchilla = {
+        behaviorIndex = 1,
+        chinchillaTypeIndex = 1,
+        chinchillaIntensity = 0.5,
+        avgSV = 1,
+        verticalShift = 0,
+        svPoints = 16,
+        finalSVIndex = 2,
+        customSV = 1,
+    },
+    combo = {
+        svType1Index = 1,
+        svType2Index = 2,
+        comboPhase = 0,
+        comboTypeIndex = 1,
+        comboMultiplier1 = 1,
+        comboMultiplier2 = 1,
+        finalSVIndex = 2,
+        customSV = 1,
+        dontNormalize = false,
+        avgSV = 1,
+        verticalShift = 0,
+    },
+    code = {
+        code = [[return function (x)
+    local startPeriod = 4
+    local endPeriod = -1
+    local height = 1.5
+    return height * math.sin(2 * math.pi * (startPeriod * x + (endPeriod - startPeriod) * 0.5 * x^2))
+end]],
+        svPoints = 64,
+        finalSVIndex = 2,
+        customSV = 1,
+    },
+    stutter = {
+        startSV = 1.5,
+        endSV = 0.5,
+        stutterDuration = 50,
+        stutterDuration2 = 0,
+        stuttersPerSection = 1,
+        avgSV = 1,
+        finalSVIndex = 2,
+        customSV = 1,
+        linearlyChange = false,
+        controlLastSV = false,
+        svMultipliers = {},
+        svDistances = {},
+        svGraphStats = createSVGraphStats(),
+        svMultipliers2 = {},
+        svDistances2 = {},
+        svGraph2Stats = createSVGraphStats(),
+    },
+    teleportStutter = {
+        svPercent = 50,
+        svPercent2 = 0,
+        distance = 50,
+        mainSV = 0.5,
+        mainSV2 = 0,
+        useDistance = false,
+        linearlyChange = false,
+        avgSV = 1,
+        finalSVIndex = 2,
+        customSV = 1,
+        stuttersPerSection = 1,
+    },
+    framesSetup = {
+        menuStep = 1,
+        numFrames = 5,
+        frameDistance = 2000,
+        distance = 2000,
+        reverseFrameOrder = false,
+        noteSkinTypeIndex = 1,
+        frameTimes = {},
+        selectedTimeIndex = 1,
+        currentFrame = 1,
+    },
+    penis = {
+        bWidth = 50,
+        sWidth = 100,
+        sCurvature = 100,
+        bCurvature = 100,
+    },
+    automate = {
+        copiedSVs = {},
+        deleteCopiedSVs = true,
+        maintainMs = true,
+        ms = 1000,
+        scaleSVs = false,
+        initialSV = 1,
+        optimizeTGs = true,
+    },
+    animationPalette = {
+        instructions = '',
+    },
+}
+---Gets the current menu's setting variables.
+---@param svType string The SV type - that is, the shape of the SV once plotted.
+---@param label string A delineator to separate two categories with similar SV types (Standard/Still, etc).
+---@return table
+function getSettingVars(svType, label)
+    local settingKey = svType:identify()
+    local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[settingKey])
+    local labelText = svType .. label .. 'Settings'
+    cache.loadTable(labelText, settingVars)
+    return settingVars
 end
 function displaceNotesForAnimationFrames(settingVars)
     local frameDistance = settingVars.frameDistance
