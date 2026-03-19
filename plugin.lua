@@ -1,6 +1,35 @@
 math.randomseed(os.time())
 imgui_disable_vector_packing=true
 PLUGIN_NAME="plumoguSV";PLUGIN_VERSION="2.1.1";PLUGIN_AUTHOR="plummyyummy, kloi34";PLUGIN_DESCRIPTION="Nothing The ultimate community-driven and open-source competitive SV plugin, remastered for the modern age."
+---@meta cache-class
+cache = {
+    boolean = {},
+    windows = {},
+    lists = {},
+}
+---@meta clock-class
+clock = {}; cache.clock = {}
+clock.prevTime = 0
+tempClockCount = 0
+---@meta color-class
+color = {
+    vctr = {},
+    int = {},
+}
+color.int.alphaMask = 16777216
+color.int.redMask = 1
+color.int.greenMask = 256
+color.int.blueMask = 65536
+color.int.whiteMask = color.int.redMask + color.int.greenMask + color.int.blueMask
+---@meta game-class
+game = {
+    window = {},
+    get = {},
+}
+---@meta input-class
+kbm = {}
+---@meta matrix-class
+matrix = {}
 DEFAULT_WIDGET_HEIGHT = 26                                             -- value determining the height of GUI widgets
 DEFAULT_WIDGET_WIDTH = 160                                             -- value determining the width of GUI widgets
 PADDING_WIDTH = 8                                                      -- value determining window and frame padding
@@ -994,35 +1023,1393 @@ function getSettingVars(svType, label)
     cache.loadTable(labelText, settingVars)
     return settingVars
 end
----@meta cache-class
-cache = {
-    boolean = {},
-    windows = {},
-    lists = {},
-}
----@meta clock-class
-clock = {}; cache.clock = {}
-clock.prevTime = 0
-tempClockCount = 0
----@meta color-class
-color = {
-    vctr = {},
-    int = {},
-}
-color.int.alphaMask = 16777216
-color.int.redMask = 1
-color.int.greenMask = 256
-color.int.blueMask = 65536
-color.int.whiteMask = color.int.redMask + color.int.greenMask + color.int.blueMask
----@meta game-class
-game = {
-    window = {},
-    get = {},
-}
----@meta input-class
-kbm = {}
----@meta matrix-class
-matrix = {}
+---#### (NOTE: This function is impure and has no return value. This should be changed eventually.)
+---Gets a list of variables.
+---@param listName string An identifier to avoid state collisions.
+---@param variables { [string]: any } The key-value table to get data for.
+function cache.loadTable(listName, variables)
+    for key, _ in pairs(variables) do
+        if (state.GetValue(listName .. key) ~= nil) then
+            variables[key] = state.GetValue(listName .. key)
+        end
+    end
+end
+---Saves a table in state, independently.
+---@param listName string An identifier to avoid state collisions.
+---@param variables { [string]: any } A key-value table to save.
+function cache.saveTable(listName, variables)
+    for key, value in pairs(variables) do
+        state.SetValue(listName .. key, value)
+    end
+end
+---Returns the number of milliseconds the plugin has been active.
+---@return number lifetime
+function clock.getTime()
+    return (state.UnixTime - clock.prevTime) / 1000
+end
+require('packages.cache.initialize.priority')
+---Returns true every `interval` ms.
+---@param id string The unique identifier of the clock.
+---@param interval integer The interval at which the clock should run.
+---@return boolean ev True if the clock has reached its interval time.
+function clock.listen(id, interval)
+    local currentTime = state
+        .UnixTime -- Avoid calling state global multiple times, which causes a heavy load on performance
+    local prevTime = cache.clock[id]
+    if (not prevTime) then
+        cache.clock[id] = currentTime
+        prevTime = currentTime
+    end
+    if (currentTime - prevTime > interval) then
+        cache.clock[id] = currentTime
+        return true
+    end
+    return false
+end
+---Alters opacity of a given color.
+---@param col integer
+---@param additiveOpacity integer
+---@return number
+---@overload fun(col: Vector4, additiveOpacity: number): Vector4
+function color.alterOpacity(col, additiveOpacity)
+    if (type(col) ~= 'number') then
+        return col + vector.New(0, 0, 0, additiveOpacity)
+    end
+    return col + math.floor(additiveOpacity) * 16777216
+end
+color.vctr.white = vector.New(1, 1, 1, 1)
+color.vctr.black = vector.New(0, 0, 0, 1)
+color.vctr.transparent = vector.New(0, 0, 0, 0)
+color.int.white = color.int.whiteMask * 255 + color.int.alphaMask * 255
+color.int.black = color.int.alphaMask * 255
+color.int.transparent = 0
+color.vctr.red = vector.New(1, 0, 0, 1)
+color.vctr.light_red = vector.New(1, 0.5, 0.5, 1)
+color.int.red = color.int.redMask * 255 + color.int.alphaMask * 255
+color.vctr.orange = vector.New(1, 0.5, 0, 1)
+color.vctr.light_orange = vector.New(1, 0.75, 0.5, 1)
+color.int.orange = 4278222975
+color.vctr.yellow = vector.New(1, 1, 0, 1)
+color.vctr.light_yellow = vector.New(1, 1, 0.5, 1)
+color.int.yellow = 4278255615
+color.vctr.green = vector.New(0, 1, 0, 1)
+color.vctr.light_green = vector.New(0.5, 1, 0.5, 1)
+color.int.green = 4278255360
+color.vctr.aqua = vector.New(0, 1, 1, 1)
+color.vctr.light_aqua = vector.New(0.5, 1, 1, 1)
+color.int.aqua = 4294967040
+color.vctr.blue = vector.New(0, 0, 1, 1)
+color.vctr.light_blue = vector.New(0.5, 0.5, 1, 1)
+color.int.blue = 4294901760
+color.vctr.purple = vector.New(1, 0, 1, 1)
+color.vctr.light_purple = vector.New(1, 0.5, 1, 1)
+color.int.purple = 4294901887
+color.vctr.magenta = vector.New(1, 0, 0.5, 1)
+color.vctr.light_magenta = vector.New(1, 0.5, 0.75, 1)
+color.int.magenta = 4286546175
+HEXADECIMAL = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' }
+NONDUA = { '!', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+    'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f',
+    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}',
+    '~' }
+---Converts rgba to an unsigned integer (0-4294967295).
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return integer
+function color.rgbaToUint(r, g, b, a)
+    local flr = math.floor
+    return flr(a) * 16 ^ 6 + flr(b) * 16 ^ 4 + flr(g) * 16 ^ 2 + flr(r)
+end
+---Converts rgba (in vector form) to an unsigned integer (0-4294967295).
+---@param col Vector4
+---@return integer
+function color.vrgbaToUint(col)
+    local flr = math.floor
+    return color.rgbaToUint(flr(col.x * 255), flr(col.y * 255), flr(col.z * 255), flr(col.w * 255))
+end
+---Converts an unsigned integer to a Vector4 of color values (0-1 for each element).
+---@param n integer
+---@return Vector4
+function color.uintToRgba(n)
+    local tbl = {}
+    for i = 0, 3 do
+        table.insert(tbl, math.floor(n / 256 ^ i) % 256)
+    end
+    return table.vectorize4(tbl) / 255
+end
+---Converts rgba to an ndua string (base 92).
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return string
+function color.rgbaToNdua(r, g, b, a)
+    local uint = color.rgbaToUint(r, g, b, a)
+    local str = ''
+    for i = 0, 4 do
+        str = str .. NONDUA[math.floor(uint / (92 ^ i)) % 92 + 1]
+    end
+    return str:reverse()
+end
+---Converts an ndua string (base 92) to an rgba Vector4 (0-1 for each element).
+---@param ndua string
+---@return Vector4
+function color.nduaToRgba(ndua)
+    local num = 0
+    for i = 1, 5 do
+        local idx = table.indexOf(NONDUA, ndua:charAt(i))
+        if (idx == -1) then goto nextIndex end
+        num = num + (idx - 1) * 92 ^ (5 - i)
+        ::nextIndex::
+    end
+    return color.uintToRgba(num)
+end
+---Converts a color to a Quaver-compatible string.
+---@param vctr Vector4
+---@return string
+function color.rgbaToStr(vctr)
+    local flr = math.floor
+    return table.concat({ flr(vctr.x * 255), flr(vctr.y * 255), flr(vctr.z * 255) }, ',')
+end
+---Converts a Quaver-compatible string to an rgba Vector4.
+---@param str string
+---@return Vector4
+function color.strToRgba(str)
+    local rgb = {}
+    str:gsub('(%d+)', function(c)
+        table.insert(rgb, c)
+    end)
+    return vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, 1)
+end
+---Converts hsl to an rgba `Vector4`, where `hue` is in degrees. The abstract formula comes from [Wikipedia](https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB_alternative).
+---@param hue integer The hue in degrees.
+---@param saturation number The saturation, within [0, 1].
+---@param lightness number The lightness, within [0, 1].
+---@param alpha number The opacity, within [0, 1].
+---@return Vector4
+function color.hslaToRgba(hue, saturation, lightness, alpha)
+    local a = saturation * math.min(lightness, 1 - lightness)
+    local f = function(n)
+        local k = (n + (hue % 360) / 30) % 12
+        return lightness - a * math.max(-1, math.min(k - 3, 9 - k, 1))
+    end
+    return vector.New(f(0), f(8), f(4), alpha)
+end
+---Generates a random color.
+---@param includeAlpha boolean If false, alpha will always be 1.
+---@return Vector4
+function generateRGBColor(includeAlpha)
+    local r = math.random()
+    local g = math.random()
+    local b = math.random()
+    local a = math.random()
+    return vector.New(r, g, b, includeAlpha and a or 1)
+end
+require('packages.table.searchClosest')
+---Gets the most recent timing point, or a dummy timing point if none exists.
+---@param offset number
+---@return TimingPoint
+function game.get.timingPointAt(offset)
+    local line = map.getTimingPointAt(offset)
+    if line then return line end
+    return { StartTime = -69420, Bpm = 42.69, Signature = 4, Hidden = false }
+end
+local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
+---Gets the snap color from a given time.
+---@param time number The time to reference.
+---@param dontPrintInaccuracy? boolean If set to true, will not print warning messages on unconfident guesses.
+---@return SnapNumber
+function game.get.snapAt(time, dontPrintInaccuracy)
+    local MAX_SNAP = 48
+    local previousBar = math.floor(map.GetNearestSnapTimeFromTime(false, 1, time + 6) or 0)
+    local barLength = 60000 / game.get.timingPointAt(state.SongTime).Bpm
+    local distanceAbovePrev = time - previousBar
+    if (distanceAbovePrev <= 5 or distanceAbovePrev >= barLength - 5) then return 1 end
+    local minSnapTime = barLength / MAX_SNAP
+    local checkingTime = 0
+    local index = -1
+    for _ = 1, MAX_SNAP do
+        if checkingTime > distanceAbovePrev then break end
+        checkingTime = checkingTime + minSnapTime
+        index = index + 1
+    end
+    if (math.abs(minSnapTime * (index + 1) - distanceAbovePrev) < math.abs(minSnapTime * index - distanceAbovePrev)) then
+        index = index + 1
+    end
+    -- Finds GCF between MAX_SNAP and given spacing
+    local divisor = MAX_SNAP
+    local div = index
+    local remainder = -1
+    while (remainder ~= 0) do
+        remainder = divisor % div
+        divisor = div
+        div = remainder
+    end
+    if (math.floor(MAX_SNAP / divisor) ~= MAX_SNAP / divisor) then return 5 end
+    if (MAX_SNAP / divisor > 16) then return 5 end
+    return MAX_SNAP / divisor
+end
+---Gets the start time of the most recent SSF, or returns -1 if there is no SSF before the given offset.
+---@param offset number
+---@param tgId? string
+---@return number
+function game.get.ssfStartTimeAt(offset, tgId)
+    local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
+    if ssf then return ssf.StartTime end
+    return -1
+end
+---Gets the multiplier of the most recent SSF, or returns 1 if there is no SSF before the given offset.
+---@param offset number
+---@param tgId? string
+---@return number
+function game.get.ssfMultiplierAt(offset, tgId)
+    local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
+    if ssf then return ssf.Multiplier end
+    return 1
+end
+---Gets the start time of the most recent SV, or returns -1 if there is no SV before the given offset.
+---@param offset number
+---@param tgId? string
+---@return number
+function game.get.svStartTimeAt(offset, tgId)
+    local sv = map.GetScrollVelocityAt(offset, tgId)
+    if sv then return sv.StartTime end
+    return -1
+end
+---Gets the multiplier of the most recent SV, or returns the initial scroll velocity or 1 if there is no SV before the given offset.
+---@param offset number
+---@param tgId? string
+---@return number
+function game.get.svMultiplierAt(offset, tgId)
+    local sv = map.GetScrollVelocityAt(offset, tgId)
+    if sv then return sv.Multiplier end
+    local initTgSv = state.SelectedScrollGroup.InitialScrollVelocity
+    if initTgSv ~= nil then return initTgSv end
+    local initSV = map.InitialScrollVelocity
+    if initSV ~= nil then return initSV end
+    return 1
+end
+---Returns a list of [bookmarks](lua://Bookmark) between two times, inclusive.
+---@param startOffset number The lower bound of the search area.
+---@param endOffset number The upper bound of the search area.
+---@return Bookmark[] bms All of the [bookmarks](lua://Bookmark) within the area.
+function game.get.bookmarksBetweenOffsets(startOffset, endOffset)
+    local bookmarksBetweenOffsets = {} ---@type Bookmark[]
+    for _, bm in ipairs(map.Bookmarks) do
+        local bmIsInRange = bm.StartTime >= startOffset and bm.StartTime < endOffset
+        if bmIsInRange then table.insert(bookmarksBetweenOffsets, bm) end
+    end
+    return sort(bookmarksBetweenOffsets, sortAscendingStartTime)
+end
+---Returns a list of [timing points](lua://TimingPoint) between two times, inclusive.
+---@param startOffset number The lower bound of the search area.
+---@param endOffset number The upper bound of the search area.
+---@return TimingPoint[] tps All of the [timing points](lua://TimingPoint) within the area.
+function game.get.linesBetweenOffsets(startOffset, endOffset)
+    local linesBetweenoffsets = {} ---@type TimingPoint[]
+    for _, line in ipairs(map.TimingPoints) do
+        local lineIsInRange = line.StartTime >= startOffset and line.StartTime < endOffset
+        if lineIsInRange then table.insert(linesBetweenoffsets, line) end
+    end
+    return sort(linesBetweenoffsets, sortAscendingStartTime)
+end
+---Returns a list of [hit objects](lua://HitObject) between two times, inclusive.
+---@param startOffset number The lower bound of the search area.
+---@param endOffset number The upper bound of the search area.
+---@return HitObject[] objs All of the [hit objects](lua://HitObject) within the area.
+function game.get.notesBetweenOffsets(startOffset, endOffset)
+    local notesBetweenOffsets = {} ---@type HitObject[]
+    for _, note in ipairs(map.HitObjects) do
+        local noteIsInRange = note.StartTime >= startOffset and note.StartTime <= endOffset
+        if noteIsInRange then table.insert(notesBetweenOffsets, note) end
+    end
+    return sort(notesBetweenOffsets, sortAscendingStartTime)
+end
+---Returns a list of [scroll speed factors](lua://ScrollSpeedFactor) between two times, inclusive.
+---@param startOffset number The lower bound of the search area.
+---@param endOffset number The upper bound of the search area.
+---@param includeEnd? boolean Whether or not to include any SVs on the end time.
+---@param dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
+---@return ScrollSpeedFactor[] ssfs All of the [scroll speed factors](lua://ScrollSpeedFactor) within the area.
+function game.get.ssfsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
+    local ssfsBetweenOffsets = {} ---@type ScrollSpeedFactor[]
+    local ssfs = map.ScrollSpeedFactors
+    if ssfs == nil then
+        ssfs = {}
+    else
+        for _, ssf in ipairs(map.ScrollSpeedFactors) do
+            local ssfIsInRange = ssf.StartTime >= startOffset and ssf.StartTime < endOffset
+            if (includeEnd and ssf.StartTime == endOffset) then ssfIsInRange = true end
+            if ssfIsInRange then table.insert(ssfsBetweenOffsets, ssf) end
+        end
+    end
+    if dontSort then return ssfsBetweenOffsets end
+    return sort(ssfsBetweenOffsets, sortAscendingStartTime)
+end
+---Returns a list of [scroll velocities](lua://ScrollVelocity) between two times, inclusive.
+---@param startOffset number The lower bound of the search area.
+---@param endOffset number The upper bound of the search area.
+---@param includeEnd? boolean Whether or not to include any SVs on the end time.
+---@param dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
+---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
+function game.get.svsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
+    local svsBetweenOffsets = {} ---@type ScrollVelocity[]
+    for _, sv in ipairs(map.ScrollVelocities) do
+        local svIsInRange = sv.StartTime >= startOffset and sv.StartTime < endOffset
+        if (includeEnd and sv.StartTime == endOffset) then svIsInRange = true end
+        if svIsInRange then table.insert(svsBetweenOffsets, sv) end
+    end
+    if dontSort then return svsBetweenOffsets end
+    return sort(svsBetweenOffsets, sortAscendingStartTime)
+end
+---Returns an array of all timing group ids, including `$DEFAULT` and `$GLOBAL`.
+---@return string[]
+function game.get.timingGroupList()
+    local baseList = table.keys(map.TimingGroups)
+    local defaultIndex = table.indexOf(baseList, '$Default')
+    table.remove(baseList, defaultIndex)
+    local globalIndex = table.indexOf(baseList, '$Global')
+    table.remove(baseList, globalIndex)
+    table.insert(baseList, 1, '$Default')
+    table.insert(baseList, 2, '$Global')
+    if (globalVars.hideAutomatic) then table.filter(baseList, function(str) return not string.find(str, 'automate_') end) end
+    return baseList
+end
+require('packages.table.dedupe')
+require('packages.table.sort')
+---Finds and returns a list of all unique offsets of notes between selected notes [Table]
+---@param includeLN? boolean
+---@return number[]
+function game.get.uniqueNoteOffsetsBetweenSelected(includeLN)
+    local selectedNoteOffsets = game.get.uniqueSelectedNoteOffsets()
+    if (not selectedNoteOffsets) then
+        toggleablePrint('e!',
+            'Warning: There are not enough notes in the current selection (within this timing group) to perform the action.')
+        return {}
+    end
+    local startOffset = selectedNoteOffsets[1]
+    local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
+    local offsets = game.get.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
+    if (#offsets < 2) then
+        toggleablePrint('e!',
+            'Warning: There are not enough notes in the current selection (within this timing group) to perform the action.')
+        return {}
+    end
+    return offsets
+end
+---Returns a list of unique offsets (in increasing order) of selected notes [Table]
+---@return number[]
+function game.get.uniqueSelectedNoteOffsets()
+    local offsets = {}
+    for _, ho in pairs(state.SelectedHitObjects) do
+        table.insert(offsets, ho.StartTime)
+        if (ho.EndTime ~= 0 and globalVars.useEndTimeOffsets) then table.insert(offsets, ho.EndTime) end
+    end
+    if (not isTruthy(offsets)) then return {} end
+    offsets = table.dedupe(offsets)
+    offsets = sort(offsets, sortAscending)
+    return offsets
+end
+---Returns an array of hit objects within the selection time.
+---@return HitObject[]
+function game.get.uniqueNotesBetweenSelected()
+    local selectedNoteOffsets = game.get.uniqueSelectedNoteOffsets()
+    if (not selectedNoteOffsets) then
+        toggleablePrint('e!',
+            'Warning: There are not enough notes in the current selection (within this timing group) to perform the action.')
+        return {}
+    end
+    local startOffset = selectedNoteOffsets[1]
+    local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
+    local hos = game.get.notesBetweenOffsets(startOffset, endOffset)
+    if (#hos < 2) then
+        toggleablePrint('e!',
+            'Warning: There are not enough notes in the current selection (within this timing group) to perform the action.')
+        return {}
+    end
+    return hos
+end
+---Finds and returns a list of all unique offsets of notes between a start and an end time [Table]
+---@param startOffset number
+---@param endOffset number
+---@param includeLN? boolean
+---@return number[]
+function game.get.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
+    local noteOffsetsBetween = {}
+    includeLN = includeLN or globalVars.useEndTimeOffsets
+    for _, ho in ipairs(map.HitObjects) do
+        if ho.StartTime >= startOffset and ho.StartTime <= endOffset then
+            local skipNote = false
+            if (state.SelectedScrollGroupId ~= ho.TimingGroup and globalVars.ignoreNotesOutsideTg) then skipNote = true end
+            if (ho.StartTime == startOffset or ho.StartTime == endOffset) then skipNote = false end
+            if skipNote then goto nextNote end
+            table.insert(noteOffsetsBetween, ho.StartTime)
+            if (ho.EndTime ~= 0 and ho.EndTime <= endOffset and includeLN) then
+                table.insert(noteOffsetsBetween,
+                    ho.EndTime)
+            end
+            ::nextNote::
+        end
+        if ho.EndTime >= startOffset and ho.EndTime <= endOffset and includeLN then
+            table.insert(noteOffsetsBetween, ho.EndTime)
+        end
+    end
+    noteOffsetsBetween = table.dedupe(noteOffsetsBetween)
+    noteOffsetsBetween = sort(noteOffsetsBetween, sortAscending)
+    return noteOffsetsBetween
+end
+---Returns the center of the window (in pixels).
+---@return Vector2 center
+function game.window.getCenter()
+    local windowDim = state.WindowSize
+    return vector.New(state.WindowSize[1] / 2, state.WindowSize[2] / 2)
+end
+---Listens to the keyboard and returns specific values based on if keys are pressed.
+---@return string[] prefixes An array of prefixes like "Ctrl" or "Shift".
+---@return integer key The key enum of the pressed key.
+function kbm.listenForAnyKeyPressed()
+    local isCtrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
+    local isShiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)
+    local isAltHeld = utils.IsKeyDown(keys.LeftAlt) or utils.IsKeyDown(keys.RightAlt)
+    local key = -1
+    local prefixes = {}
+    if isCtrlHeld then table.insert(prefixes, 'Ctrl') end
+    if isShiftHeld then table.insert(prefixes, 'Shift') end
+    if isAltHeld then table.insert(prefixes, 'Alt') end
+    for i = 65, 90 do
+        if (utils.IsKeyPressed(i)) then
+            key = i
+        end
+    end
+    return prefixes, key
+end
+---Gets the amount of distance the mouse moved THIS FRAME.
+---@param button? ImGuiMouseButton
+---@return Vector2 delta
+function kbm.mouseDelta(button)
+    local delta = imgui.GetMouseDragDelta(button or 0)
+    imgui.ResetMouseDragDelta(button or 0)
+    return delta
+end
+ALPHABET_LIST = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+    'T', 'U', 'V', 'W', 'X', 'Y', 'Z' }
+---Converts a key enum to a specific character.
+---@param num integer
+---@return string
+function kbm.numToKey(num)
+    return ALPHABET_LIST[math.clamp(num - 64, 1, #ALPHABET_LIST)]
+end
+require('packages.table.contains')
+---Returns true if the given key combo is pressed (e.g. "Ctrl+Shift+L")
+---@param keyCombo string
+---@return boolean
+function kbm.pressedKeyCombo(keyCombo)
+    keyCombo = keyCombo:upper()
+    local comboList = {}
+    for v in keyCombo:gmatch('%u+') do
+        table.insert(comboList, v)
+    end
+    local keyReq = comboList[#comboList]
+    local ctrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
+    local shiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)
+    local altHeld = utils.IsKeyDown(keys.LeftAlt) or utils.IsKeyDown(keys.RightAlt)
+    if (table.contains(comboList, 'CTRL') ~= ctrlHeld) then
+        return false
+    end
+    if (table.contains(comboList, 'SHIFT') ~= shiftHeld) then
+        return false
+    end
+    if (table.contains(comboList, 'ALT') ~= altHeld) then
+        return false
+    end
+    return utils.IsKeyPressed(keys[keyReq])
+end
+kbm.executedKeyCombo = kbm.pressedKeyCombo
+---Evaluates a simplified one-dimensional cubic bezier expression with points (0, p2, p3, 1).
+---@param p2 number The second point in the cubic bezier.
+---@param p3 number The third point in the cubic bezier.
+---@param t number The time in which to evaluate the cubic bezier.
+---@return number cBez The result.
+function math.cubicBezier(p2, p3, t)
+    return 3 * t * (1 - t) ^ 2 * p2 + 3 * t ^ 2 * (1 - t) * p3 + t ^ 3
+end
+---Evaluates a simplified one-dimensional quadratic bezier expression with points (0, p2, 1).
+---@param p2 number The second point in the quadratic bezier.
+---@param t number The time in which to evaluate the quadratic bezier.
+---@return number qBez The result.
+function math.quadraticBezier(p2, t)
+    return 2 * t * (1 - t) * p2 + t ^ 2
+end
+require('packages.math.factorial')
+---Restricts a number to be within a chosen bound.
+---@param number number
+---@param lowerBound number
+---@param upperBound number
+---@return number
+function math.clamp(number, lowerBound, upperBound)
+    if number < lowerBound then return lowerBound end
+    if number > upperBound then return upperBound end
+    return number
+end
+function math.createKernel(kernelType, parameters)
+    kernelType = kernelType:lower()
+    if (kernelType == 'gaussian') then
+        local sigma = parameters.sigma
+        local radius = math.ceil(sigma * 3)
+        local kernel = {}
+        local sum = 0
+        for i = -radius, radius do
+            local val = math.exp(-(i * i) / (2 * sigma * sigma))
+            kernel[i + radius + 1] = val
+            sum = sum + val
+        end
+        local max_val = kernel[radius + 1]
+        if (parameters.normalize) then max_val = sum end
+        for i = 1, #kernel do
+            kernel[i] = kernel[i] / max_val
+        end
+        return kernel, radius
+    end
+end
+---Evaluates a polynomial (specified by the coefficient array) at a value `x`.
+---@param ceff number[] The coefficients of the polynomial in descending order; for example, the polynomial x^3+3x^2-3x+4 is represented as `{1, 3, -3, 4}`.
+---@param x number
+---@return number y
+function math.evaluatePolynomial(ceff, x)
+    local sum = 0
+    local degree = #ceff - 1
+    for i, c in ipairs(ceff) do
+        sum = sum + c * x ^ (degree - i + 1)
+    end
+    return sum
+end
+---Clamps a number between `lowerBound` and `upperBound` by repeatedly multiplying or dividing by the `multiplicativeFactor`.
+---@param n number
+---@param lowerBound number
+---@param upperBound number
+---@param multiplicativeFactor? number
+---@return number
+function math.expoClamp(n, lowerBound, upperBound, multiplicativeFactor)
+    if upperBound <= lowerBound then return n end
+    if (n <= upperBound and n >= lowerBound) then return n end
+    local factor = multiplicativeFactor < 1 and 1 / multiplicativeFactor or multiplicativeFactor
+    while (n < lowerBound) do
+        n = n * factor
+    end
+    while (n > upperBound) do
+        n = n / factor
+    end
+    return n
+end
+require('packages.math.round')
+---Forces a number to have a quarterly decimal part.
+---@param number number
+---@return number
+function math.quarter(number)
+    return math.round(number * 4) * 0.25
+end
+---Returns the fractional portion of a number (e.g. in 4.4, returns 0.4).
+---@param n number
+---@return number
+function math.frac(n)
+    return n - math.floor(n)
+end
+---Picks a random number with a Gaussian distribution; implemented with the polar Box-Muller transform.
+---@param mean number The mean of the Gaussian distribution.
+---@param stdDev number The standard deviation of the Gaussian distribution.
+---@param withinStdDevCount number If the resulting random number is over this number of standard deviations from the mean, rerolls until it is no longer so.
+---@return number z1 A random number.
+---@return number x2 Another random number.
+function math.gaussianRandom(mean, stdDev, withinStdDevCount)
+    local output, output2 = nil, 0
+    while (not output or math.abs(output - mean) / stdDev > withinStdDevCount) do
+        local randomRadius = math.random()
+        while (randomRadius == 0) do randomRadius = math.random() end -- Avoids math.random outputting exactly 0
+        local R = math.sqrt(-2 * math.log(randomRadius))
+        local theta = 2 * math.pi * math.random()
+        output, output2 = R * math.cos(theta) * stdDev + mean, R * math.sin(theta) * stdDev + mean
+    end
+    return output, output2
+end
+---Evaluates a simplified one-dimensional hermite related (?) spline for SV purposes
+---@param m1 number
+---@param m2 number
+---@param y2 number
+---@param t number
+---@return number
+function math.hermite(m1, m2, y2, t)
+    local a = m1 + m2 - 2 * y2
+    local b = 3 * y2 - 2 * m1 - m2
+    local c = m1
+    return a * t ^ 3 + b * t ^ 2 + c * t
+end
+---Returns the weight of a number between `lowerBound` and `upperBound`.
+---@param num number
+---@param lowerBound number
+---@param upperBound number
+---@return number
+function math.inverseLerp(num, lowerBound, upperBound)
+    return (num - lowerBound) / (upperBound - lowerBound)
+end
+---Returns the index of a zero row, or `nil` if none are found.
+---@param mtrx number[][]
+---@return integer?
+function matrix.findZeroRow(mtrx)
+    for idx, row in pairs(mtrx) do
+        local zeroRow = true
+        for k2 = 1, #row do
+            local num = row[k2]
+            if num ~= 0 then
+                zeroRow = false
+                break
+            end
+        end
+        if zeroRow then return idx end
+    end
+    return nil
+end
+function matrix.multiply(m1, m2)
+    local p1 = type(m1[1]) == 'table' and #m1 or 1
+    local p2 = type(m1[1]) == 'table' and #m1[1] or #m1
+    local q1 = type(m2[1]) == 'table' and #m1 or 1
+    local q2 = type(m2[1]) == 'table' and #m2[1] or #m2
+    if (p2 ~= q1) then error('Incompatible matrices were told to be multiplied', 69) end
+    local result = {}
+    local rowCount = p1
+    local columnCount = q2
+    for i = 1, rowCount do
+        local row = {}
+        for j = 1, columnCount do
+            local sum = 0
+            for k = 1, #m2 do
+                local m1Factor = p2 == 1 and m1[k] or m1[i][k]
+                local m2Factor = q2 == 1 and m2[j] or m1[k][j]
+                sum = sum + m1[i][k] * m2[k][j]
+            end
+            table.insert(row, sum)
+        end
+        table.insert(result, row)
+    end
+    return result
+end
+function matrix.rowLinComb(mtrx, rowIdx1, rowIdx2, row2Factor)
+    for k, v in pairs(mtrx[rowIdx1]) do
+        mtrx[rowIdx1][k] = v + mtrx[rowIdx2][k] * row2Factor
+    end
+end
+function matrix.scaleRow(mtrx, rowIdx, factor)
+    for k, v in pairs(mtrx[rowIdx]) do
+        mtrx[rowIdx][k] = v * factor
+    end
+end
+require('packages.table.duplicate')
+require('packages.math.matrix.findZeroRow')
+require('packages.math.matrix.rowLinComb')
+require('packages.math.matrix.scaleRow')
+---Given a square matrix A and equally-sized vector B, returns a vector x such that Ax=B.
+---@param mtrx number[][]
+---@param vctr number[]
+---@return number[]? sln The solution vector, given that it exists. Will return `nil` if no such vector exists.
+---@return number? errType If no such vector exists, returns positive infinity if the system has infinite solutions, zero if the system has zero solutions, and negative infinity if the matrix and vector are not compatible.
+function matrix.solve(mtrx, vctr)
+    if (#vctr ~= #mtrx) then return nil, -1 / 0 end
+    local augMtrx = table.duplicate(mtrx)
+    for i, n in pairs(vctr) do
+        table.insert(augMtrx[i], n)
+    end
+    for i = 1, #mtrx do
+        matrix.scaleRow(augMtrx, i, 1 / augMtrx[i][i])
+        for j = i + 1, #mtrx do
+            matrix.rowLinComb(augMtrx, j, i, -augMtrx[j][i]) -- Triangular Downward Sweep
+            local zeroRowIdx = matrix.findZeroRow(augMtrx)
+            if zeroRowIdx then
+                return nil, augMtrx[zeroRowIdx][#mtrx + 1] == 0 and 1 / 0 or 0
+                -- infinity for singular full zero row, zero for singular 0 = x
+            end
+        end
+    end
+    for i = #mtrx, 2, -1 do
+        for j = i - 1, 1, -1 do
+            matrix.rowLinComb(augMtrx, j, i, -augMtrx[j][i]) -- Triangular Upward Sweep
+        end
+    end
+    return table.property(augMtrx, #mtrx + 1) -- Last Column
+end
+---Rounds a number to a given amount of decimal places.
+---@param number number
+---@param decimalPlaces? integer
+---@return number
+function math.round(number, decimalPlaces)
+    if (not decimalPlaces) then decimalPlaces = 0 end
+    local multiplier = 10 ^ decimalPlaces
+    return math.floor(multiplier * number + 0.5) / multiplier
+end
+---Returns the sign of a number: `1` if the number is non-negative, `-1` if negative.
+---@param number number
+---@return 1|-1
+function math.sign(number)
+    if number >= 0 then return 1 end
+    return -1
+end
+---Alias of [tonumber](lua://tonumber) for type coercion. Converts boolean values into their respective binary digits.
+---@param x? string | number | boolean
+---@return number
+function math.toNumber(x)
+    if (not x) then return 0 end
+    if x == true then return 1 end
+    local result = tonumber(x)
+    if (not result or type(result) ~= 'number') then return 0 end
+    return result
+end
+tn = math.toNumber
+---Wraps a number to an interval; that is, if the number is greater than the lower bound, continuously adds the difference until it reaches the upper bound, and vice versa.
+---@param n number
+---@param lowerBound number
+---@param upperBound number
+---@param discrete? boolean Whether or not to wrap discretely - that is, in a range of 1 to n, if given 0, will return n instead of n - 1. Check [OBOE or fencepost error](https://en.wikipedia.org/wiki/Off-by-one_error).
+---@return number
+function math.wrap(n, lowerBound, upperBound, discrete)
+    if upperBound <= lowerBound then return n end
+    if (n >= lowerBound and n <= upperBound) then return n end
+    local additionFactor = math.toNumber(discrete)
+    local diff = upperBound - lowerBound
+    while (n < lowerBound) do
+        n = n + diff + additionFactor
+    end
+    while (n > upperBound) do
+        n = n - diff - additionFactor
+    end
+    return n
+end
+---Restricts a number to be within a closed ring.
+---@param number number
+---@param lowerBound number
+---@param upperBound number
+---@return number
+function math.wrappedClamp(number, lowerBound, upperBound)
+    if number < lowerBound then return upperBound end
+    if number > upperBound then return lowerBound end
+    return number
+end
+require('packages.table.contains')
+require('packages.string.charAt')
+CONSONANTS = { 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Z' }
+---Very rudimentary function that returns a string depending on whether or not it should be plural.
+---@param str string The inital string, which should be a noun (e.g. `bookmark`)
+---@param val number The value, or count, of the noun, which will determine if it should be plural.
+---@param pos? integer Where the pluralization letter(s) should be inserted.
+---@return string pluralizedStr A new string that is pluralized if `val ~= 1`.
+function pluralize(str, val, pos)
+    local strEnding = ''
+    if pos then
+        strEnding = str:sub(pos + 1, -1)
+        str = str:sub(1, pos)
+    end
+    local finalStrTbl = { str, 's' }
+    if val == 1 then return str .. (strEnding or '') end
+    local lastLetter = str:sub(-1):upper()
+    local secondToLastLetter = str:charAt(-2):upper()
+    if (lastLetter == 'Y' and table.contains(CONSONANTS, secondToLastLetter)) then
+        finalStrTbl[1] = finalStrTbl[1]:sub(1, -2)
+        finalStrTbl[2] = 'ies'
+    end
+    if (str:sub(-3):lower() == 'quy') then
+        finalStrTbl[1] = finalStrTbl[1]:sub(1, -2)
+        finalStrTbl[2] = 'ies'
+    end
+    if (table.contains({ 'J', 'S', 'X', 'Z' }, lastLetter) or table.contains({ 'SH', 'CH' }, str:sub(-2))) then
+        finalStrTbl[2] = 'es'
+    end
+    return table.concat(finalStrTbl) .. (strEnding or '')
+end
+require('packages.string.charAt')
+---Capitalizes the first letter of the given string. If `forceLowercase` is true, then all other letters will be forced into lowercase.
+---@param str string
+---@param forceLowercase? boolean
+---@return string
+function string.capitalize(str, forceLowercase)
+    local secondPortion = str:sub(2)
+    if forceLowercase then secondPortion = secondPortion:lower() end
+    return str:charAt(1):upper() .. secondPortion
+end
+---Returns the `idx`th character in a string. Simply used for shorthand. Also supports negative indexes.
+---@param str string The string to search.
+---@param idx integer If positive, returns the `i`th character. If negative, returns the `i`th character from the end of the string (e.g. -1 returns the last character).
+---@return string
+function string.charAt(str, idx)
+    return str:sub(idx, idx)
+end
+---Changes a string to fit a certain size, with a ... at the end.
+---@param str string
+---@param targetSize integer
+---@return string dottedStr
+function string.fixToSize(str, targetSize)
+    local size = imgui.CalcTextSize(str).x
+    if size <= targetSize then return str end
+    while (str:len() > 3 and size > targetSize) do
+        str = str:sub(1, -2)
+        size = imgui.CalcTextSize(str .. '...').x
+    end
+    return str .. '...'
+end
+require('packages.string.charAt')
+---Removes spaces and turns a string into lowerCamelCase. Also removes special characters.
+---@param str string
+---@return string
+function string.identify(str)
+    newStr = str:gsub('[%s%(%)#&]+', '')
+    newStr = newStr:charAt(1):lower() .. newStr:sub(2)
+    return newStr
+end
+require('packages.kbm.numToKey')
+function string.obfuscate(str)
+    local newStr = ''
+    local originalSize = imgui.CalcTextSize(str).x
+    local unchangingLetters = { ' ', '#' }
+    for i = 1, str:len() do
+        if (table.includes(unchangingLetters, str:charAt(i)) or math.random() < 0.5) then
+            newStr = newStr .. str:charAt(i)
+        else
+            newStr = newStr .. ALPHABET_LIST[math.random(1, 26)]:lower()
+        end
+        if (imgui.CalcTextSize(newStr).x > originalSize) then
+            newStr = newStr:sub(1, -2)
+            break
+        end
+    end
+    return newStr
+end
+require('packages.string.charAt')
+---Lots of imgui functions have ## in them as identifiers. This will remove everything after the ##.
+---@param str string
+---@return string
+function string.removeTrailingTag(str)
+    local newStr = {}
+    for i = 1, str:len() do
+        if (str:charAt(i) == '#' and str:charAt(i + 1) == '#') then break end
+        table.insert(newStr, str:charAt(i))
+    end
+    return table.concat(newStr)
+end
+require('packages.string.charAt')
+require('packages.table.contains')
+---Removes vowels from a string.
+---@param str string
+---@return string
+function string.removeVowels(str)
+    local VOWELS = { 'a', 'e', 'i', 'o', 'u', 'y' }
+    local newStr = ''
+    for i = 1, str:len() do
+        local char = str:charAt(i)
+        if (not table.contains(VOWELS, char)) then
+            newStr = newStr .. char
+        end
+    end
+    return newStr
+end
+require('packages.string.removeVowels')
+require('packages.string.charAt')
+---Shortens a string to three consonants; the first, the second, and the last.
+---@param str string
+---@return string
+function string.shorten(str)
+    local consonants = str:removeVowels()
+    if (consonants:len() < 3) then return consonants end
+    return table.concat({ consonants:charAt(1), consonants:charAt(2), consonants:charAt(-1) })
+end
+---Splits a string into a table via the given separator.
+---@param str string
+---@param sep string
+---@return string[]
+function string.split(str, sep)
+    local tbl = {}
+    for s in str:gmatch('([^' .. sep .. ']+)') do
+        table.insert(tbl, s)
+    end
+    return tbl
+end
+---Takes in two lists and converts them to a key-value table.
+---@generic T
+---@generic U
+---@param keyArr T[]
+---@param valArr U[]
+---@return { [T]: U } tbl
+function table.assign(keyArr, valArr)
+    if (#valArr > #keyArr) then
+        valArr = table.slice(valArr, 1, #keyArr)
+    end
+    local tbl = {}
+    for i = 1, #keyArr do
+        tbl[keyArr[i]] = valArr[i]
+    end
+    return tbl
+end
+---Returns the average value of an array.
+---@param values number[] The list of numbers.
+---@param includeLastValue? boolean Whether or not to include the last value in the table.
+---@return number avg The arithmetic mean of the table.
+function table.average(values, includeLastValue)
+    if not isTruthy(values) then return 0 end
+    local sum = 0
+    for k3 = 1, #values do
+        local value = values[k3]
+        sum = sum + value
+    end
+    if not includeLastValue then
+        sum = sum - values[#values]
+        return sum / (#values - 1)
+    end
+    return sum / #values
+end
+require('packages.table.duplicate')
+---Concatenates arrays together.
+---@param t1 any[] The first table.
+---@param ... any[] The next tables.
+---@return any[] tbl The resultant table.
+function table.combine(t1, ...)
+    local newTbl = table.duplicate(t1)
+    for _, tbl in ipairs({ ... }) do
+        for i = 1, #tbl do
+            table.insert(newTbl, tbl[i])
+        end
+    end
+    return newTbl
+end
+---Creates a new array with a custom metatable, allowing for `:` syntactic sugar.
+---@param ... any entries to put into the table.
+---@return table tbl A table with the given entries.
+function table.construct(...)
+    local tbl = {}
+    for _, v in ipairs({ ... }) do
+        table.insert(tbl, v)
+    end
+    setmetatable(tbl, { __index = table })
+    return tbl
+end
+---Creates a new array with a custom metatable, allowing for `:` syntactic sugar. All elements will be the given item.
+---@generic T: string | number | boolean | table
+---@param item T The entry to use.
+---@param num integer The number of entries to put into the table.
+---@return T[] tbl A table with the given entries.
+function table.constructRepeating(item, num)
+    local tbl = table.construct()
+    for _ = 1, num do
+        table.insert(tbl, item)
+    end
+    return tbl
+end
+---Returns a boolean value corresponding to whether or not an element exists within a table.
+---@param tbl any[] The table to search in.
+---@param item any The item to search for.
+---@return boolean contains Whether or not the item given is within the table.
+function table.contains(tbl, item)
+    for k4 = 1, #tbl do
+        local v = tbl[k4]
+        if v == item then return true end
+    end
+    return false
+end
+table.includes = table.contains -- provide alias bc i'm a js user kekw
+---Removes duplicate values from a table.
+---@param tbl table The original table.
+---@return table tbl A new table with no duplicates.
+function table.dedupe(tbl)
+    local hash = {}
+    local newTbl = {}
+    for k5 = 1, #tbl do
+        local value = tbl[k5]
+        if (not hash[value]) then
+            newTbl[#newTbl + 1] = value
+            hash[value] = true
+        end
+    end
+    return newTbl
+end
+require('packages.table.keys')
+---Returns a deep copy of a table.
+---@generic T : table
+---@param tbl T The original table.
+---@return T tbl The new table.
+function table.duplicate(tbl)
+    if not tbl then return {} end
+    local dupeTbl = {}
+    if (tbl[1]) then
+        for k6 = 1, #tbl do
+            local value = tbl[k6]
+            table.insert(dupeTbl, type(value) == 'table' and table.duplicate(value) or value)
+        end
+    else
+        for _, key in ipairs(table.keys(tbl)) do
+            local value = tbl[key]
+            dupeTbl[key] = type(value) == 'table' and table.duplicate(value) or value
+        end
+    end
+    return dupeTbl
+end
+---Filters a table via a given function. For each element in the table, it is passed into the function; if the function returns true, the value is kept, and if the function returns false, the value will not be kept in the new array. Not mutative.
+---@generic T
+---@param tbl T[]
+---@param fn fun(element: T): boolean
+function table.filter(tbl, fn)
+    local newTbl = {}
+end
+---Returns a 1-indexed value corresponding to the location of an element within a table.
+---@param tbl table The table to search in.
+---@param item any The item to search for.
+---@return integer idx The index of the item. If the item doesn't exist, returns -1 instead.
+function table.indexOf(tbl, item)
+    for i, v in pairs(tbl) do
+        if v == item then return i end
+    end
+    return -1
+end
+require('packages.table.construct')
+require('packages.table.dedupe')
+---Returns a table of keys from a table.
+---@param tbl { [string]: any } The table to search in.
+---@return string[] keys A list of keys.
+function table.keys(tbl)
+    local resultsTbl = table.construct()
+    for k, _ in pairs(tbl) do
+        table.insert(resultsTbl, k)
+    end
+    return table.dedupe(resultsTbl)
+end
+---Transforms an array element-wise using a given function.
+---@generic T: string | number | boolean
+---@generic U
+---@param tbl T[]
+---@param fn fun(element: T, idx?: number): U
+---@return U[]
+function table.map(tbl, fn)
+    local newTbl = {}
+    for idx, v in ipairs(tbl) do
+        table.insert(newTbl, fn(v, idx))
+    end
+    return newTbl
+end
+require('packages.table.slice')
+---Navigates a tree with dot notation and returns the corresponding value. For example, if you had a table { foo = { bar = 1 } }, then this returns 1 if the given value is "foo.bar".
+---@param tree { [string]: any }
+---@param value string[]
+---@return any
+function table.nestedValue(tree, value)
+    if (#value > 1) then
+        return table.nestedValue(tree[value[1]], table.slice(value, 2))
+    end
+    return tree[value[1]]
+end
+require('packages.table.average')
+require('packages.table.construct')
+---Normalizes a table of numbers to achieve a target average.
+---@param values number[] The table to normalize.
+---@param targetAverage number The desired average value.
+---@param includeLastValue boolean Whether or not to include the last value in the average.
+---@return number[]
+function table.normalize(values, targetAverage, includeLastValue)
+    local avgValue = table.average(values, includeLastValue)
+    if avgValue == 0 then return table.constructRepeating(0, #values) end
+    local newValues = {}
+    for i = 1, #values do
+        table.insert(newValues, (values[i] * targetAverage) / avgValue)
+    end
+    return newValues
+end
+require('packages.table.contains')
+require('packages.string.charAt')
+require('packages.math.toNumber')
+---Converts a string (generated from [table.stringify](lua://table.stringify)) into a table.
+---@param str string
+---@return any
+function table.parse(str)
+    if (str == 'FALSE' or str == 'TRUE') then return str == 'TRUE' end
+    if (str:charAt(1) == '"') then return str:sub(2, -2) end
+    if (str:match('^%-?[%d%.]+$')) then return math.toNumber(str) end
+    if (not table.contains({ '{', '[' }, str:charAt(1))) then
+        print('e!',
+            'Something really bad has happened with the parsing algorithm weewooweewoo please report this to the Discord thanks!!!!!!!!!')
+        error('POO')
+        return str
+    end
+    if (str:charAt(1) == '{' and str:charAt(2) == '}') or (str:charAt(1) == '[' and str:charAt(2) == ']') then return {} end
+    local tableType = str:charAt(1) == '[' and 'arr' or 'dict'
+    local tbl = {}
+    local terms = {}
+    local MAX_ITERATIONS = 10000
+    for i = 1, MAX_ITERATIONS do
+        local nestedTableFactor = tn(table.contains({ '[', '{' }, str:charAt(2)))
+        local depth = nestedTableFactor
+        local searchIdx = 2 + nestedTableFactor
+        local inQuotes = false
+        while (searchIdx < str:len()) do
+            if (str:charAt(searchIdx) == '"') then
+                inQuotes = not inQuotes
+            end
+            if (table.contains({ ']', '}' }, str:charAt(searchIdx)) and not inQuotes) then
+                depth = depth - 1
+            end
+            if (table.contains({ '[', '{' }, str:charAt(searchIdx)) and not inQuotes) then
+                depth = depth + 1
+            end
+            if ((str:charAt(searchIdx) == ',' or nestedTableFactor == 1) and not inQuotes and depth == 0) then break end
+            searchIdx = searchIdx + 1
+        end
+        table.insert(terms, str:sub(2, searchIdx + nestedTableFactor - 1))
+        str = str:sub(searchIdx + nestedTableFactor)
+        if (str:len() <= 1) then break end
+    end
+    if (tableType == 'arr') then
+        for k7 = 1, #terms do
+            local v = terms[k7]
+            table.insert(tbl, table.parse(v))
+        end
+    else
+        for k8 = 1, #terms do
+            local v = terms[k8]
+            local idx = v:find('=')
+            tbl[v:sub(1, idx - 1)] = table.parse(v:sub(idx + 1))
+        end
+    end
+    return tbl
+end
+---In a nested table `tbl`, returns a table of property values with key `property`.
+---@generic T
+---@param tbl T[][] | { [string]: T[] } The table to search in.
+---@param property string | integer The property name.
+---@return T[] properties The resultant table.
+function table.property(tbl, property)
+    local resultsTbl = {}
+    for _, v in pairs(tbl) do
+        table.insert(resultsTbl, v[property])
+    end
+    return resultsTbl
+end
+---Reduces an array element-wise using a given function.
+---@generic T: string | number | boolean
+---@generic V: string | number | boolean | string[] | number[] | boolean[] | { [string]: any }
+---@param tbl T[]
+---@param fn fun(accumulator: V, current: T): V
+---@param initialValue V
+---@return V
+function table.reduce(tbl, fn, initialValue)
+    local accumulator = initialValue
+    for k9 = 1, #tbl do
+        local v = tbl[k9]
+        accumulator = fn(accumulator, v)
+    end
+    return accumulator
+end
+---Reverses the order of an array.
+---@param tbl table The original table.
+---@return table tbl The original table, reversed.
+function table.reverse(tbl)
+    local reverseTbl = {}
+    for i = 1, #tbl do
+        table.insert(reverseTbl, tbl[#tbl + 1 - i])
+    end
+    return reverseTbl
+end
+---In an array of numbers, searches for the closest number to `item`.
+---@param tbl number[] The array of numbers to search in.
+---@param item number The number to search for.
+---@param searchMode? 0|1|2 `0/nil`: Search before and after. `1`: Search only before. `2`: Search only after.
+---@return number num, integer index The number that is the closest to the given item, and the index of that number in the given table.
+function table.searchClosest(tbl, item, searchMode)
+    local leftIdx = 1
+    local rightIdx = #tbl
+    while rightIdx - leftIdx > 1 do
+        local middleIdx = math.floor((leftIdx + rightIdx) * 0.5)
+        if (item >= tbl[middleIdx]) then
+            leftIdx = middleIdx
+        else
+            rightIdx = middleIdx
+        end
+    end
+    local leftDifference = item - tbl[leftIdx]
+    local rightDifference = tbl[rightIdx] - item
+    if ((leftDifference < rightDifference or searchMode == 1) and searchMode ~= 2) then
+        return tbl[leftIdx], leftIdx
+    else
+        return tbl[rightIdx], rightIdx
+    end
+end
+---Returns a copy of a table containing all values between indices `i` and `j` (inclusive). If `j` is not passed in, will slice to the end of the table.
+---@generic T
+---@param tbl T[]
+---@param i integer
+---@param j? integer
+---@return T[]
+function table.slice(tbl, i, j)
+    return { table.unpack(tbl, i, j or #tbl) }
+end
+require('packages.table.duplicate')
+---Sorting function for sorting objects by their numerical value. Should be passed into [`table.sort`](lua://table.sort).
+---@param a number
+---@param b number
+---@return boolean
+function sortAscending(a, b) return a < b end
+---Sorting function for sorting objects by their `startTime` property. Should be passed into [`table.sort`](lua://table.sort).
+---@param a { StartTime: number }
+---@param b { StartTime: number }
+---@return boolean
+function sortAscendingStartTime(a, b) return a.StartTime < b.StartTime end
+---Sorting function for sorting objects by their `time` property. Should be passed into [`table.sort`](lua://table.sort).
+---@param a { time: number }
+---@param b { time: number }
+---@return boolean
+function sortAscendingTime(a, b) return a.time < b.time end
+---Sorting function for sorting notes by their `startTime` property. Should be passed into [`table.sort`](lua://table.sort). If two items are identical, sorts by their lanes instead.
+---@param a { StartTime: number, Lane: integer }
+---@param b { StartTime: number, Lane: integer }
+---@return boolean
+function sortAscendingNoteLaneTime(a, b)
+    if (math.abs(a.StartTime - b.StartTime) > 0.1) then return a.StartTime < b.StartTime end
+    return a.Lane < b.Lane
+end
+---Sorts a table given a sorting function.
+---@generic T
+---@param tbl T[] The table to sort.
+---@param compFn fun(a: T, b: T): boolean A comparison function. Given two elements `a` and `b`, how should they be sorted?
+---@return T[] sortedTbl A sorted table.
+function sort(tbl, compFn)
+    newTbl = table.duplicate(tbl)
+    table.sort(newTbl, compFn)
+    return newTbl
+end
+require('packages.truthy')
+require('packages.table.keys')
+---Converts a table (or any other primitive values) to a string.
+---@param var any
+---@return string
+function table.stringify(var)
+    if (type(var) == 'boolean') then return var and 'TRUE' or 'FALSE' end
+    if (type(var) == 'string') then return '"' .. var .. '"' end
+    if (type(var) == 'number') then return var end
+    if (type(var) ~= 'table') then return 'UNKNOWN' end
+    if (var[1] ~= nil) then
+        local str = '['
+        for k10 = 1, #var do
+            local v = var[k10]
+            str = str .. table.stringify(v) .. ','
+        end
+        return str:sub(1, -2) .. ']'
+    end -- from below, must be a key-value table
+    if (not isTruthy(table.keys(var))) then return '[]' end
+    local str = '{'
+    for k, v in pairs(var) do
+        str = str .. k .. '=' .. table.stringify(v) .. ','
+    end
+    return str:sub(1, -2) .. '}'
+end
+require('packages.table.keys')
+require('packages.table.contains')
+---When given a dictionary and table of keys, returns a new table with only the specified keys and values.
+---@generic T table
+---@param checkList T The base table, which has a list of keys to include in the new table.
+---@param tbl T The base table in which to lint the data from.
+---@param extrapolateData? boolean If this is set to true, will fill in missing keys in the new table with values frmo the old table.
+---@param inferTypes? boolean If true, this will try to coerce types from `tbl` into the types of `checkList`.
+---@return T outputTable
+function table.validate(checkList, tbl, extrapolateData, inferTypes)
+    local validKeys = table.keys(checkList)
+    local tableKeys = table.keys(tbl)
+    local outputTable = {}
+    for k11 = 1, #validKeys do
+        local key = validKeys[k11]
+        if (table.contains(tableKeys, key)) then
+            outputTable[key] = tbl[key]
+        end
+        if (not table.contains(tableKeys, key) and extrapolateData) then
+            outputTable[key] = checkList[key]
+        end
+        if (inferTypes and outputTable[key]) then
+            outputTable[key] = parseDefaultProperty(outputTable[key], checkList[key]) or outputTable[key]
+        end
+    end
+    return outputTable
+end
+require('packages.table.construct')
+---Returns a table of values from a table.
+---@param tbl { [string]: any } The table to search in.
+---@return string[] values A list of values.
+function table.values(tbl)
+    local resultsTbl = table.construct()
+    for k12 = 1, #tbl do
+        local v = tbl[k12]
+        table.insert(resultsTbl, v)
+    end
+    return resultsTbl
+end
+---@diagnostic disable: return-type-mismatch
+---The above is made because we want the functions to be identity functions when passing in vectors instead of tables.
+---Converts a table of length 4 into a [`Vector4`](lua://Vector4).
+---@param tbl number[] | { x: number, y: number, z: number, w: number } The table to convert.
+---@return Vector4 vctr The output vector.
+function table.vectorize4(tbl)
+    if (not tbl) then return vctr4(0) end
+    if (type(tbl) == 'userdata') then return tbl end
+    if (tbl[1] and tbl[2] and tbl[3] and tbl[4]) then return vector.New(tbl[1], tbl[2], tbl[3], tbl[4]) end
+    return vector.New(tbl.x, tbl.y, tbl.z, tbl.w)
+end
+---Converts a table of length 3 into a [`Vector3`](lua://Vector3).
+---@param tbl number[] | { x: number, y: number, z: number } The table to convert.
+---@return Vector3 vctr The output vector.
+function table.vectorize3(tbl)
+    if (not tbl) then return vctr3(0) end
+    if (type(tbl) == 'userdata') then return tbl end
+    if (tbl[1] and tbl[2] and tbl[3]) then return vector.New(tbl[1], tbl[2], tbl[3]) end
+    return vector.New(tbl.x, tbl.y, tbl.z)
+end
+---Converts a table of length 2 into a [`Vector2`](lua://Vector2).
+---@param tbl number[] | { x: number, y: number } The table to convert.
+---@return Vector2 vctr The output vector.
+function table.vectorize2(tbl)
+    if (not tbl) then return vctr2(0) end
+    if (type(tbl) == 'userdata') then return tbl end
+    if (tbl[1] and tbl[2]) then return vector.New(tbl[1], tbl[2]) end
+    return vector.New(tbl.x, tbl.y)
+end
+---Returns `true` if given a string called "true", given a number greater than 0, given a table with an element, or is given `true`. Otherwise, returns `false`.
+---@param param any The parameter to truthify.
+---@param assumeTrue? boolean If the item is nil, will return true if this is true.
+---@return boolean truthy The truthy value of the parameter.
+function isTruthy(param, assumeTrue)
+    local t = type(param)
+    if t == 'string' then
+        return param:lower() == 'true'
+    end
+    if t == 'number' then
+        return param > 0
+    end
+    if t == 'table' or t == 'userdata' then
+        return #param > 0
+    end
+    if t == 'boolean' then
+        return param
+    end
+    return assumeTrue or false
+end
+---Creates a new [`Vector4`](lua://Vector4) with all elements being the given number.
+---@param n number The number to use as the entries.
+---@return Vector4 vctr The resultant vector of style `<n, n, n, n>`.
+function vctr4(n)
+    return vector.New(n, n, n, n)
+end
+---Creates a new [`Vector3`](lua://Vector4) with all elements being the given number.
+---@param n number The number to use as the entries.
+---@return Vector3 vctr The resultant vector of style `<n, n, n>`.
+function vctr3(n)
+    return vector.New(n, n, n)
+end
+---Creates a new [`Vector2`](lua://Vector2) with all elements being the given number.
+---@param n number The number to use as the entries.
+---@return Vector2 vctr The resultant vector of style `<n, n>`.
+function vctr2(n)
+    return vector.New(n, n)
+end
 function displaceNotesForAnimationFrames(settingVars)
     local frameDistance = settingVars.frameDistance
     local initialDistance = settingVars.distance
@@ -1076,8 +2463,8 @@ function automateCopySVs(settingVars)
         return
     end
     local firstSVTime = svs[1].StartTime
-    for k2 = 1, #svs do
-        local sv = svs[k2]
+    for k13 = 1, #svs do
+        local sv = svs[k13]
         local copiedSV = {
             relativeOffset = sv.StartTime - firstSVTime,
             multiplier = sv.Multiplier,
@@ -1649,12 +3036,12 @@ function changeGroups(menuVars)
     local svsToAdd = {}
     local ssfsToAdd = {}
     local oldGroup = state.SelectedScrollGroupId
-    for k3 = 1, #svsToRemove do
-        local sv = svsToRemove[k3]
+    for k14 = 1, #svsToRemove do
+        local sv = svsToRemove[k14]
         table.insert(svsToAdd, createSV(sv.StartTime, sv.Multiplier))
     end
-    for k4 = 1, #ssfsToRemove do
-        local ssf = ssfsToRemove[k4]
+    for k15 = 1, #ssfsToRemove do
+        local ssf = ssfsToRemove[k15]
         table.insert(ssfsToAdd, createSSF(ssf.StartTime, ssf.Multiplier))
     end
     local actionList = {}
@@ -1792,22 +3179,22 @@ function convertSVSSF(menuVars)
     local editorActions = {}
     if (menuVars.conversionDirection) then
         local svs = game.get.svsBetweenOffsets(startOffset, endOffset, false)
-        for k5 = 1, #svs do
-            local sv = svs[k5]
+        for k16 = 1, #svs do
+            local sv = svs[k16]
             table.insert(objects, { StartTime = sv.StartTime, Multiplier = sv.Multiplier })
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svs))
     else
         local ssfs = game.get.ssfsBetweenOffsets(startOffset, endOffset, false)
-        for k6 = 1, #ssfs do
-            local ssf = ssfs[k6]
+        for k17 = 1, #ssfs do
+            local ssf = ssfs[k17]
             table.insert(objects, { StartTime = ssf.StartTime, Multiplier = ssf.Multiplier })
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfs))
     end
     local createTable = {}
-    for k7 = 1, #objects do
-        local obj = objects[k7]
+    for k18 = 1, #objects do
+        local obj = objects[k18]
         if (menuVars.conversionDirection) then
             table.insert(createTable, createSSF(obj.StartTime,
                 obj.Multiplier))
@@ -1856,8 +3243,8 @@ function copyItems(menuVars)
     local ssfs = game.get.ssfsBetweenOffsets(startOffset, endOffset)
     local bms = game.get.bookmarksBetweenOffsets(startOffset, endOffset)
     if (not menuVars.copyLines) then goto lineSkip end
-    for k8 = 1, #lines do
-        local line = lines[k8]
+    for k19 = 1, #lines do
+        local line = lines[k19]
         local copiedLine = {
             relativeOffset = line.StartTime - startOffset,
             bpm = line.Bpm,
@@ -1868,8 +3255,8 @@ function copyItems(menuVars)
     end
     ::lineSkip::
     if (not menuVars.copySVs) then goto svSkip end
-    for k9 = 1, #svs do
-        local sv = svs[k9]
+    for k20 = 1, #svs do
+        local sv = svs[k20]
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
             multiplier = sv.Multiplier,
@@ -1878,8 +3265,8 @@ function copyItems(menuVars)
     end
     ::svSkip::
     if (not menuVars.copySSFs) then goto ssfSkip end
-    for k10 = 1, #ssfs do
-        local ssf = ssfs[k10]
+    for k21 = 1, #ssfs do
+        local ssf = ssfs[k21]
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
             multiplier = ssf.Multiplier,
@@ -1888,8 +3275,8 @@ function copyItems(menuVars)
     end
     ::ssfSkip::
     if (not menuVars.copyBMs) then goto bmSkip end
-    for k11 = 1, #bms do
-        local bm = bms[k11]
+    for k22 = 1, #bms do
+        local bm = bms[k22]
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
             note = bm.Note,
@@ -2066,8 +3453,8 @@ function displaceNoteSVsParent(menuVars)
     if (not isTruthy(offsets)) then return end
     local svsToRemove = {}
     local svsToAdd = {}
-    for k12 = 1, #offsets do
-        local offset = offsets[k12]
+    for k23 = 1, #offsets do
+        local offset = offsets[k23]
         local displaceNoteResults = displaceNoteSVs(
             {
                 distance = (offset - offsets[1]) / (offsets[#offsets] - offsets[1]) *
@@ -2148,8 +3535,8 @@ function dynamicScaleSVs(menuVars)
         --]]
         local targetDistance = targetAvgSV * (endOffset - startOffset)
         local scalingFactor = targetDistance / currentDistance
-        for k13 = 1, #svsBetweenOffsets do
-            local sv = svsBetweenOffsets[k13]
+        for k24 = 1, #svsBetweenOffsets do
+            local sv = svsBetweenOffsets[k24]
             local newSVMultiplier = scalingFactor * sv.Multiplier
             addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
         end
@@ -2230,8 +3617,8 @@ function layerSnaps()
     local originalLayerNames = table.property(map.EditorLayers, 'Name')
     local layerNames = table.duplicate(originalLayerNames)
     local notes = map.HitObjects
-    for k14 = 1, #notes do
-        local ho = notes[k14]
+    for k25 = 1, #notes do
+        local ho = notes[k25]
         local color = COLOR_MAP[game.get.snapAt(ho.StartTime)]
         if (ho.EditorLayer == 0) then
             layer = { Name = 'Default', ColorRgb = '255,255,255', Hidden = false }
@@ -2357,8 +3744,8 @@ function alignTimingLines()
             table.insert(times, originalTime)
         end
     end
-    for k15 = 1, #times do
-        local time = times[k15]
+    for k26 = 1, #times do
+        local time = times[k26]
         local initialTl = game.get.timingPointAt(time)
         if (initialTl.StartTime == time) then
             table.insert(tpsToRemove, initialTl)
@@ -2525,8 +3912,8 @@ function removeAllHitSounds()
         return
     end
     local hos = game.get.uniqueNotesBetweenSelected()
-    for k16 = 1, #hos do
-        local ho = hos[k16]
+    for k27 = 1, #hos do
+        local ho = hos[k27]
         local hs = tonumber(ho.HitSound)
         if hs > 1 then
             table.insert(hitsoundActions, createEA(action_type.RemoveHitsound, { ho }, hs))
@@ -2656,14 +4043,14 @@ function reverseScrollSVs(menuVars)
         prepareDisplacingSVs(noteOffset, almostSVsToAdd, svTimeIsAdded, beforeDisplacement,
             atDisplacement, afterDisplacement)
     end
-    for k17 = 1, #svsBetweenOffsets do
-        local sv = svsBetweenOffsets[k17]
+    for k28 = 1, #svsBetweenOffsets do
+        local sv = svsBetweenOffsets[k28]
         if (not svTimeIsAdded[sv.StartTime]) then
             table.insert(almostSVsToAdd, sv)
         end
     end
-    for k18 = 1, #almostSVsToAdd do
-        local sv = almostSVsToAdd[k18]
+    for k29 = 1, #almostSVsToAdd do
+        local sv = almostSVsToAdd[k29]
         local newSVMultiplier = -sv.Multiplier
         if sv.StartTime > endOffset then newSVMultiplier = sv.Multiplier end
         addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
@@ -2729,8 +4116,8 @@ function scaleMultiplySVs(menuVars)
         elseif scaleType == 'Absolute Distance' then
             scalingFactor = menuVars.distance / currentDistance
         end
-        for k19 = 1, #svsBetweenOffsets do
-            local sv = svsBetweenOffsets[k19]
+        for k30 = 1, #svsBetweenOffsets do
+            local sv = svsBetweenOffsets[k30]
             local newSVMultiplier = scalingFactor * sv.Multiplier
             addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
         end
@@ -2741,8 +4128,8 @@ function splitNotes(menuVars)
     local noteDict = {}
     local notes = state.SelectedHitObjects
     if (menuVars.modeIndex == 1) then
-        for k20 = 1, #notes do
-            local note = notes[k20]
+        for k31 = 1, #notes do
+            local note = notes[k31]
             if (noteDict[note.Lane]) then
                 table.insert(noteDict[note.Lane], note)
             else
@@ -2750,8 +4137,8 @@ function splitNotes(menuVars)
             end
         end
     elseif (menuVars.modeIndex == 2) then
-        for k21 = 1, #notes do
-            local note = notes[k21]
+        for k32 = 1, #notes do
+            local note = notes[k32]
             if (noteDict[note.StartTime]) then
                 table.insert(noteDict[note.StartTime], note)
             else
@@ -2759,8 +4146,8 @@ function splitNotes(menuVars)
             end
         end
     else
-        for k22 = 1, #notes do
-            local note = notes[k22]
+        for k33 = 1, #notes do
+            local note = notes[k33]
             noteDict[note.StartTime .. '_' .. note.Lane] = { note }
         end
     end
@@ -2827,8 +4214,8 @@ function verticalShiftSVs(menuVars)
     local svsToRemove = game.get.svsBetweenOffsets(startOffset, endOffset)
     local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
-    for k23 = 1, #svsBetweenOffsets do
-        local sv = svsBetweenOffsets[k23]
+    for k34 = 1, #svsBetweenOffsets do
+        local sv = svsBetweenOffsets[k34]
         local newSVMultiplier = sv.Multiplier + menuVars.verticalShift
         addSVToList(svsToAdd, sv.StartTime, newSVMultiplier, true)
     end
@@ -2960,8 +4347,8 @@ function getMapStats()
     local tgList = map.GetTimingGroupIds()
     local svSum = 0
     local ssfSum = 0
-    for k24 = 1, #tgList do
-        local tg = tgList[k24]
+    for k35 = 1, #tgList do
+        local tg = tgList[k35]
         state.SelectedScrollGroupId = tg
         svSum = svSum + #map.ScrollVelocities
         ssfSum = ssfSum + #map.ScrollSpeedFactors
@@ -2986,8 +4373,8 @@ function selectAlternating(menuVars)
     local notes = game.get.notesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     local times = {}
-    for k25 = 1, #notes do
-        local ho = notes[k25]
+    for k36 = 1, #notes do
+        local ho = notes[k36]
         table.insert(times, ho.StartTime)
     end
     times = table.dedupe(times)
@@ -3000,8 +4387,8 @@ function selectAlternating(menuVars)
     local notesToSelect = {}
     local currentTime = allowedTimes[1]
     local index = 2
-    for k26 = 1, #notes do
-        local note = notes[k26]
+    for k37 = 1, #notes do
+        local note = notes[k37]
         if (note.StartTime > currentTime and index <= #allowedTimes) then
             currentTime = allowedTimes[index]
             index = index + 1
@@ -3022,8 +4409,8 @@ function selectByChordSizes(menuVars)
     if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
     notes = sort(notes, sortAscendingNoteLaneTime)
     local noteTimeTable = {}
-    for k27 = 1, #notes do
-        local note = notes[k27]
+    for k38 = 1, #notes do
+        local note = notes[k38]
         table.insert(noteTimeTable, note.StartTime)
     end
     noteTimeTable = table.dedupe(noteTimeTable)
@@ -3035,13 +4422,13 @@ function selectByChordSizes(menuVars)
     -- for n in tostring(menuVars.laneSelector):gmatch("%d") do
     --     table.insert(allowedOrdering, tn(n))
     -- end
-    for k28 = 1, #noteTimeTable do
-        local time = noteTimeTable[k28]
+    for k39 = 1, #noteTimeTable do
+        local time = noteTimeTable[k39]
         local size = 0
         local curLane = 0
         local totalNotes = {}
-        for k29 = 1, #notes do
-            local note = notes[k29]
+        for k40 = 1, #notes do
+            local note = notes[k40]
             if (math.abs(note.StartTime - time) < 3) then
                 size = size + 1
                 curLane = curLane + 1
@@ -3070,8 +4457,8 @@ function selectByNoteType(menuVars)
     local totalNotes = game.get.notesBetweenOffsets(startOffset, endOffset)
     if (globalVars.comboizeSelect) then totalNotes = state.SelectedHitObjects end
     local notesToSelect = {}
-    for k30 = 1, #totalNotes do
-        local note = totalNotes[k30]
+    for k41 = 1, #totalNotes do
+        local note = totalNotes[k41]
         if hitobject_type then
             if (note.Type == hitobject_type.Normal and not menuVars.normal) then
                 goto skipType
@@ -8144,13 +9531,13 @@ function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugF
     ::skipLogoRender::
     imgui.EndChild()
     imgui.SeparatorText('Bug Fixes / Minor Changes')
-    for k31 = 1, #bugFixes do
-        local v = bugFixes[k31]
+    for k42 = 1, #bugFixes do
+        local v = bugFixes[k42]
         imgui.BulletText(v)
     end
     imgui.SeparatorText('New Features')
-    for k32 = 1, #newFeatures do
-        local v = newFeatures[k32]
+    for k43 = 1, #newFeatures do
+        local v = newFeatures[k43]
         imgui.BulletText(v)
     end
 end
@@ -11191,8 +12578,8 @@ function showAppearanceSettings()
     if (imgui.Button('Copy Current Theme')) then
         setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
-        for k33 = 1, #customStyleIds do
-            local id = customStyleIds[k33]
+        for k44 = 1, #customStyleIds do
+            local id = customStyleIds[k44]
             local query = id:capitalize()
             if (query:match('%u%l+') == 'Loadup') then
                 customStyle[id] = loadup[query:sub(7)]
@@ -11282,14 +12669,14 @@ function chooseColorTheme()
         local padding = 10
         if (tree[1]) then
             local maxItemSize = 0
-            for k34 = 1, #tree do
-                local item = tree[k34]
+            for k45 = 1, #tree do
+                local item = tree[k45]
                 if (imgui.CalcTextSize(item.id).x > maxItemSize) then
                     maxItemSize = imgui.CalcTextSize(item.id).x * 1.03
                 end
             end
-            for k35 = 1, #tree do
-                local item = tree[k35]
+            for k46 = 1, #tree do
+                local item = tree[k46]
                 local col = item.textColor
                 local sz = vector.New(maxItemSize, imgui.CalcTextSize(item.id).y) + vector.New(padding, 0)
                 imgui.BeginChild('themetree' .. item.id, sz)
@@ -11527,8 +12914,8 @@ end
 function stringifyCustomStyle(customStyle)
     local keys = table.keys(customStyle)
     local resultStr = 'v2 '
-    for k36 = 1, #keys do
-        local key = keys[k36]
+    for k47 = 1, #keys do
+        local key = keys[k47]
         local value = customStyle[key]
         keyId = convertStrToShort(key)
         if (key:sub(1, 6) == 'loadup') then keyId = keyId .. key:sub(-1):upper() end
@@ -12758,8 +14145,8 @@ function runTest()
         --     color.int.white)
     end
     local triangleBuffer = {}
-    for k37 = 1, #surfaceIndices do
-        local quad = surfaceIndices[k37]
+    for k48 = 1, #surfaceIndices do
+        local quad = surfaceIndices[k48]
         local p1 = topLeft + cameraPoints[quad[1]]
         local p2 = topLeft + cameraPoints[quad[2]]
         local p3 = topLeft + cameraPoints[quad[3]]
@@ -12777,12 +14164,12 @@ function runTest()
     local sortedBuffer = sort(triangleBuffer, function(a, b)
         return a[4] > b[4]
     end)
-    for k38 = 1, #sortedBuffer do
-        local tri = sortedBuffer[k38]
+    for k49 = 1, #sortedBuffer do
+        local tri = sortedBuffer[k49]
         ctx.AddTriangleFilled(tri[1], tri[2], tri[3], tri[5])
     end
-    for k39 = 1, #edgeIndices do
-        local pair = edgeIndices[k39]
+    for k50 = 1, #edgeIndices do
+        local pair = edgeIndices[k50]
         local p1 = topLeft + cameraPoints[pair[1]]
         local p2 = topLeft + cameraPoints[pair[2]]
         ctx.AddLine(p1, p2, color.int.white, 2)
@@ -14352,8 +15739,8 @@ end
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for k40 = 1, #svs do
-        local sv = svs[k40]
+    for k51 = 1, #svs do
+        local sv = svs[k51]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
         if svIsInRange then table.insert(svsBetweenOffsets, sv) end
     end
@@ -14925,1393 +16312,6 @@ function toggleablePrint(type, msg)
     local creationMsg = msg:find('Create') and true or false
     if (creationMsg and globalVars.dontPrintCreation) then return end
     print(type, msg)
-end
----#### (NOTE: This function is impure and has no return value. This should be changed eventually.)
----Gets a list of variables.
----@param listName string An identifier to avoid state collisions.
----@param variables { [string]: any } The key-value table to get data for.
-function cache.loadTable(listName, variables)
-    for key, _ in pairs(variables) do
-        if (state.GetValue(listName .. key) ~= nil) then
-            variables[key] = state.GetValue(listName .. key)
-        end
-    end
-end
----Saves a table in state, independently.
----@param listName string An identifier to avoid state collisions.
----@param variables { [string]: any } A key-value table to save.
-function cache.saveTable(listName, variables)
-    for key, value in pairs(variables) do
-        state.SetValue(listName .. key, value)
-    end
-end
----Returns the number of milliseconds the plugin has been active.
----@return number lifetime
-function clock.getTime()
-    return (state.UnixTime - clock.prevTime) / 1000
-end
-require('packages.cache.initialize.priority')
----Returns true every `interval` ms.
----@param id string The unique identifier of the clock.
----@param interval integer The interval at which the clock should run.
----@return boolean ev True if the clock has reached its interval time.
-function clock.listen(id, interval)
-    local currentTime = state
-        .UnixTime -- Avoid calling state global multiple times, which causes a heavy load on performance
-    local prevTime = cache.clock[id]
-    if (not prevTime) then
-        cache.clock[id] = currentTime
-        prevTime = currentTime
-    end
-    if (currentTime - prevTime > interval) then
-        cache.clock[id] = currentTime
-        return true
-    end
-    return false
-end
----Alters opacity of a given color.
----@param col integer
----@param additiveOpacity integer
----@return number
----@overload fun(col: Vector4, additiveOpacity: number): Vector4
-function color.alterOpacity(col, additiveOpacity)
-    if (type(col) ~= 'number') then
-        return col + vector.New(0, 0, 0, additiveOpacity)
-    end
-    return col + math.floor(additiveOpacity) * 16777216
-end
-color.vctr.white = vector.New(1, 1, 1, 1)
-color.vctr.black = vector.New(0, 0, 0, 1)
-color.vctr.transparent = vector.New(0, 0, 0, 0)
-color.int.white = color.int.whiteMask * 255 + color.int.alphaMask * 255
-color.int.black = color.int.alphaMask * 255
-color.int.transparent = 0
-color.vctr.red = vector.New(1, 0, 0, 1)
-color.vctr.light_red = vector.New(1, 0.5, 0.5, 1)
-color.int.red = color.int.redMask * 255 + color.int.alphaMask * 255
-color.vctr.orange = vector.New(1, 0.5, 0, 1)
-color.vctr.light_orange = vector.New(1, 0.75, 0.5, 1)
-color.int.orange = 4278222975
-color.vctr.yellow = vector.New(1, 1, 0, 1)
-color.vctr.light_yellow = vector.New(1, 1, 0.5, 1)
-color.int.yellow = 4278255615
-color.vctr.green = vector.New(0, 1, 0, 1)
-color.vctr.light_green = vector.New(0.5, 1, 0.5, 1)
-color.int.green = 4278255360
-color.vctr.aqua = vector.New(0, 1, 1, 1)
-color.vctr.light_aqua = vector.New(0.5, 1, 1, 1)
-color.int.aqua = 4294967040
-color.vctr.blue = vector.New(0, 0, 1, 1)
-color.vctr.light_blue = vector.New(0.5, 0.5, 1, 1)
-color.int.blue = 4294901760
-color.vctr.purple = vector.New(1, 0, 1, 1)
-color.vctr.light_purple = vector.New(1, 0.5, 1, 1)
-color.int.purple = 4294901887
-color.vctr.magenta = vector.New(1, 0, 0.5, 1)
-color.vctr.light_magenta = vector.New(1, 0.5, 0.75, 1)
-color.int.magenta = 4286546175
-HEXADECIMAL = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' }
-NONDUA = { '!', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5', '6', '7',
-    '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-    'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f',
-    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}',
-    '~' }
----Converts rgba to an unsigned integer (0-4294967295).
----@param r integer
----@param g integer
----@param b integer
----@param a integer
----@return integer
-function color.rgbaToUint(r, g, b, a)
-    local flr = math.floor
-    return flr(a) * 16 ^ 6 + flr(b) * 16 ^ 4 + flr(g) * 16 ^ 2 + flr(r)
-end
----Converts rgba (in vector form) to an unsigned integer (0-4294967295).
----@param col Vector4
----@return integer
-function color.vrgbaToUint(col)
-    local flr = math.floor
-    return color.rgbaToUint(flr(col.x * 255), flr(col.y * 255), flr(col.z * 255), flr(col.w * 255))
-end
----Converts an unsigned integer to a Vector4 of color values (0-1 for each element).
----@param n integer
----@return Vector4
-function color.uintToRgba(n)
-    local tbl = {}
-    for i = 0, 3 do
-        table.insert(tbl, math.floor(n / 256 ^ i) % 256)
-    end
-    return table.vectorize4(tbl) / 255
-end
----Converts rgba to an ndua string (base 92).
----@param r integer
----@param g integer
----@param b integer
----@param a integer
----@return string
-function color.rgbaToNdua(r, g, b, a)
-    local uint = color.rgbaToUint(r, g, b, a)
-    local str = ''
-    for i = 0, 4 do
-        str = str .. NONDUA[math.floor(uint / (92 ^ i)) % 92 + 1]
-    end
-    return str:reverse()
-end
----Converts an ndua string (base 92) to an rgba Vector4 (0-1 for each element).
----@param ndua string
----@return Vector4
-function color.nduaToRgba(ndua)
-    local num = 0
-    for i = 1, 5 do
-        local idx = table.indexOf(NONDUA, ndua:charAt(i))
-        if (idx == -1) then goto nextIndex end
-        num = num + (idx - 1) * 92 ^ (5 - i)
-        ::nextIndex::
-    end
-    return color.uintToRgba(num)
-end
----Converts a color to a Quaver-compatible string.
----@param vctr Vector4
----@return string
-function color.rgbaToStr(vctr)
-    local flr = math.floor
-    return table.concat({ flr(vctr.x * 255), flr(vctr.y * 255), flr(vctr.z * 255) }, ',')
-end
----Converts a Quaver-compatible string to an rgba Vector4.
----@param str string
----@return Vector4
-function color.strToRgba(str)
-    local rgb = {}
-    str:gsub('(%d+)', function(c)
-        table.insert(rgb, c)
-    end)
-    return vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, 1)
-end
----Converts hsl to an rgba `Vector4`, where `hue` is in degrees. The abstract formula comes from [Wikipedia](https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_RGB_alternative).
----@param hue integer The hue in degrees.
----@param saturation number The saturation, within [0, 1].
----@param lightness number The lightness, within [0, 1].
----@param alpha number The opacity, within [0, 1].
----@return Vector4
-function color.hslaToRgba(hue, saturation, lightness, alpha)
-    local a = saturation * math.min(lightness, 1 - lightness)
-    local f = function(n)
-        local k = (n + (hue % 360) / 30) % 12
-        return lightness - a * math.max(-1, math.min(k - 3, 9 - k, 1))
-    end
-    return vector.New(f(0), f(8), f(4), alpha)
-end
----Generates a random color.
----@param includeAlpha boolean If false, alpha will always be 1.
----@return Vector4
-function generateRGBColor(includeAlpha)
-    local r = math.random()
-    local g = math.random()
-    local b = math.random()
-    local a = math.random()
-    return vector.New(r, g, b, includeAlpha and a or 1)
-end
-require('packages.table.searchClosest')
----Gets the most recent timing point, or a dummy timing point if none exists.
----@param offset number
----@return TimingPoint
-function game.get.timingPointAt(offset)
-    local line = map.getTimingPointAt(offset)
-    if line then return line end
-    return { StartTime = -69420, Bpm = 42.69, Signature = 4, Hidden = false }
-end
-local SPECIAL_SNAPS = { 1, 2, 3, 4, 6, 8, 12, 16 }
----Gets the snap color from a given time.
----@param time number The time to reference.
----@param dontPrintInaccuracy? boolean If set to true, will not print warning messages on unconfident guesses.
----@return SnapNumber
-function game.get.snapAt(time, dontPrintInaccuracy)
-    local MAX_SNAP = 48
-    local previousBar = math.floor(map.GetNearestSnapTimeFromTime(false, 1, time + 6) or 0)
-    local barLength = 60000 / game.get.timingPointAt(state.SongTime).Bpm
-    local distanceAbovePrev = time - previousBar
-    if (distanceAbovePrev <= 5 or distanceAbovePrev >= barLength - 5) then return 1 end
-    local minSnapTime = barLength / MAX_SNAP
-    local checkingTime = 0
-    local index = -1
-    for _ = 1, MAX_SNAP do
-        if checkingTime > distanceAbovePrev then break end
-        checkingTime = checkingTime + minSnapTime
-        index = index + 1
-    end
-    if (math.abs(minSnapTime * (index + 1) - distanceAbovePrev) < math.abs(minSnapTime * index - distanceAbovePrev)) then
-        index = index + 1
-    end
-    -- Finds GCF between MAX_SNAP and given spacing
-    local divisor = MAX_SNAP
-    local div = index
-    local remainder = -1
-    while (remainder ~= 0) do
-        remainder = divisor % div
-        divisor = div
-        div = remainder
-    end
-    if (math.floor(MAX_SNAP / divisor) ~= MAX_SNAP / divisor) then return 5 end
-    if (MAX_SNAP / divisor > 16) then return 5 end
-    return MAX_SNAP / divisor
-end
----Gets the start time of the most recent SSF, or returns -1 if there is no SSF before the given offset.
----@param offset number
----@param tgId? string
----@return number
-function game.get.ssfStartTimeAt(offset, tgId)
-    local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
-    if ssf then return ssf.StartTime end
-    return -1
-end
----Gets the multiplier of the most recent SSF, or returns 1 if there is no SSF before the given offset.
----@param offset number
----@param tgId? string
----@return number
-function game.get.ssfMultiplierAt(offset, tgId)
-    local ssf = map.GetScrollSpeedFactorAt(offset, tgId)
-    if ssf then return ssf.Multiplier end
-    return 1
-end
----Gets the start time of the most recent SV, or returns -1 if there is no SV before the given offset.
----@param offset number
----@param tgId? string
----@return number
-function game.get.svStartTimeAt(offset, tgId)
-    local sv = map.GetScrollVelocityAt(offset, tgId)
-    if sv then return sv.StartTime end
-    return -1
-end
----Gets the multiplier of the most recent SV, or returns the initial scroll velocity or 1 if there is no SV before the given offset.
----@param offset number
----@param tgId? string
----@return number
-function game.get.svMultiplierAt(offset, tgId)
-    local sv = map.GetScrollVelocityAt(offset, tgId)
-    if sv then return sv.Multiplier end
-    local initTgSv = state.SelectedScrollGroup.InitialScrollVelocity
-    if initTgSv ~= nil then return initTgSv end
-    local initSV = map.InitialScrollVelocity
-    if initSV ~= nil then return initSV end
-    return 1
-end
----Returns a list of [bookmarks](lua://Bookmark) between two times, inclusive.
----@param startOffset number The lower bound of the search area.
----@param endOffset number The upper bound of the search area.
----@return Bookmark[] bms All of the [bookmarks](lua://Bookmark) within the area.
-function game.get.bookmarksBetweenOffsets(startOffset, endOffset)
-    local bookmarksBetweenOffsets = {} ---@type Bookmark[]
-    for _, bm in ipairs(map.Bookmarks) do
-        local bmIsInRange = bm.StartTime >= startOffset and bm.StartTime < endOffset
-        if bmIsInRange then table.insert(bookmarksBetweenOffsets, bm) end
-    end
-    return sort(bookmarksBetweenOffsets, sortAscendingStartTime)
-end
----Returns a list of [timing points](lua://TimingPoint) between two times, inclusive.
----@param startOffset number The lower bound of the search area.
----@param endOffset number The upper bound of the search area.
----@return TimingPoint[] tps All of the [timing points](lua://TimingPoint) within the area.
-function game.get.linesBetweenOffsets(startOffset, endOffset)
-    local linesBetweenoffsets = {} ---@type TimingPoint[]
-    for _, line in ipairs(map.TimingPoints) do
-        local lineIsInRange = line.StartTime >= startOffset and line.StartTime < endOffset
-        if lineIsInRange then table.insert(linesBetweenoffsets, line) end
-    end
-    return sort(linesBetweenoffsets, sortAscendingStartTime)
-end
----Returns a list of [hit objects](lua://HitObject) between two times, inclusive.
----@param startOffset number The lower bound of the search area.
----@param endOffset number The upper bound of the search area.
----@return HitObject[] objs All of the [hit objects](lua://HitObject) within the area.
-function game.get.notesBetweenOffsets(startOffset, endOffset)
-    local notesBetweenOffsets = {} ---@type HitObject[]
-    for _, note in ipairs(map.HitObjects) do
-        local noteIsInRange = note.StartTime >= startOffset and note.StartTime <= endOffset
-        if noteIsInRange then table.insert(notesBetweenOffsets, note) end
-    end
-    return sort(notesBetweenOffsets, sortAscendingStartTime)
-end
----Returns a list of [scroll speed factors](lua://ScrollSpeedFactor) between two times, inclusive.
----@param startOffset number The lower bound of the search area.
----@param endOffset number The upper bound of the search area.
----@param includeEnd? boolean Whether or not to include any SVs on the end time.
----@param dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
----@return ScrollSpeedFactor[] ssfs All of the [scroll speed factors](lua://ScrollSpeedFactor) within the area.
-function game.get.ssfsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
-    local ssfsBetweenOffsets = {} ---@type ScrollSpeedFactor[]
-    local ssfs = map.ScrollSpeedFactors
-    if ssfs == nil then
-        ssfs = {}
-    else
-        for _, ssf in ipairs(map.ScrollSpeedFactors) do
-            local ssfIsInRange = ssf.StartTime >= startOffset and ssf.StartTime < endOffset
-            if (includeEnd and ssf.StartTime == endOffset) then ssfIsInRange = true end
-            if ssfIsInRange then table.insert(ssfsBetweenOffsets, ssf) end
-        end
-    end
-    if dontSort then return ssfsBetweenOffsets end
-    return sort(ssfsBetweenOffsets, sortAscendingStartTime)
-end
----Returns a list of [scroll velocities](lua://ScrollVelocity) between two times, inclusive.
----@param startOffset number The lower bound of the search area.
----@param endOffset number The upper bound of the search area.
----@param includeEnd? boolean Whether or not to include any SVs on the end time.
----@param dontSort? boolean Whether or not to resort the SVs by startTime. Should be disabled on temporal collisions.
----@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
-function game.get.svsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort)
-    local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for _, sv in ipairs(map.ScrollVelocities) do
-        local svIsInRange = sv.StartTime >= startOffset and sv.StartTime < endOffset
-        if (includeEnd and sv.StartTime == endOffset) then svIsInRange = true end
-        if svIsInRange then table.insert(svsBetweenOffsets, sv) end
-    end
-    if dontSort then return svsBetweenOffsets end
-    return sort(svsBetweenOffsets, sortAscendingStartTime)
-end
----Returns an array of all timing group ids, including `$DEFAULT` and `$GLOBAL`.
----@return string[]
-function game.get.timingGroupList()
-    local baseList = table.keys(map.TimingGroups)
-    local defaultIndex = table.indexOf(baseList, '$Default')
-    table.remove(baseList, defaultIndex)
-    local globalIndex = table.indexOf(baseList, '$Global')
-    table.remove(baseList, globalIndex)
-    table.insert(baseList, 1, '$Default')
-    table.insert(baseList, 2, '$Global')
-    if (globalVars.hideAutomatic) then table.filter(baseList, function(str) return not string.find(str, 'automate_') end) end
-    return baseList
-end
-require('packages.table.dedupe')
-require('packages.table.sort')
----Finds and returns a list of all unique offsets of notes between selected notes [Table]
----@param includeLN? boolean
----@return number[]
-function game.get.uniqueNoteOffsetsBetweenSelected(includeLN)
-    local selectedNoteOffsets = game.get.uniqueSelectedNoteOffsets()
-    if (not selectedNoteOffsets) then
-        toggleablePrint('e!',
-            'Warning: There are not enough notes in the current selection (within this timing group) to perform the action.')
-        return {}
-    end
-    local startOffset = selectedNoteOffsets[1]
-    local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
-    local offsets = game.get.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
-    if (#offsets < 2) then
-        toggleablePrint('e!',
-            'Warning: There are not enough notes in the current selection (within this timing group) to perform the action.')
-        return {}
-    end
-    return offsets
-end
----Returns a list of unique offsets (in increasing order) of selected notes [Table]
----@return number[]
-function game.get.uniqueSelectedNoteOffsets()
-    local offsets = {}
-    for _, ho in pairs(state.SelectedHitObjects) do
-        table.insert(offsets, ho.StartTime)
-        if (ho.EndTime ~= 0 and globalVars.useEndTimeOffsets) then table.insert(offsets, ho.EndTime) end
-    end
-    if (not isTruthy(offsets)) then return {} end
-    offsets = table.dedupe(offsets)
-    offsets = sort(offsets, sortAscending)
-    return offsets
-end
----Returns an array of hit objects within the selection time.
----@return HitObject[]
-function game.get.uniqueNotesBetweenSelected()
-    local selectedNoteOffsets = game.get.uniqueSelectedNoteOffsets()
-    if (not selectedNoteOffsets) then
-        toggleablePrint('e!',
-            'Warning: There are not enough notes in the current selection (within this timing group) to perform the action.')
-        return {}
-    end
-    local startOffset = selectedNoteOffsets[1]
-    local endOffset = selectedNoteOffsets[#selectedNoteOffsets]
-    local hos = game.get.notesBetweenOffsets(startOffset, endOffset)
-    if (#hos < 2) then
-        toggleablePrint('e!',
-            'Warning: There are not enough notes in the current selection (within this timing group) to perform the action.')
-        return {}
-    end
-    return hos
-end
----Finds and returns a list of all unique offsets of notes between a start and an end time [Table]
----@param startOffset number
----@param endOffset number
----@param includeLN? boolean
----@return number[]
-function game.get.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
-    local noteOffsetsBetween = {}
-    includeLN = includeLN or globalVars.useEndTimeOffsets
-    for _, ho in ipairs(map.HitObjects) do
-        if ho.StartTime >= startOffset and ho.StartTime <= endOffset then
-            local skipNote = false
-            if (state.SelectedScrollGroupId ~= ho.TimingGroup and globalVars.ignoreNotesOutsideTg) then skipNote = true end
-            if (ho.StartTime == startOffset or ho.StartTime == endOffset) then skipNote = false end
-            if skipNote then goto nextNote end
-            table.insert(noteOffsetsBetween, ho.StartTime)
-            if (ho.EndTime ~= 0 and ho.EndTime <= endOffset and includeLN) then
-                table.insert(noteOffsetsBetween,
-                    ho.EndTime)
-            end
-            ::nextNote::
-        end
-        if ho.EndTime >= startOffset and ho.EndTime <= endOffset and includeLN then
-            table.insert(noteOffsetsBetween, ho.EndTime)
-        end
-    end
-    noteOffsetsBetween = table.dedupe(noteOffsetsBetween)
-    noteOffsetsBetween = sort(noteOffsetsBetween, sortAscending)
-    return noteOffsetsBetween
-end
----Returns the center of the window (in pixels).
----@return Vector2 center
-function game.window.getCenter()
-    local windowDim = state.WindowSize
-    return vector.New(state.WindowSize[1] / 2, state.WindowSize[2] / 2)
-end
----Listens to the keyboard and returns specific values based on if keys are pressed.
----@return string[] prefixes An array of prefixes like "Ctrl" or "Shift".
----@return integer key The key enum of the pressed key.
-function kbm.listenForAnyKeyPressed()
-    local isCtrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
-    local isShiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)
-    local isAltHeld = utils.IsKeyDown(keys.LeftAlt) or utils.IsKeyDown(keys.RightAlt)
-    local key = -1
-    local prefixes = {}
-    if isCtrlHeld then table.insert(prefixes, 'Ctrl') end
-    if isShiftHeld then table.insert(prefixes, 'Shift') end
-    if isAltHeld then table.insert(prefixes, 'Alt') end
-    for i = 65, 90 do
-        if (utils.IsKeyPressed(i)) then
-            key = i
-        end
-    end
-    return prefixes, key
-end
----Gets the amount of distance the mouse moved THIS FRAME.
----@param button? ImGuiMouseButton
----@return Vector2 delta
-function kbm.mouseDelta(button)
-    local delta = imgui.GetMouseDragDelta(button or 0)
-    imgui.ResetMouseDragDelta(button or 0)
-    return delta
-end
-ALPHABET_LIST = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
-    'T', 'U', 'V', 'W', 'X', 'Y', 'Z' }
----Converts a key enum to a specific character.
----@param num integer
----@return string
-function kbm.numToKey(num)
-    return ALPHABET_LIST[math.clamp(num - 64, 1, #ALPHABET_LIST)]
-end
-require('packages.table.contains')
----Returns true if the given key combo is pressed (e.g. "Ctrl+Shift+L")
----@param keyCombo string
----@return boolean
-function kbm.pressedKeyCombo(keyCombo)
-    keyCombo = keyCombo:upper()
-    local comboList = {}
-    for v in keyCombo:gmatch('%u+') do
-        table.insert(comboList, v)
-    end
-    local keyReq = comboList[#comboList]
-    local ctrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
-    local shiftHeld = utils.IsKeyDown(keys.LeftShift) or utils.IsKeyDown(keys.RightShift)
-    local altHeld = utils.IsKeyDown(keys.LeftAlt) or utils.IsKeyDown(keys.RightAlt)
-    if (table.contains(comboList, 'CTRL') ~= ctrlHeld) then
-        return false
-    end
-    if (table.contains(comboList, 'SHIFT') ~= shiftHeld) then
-        return false
-    end
-    if (table.contains(comboList, 'ALT') ~= altHeld) then
-        return false
-    end
-    return utils.IsKeyPressed(keys[keyReq])
-end
-kbm.executedKeyCombo = kbm.pressedKeyCombo
----Evaluates a simplified one-dimensional cubic bezier expression with points (0, p2, p3, 1).
----@param p2 number The second point in the cubic bezier.
----@param p3 number The third point in the cubic bezier.
----@param t number The time in which to evaluate the cubic bezier.
----@return number cBez The result.
-function math.cubicBezier(p2, p3, t)
-    return 3 * t * (1 - t) ^ 2 * p2 + 3 * t ^ 2 * (1 - t) * p3 + t ^ 3
-end
----Evaluates a simplified one-dimensional quadratic bezier expression with points (0, p2, 1).
----@param p2 number The second point in the quadratic bezier.
----@param t number The time in which to evaluate the quadratic bezier.
----@return number qBez The result.
-function math.quadraticBezier(p2, t)
-    return 2 * t * (1 - t) * p2 + t ^ 2
-end
-require('packages.math.factorial')
----Restricts a number to be within a chosen bound.
----@param number number
----@param lowerBound number
----@param upperBound number
----@return number
-function math.clamp(number, lowerBound, upperBound)
-    if number < lowerBound then return lowerBound end
-    if number > upperBound then return upperBound end
-    return number
-end
-function math.createKernel(kernelType, parameters)
-    kernelType = kernelType:lower()
-    if (kernelType == 'gaussian') then
-        local sigma = parameters.sigma
-        local radius = math.ceil(sigma * 3)
-        local kernel = {}
-        local sum = 0
-        for i = -radius, radius do
-            local val = math.exp(-(i * i) / (2 * sigma * sigma))
-            kernel[i + radius + 1] = val
-            sum = sum + val
-        end
-        local max_val = kernel[radius + 1]
-        if (parameters.normalize) then max_val = sum end
-        for i = 1, #kernel do
-            kernel[i] = kernel[i] / max_val
-        end
-        return kernel, radius
-    end
-end
----Evaluates a polynomial (specified by the coefficient array) at a value `x`.
----@param ceff number[] The coefficients of the polynomial in descending order; for example, the polynomial x^3+3x^2-3x+4 is represented as `{1, 3, -3, 4}`.
----@param x number
----@return number y
-function math.evaluatePolynomial(ceff, x)
-    local sum = 0
-    local degree = #ceff - 1
-    for i, c in ipairs(ceff) do
-        sum = sum + c * x ^ (degree - i + 1)
-    end
-    return sum
-end
----Clamps a number between `lowerBound` and `upperBound` by repeatedly multiplying or dividing by the `multiplicativeFactor`.
----@param n number
----@param lowerBound number
----@param upperBound number
----@param multiplicativeFactor? number
----@return number
-function math.expoClamp(n, lowerBound, upperBound, multiplicativeFactor)
-    if upperBound <= lowerBound then return n end
-    if (n <= upperBound and n >= lowerBound) then return n end
-    local factor = multiplicativeFactor < 1 and 1 / multiplicativeFactor or multiplicativeFactor
-    while (n < lowerBound) do
-        n = n * factor
-    end
-    while (n > upperBound) do
-        n = n / factor
-    end
-    return n
-end
-require('packages.math.round')
----Forces a number to have a quarterly decimal part.
----@param number number
----@return number
-function math.quarter(number)
-    return math.round(number * 4) * 0.25
-end
----Returns the fractional portion of a number (e.g. in 4.4, returns 0.4).
----@param n number
----@return number
-function math.frac(n)
-    return n - math.floor(n)
-end
----Picks a random number with a Gaussian distribution; implemented with the polar Box-Muller transform.
----@param mean number The mean of the Gaussian distribution.
----@param stdDev number The standard deviation of the Gaussian distribution.
----@param withinStdDevCount number If the resulting random number is over this number of standard deviations from the mean, rerolls until it is no longer so.
----@return number z1 A random number.
----@return number x2 Another random number.
-function math.gaussianRandom(mean, stdDev, withinStdDevCount)
-    local output, output2 = nil, 0
-    while (not output or math.abs(output - mean) / stdDev > withinStdDevCount) do
-        local randomRadius = math.random()
-        while (randomRadius == 0) do randomRadius = math.random() end -- Avoids math.random outputting exactly 0
-        local R = math.sqrt(-2 * math.log(randomRadius))
-        local theta = 2 * math.pi * math.random()
-        output, output2 = R * math.cos(theta) * stdDev + mean, R * math.sin(theta) * stdDev + mean
-    end
-    return output, output2
-end
----Evaluates a simplified one-dimensional hermite related (?) spline for SV purposes
----@param m1 number
----@param m2 number
----@param y2 number
----@param t number
----@return number
-function math.hermite(m1, m2, y2, t)
-    local a = m1 + m2 - 2 * y2
-    local b = 3 * y2 - 2 * m1 - m2
-    local c = m1
-    return a * t ^ 3 + b * t ^ 2 + c * t
-end
----Returns the weight of a number between `lowerBound` and `upperBound`.
----@param num number
----@param lowerBound number
----@param upperBound number
----@return number
-function math.inverseLerp(num, lowerBound, upperBound)
-    return (num - lowerBound) / (upperBound - lowerBound)
-end
----Returns the index of a zero row, or `nil` if none are found.
----@param mtrx number[][]
----@return integer?
-function matrix.findZeroRow(mtrx)
-    for idx, row in pairs(mtrx) do
-        local zeroRow = true
-        for k41 = 1, #row do
-            local num = row[k41]
-            if num ~= 0 then
-                zeroRow = false
-                break
-            end
-        end
-        if zeroRow then return idx end
-    end
-    return nil
-end
-function matrix.multiply(m1, m2)
-    local p1 = type(m1[1]) == 'table' and #m1 or 1
-    local p2 = type(m1[1]) == 'table' and #m1[1] or #m1
-    local q1 = type(m2[1]) == 'table' and #m1 or 1
-    local q2 = type(m2[1]) == 'table' and #m2[1] or #m2
-    if (p2 ~= q1) then error('Incompatible matrices were told to be multiplied', 69) end
-    local result = {}
-    local rowCount = p1
-    local columnCount = q2
-    for i = 1, rowCount do
-        local row = {}
-        for j = 1, columnCount do
-            local sum = 0
-            for k = 1, #m2 do
-                local m1Factor = p2 == 1 and m1[k] or m1[i][k]
-                local m2Factor = q2 == 1 and m2[j] or m1[k][j]
-                sum = sum + m1[i][k] * m2[k][j]
-            end
-            table.insert(row, sum)
-        end
-        table.insert(result, row)
-    end
-    return result
-end
-function matrix.rowLinComb(mtrx, rowIdx1, rowIdx2, row2Factor)
-    for k, v in pairs(mtrx[rowIdx1]) do
-        mtrx[rowIdx1][k] = v + mtrx[rowIdx2][k] * row2Factor
-    end
-end
-function matrix.scaleRow(mtrx, rowIdx, factor)
-    for k, v in pairs(mtrx[rowIdx]) do
-        mtrx[rowIdx][k] = v * factor
-    end
-end
-require('packages.table.duplicate')
-require('packages.math.matrix.findZeroRow')
-require('packages.math.matrix.rowLinComb')
-require('packages.math.matrix.scaleRow')
----Given a square matrix A and equally-sized vector B, returns a vector x such that Ax=B.
----@param mtrx number[][]
----@param vctr number[]
----@return number[]? sln The solution vector, given that it exists. Will return `nil` if no such vector exists.
----@return number? errType If no such vector exists, returns positive infinity if the system has infinite solutions, zero if the system has zero solutions, and negative infinity if the matrix and vector are not compatible.
-function matrix.solve(mtrx, vctr)
-    if (#vctr ~= #mtrx) then return nil, -1 / 0 end
-    local augMtrx = table.duplicate(mtrx)
-    for i, n in pairs(vctr) do
-        table.insert(augMtrx[i], n)
-    end
-    for i = 1, #mtrx do
-        matrix.scaleRow(augMtrx, i, 1 / augMtrx[i][i])
-        for j = i + 1, #mtrx do
-            matrix.rowLinComb(augMtrx, j, i, -augMtrx[j][i]) -- Triangular Downward Sweep
-            local zeroRowIdx = matrix.findZeroRow(augMtrx)
-            if zeroRowIdx then
-                return nil, augMtrx[zeroRowIdx][#mtrx + 1] == 0 and 1 / 0 or 0
-                -- infinity for singular full zero row, zero for singular 0 = x
-            end
-        end
-    end
-    for i = #mtrx, 2, -1 do
-        for j = i - 1, 1, -1 do
-            matrix.rowLinComb(augMtrx, j, i, -augMtrx[j][i]) -- Triangular Upward Sweep
-        end
-    end
-    return table.property(augMtrx, #mtrx + 1) -- Last Column
-end
----Rounds a number to a given amount of decimal places.
----@param number number
----@param decimalPlaces? integer
----@return number
-function math.round(number, decimalPlaces)
-    if (not decimalPlaces) then decimalPlaces = 0 end
-    local multiplier = 10 ^ decimalPlaces
-    return math.floor(multiplier * number + 0.5) / multiplier
-end
----Returns the sign of a number: `1` if the number is non-negative, `-1` if negative.
----@param number number
----@return 1|-1
-function math.sign(number)
-    if number >= 0 then return 1 end
-    return -1
-end
----Alias of [tonumber](lua://tonumber) for type coercion. Converts boolean values into their respective binary digits.
----@param x? string | number | boolean
----@return number
-function math.toNumber(x)
-    if (not x) then return 0 end
-    if x == true then return 1 end
-    local result = tonumber(x)
-    if (not result or type(result) ~= 'number') then return 0 end
-    return result
-end
-tn = math.toNumber
----Wraps a number to an interval; that is, if the number is greater than the lower bound, continuously adds the difference until it reaches the upper bound, and vice versa.
----@param n number
----@param lowerBound number
----@param upperBound number
----@param discrete? boolean Whether or not to wrap discretely - that is, in a range of 1 to n, if given 0, will return n instead of n - 1. Check [OBOE or fencepost error](https://en.wikipedia.org/wiki/Off-by-one_error).
----@return number
-function math.wrap(n, lowerBound, upperBound, discrete)
-    if upperBound <= lowerBound then return n end
-    if (n >= lowerBound and n <= upperBound) then return n end
-    local additionFactor = math.toNumber(discrete)
-    local diff = upperBound - lowerBound
-    while (n < lowerBound) do
-        n = n + diff + additionFactor
-    end
-    while (n > upperBound) do
-        n = n - diff - additionFactor
-    end
-    return n
-end
----Restricts a number to be within a closed ring.
----@param number number
----@param lowerBound number
----@param upperBound number
----@return number
-function math.wrappedClamp(number, lowerBound, upperBound)
-    if number < lowerBound then return upperBound end
-    if number > upperBound then return lowerBound end
-    return number
-end
-require('packages.table.contains')
-require('packages.string.charAt')
-CONSONANTS = { 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Z' }
----Very rudimentary function that returns a string depending on whether or not it should be plural.
----@param str string The inital string, which should be a noun (e.g. `bookmark`)
----@param val number The value, or count, of the noun, which will determine if it should be plural.
----@param pos? integer Where the pluralization letter(s) should be inserted.
----@return string pluralizedStr A new string that is pluralized if `val ~= 1`.
-function pluralize(str, val, pos)
-    local strEnding = ''
-    if pos then
-        strEnding = str:sub(pos + 1, -1)
-        str = str:sub(1, pos)
-    end
-    local finalStrTbl = { str, 's' }
-    if val == 1 then return str .. (strEnding or '') end
-    local lastLetter = str:sub(-1):upper()
-    local secondToLastLetter = str:charAt(-2):upper()
-    if (lastLetter == 'Y' and table.contains(CONSONANTS, secondToLastLetter)) then
-        finalStrTbl[1] = finalStrTbl[1]:sub(1, -2)
-        finalStrTbl[2] = 'ies'
-    end
-    if (str:sub(-3):lower() == 'quy') then
-        finalStrTbl[1] = finalStrTbl[1]:sub(1, -2)
-        finalStrTbl[2] = 'ies'
-    end
-    if (table.contains({ 'J', 'S', 'X', 'Z' }, lastLetter) or table.contains({ 'SH', 'CH' }, str:sub(-2))) then
-        finalStrTbl[2] = 'es'
-    end
-    return table.concat(finalStrTbl) .. (strEnding or '')
-end
-require('packages.string.charAt')
----Capitalizes the first letter of the given string. If `forceLowercase` is true, then all other letters will be forced into lowercase.
----@param str string
----@param forceLowercase? boolean
----@return string
-function string.capitalize(str, forceLowercase)
-    local secondPortion = str:sub(2)
-    if forceLowercase then secondPortion = secondPortion:lower() end
-    return str:charAt(1):upper() .. secondPortion
-end
----Returns the `idx`th character in a string. Simply used for shorthand. Also supports negative indexes.
----@param str string The string to search.
----@param idx integer If positive, returns the `i`th character. If negative, returns the `i`th character from the end of the string (e.g. -1 returns the last character).
----@return string
-function string.charAt(str, idx)
-    return str:sub(idx, idx)
-end
----Changes a string to fit a certain size, with a ... at the end.
----@param str string
----@param targetSize integer
----@return string dottedStr
-function string.fixToSize(str, targetSize)
-    local size = imgui.CalcTextSize(str).x
-    if size <= targetSize then return str end
-    while (str:len() > 3 and size > targetSize) do
-        str = str:sub(1, -2)
-        size = imgui.CalcTextSize(str .. '...').x
-    end
-    return str .. '...'
-end
-require('packages.string.charAt')
----Removes spaces and turns a string into lowerCamelCase. Also removes special characters.
----@param str string
----@return string
-function string.identify(str)
-    newStr = str:gsub('[%s%(%)#&]+', '')
-    newStr = newStr:charAt(1):lower() .. newStr:sub(2)
-    return newStr
-end
-require('packages.kbm.numToKey')
-function string.obfuscate(str)
-    local newStr = ''
-    local originalSize = imgui.CalcTextSize(str).x
-    local unchangingLetters = { ' ', '#' }
-    for i = 1, str:len() do
-        if (table.includes(unchangingLetters, str:charAt(i)) or math.random() < 0.5) then
-            newStr = newStr .. str:charAt(i)
-        else
-            newStr = newStr .. ALPHABET_LIST[math.random(1, 26)]:lower()
-        end
-        if (imgui.CalcTextSize(newStr).x > originalSize) then
-            newStr = newStr:sub(1, -2)
-            break
-        end
-    end
-    return newStr
-end
-require('packages.string.charAt')
----Lots of imgui functions have ## in them as identifiers. This will remove everything after the ##.
----@param str string
----@return string
-function string.removeTrailingTag(str)
-    local newStr = {}
-    for i = 1, str:len() do
-        if (str:charAt(i) == '#' and str:charAt(i + 1) == '#') then break end
-        table.insert(newStr, str:charAt(i))
-    end
-    return table.concat(newStr)
-end
-require('packages.string.charAt')
-require('packages.table.contains')
----Removes vowels from a string.
----@param str string
----@return string
-function string.removeVowels(str)
-    local VOWELS = { 'a', 'e', 'i', 'o', 'u', 'y' }
-    local newStr = ''
-    for i = 1, str:len() do
-        local char = str:charAt(i)
-        if (not table.contains(VOWELS, char)) then
-            newStr = newStr .. char
-        end
-    end
-    return newStr
-end
-require('packages.string.removeVowels')
-require('packages.string.charAt')
----Shortens a string to three consonants; the first, the second, and the last.
----@param str string
----@return string
-function string.shorten(str)
-    local consonants = str:removeVowels()
-    if (consonants:len() < 3) then return consonants end
-    return table.concat({ consonants:charAt(1), consonants:charAt(2), consonants:charAt(-1) })
-end
----Splits a string into a table via the given separator.
----@param str string
----@param sep string
----@return string[]
-function string.split(str, sep)
-    local tbl = {}
-    for s in str:gmatch('([^' .. sep .. ']+)') do
-        table.insert(tbl, s)
-    end
-    return tbl
-end
----Takes in two lists and converts them to a key-value table.
----@generic T
----@generic U
----@param keyArr T[]
----@param valArr U[]
----@return { [T]: U } tbl
-function table.assign(keyArr, valArr)
-    if (#valArr > #keyArr) then
-        valArr = table.slice(valArr, 1, #keyArr)
-    end
-    local tbl = {}
-    for i = 1, #keyArr do
-        tbl[keyArr[i]] = valArr[i]
-    end
-    return tbl
-end
----Returns the average value of an array.
----@param values number[] The list of numbers.
----@param includeLastValue? boolean Whether or not to include the last value in the table.
----@return number avg The arithmetic mean of the table.
-function table.average(values, includeLastValue)
-    if not isTruthy(values) then return 0 end
-    local sum = 0
-    for k42 = 1, #values do
-        local value = values[k42]
-        sum = sum + value
-    end
-    if not includeLastValue then
-        sum = sum - values[#values]
-        return sum / (#values - 1)
-    end
-    return sum / #values
-end
-require('packages.table.duplicate')
----Concatenates arrays together.
----@param t1 any[] The first table.
----@param ... any[] The next tables.
----@return any[] tbl The resultant table.
-function table.combine(t1, ...)
-    local newTbl = table.duplicate(t1)
-    for _, tbl in ipairs({ ... }) do
-        for i = 1, #tbl do
-            table.insert(newTbl, tbl[i])
-        end
-    end
-    return newTbl
-end
----Creates a new array with a custom metatable, allowing for `:` syntactic sugar.
----@param ... any entries to put into the table.
----@return table tbl A table with the given entries.
-function table.construct(...)
-    local tbl = {}
-    for _, v in ipairs({ ... }) do
-        table.insert(tbl, v)
-    end
-    setmetatable(tbl, { __index = table })
-    return tbl
-end
----Creates a new array with a custom metatable, allowing for `:` syntactic sugar. All elements will be the given item.
----@generic T: string | number | boolean | table
----@param item T The entry to use.
----@param num integer The number of entries to put into the table.
----@return T[] tbl A table with the given entries.
-function table.constructRepeating(item, num)
-    local tbl = table.construct()
-    for _ = 1, num do
-        table.insert(tbl, item)
-    end
-    return tbl
-end
----Returns a boolean value corresponding to whether or not an element exists within a table.
----@param tbl any[] The table to search in.
----@param item any The item to search for.
----@return boolean contains Whether or not the item given is within the table.
-function table.contains(tbl, item)
-    for k43 = 1, #tbl do
-        local v = tbl[k43]
-        if v == item then return true end
-    end
-    return false
-end
-table.includes = table.contains -- provide alias bc i'm a js user kekw
----Removes duplicate values from a table.
----@param tbl table The original table.
----@return table tbl A new table with no duplicates.
-function table.dedupe(tbl)
-    local hash = {}
-    local newTbl = {}
-    for k44 = 1, #tbl do
-        local value = tbl[k44]
-        if (not hash[value]) then
-            newTbl[#newTbl + 1] = value
-            hash[value] = true
-        end
-    end
-    return newTbl
-end
-require('packages.table.keys')
----Returns a deep copy of a table.
----@generic T : table
----@param tbl T The original table.
----@return T tbl The new table.
-function table.duplicate(tbl)
-    if not tbl then return {} end
-    local dupeTbl = {}
-    if (tbl[1]) then
-        for k45 = 1, #tbl do
-            local value = tbl[k45]
-            table.insert(dupeTbl, type(value) == 'table' and table.duplicate(value) or value)
-        end
-    else
-        for _, key in ipairs(table.keys(tbl)) do
-            local value = tbl[key]
-            dupeTbl[key] = type(value) == 'table' and table.duplicate(value) or value
-        end
-    end
-    return dupeTbl
-end
----Filters a table via a given function. For each element in the table, it is passed into the function; if the function returns true, the value is kept, and if the function returns false, the value will not be kept in the new array. Not mutative.
----@generic T
----@param tbl T[]
----@param fn fun(element: T): boolean
-function table.filter(tbl, fn)
-    local newTbl = {}
-end
----Returns a 1-indexed value corresponding to the location of an element within a table.
----@param tbl table The table to search in.
----@param item any The item to search for.
----@return integer idx The index of the item. If the item doesn't exist, returns -1 instead.
-function table.indexOf(tbl, item)
-    for i, v in pairs(tbl) do
-        if v == item then return i end
-    end
-    return -1
-end
-require('packages.table.construct')
-require('packages.table.dedupe')
----Returns a table of keys from a table.
----@param tbl { [string]: any } The table to search in.
----@return string[] keys A list of keys.
-function table.keys(tbl)
-    local resultsTbl = table.construct()
-    for k, _ in pairs(tbl) do
-        table.insert(resultsTbl, k)
-    end
-    return table.dedupe(resultsTbl)
-end
----Transforms an array element-wise using a given function.
----@generic T: string | number | boolean
----@generic U
----@param tbl T[]
----@param fn fun(element: T, idx?: number): U
----@return U[]
-function table.map(tbl, fn)
-    local newTbl = {}
-    for idx, v in ipairs(tbl) do
-        table.insert(newTbl, fn(v, idx))
-    end
-    return newTbl
-end
-require('packages.table.slice')
----Navigates a tree with dot notation and returns the corresponding value. For example, if you had a table { foo = { bar = 1 } }, then this returns 1 if the given value is "foo.bar".
----@param tree { [string]: any }
----@param value string[]
----@return any
-function table.nestedValue(tree, value)
-    if (#value > 1) then
-        return table.nestedValue(tree[value[1]], table.slice(value, 2))
-    end
-    return tree[value[1]]
-end
-require('packages.table.average')
-require('packages.table.construct')
----Normalizes a table of numbers to achieve a target average.
----@param values number[] The table to normalize.
----@param targetAverage number The desired average value.
----@param includeLastValue boolean Whether or not to include the last value in the average.
----@return number[]
-function table.normalize(values, targetAverage, includeLastValue)
-    local avgValue = table.average(values, includeLastValue)
-    if avgValue == 0 then return table.constructRepeating(0, #values) end
-    local newValues = {}
-    for i = 1, #values do
-        table.insert(newValues, (values[i] * targetAverage) / avgValue)
-    end
-    return newValues
-end
-require('packages.table.contains')
-require('packages.string.charAt')
-require('packages.math.toNumber')
----Converts a string (generated from [table.stringify](lua://table.stringify)) into a table.
----@param str string
----@return any
-function table.parse(str)
-    if (str == 'FALSE' or str == 'TRUE') then return str == 'TRUE' end
-    if (str:charAt(1) == '"') then return str:sub(2, -2) end
-    if (str:match('^%-?[%d%.]+$')) then return math.toNumber(str) end
-    if (not table.contains({ '{', '[' }, str:charAt(1))) then
-        print('e!',
-            'Something really bad has happened with the parsing algorithm weewooweewoo please report this to the Discord thanks!!!!!!!!!')
-        error('POO')
-        return str
-    end
-    if (str:charAt(1) == '{' and str:charAt(2) == '}') or (str:charAt(1) == '[' and str:charAt(2) == ']') then return {} end
-    local tableType = str:charAt(1) == '[' and 'arr' or 'dict'
-    local tbl = {}
-    local terms = {}
-    local MAX_ITERATIONS = 10000
-    for i = 1, MAX_ITERATIONS do
-        local nestedTableFactor = tn(table.contains({ '[', '{' }, str:charAt(2)))
-        local depth = nestedTableFactor
-        local searchIdx = 2 + nestedTableFactor
-        local inQuotes = false
-        while (searchIdx < str:len()) do
-            if (str:charAt(searchIdx) == '"') then
-                inQuotes = not inQuotes
-            end
-            if (table.contains({ ']', '}' }, str:charAt(searchIdx)) and not inQuotes) then
-                depth = depth - 1
-            end
-            if (table.contains({ '[', '{' }, str:charAt(searchIdx)) and not inQuotes) then
-                depth = depth + 1
-            end
-            if ((str:charAt(searchIdx) == ',' or nestedTableFactor == 1) and not inQuotes and depth == 0) then break end
-            searchIdx = searchIdx + 1
-        end
-        table.insert(terms, str:sub(2, searchIdx + nestedTableFactor - 1))
-        str = str:sub(searchIdx + nestedTableFactor)
-        if (str:len() <= 1) then break end
-    end
-    if (tableType == 'arr') then
-        for k46 = 1, #terms do
-            local v = terms[k46]
-            table.insert(tbl, table.parse(v))
-        end
-    else
-        for k47 = 1, #terms do
-            local v = terms[k47]
-            local idx = v:find('=')
-            tbl[v:sub(1, idx - 1)] = table.parse(v:sub(idx + 1))
-        end
-    end
-    return tbl
-end
----In a nested table `tbl`, returns a table of property values with key `property`.
----@generic T
----@param tbl T[][] | { [string]: T[] } The table to search in.
----@param property string | integer The property name.
----@return T[] properties The resultant table.
-function table.property(tbl, property)
-    local resultsTbl = {}
-    for _, v in pairs(tbl) do
-        table.insert(resultsTbl, v[property])
-    end
-    return resultsTbl
-end
----Reduces an array element-wise using a given function.
----@generic T: string | number | boolean
----@generic V: string | number | boolean | string[] | number[] | boolean[] | { [string]: any }
----@param tbl T[]
----@param fn fun(accumulator: V, current: T): V
----@param initialValue V
----@return V
-function table.reduce(tbl, fn, initialValue)
-    local accumulator = initialValue
-    for k48 = 1, #tbl do
-        local v = tbl[k48]
-        accumulator = fn(accumulator, v)
-    end
-    return accumulator
-end
----Reverses the order of an array.
----@param tbl table The original table.
----@return table tbl The original table, reversed.
-function table.reverse(tbl)
-    local reverseTbl = {}
-    for i = 1, #tbl do
-        table.insert(reverseTbl, tbl[#tbl + 1 - i])
-    end
-    return reverseTbl
-end
----In an array of numbers, searches for the closest number to `item`.
----@param tbl number[] The array of numbers to search in.
----@param item number The number to search for.
----@param searchMode? 0|1|2 `0/nil`: Search before and after. `1`: Search only before. `2`: Search only after.
----@return number num, integer index The number that is the closest to the given item, and the index of that number in the given table.
-function table.searchClosest(tbl, item, searchMode)
-    local leftIdx = 1
-    local rightIdx = #tbl
-    while rightIdx - leftIdx > 1 do
-        local middleIdx = math.floor((leftIdx + rightIdx) * 0.5)
-        if (item >= tbl[middleIdx]) then
-            leftIdx = middleIdx
-        else
-            rightIdx = middleIdx
-        end
-    end
-    local leftDifference = item - tbl[leftIdx]
-    local rightDifference = tbl[rightIdx] - item
-    if ((leftDifference < rightDifference or searchMode == 1) and searchMode ~= 2) then
-        return tbl[leftIdx], leftIdx
-    else
-        return tbl[rightIdx], rightIdx
-    end
-end
----Returns a copy of a table containing all values between indices `i` and `j` (inclusive). If `j` is not passed in, will slice to the end of the table.
----@generic T
----@param tbl T[]
----@param i integer
----@param j? integer
----@return T[]
-function table.slice(tbl, i, j)
-    return { table.unpack(tbl, i, j or #tbl) }
-end
-require('packages.table.duplicate')
----Sorting function for sorting objects by their numerical value. Should be passed into [`table.sort`](lua://table.sort).
----@param a number
----@param b number
----@return boolean
-function sortAscending(a, b) return a < b end
----Sorting function for sorting objects by their `startTime` property. Should be passed into [`table.sort`](lua://table.sort).
----@param a { StartTime: number }
----@param b { StartTime: number }
----@return boolean
-function sortAscendingStartTime(a, b) return a.StartTime < b.StartTime end
----Sorting function for sorting objects by their `time` property. Should be passed into [`table.sort`](lua://table.sort).
----@param a { time: number }
----@param b { time: number }
----@return boolean
-function sortAscendingTime(a, b) return a.time < b.time end
----Sorting function for sorting notes by their `startTime` property. Should be passed into [`table.sort`](lua://table.sort). If two items are identical, sorts by their lanes instead.
----@param a { StartTime: number, Lane: integer }
----@param b { StartTime: number, Lane: integer }
----@return boolean
-function sortAscendingNoteLaneTime(a, b)
-    if (math.abs(a.StartTime - b.StartTime) > 0.1) then return a.StartTime < b.StartTime end
-    return a.Lane < b.Lane
-end
----Sorts a table given a sorting function.
----@generic T
----@param tbl T[] The table to sort.
----@param compFn fun(a: T, b: T): boolean A comparison function. Given two elements `a` and `b`, how should they be sorted?
----@return T[] sortedTbl A sorted table.
-function sort(tbl, compFn)
-    newTbl = table.duplicate(tbl)
-    table.sort(newTbl, compFn)
-    return newTbl
-end
-require('packages.truthy')
-require('packages.table.keys')
----Converts a table (or any other primitive values) to a string.
----@param var any
----@return string
-function table.stringify(var)
-    if (type(var) == 'boolean') then return var and 'TRUE' or 'FALSE' end
-    if (type(var) == 'string') then return '"' .. var .. '"' end
-    if (type(var) == 'number') then return var end
-    if (type(var) ~= 'table') then return 'UNKNOWN' end
-    if (var[1] ~= nil) then
-        local str = '['
-        for k49 = 1, #var do
-            local v = var[k49]
-            str = str .. table.stringify(v) .. ','
-        end
-        return str:sub(1, -2) .. ']'
-    end -- from below, must be a key-value table
-    if (not isTruthy(table.keys(var))) then return '[]' end
-    local str = '{'
-    for k, v in pairs(var) do
-        str = str .. k .. '=' .. table.stringify(v) .. ','
-    end
-    return str:sub(1, -2) .. '}'
-end
-require('packages.table.keys')
-require('packages.table.contains')
----When given a dictionary and table of keys, returns a new table with only the specified keys and values.
----@generic T table
----@param checkList T The base table, which has a list of keys to include in the new table.
----@param tbl T The base table in which to lint the data from.
----@param extrapolateData? boolean If this is set to true, will fill in missing keys in the new table with values frmo the old table.
----@param inferTypes? boolean If true, this will try to coerce types from `tbl` into the types of `checkList`.
----@return T outputTable
-function table.validate(checkList, tbl, extrapolateData, inferTypes)
-    local validKeys = table.keys(checkList)
-    local tableKeys = table.keys(tbl)
-    local outputTable = {}
-    for k50 = 1, #validKeys do
-        local key = validKeys[k50]
-        if (table.contains(tableKeys, key)) then
-            outputTable[key] = tbl[key]
-        end
-        if (not table.contains(tableKeys, key) and extrapolateData) then
-            outputTable[key] = checkList[key]
-        end
-        if (inferTypes and outputTable[key]) then
-            outputTable[key] = parseDefaultProperty(outputTable[key], checkList[key]) or outputTable[key]
-        end
-    end
-    return outputTable
-end
-require('packages.table.construct')
----Returns a table of values from a table.
----@param tbl { [string]: any } The table to search in.
----@return string[] values A list of values.
-function table.values(tbl)
-    local resultsTbl = table.construct()
-    for k51 = 1, #tbl do
-        local v = tbl[k51]
-        table.insert(resultsTbl, v)
-    end
-    return resultsTbl
-end
----@diagnostic disable: return-type-mismatch
----The above is made because we want the functions to be identity functions when passing in vectors instead of tables.
----Converts a table of length 4 into a [`Vector4`](lua://Vector4).
----@param tbl number[] | { x: number, y: number, z: number, w: number } The table to convert.
----@return Vector4 vctr The output vector.
-function table.vectorize4(tbl)
-    if (not tbl) then return vctr4(0) end
-    if (type(tbl) == 'userdata') then return tbl end
-    if (tbl[1] and tbl[2] and tbl[3] and tbl[4]) then return vector.New(tbl[1], tbl[2], tbl[3], tbl[4]) end
-    return vector.New(tbl.x, tbl.y, tbl.z, tbl.w)
-end
----Converts a table of length 3 into a [`Vector3`](lua://Vector3).
----@param tbl number[] | { x: number, y: number, z: number } The table to convert.
----@return Vector3 vctr The output vector.
-function table.vectorize3(tbl)
-    if (not tbl) then return vctr3(0) end
-    if (type(tbl) == 'userdata') then return tbl end
-    if (tbl[1] and tbl[2] and tbl[3]) then return vector.New(tbl[1], tbl[2], tbl[3]) end
-    return vector.New(tbl.x, tbl.y, tbl.z)
-end
----Converts a table of length 2 into a [`Vector2`](lua://Vector2).
----@param tbl number[] | { x: number, y: number } The table to convert.
----@return Vector2 vctr The output vector.
-function table.vectorize2(tbl)
-    if (not tbl) then return vctr2(0) end
-    if (type(tbl) == 'userdata') then return tbl end
-    if (tbl[1] and tbl[2]) then return vector.New(tbl[1], tbl[2]) end
-    return vector.New(tbl.x, tbl.y)
-end
----Returns `true` if given a string called "true", given a number greater than 0, given a table with an element, or is given `true`. Otherwise, returns `false`.
----@param param any The parameter to truthify.
----@param assumeTrue? boolean If the item is nil, will return true if this is true.
----@return boolean truthy The truthy value of the parameter.
-function isTruthy(param, assumeTrue)
-    local t = type(param)
-    if t == 'string' then
-        return param:lower() == 'true'
-    end
-    if t == 'number' then
-        return param > 0
-    end
-    if t == 'table' or t == 'userdata' then
-        return #param > 0
-    end
-    if t == 'boolean' then
-        return param
-    end
-    return assumeTrue or false
-end
----Creates a new [`Vector4`](lua://Vector4) with all elements being the given number.
----@param n number The number to use as the entries.
----@return Vector4 vctr The resultant vector of style `<n, n, n, n>`.
-function vctr4(n)
-    return vector.New(n, n, n, n)
-end
----Creates a new [`Vector3`](lua://Vector4) with all elements being the given number.
----@param n number The number to use as the entries.
----@return Vector3 vctr The resultant vector of style `<n, n, n>`.
-function vctr3(n)
-    return vector.New(n, n, n)
-end
----Creates a new [`Vector2`](lua://Vector2) with all elements being the given number.
----@param n number The number to use as the entries.
----@return Vector2 vctr The resultant vector of style `<n, n>`.
-function vctr2(n)
-    return vector.New(n, n)
 end
 function awake()
 loadup = {}     -- later inserted to via setStyleVars.lua
