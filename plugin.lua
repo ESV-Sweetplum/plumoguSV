@@ -1808,6 +1808,7 @@ globalVars = {
     useCustomPulseColor = false,
     useEndTimeOffsets = false,
     useMinDisplacementMultiplier = true,
+    useSelectionForNavigation = false,
 }
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 function setGlobalVars(tempGlobalVars)
@@ -1852,6 +1853,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
     globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
     globalVars.useMinDisplacementMultiplier = isTruthy(tempGlobalVars.useMinDisplacementMultiplier, true)
+    globalVars.useSelectionForNavigation = isTruthy(tempGlobalVars.useSelectionForNavigation)
     local forceVectorizeList = { 'border', 'loadupOpeningTextColor', 'loadupPulseTextColorLeft',
         'loadupPulseTextColorRight', 'loadupBgTl', 'loadupBgTr', 'loadupBgBl', 'loadupBgBr' }
     if (tempGlobalVars.customStyles) then
@@ -3734,7 +3736,10 @@ function fixFlippedLNEnds()
     local endOffset = map.HitObjects[#map.HitObjects].EndTime
     if endOffset == 0 then endOffset = map.HitObjects[#map.HitObjects].StartTime end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
-    removeAndAddSVs(svsToRemove, svsToAdd)
+    actions.PerformBatch({
+        createEA(action_type.RemoveScrollVelocityBatch, svsToRemove),
+        createEA(action_type.AddScrollVelocityBatch, svsToAdd),
+    })
     local type = isTruthy(fixedLNEndsCount) and 's!' or 'w!'
     print(type, 'Fixed ' .. fixedLNEndsCount .. pluralize(' flipped LN end.', fixedLNEndsCount, -2))
     state.SelectedScrollGroupId = ogTg
@@ -4210,7 +4215,7 @@ end
 function changeTGIndex(diff)
     local groups = state.GetValue("tgList")
     local selectedTgDict = {}
-    if (not isTruthy(state.SelectedHitObjects)) then
+    if (not isTruthy(state.SelectedHitObjects) or not globalVars.useSelectionForNavigation) then
         globalVars.scrollGroupIndex = math.wrap(globalVars.scrollGroupIndex + diff, 1, #groups, true)
         state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
         return
@@ -4255,6 +4260,7 @@ function checkForGlobalHotkeys()
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_next_tg])) then goToNextTg() end
 end
 function moveSelectionToTg()
+    if (not isTruthy(state.SelectedHitObjects)) then return end
     actions.MoveObjectsToTimingGroup(state.SelectedHitObjects, state.SelectedScrollGroupId)
 end
 function toggleUseEndOffsets()
@@ -12274,6 +12280,8 @@ function showAdvancedSettings()
         "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets.")
     GlobalCheckbox('ignoreNotesOutsideTg', 'Ignore Notes Not In Current Timing Group',
         'Notes that are in a timing group outside of the current one will be ignored by stills, selection checks, etc.')
+    GlobalCheckbox('useSelectionForNavigation', 'Use Selection for TG Navigation',
+        'If enabled, pressing the keybinds to switch to prev/next TGs will only cycle through TGs that include at least one note within your current selection.')
     GlobalCheckbox('useMinDisplacementMultiplier', 'Use Displacement Multiplier Supremum',
         'Uses the greatest minimum possible displacement multiplier throughout the whole map to ensure that copy-paste is possible while maintaining consistency.')
     if (globalVars.useMinDisplacementMultiplier) then
@@ -15854,6 +15862,29 @@ function awake()
     clock.prevTime = state.UnixTime
     game.keyCount = map.GetKeyCount()
 end
+function runOtherTest()
+    local ogTg = state.SelectedScrollGroupId
+    local svsToAdd = {}
+    for _, v in pairs(state.SelectedHitObjects) do
+        state.SelectedScrollGroupId = 'splitter_col_' .. v.Lane
+        local dist = getDist(v.StartTime, v.Lane)
+        local curSSF = map.GetScrollSpeedFactorAt(v.StartTime + 1).Multiplier
+        prepareDisplacingSVs(v.StartTime, svsToAdd, {}, dist * curSSF, -dist * curSSF, 0)
+    end
+    actions.PlaceScrollVelocityBatch(svsToAdd)
+    state.SelectedScrollGroupId = ogTg
+end
+function getDist(t, l)
+    local ogTg = state.SelectedScrollGroupId
+    state.SelectedScrollGroupId = 'w_receptor_' .. l
+    svsBetweenOffsets = game.get.svsBetweenOffsets(t, 200479)
+    local nsvDistance = 200479 - t
+    addStartSVIfMissing(svsBetweenOffsets, t)
+    local totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, t, 200479) or 0
+    local roundedSVDistance = math.round(totalDistance, 3)
+    state.SelectedScrollGroupId = ogTg
+    return roundedSVDistance
+end
 function draw()
     if (not state.CurrentTimingPoint or not imgui or not state) then return end
     local performanceMode = globalVars.performanceMode
@@ -15902,6 +15933,9 @@ function draw()
     end
     if (not performanceMode and map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ') then
         runTest()
+    end
+    if (imgui.Button('run')) then
+        runOtherTest()
     end
     imgui.End()
     logoThread()

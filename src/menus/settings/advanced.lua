@@ -5,6 +5,8 @@ function showAdvancedSettings()
         "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets.")
     GlobalCheckbox('ignoreNotesOutsideTg', 'Ignore Notes Not In Current Timing Group',
         'Notes that are in a timing group outside of the current one will be ignored by stills, selection checks, etc.')
+    GlobalCheckbox('useSelectionForNavigation', 'Use Selection for TG Navigation',
+        'If enabled, pressing the keybinds to switch to prev/next TGs will only cycle through TGs that include at least one note within your current selection.')
     GlobalCheckbox('useMinDisplacementMultiplier', 'Use Displacement Multiplier Supremum',
         'Uses the greatest minimum possible displacement multiplier throughout the whole map to ensure that copy-paste is possible while maintaining consistency.')
     if (globalVars.useMinDisplacementMultiplier) then

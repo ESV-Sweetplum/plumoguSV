@@ -86,7 +86,10 @@ function fixFlippedLNEnds()
     local endOffset = map.HitObjects[#map.HitObjects].EndTime
     if endOffset == 0 then endOffset = map.HitObjects[#map.HitObjects].StartTime end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
-    removeAndAddSVs(svsToRemove, svsToAdd)
+    actions.PerformBatch({
+        createEA(action_type.RemoveScrollVelocityBatch, svsToRemove),
+        createEA(action_type.AddScrollVelocityBatch, svsToAdd),
+    })
 
     local type = isTruthy(fixedLNEndsCount) and 's!' or 'w!'
     print(type, 'Fixed ' .. fixedLNEndsCount .. pluralize(' flipped LN end.', fixedLNEndsCount, -2))

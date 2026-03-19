@@ -48,6 +48,7 @@ globalVars = {
     useCustomPulseColor = false,
     useEndTimeOffsets = false,
     useMinDisplacementMultiplier = true,
+    useSelectionForNavigation = false,
 }
 
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
@@ -95,6 +96,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.useCustomPulseColor = isTruthy(tempGlobalVars.useCustomPulseColor)
     globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
     globalVars.useMinDisplacementMultiplier = isTruthy(tempGlobalVars.useMinDisplacementMultiplier, true)
+    globalVars.useSelectionForNavigation = isTruthy(tempGlobalVars.useSelectionForNavigation)
 
     -- All fields below are colors that must be vectorized to properly perform color arithmetic.
     local forceVectorizeList = { 'border', 'loadupOpeningTextColor', 'loadupPulseTextColorLeft',

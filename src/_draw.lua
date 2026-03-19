@@ -1,3 +1,30 @@
+function runOtherTest()
+    local ogTg = state.SelectedScrollGroupId
+    local svsToAdd = {}
+
+    for _, v in pairs(state.SelectedHitObjects) do
+        state.SelectedScrollGroupId = 'splitter_col_' .. v.Lane
+        local dist = getDist(v.StartTime, v.Lane)
+        local curSSF = map.GetScrollSpeedFactorAt(v.StartTime + 1).Multiplier
+        prepareDisplacingSVs(v.StartTime, svsToAdd, {}, dist * curSSF, -dist * curSSF, 0)
+    end
+
+    actions.PlaceScrollVelocityBatch(svsToAdd)
+    state.SelectedScrollGroupId = ogTg
+end
+
+function getDist(t, l)
+    local ogTg = state.SelectedScrollGroupId
+    state.SelectedScrollGroupId = 'w_receptor_' .. l
+    svsBetweenOffsets = game.get.svsBetweenOffsets(t, 200479)
+    local nsvDistance = 200479 - t
+    addStartSVIfMissing(svsBetweenOffsets, t)
+    local totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, t, 200479) or 0
+    local roundedSVDistance = math.round(totalDistance, 3)
+    state.SelectedScrollGroupId = ogTg
+    return roundedSVDistance
+end
+
 function draw()
     if (not state.CurrentTimingPoint or not imgui or not state) then return end
     local performanceMode = globalVars.performanceMode
@@ -53,6 +80,10 @@ function draw()
 
     if (not performanceMode and map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ') then
         runTest()
+    end
+
+    if (imgui.Button('run')) then
+        runOtherTest()
     end
 
     imgui.End()
