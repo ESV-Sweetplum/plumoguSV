@@ -2,3 +2,6 @@
 	path = quinsight
 	url = https://github.com/ESV-Sweetplum/quinsight
     branch = main
+[submodule "Luaver"]
+	path = Luaver
+	url = https://github.com/ESV-Sweetplum/Luaver
