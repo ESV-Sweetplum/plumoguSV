@@ -3,12 +3,8 @@
     "version": "2.1.1",
     "description": "The ultimate SV plugin for Quaver.",
     "scripts": {
-        "test": "npm run transpile && node dist/tests",
-        "transpile": "tsc && node dist/transpiler",
-        "watch": "tsc && node dist/transpiler/watch",
-        "dev": "npm run watch",
-        "build": "tsc && node dist/transpiler/build",
-        "bezier": "tsc && node dist/transpiler/lib/bezier"
+        "dev": "tsc && node dist/watch",
+        "watch": "npm run dev"
     },
     "repository": {
         "type": "git",
@@ -27,8 +23,9 @@
         "@types/luaparse": "^0.2.13",
         "adm-zip": "^0.5.16",
         "ahocorasick": "^1.0.2",
-        "chalk": "^4.1.2",
+        "chalk": "^5.6.2",
         "chokidar": "^4.0.3",
+        "json5": "^2.2.3",
         "luaparse": "^0.3.1"
     },
     "devDependencies": {

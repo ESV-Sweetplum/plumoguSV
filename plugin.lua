@@ -1,5 +1,6 @@
-ENVIRONMENT = "development"
-devMode = true
+math.randomseed(os.time())
+imgui_disable_vector_packing=true
+PLUGIN_NAME="plumoguSV";PLUGIN_VERSION="2.1.1";PLUGIN_AUTHOR="plummyyummy, kloi34";PLUGIN_DESCRIPTION="The ultimate community-driven and open-source competitive SV plugin, remastered for the modern age."
 cache = {
     boolean = {},
     windows = {},
@@ -53,7 +54,7 @@ end
 ---@return boolean ev True if the clock has reached its interval time.
 function clock.listen(id, interval)
     local currentTime = state
-        .UnixTime
+        .UnixTime -- Avoid calling state global multiple times, which causes a heavy load on performance
     local prevTime = cache.clock[id]
     if (not prevTime) then
         cache.clock[id] = currentTime
@@ -64,6 +65,17 @@ function clock.listen(id, interval)
         return true
     end
     return false
+end
+---Alters opacity of a given color.
+---@param col integer
+---@param additiveOpacity integer
+---@return number
+---@overload fun(col: Vector4, additiveOpacity: number): Vector4
+function color.alterOpacity(col, additiveOpacity)
+    if (type(col) ~= 'number') then
+        return col + vector.New(0, 0, 0, additiveOpacity)
+    end
+    return col + math.floor(additiveOpacity) * 16777216
 end
 color.vctr.white = vector.New(1, 1, 1, 1)
 color.vctr.black = vector.New(0, 0, 0, 1)
@@ -124,7 +136,7 @@ end
 function color.uintToRgba(n)
     local tbl = {}
     for i = 0, 3 do
-        tbl[#tbl + 1] = math.floor(n / 256 ^ i) % 256
+        table.insert(tbl, math.floor(n / 256 ^ i) % 256)
     end
     return table.vectorize4(tbl) / 255
 end
@@ -168,7 +180,7 @@ end
 function color.strToRgba(str)
     local rgb = {}
     str:gsub('(%d+)', function(c)
-        rgb[#rgb + 1] = c
+        table.insert(rgb, c)
     end)
     return vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, 1)
 end
@@ -226,6 +238,7 @@ function game.get.snapAt(time, dontPrintInaccuracy)
     if (math.abs(minSnapTime * (index + 1) - distanceAbovePrev) < math.abs(minSnapTime * index - distanceAbovePrev)) then
         index = index + 1
     end
+    -- Finds GCF between MAX_SNAP and given spacing
     local divisor = MAX_SNAP
     local div = index
     local remainder = -1
@@ -286,7 +299,7 @@ function game.get.bookmarksBetweenOffsets(startOffset, endOffset)
     local bookmarksBetweenOffsets = {} ---@type Bookmark[]
     for _, bm in ipairs(map.Bookmarks) do
         local bmIsInRange = bm.StartTime >= startOffset and bm.StartTime < endOffset
-        if bmIsInRange then bookmarksBetweenOffsets[#bookmarksBetweenOffsets + 1] = bm end
+        if bmIsInRange then table.insert(bookmarksBetweenOffsets, bm) end
     end
     return sort(bookmarksBetweenOffsets, sortAscendingStartTime)
 end
@@ -298,7 +311,7 @@ function game.get.linesBetweenOffsets(startOffset, endOffset)
     local linesBetweenoffsets = {} ---@type TimingPoint[]
     for _, line in ipairs(map.TimingPoints) do
         local lineIsInRange = line.StartTime >= startOffset and line.StartTime < endOffset
-        if lineIsInRange then linesBetweenoffsets[#linesBetweenoffsets + 1] = line end
+        if lineIsInRange then table.insert(linesBetweenoffsets, line) end
     end
     return sort(linesBetweenoffsets, sortAscendingStartTime)
 end
@@ -310,7 +323,7 @@ function game.get.notesBetweenOffsets(startOffset, endOffset)
     local notesBetweenOffsets = {} ---@type HitObject[]
     for _, note in ipairs(map.HitObjects) do
         local noteIsInRange = note.StartTime >= startOffset and note.StartTime <= endOffset
-        if noteIsInRange then notesBetweenOffsets[#notesBetweenOffsets + 1] = note end
+        if noteIsInRange then table.insert(notesBetweenOffsets, note) end
     end
     return sort(notesBetweenOffsets, sortAscendingStartTime)
 end
@@ -329,7 +342,7 @@ function game.get.ssfsBetweenOffsets(startOffset, endOffset, includeEnd, dontSor
         for _, ssf in ipairs(map.ScrollSpeedFactors) do
             local ssfIsInRange = ssf.StartTime >= startOffset and ssf.StartTime < endOffset
             if (includeEnd and ssf.StartTime == endOffset) then ssfIsInRange = true end
-            if ssfIsInRange then ssfsBetweenOffsets[#ssfsBetweenOffsets + 1] = ssf end
+            if ssfIsInRange then table.insert(ssfsBetweenOffsets, ssf) end
         end
     end
     if dontSort then return ssfsBetweenOffsets end
@@ -346,7 +359,7 @@ function game.get.svsBetweenOffsets(startOffset, endOffset, includeEnd, dontSort
     for _, sv in ipairs(map.ScrollVelocities) do
         local svIsInRange = sv.StartTime >= startOffset and sv.StartTime < endOffset
         if (includeEnd and sv.StartTime == endOffset) then svIsInRange = true end
-        if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
+        if svIsInRange then table.insert(svsBetweenOffsets, sv) end
     end
     if dontSort then return svsBetweenOffsets end
     return sort(svsBetweenOffsets, sortAscendingStartTime)
@@ -389,8 +402,8 @@ end
 function game.get.uniqueSelectedNoteOffsets()
     local offsets = {}
     for _, ho in pairs(state.SelectedHitObjects) do
-        offsets[#offsets + 1] = ho.StartTime
-        if (ho.EndTime ~= 0 and globalVars.useEndTimeOffsets) then offsets[#offsets + 1] = ho.EndTime end
+        table.insert(offsets, ho.StartTime)
+        if (ho.EndTime ~= 0 and globalVars.useEndTimeOffsets) then table.insert(offsets, ho.EndTime) end
     end
     if (not isTruthy(offsets)) then return {} end
     offsets = table.dedupe(offsets)
@@ -430,7 +443,7 @@ function game.get.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
             if (state.SelectedScrollGroupId ~= ho.TimingGroup and globalVars.ignoreNotesOutsideTg) then skipNote = true end
             if (ho.StartTime == startOffset or ho.StartTime == endOffset) then skipNote = false end
             if skipNote then goto nextNote end
-            noteOffsetsBetween[#noteOffsetsBetween + 1] = ho.StartTime
+            table.insert(noteOffsetsBetween, ho.StartTime)
             if (ho.EndTime ~= 0 and ho.EndTime <= endOffset and includeLN) then
                 table.insert(noteOffsetsBetween,
                     ho.EndTime)
@@ -438,7 +451,7 @@ function game.get.uniqueNoteOffsetsBetween(startOffset, endOffset, includeLN)
             ::nextNote::
         end
         if ho.EndTime >= startOffset and ho.EndTime <= endOffset and includeLN then
-            noteOffsetsBetween[#noteOffsetsBetween + 1] = ho.EndTime
+            table.insert(noteOffsetsBetween, ho.EndTime)
         end
     end
     noteOffsetsBetween = table.dedupe(noteOffsetsBetween)
@@ -460,9 +473,9 @@ function kbm.listenForAnyKeyPressed()
     local isAltHeld = utils.IsKeyDown(keys.LeftAlt) or utils.IsKeyDown(keys.RightAlt)
     local key = -1
     local prefixes = {}
-    if isCtrlHeld then prefixes[#prefixes + 1] = 'Ctrl' end
-    if isShiftHeld then prefixes[#prefixes + 1] = 'Shift' end
-    if isAltHeld then prefixes[#prefixes + 1] = 'Alt' end
+    if isCtrlHeld then table.insert(prefixes, 'Ctrl') end
+    if isShiftHeld then table.insert(prefixes, 'Shift') end
+    if isAltHeld then table.insert(prefixes, 'Alt') end
     for i = 65, 90 do
         if (utils.IsKeyPressed(i)) then
             key = i
@@ -493,7 +506,7 @@ function kbm.pressedKeyCombo(keyCombo)
     keyCombo = keyCombo:upper()
     local comboList = {}
     for v in keyCombo:gmatch('%u+') do
-        comboList[#comboList + 1] = v
+        table.insert(comboList, v)
     end
     local keyReq = comboList[#comboList]
     local ctrlHeld = utils.IsKeyDown(keys.LeftControl) or utils.IsKeyDown(keys.RightControl)
@@ -517,14 +530,14 @@ kbm.executedKeyCombo = kbm.pressedKeyCombo
 ---@param t number The time in which to evaluate the cubic bezier.
 ---@return number cBez The result.
 function math.cubicBezier(p2, p3, t)
-    return 3 * t * (1 - t) ^ 2 * p2 + 3 * t * t * (1 - t) * p3 + t * t * t
+    return 3 * t * (1 - t) ^ 2 * p2 + 3 * t ^ 2 * (1 - t) * p3 + t ^ 3
 end
 ---Evaluates a simplified one-dimensional quadratic bezier expression with points (0, p2, 1).
 ---@param p2 number The second point in the quadratic bezier.
 ---@param t number The time in which to evaluate the quadratic bezier.
 ---@return number qBez The result.
 function math.quadraticBezier(p2, t)
-    return 2 * t * (1 - t) * p2 + t * t
+    return 2 * t * (1 - t) * p2 + t ^ 2
 end
 ---Restricts a number to be within a chosen bound.
 ---@param number number
@@ -608,7 +621,7 @@ function math.gaussianRandom(mean, stdDev, withinStdDevCount)
     local output, output2 = nil, 0
     while (not output or math.abs(output - mean) / stdDev > withinStdDevCount) do
         local randomRadius = math.random()
-        while (randomRadius == 0) do randomRadius = math.random() end
+        while (randomRadius == 0) do randomRadius = math.random() end -- Avoids math.random outputting exactly 0
         local R = math.sqrt(-2 * math.log(randomRadius))
         local theta = 2 * math.pi * math.random()
         output, output2 = R * math.cos(theta) * stdDev + mean, R * math.sin(theta) * stdDev + mean
@@ -625,7 +638,7 @@ function math.hermite(m1, m2, y2, t)
     local a = m1 + m2 - 2 * y2
     local b = 3 * y2 - 2 * m1 - m2
     local c = m1
-    return a * t * t * t + b * t * t + c * t
+    return a * t ^ 3 + b * t ^ 2 + c * t
 end
 ---Returns the weight of a number between `lowerBound` and `upperBound`.
 ---@param num number
@@ -670,9 +683,9 @@ function matrix.multiply(m1, m2)
                 local m2Factor = q2 == 1 and m2[j] or m1[k][j]
                 sum = sum + m1[i][k] * m2[k][j]
             end
-            row[#row + 1] = sum
+            table.insert(row, sum)
         end
-        result[#result + 1] = row
+        table.insert(result, row)
     end
     return result
 end
@@ -695,7 +708,7 @@ function matrix.solve(mtrx, vctr)
     if (#vctr ~= #mtrx) then return nil, -1 / 0 end
     local augMtrx = table.duplicate(mtrx)
     for i, n in pairs(vctr) do
-        augMtrx[i][#augMtrx[i] + 1] = n
+        table.insert(augMtrx[i], n)
     end
     for i = 1, #mtrx do
         matrix.scaleRow(augMtrx, i, 1 / augMtrx[i][i])
@@ -704,6 +717,7 @@ function matrix.solve(mtrx, vctr)
             local zeroRowIdx = matrix.findZeroRow(augMtrx)
             if zeroRowIdx then
                 return nil, augMtrx[zeroRowIdx][#mtrx + 1] == 0 and 1 / 0 or 0
+                -- infinity for singular full zero row, zero for singular 0 = x
             end
         end
     end
@@ -712,7 +726,7 @@ function matrix.solve(mtrx, vctr)
             matrix.rowLinComb(augMtrx, j, i, -augMtrx[j][i]) -- Triangular Upward Sweep
         end
     end
-    return table.property(augMtrx, #mtrx + 1)
+    return table.property(augMtrx, #mtrx + 1) -- Last Column
 end
 ---Rounds a number to a given amount of decimal places.
 ---@param number number
@@ -860,7 +874,7 @@ function string.removeTrailingTag(str)
     local newStr = {}
     for i = 1, str:len() do
         if (str:charAt(i) == '#' and str:charAt(i + 1) == '#') then break end
-        newStr[#newStr + 1] = str:charAt(i)
+        table.insert(newStr, str:charAt(i))
     end
     return table.concat(newStr)
 end
@@ -892,8 +906,8 @@ end
 ---@return string[]
 function string.split(str, sep)
     local tbl = {}
-    for s in str:gmatch(table.concat({'([^', sep, ']+)'})) do
-        tbl[#tbl + 1] = s
+    for s in str:gmatch('([^' .. sep .. ']+)') do
+        table.insert(tbl, s)
     end
     return tbl
 end
@@ -938,7 +952,7 @@ function table.combine(t1, ...)
     local newTbl = table.duplicate(t1)
     for _, tbl in ipairs({ ... }) do
         for i = 1, #tbl do
-            newTbl[#newTbl + 1] = tbl[i]
+            table.insert(newTbl, tbl[i])
         end
     end
     return newTbl
@@ -949,7 +963,7 @@ end
 function table.construct(...)
     local tbl = {}
     for _, v in ipairs({ ... }) do
-        tbl[#tbl + 1] = v
+        table.insert(tbl, v)
     end
     setmetatable(tbl, { __index = table })
     return tbl
@@ -962,7 +976,7 @@ end
 function table.constructRepeating(item, num)
     local tbl = table.construct()
     for _ = 1, num do
-        tbl[#tbl + 1] = item
+        table.insert(tbl, item)
     end
     return tbl
 end
@@ -977,7 +991,7 @@ function table.contains(tbl, item)
     end
     return false
 end
-table.includes = table.contains
+table.includes = table.contains -- provide alias bc i'm a js user kekw
 ---Removes duplicate values from a table.
 ---@param tbl table The original table.
 ---@return table tbl A new table with no duplicates.
@@ -1003,7 +1017,7 @@ function table.duplicate(tbl)
     if (tbl[1]) then
         for k5 = 1, #tbl do
             local value = tbl[k5]
-            dupeTbl[#dupeTbl + 1] = type(value) == 'table' and table.duplicate(value) or value
+            table.insert(dupeTbl, type(value) == 'table' and table.duplicate(value) or value)
         end
     else
         for _, key in ipairs(table.keys(tbl)) do
@@ -1036,7 +1050,7 @@ end
 function table.keys(tbl)
     local resultsTbl = table.construct()
     for k, _ in pairs(tbl) do
-        resultsTbl[#resultsTbl + 1] = k
+        table.insert(resultsTbl, k)
     end
     return table.dedupe(resultsTbl)
 end
@@ -1073,7 +1087,7 @@ function table.normalize(values, targetAverage, includeLastValue)
     if avgValue == 0 then return table.constructRepeating(0, #values) end
     local newValues = {}
     for i = 1, #values do
-        newValues[#newValues + 1] = (values[i] * targetAverage) / avgValue
+        table.insert(newValues, (values[i] * targetAverage) / avgValue)
     end
     return newValues
 end
@@ -1120,7 +1134,7 @@ function table.parse(str)
     if (tableType == 'arr') then
         for k6 = 1, #terms do
             local v = terms[k6]
-            tbl[#tbl + 1] = table.parse(v)
+            table.insert(tbl, table.parse(v))
         end
     else
         for k7 = 1, #terms do
@@ -1139,7 +1153,7 @@ end
 function table.property(tbl, property)
     local resultsTbl = {}
     for _, v in pairs(tbl) do
-        resultsTbl[#resultsTbl + 1] = v[property]
+        table.insert(resultsTbl, v[property])
     end
     return resultsTbl
 end
@@ -1164,7 +1178,7 @@ end
 function table.reverse(tbl)
     local reverseTbl = {}
     for i = 1, #tbl do
-        reverseTbl[#reverseTbl + 1] = tbl[#tbl + 1 - i]
+        table.insert(reverseTbl, tbl[#tbl + 1 - i])
     end
     return reverseTbl
 end
@@ -1239,7 +1253,7 @@ end
 ---@return string
 function table.stringify(var)
     if (type(var) == 'boolean') then return var and 'TRUE' or 'FALSE' end
-    if (type(var) == 'string') then return table.concat({'"', var, '"'}) end
+    if (type(var) == 'string') then return '"' .. var .. '"' end
     if (type(var) == 'number') then return var end
     if (type(var) ~= 'table') then return 'UNKNOWN' end
     if (var[1] ~= nil) then
@@ -1249,11 +1263,11 @@ function table.stringify(var)
             str = str .. table.stringify(v) .. ','
         end
         return str:sub(1, -2) .. ']'
-    end
+    end -- from below, must be a key-value table
     if (not isTruthy(table.keys(var))) then return '[]' end
     local str = '{'
     for k, v in pairs(var) do
-        str = str .. k .. table.concat({'=', table.stringify(v), ','})
+        str = str .. k .. '=' .. table.stringify(v) .. ','
     end
     return str:sub(1, -2) .. '}'
 end
@@ -1289,7 +1303,7 @@ function table.values(tbl)
     local resultsTbl = table.construct()
     for k11 = 1, #tbl do
         local v = tbl[k11]
-        resultsTbl[#resultsTbl + 1] = v
+        table.insert(resultsTbl, v)
     end
     return resultsTbl
 end
@@ -1360,26 +1374,24 @@ end
 function vctr2(n)
     return vector.New(n, n)
 end
-imgui_disable_vector_packing = true
-math.randomseed(os.time())
-DEFAULT_WIDGET_HEIGHT = 26
-DEFAULT_WIDGET_WIDTH = 160
-PADDING_WIDTH = 8
-RADIO_BUTTON_SPACING = 7.5
-SAMELINE_SPACING = 5
-ACTION_BUTTON_SIZE = vector.New(253, 42)
-PLOT_GRAPH_SIZE = vector.New(253, 100)
+DEFAULT_WIDGET_HEIGHT = 26                                             -- value determining the height of GUI widgets
+DEFAULT_WIDGET_WIDTH = 160                                             -- value determining the width of GUI widgets
+PADDING_WIDTH = 8                                                      -- value determining window and frame padding
+RADIO_BUTTON_SPACING = 7.5                                             -- value determining spacing between radio buttons
+SAMELINE_SPACING = 5                                                   -- value determining spacing between GUI items on the same row
+ACTION_BUTTON_SIZE = vector.New(253, 42)                               -- dimensions of the button that does important things
+PLOT_GRAPH_SIZE = vector.New(253, 100)                                 -- dimensions of the plot graph for SVs and note motion
 HALF_ACTION_BUTTON_SIZE = vector.New((253 - SAMELINE_SPACING) / 2, 42) -- dimensions of a button that does kinda important things
-SECONDARY_BUTTON_SIZE = vector.New(48, 24)
-TERTIARY_BUTTON_SIZE = vector.New(21.5, 24)
-EXPORT_BUTTON_SIZE = vector.New(40, 24)
-BEEG_BUTTON_SIZE = vector.New(253, 24)
-MIN_RGB_CYCLE_TIME = 0.1
-MAX_RGB_CYCLE_TIME = 300
-MAX_CURSOR_TRAIL_POINTS = 100
-MAX_SV_POINTS = 1024
-MAX_ANIMATION_FRAMES = 999
-MAX_IMPORT_CHARACTER_LIMIT = 999999
+SECONDARY_BUTTON_SIZE = vector.New(48, 24)                             -- dimensions of a button that does less important things
+TERTIARY_BUTTON_SIZE = vector.New(21.5, 24)                            -- dimensions of a button that does much less important things
+EXPORT_BUTTON_SIZE = vector.New(40, 24)                                -- dimensions of the export menu settings button
+BEEG_BUTTON_SIZE = vector.New(253, 24)                                 -- beeg button
+MIN_RGB_CYCLE_TIME = 0.1                                               -- minimum seconds for one complete RGB color cycle
+MAX_RGB_CYCLE_TIME = 300                                               -- maximum seconds for one complete RGB color cycle
+MAX_CURSOR_TRAIL_POINTS = 100                                          -- maximum number of points for cursor trail effects
+MAX_SV_POINTS = 1024                                                   -- maximum number of SV points allowed
+MAX_ANIMATION_FRAMES = 999                                             -- maximum number of animation frames allowed
+MAX_IMPORT_CHARACTER_LIMIT = 999999                                    -- maximum number of characters allowed for import text
 CHINCHILLA_TYPES = {
     'Exponential',
     'Polynomial',
@@ -1608,9 +1620,9 @@ VIBRATO_QUALITIES = {
     'Omega',
 }
 VIBRATO_FRAME_RATES = { 60, 90, 150, 210, 270 }
-VIBRATO_DETAILED_QUALITIES = {}
+VIBRATO_DETAILED_QUALITIES = {} -- what actually shows up in-game
 for i, v in pairs(VIBRATO_QUALITIES) do
-    VIBRATO_DETAILED_QUALITIES[#VIBRATO_DETAILED_QUALITIES + 1] = v .. table.concat({'  (~', VIBRATO_FRAME_RATES[i], 'fps)'})
+    table.insert(VIBRATO_DETAILED_QUALITIES, v .. '  (~' .. VIBRATO_FRAME_RATES[i] .. 'fps)')
 end
 VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
 DEFAULT_STYLE = {
@@ -1820,6 +1832,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
     globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
     globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
+    -- `table.duplicate` must be used to prevent YAML issues; more specifically, when setting a table's value to nil (which should erase the key) and writing, the YAML file contains the key with a null parameter. To fix this, we iterate over the table and reconstruct it from scratch (which is what `table.duplicate` does).
     globalVars.customStyles = table.duplicate(tempGlobalVars.customStyles)
     globalVars.disableKofiMessage = isTruthy(tempGlobalVars.disableKofiMessage)
     globalVars.disableLoadup = isTruthy(tempGlobalVars.disableLoadup)
@@ -1854,6 +1867,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.useEndTimeOffsets = isTruthy(tempGlobalVars.useEndTimeOffsets)
     globalVars.useMinDisplacementMultiplier = isTruthy(tempGlobalVars.useMinDisplacementMultiplier, true)
     globalVars.useSelectionForNavigation = isTruthy(tempGlobalVars.useSelectionForNavigation)
+    -- All fields below are colors that must be vectorized to properly perform color arithmetic.
     local forceVectorizeList = { 'border', 'loadupOpeningTextColor', 'loadupPulseTextColorLeft',
         'loadupPulseTextColorRight', 'loadupBgTl', 'loadupBgTr', 'loadupBgBl', 'loadupBgBr' }
     if (tempGlobalVars.customStyles) then
@@ -1869,6 +1883,7 @@ function setGlobalVars(tempGlobalVars)
     else
         globalCustomStyle = {}
     end
+    -- All fields below are not settings, but menu operators that need to be kept on hot-reload.
     globalVars.placeTypeIndex = state.GetValue('global.placeTypeIndex', globalVars.placeTypeIndex)
     globalVars.editToolIndex = state.GetValue('global.editToolIndex', globalVars.editToolIndex)
     globalVars.selectTypeIndex = state.GetValue('global.selectTypeIndex', globalVars.selectTypeIndex)
@@ -2058,6 +2073,7 @@ DEFAULT_STARTING_MENU_VARS = {
 ---@return table
 function getMenuVars(menuType, optionalLabel)
     local menuKey = menuType:identify()
+    -- local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuKey])
     local menuVars = DEFAULT_STARTING_MENU_VARS[menuKey]
     local labelText = table.concat({ menuType, optionalLabel or '', 'Menu' })
     cache.loadTable(labelText, menuVars)
@@ -2389,6 +2405,8 @@ function displaceNotesForAnimationFrames(settingVars)
     end
     getRemovableSVs(svsToRemove, svTimeIsAdded, firstOffset, lastOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)
+    -- Maybe add in future: use svbeforebefore + isnotetimeadded to
+    -- account for displacement discrepancies (if discrepancy is above certain amount)
 end
 function automateCopySVs(settingVars)
     settingVars.copiedSVs = {}
@@ -2428,7 +2446,7 @@ function automateSVs(settingVars)
     local idIndex = 0
     for idx, ho in pairs(selected) do
         if (not settingVars.maintainMs and idx == 1) then goto nextSelected end
-        do
+        do -- avoid jumping over local scope error
             local thisTime = isTruthy(ho.EndTime) and ho.EndTime or ho.StartTime
             local prevTime = isTruthy(selected[math.max(1, idx - 1)].EndTime) and selected[math.max(1, idx - 1)].EndTime or
                 selected[math.max(1, idx - 1)].StartTime
@@ -2473,7 +2491,7 @@ function automateSVs(settingVars)
         local b = math.random(255)
         local tg = createSG(data.svs, settingVars.initialSV or 1, table.concat({ r, g, b }, ','))
         local action = createEA(action_type.CreateTimingGroup, id, tg, data.hos)
-        actionList[#actionList + 1] = action
+        table.insert(actionList, action)
     end
     actions.PerformBatch(actionList)
     toggleablePrint('w!', 'Automated.')
@@ -2801,7 +2819,7 @@ function ssfVibrato(menuVars, func1, func2)
     actions.PerformBatch({
         createEA(action_type.AddScrollSpeedFactorBatch, ssfs),
     })
-    toggleablePrint('s!', table.concat({'Created ', #ssfs, pluralize(' SSF.', #ssfs, -2)}))
+    toggleablePrint('s!', 'Created ' .. #ssfs .. pluralize(' SSF.', #ssfs, -2))
 end
 ---comment
 ---@param menuVars any
@@ -2888,11 +2906,11 @@ function svVibrato(menuVars, heightFn)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function deviateVibratoHeight(initHeight, deviationIndex, deviationDistance)
-    if (deviationIndex == 1) then return initHeight end
-    if (deviationIndex == 2) then
+    if (deviationIndex == 1) then return initHeight end -- None
+    if (deviationIndex == 2) then                       -- Linear
         return initHeight + (math.random() * 2 - 1) * deviationDistance
     end
-    if (deviationIndex == 3) then
+    if (deviationIndex == 3) then -- Gaussian
         local stdDevTolerance = 2
         return initHeight + math.gaussianRandom(0, deviationDistance / stdDevTolerance, stdDevTolerance)
     end
@@ -2923,7 +2941,7 @@ function deleteItems(menuVars)
                 action_type.RemoveBookmarkBatch, bmsToRemove) })
     end
     if (isTruthy(linesToRemove)) then
-        toggleablePrint('e!', table.concat({'Deleted ', #linesToRemove, pluralize(' timing point.', #linesToRemove, -2)}))
+        toggleablePrint('e!', 'Deleted ' .. #linesToRemove .. pluralize(' timing point.', #linesToRemove, -2))
     end
     if (isTruthy(svsToRemove)) then
         toggleablePrint('e!',
@@ -2934,7 +2952,7 @@ function deleteItems(menuVars)
             'Deleted ' .. #ssfsToRemove .. pluralize(' scroll speed factor.', #ssfsToRemove, -2))
     end
     if (isTruthy(bmsToRemove)) then
-        toggleablePrint('e!', table.concat({'Deleted ', #bmsToRemove, pluralize(' bookmark.', #bmsToRemove, -2)}))
+        toggleablePrint('e!', 'Deleted ' .. #bmsToRemove .. pluralize(' bookmark.', #bmsToRemove, -2))
     end
 end
 function addTeleportSVs(menuVars)
@@ -2991,7 +3009,7 @@ function changeGroups(menuVars)
             table.insert(actionList, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
         end
         state.SelectedScrollGroupId = menuVars
-            .designatedTimingGroup
+            .designatedTimingGroup -- must change in the middle because previous line applies to previous tg, next line applies to next tg
         table.insert(actionList, createEA(action_type.AddScrollVelocityBatch, svsToAdd))
     end
     if willChangeSSFs then
@@ -3009,12 +3027,12 @@ function changeGroups(menuVars)
     if willChangeSVs then
         toggleablePrint('s!',
             'Successfully moved ' .. #svsToRemove ..
-            pluralize(' SV', #svsToRemove) .. table.concat({' to "', menuVars.designatedTimingGroup, '".'}))
+            pluralize(' SV', #svsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
     end
     if willChangeSSFs then
         toggleablePrint('s!',
             'Successfully moved ' .. #ssfsToRemove ..
-            pluralize(' SSF', #ssfsToRemove) .. table.concat({' to "', menuVars.designatedTimingGroup, '".'}))
+            pluralize(' SSF', #ssfsToRemove) .. ' to "' .. menuVars.designatedTimingGroup .. '".')
     end
 end
 function storeDuplicateItems(menuVars)
@@ -3044,10 +3062,10 @@ function storeDuplicateItems(menuVars)
         local svs = game.get.svsBetweenOffsets(startOffset, endOffset)
         local ssfs = game.get.ssfsBetweenOffsets(startOffset, endOffset)
         for _, sv in pairs(svs) do
-            svTbl[tgId][#svTbl[tgId] + 1] = sv
+            table.insert(svTbl[tgId], sv)
         end
         for _, ssf in pairs(ssfs) do
-            ssfTbl[tgId][#ssfTbl[tgId] + 1] = ssf
+            table.insert(ssfTbl[tgId], ssf)
         end
     end
     state.SelectedScrollGroupId = ogTg
@@ -3076,7 +3094,7 @@ function placeDuplicateItems(menuVars)
         if (obj.type == 'ho' and not menuVars.dontCloneHos) then
             local ho = utils.CreateHitObject(data.StartTime + offset, data.Lane,
                 data.EndTime == 0 and 0 or data.EndTime + offset, data.HitSound, data.EditorLayer)
-            hosToAdd[#hosToAdd + 1] = ho
+            table.insert(hosToAdd, ho)
             table.insert(moveActions, createEA(action_type.MoveObjectsToTimingGroup, { ho }, data.TimingGroup))
         end
         if (obj.type == 'tl') then
@@ -3340,7 +3358,7 @@ function pasteItems(menuVars)
         createEA(action_type.AddBookmarkBatch, bmsToAdd),
     })
     if (isTruthy(linesToRemove)) then
-        toggleablePrint('e!', table.concat({'Deleted ', #linesToRemove, pluralize(' timing point.', #linesToRemove, -2)}))
+        toggleablePrint('e!', 'Deleted ' .. #linesToRemove .. pluralize(' timing point.', #linesToRemove, -2))
     end
     if (isTruthy(svsToRemove)) then
         toggleablePrint('e!',
@@ -3351,10 +3369,10 @@ function pasteItems(menuVars)
             'Deleted ' .. #ssfsToRemove .. pluralize(' scroll speed factor.', #ssfsToRemove, -2))
     end
     if (isTruthy(bmsToRemove)) then
-        toggleablePrint('e!', table.concat({'Deleted ', #bmsToRemove, pluralize(' bookmark.', #bmsToRemove, -2)}))
+        toggleablePrint('e!', 'Deleted ' .. #bmsToRemove .. pluralize(' bookmark.', #bmsToRemove, -2))
     end
     if (isTruthy(linesToAdd)) then
-        toggleablePrint('s!', table.concat({'Created ', #linesToAdd, pluralize(' timing point.', #linesToAdd, -2)}))
+        toggleablePrint('s!', 'Created ' .. #linesToAdd .. pluralize(' timing point.', #linesToAdd, -2))
     end
     if (isTruthy(svsToAdd)) then
         toggleablePrint('s!',
@@ -3365,7 +3383,7 @@ function pasteItems(menuVars)
             'Created ' .. #ssfsToAdd .. pluralize(' scroll speed factor.', #ssfsToAdd, -2))
     end
     if (isTruthy(bmsToAdd)) then
-        toggleablePrint('s!', table.concat({'Created ', #bmsToAdd, pluralize(' bookmark.', #bmsToAdd, -2)}))
+        toggleablePrint('s!', 'Created ' .. #bmsToAdd .. pluralize(' bookmark.', #bmsToAdd, -2))
     end
 end
 function tryAlignToHitObjects(time, hitObjectTimes, alignWindow)
@@ -3468,6 +3486,10 @@ function dynamicScaleSVs(menuVars)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
             endOffset)
+        --[[
+        local currentAvgSV = currentDistance / (endOffset - startOffset)
+        local scalingFactor = targetAvgSV / currentAvgSV
+        --]]
         local targetDistance = targetAvgSV * (endOffset - startOffset)
         local scalingFactor = targetDistance / currentDistance
         for k24 = 1, #svsBetweenOffsets do
@@ -3570,7 +3592,7 @@ function layerSnaps()
             table.insert(layerDict[newLayerName].hos, ho)
         else
             layerDict[newLayerName] = { hos = { ho }, ColorRgb = layer.ColorRgb, Hidden = layer.Hidden }
-            layerNames[#layerNames + 1] = newLayerName
+            table.insert(layerNames, newLayerName)
         end
     end
     local createLayerQueue = {}
@@ -3595,7 +3617,7 @@ function collapseSnaps()
     for _, ho in ipairs(map.HitObjects) do
         for _, tp in ipairs(map.TimingPoints) do
             if ho.StartTime - snapInterval <= tp.StartTime and tp.StartTime <= ho.StartTime + snapInterval then
-                tpsToRemove[#tpsToRemove + 1] = tp
+                table.insert(tpsToRemove, tp)
             end
             if tp.StartTime > ho.StartTime + snapInterval then break end
         end
@@ -3672,18 +3694,18 @@ function alignTimingLines()
             table.remove(noteTimes, 1)
         end
         if (not isTruthy(noteTimes)) then
-            times[#times + 1] = originalTime
+            table.insert(times, originalTime)
         elseif (math.abs(noteTimes[1] - originalTime) <= 5) then
-            times[#times + 1] = noteTimes[1]
+            table.insert(times, noteTimes[1])
         else
-            times[#times + 1] = originalTime
+            table.insert(times, originalTime)
         end
     end
     for k26 = 1, #times do
         local time = times[k26]
         local initialTl = game.get.timingPointAt(time)
         if (initialTl.StartTime == time) then
-            tpsToRemove[#tpsToRemove + 1] = initialTl
+            table.insert(tpsToRemove, initialTl)
         end
         table.insert(tpsToAdd, utils.CreateTimingPoint(time, initialTl.Bpm, initialTl.Signature, initialTl.Hidden))
     end
@@ -3691,7 +3713,7 @@ function alignTimingLines()
         createEA(action_type.AddTimingPointBatch, tpsToAdd),
         createEA(action_type.RemoveTimingPointBatch, tpsToRemove),
     })
-    toggleablePrint('s!', table.concat({'Created ', #tpsToAdd, pluralize(' timing point.', #tpsToAdd, -2)}))
+    toggleablePrint('s!', 'Created ' .. #tpsToAdd .. pluralize(' timing point.', #tpsToAdd, -2))
     if (isTruthy(tpsToRemove)) then
         toggleablePrint('e!',
             'Deleted ' .. #tpsToRemove .. pluralize(' timing point.', #tpsToRemove, -2))
@@ -3755,16 +3777,16 @@ function mergeSVsAndSSFs()
         local svsToRemove = {}
         local ssfTimeDict = {}
         local ssfsToRemove = {}
-        for _, sv in ipairs(table.reverse(map.ScrollVelocities)) do
+        for _, sv in ipairs(table.reverse(map.ScrollVelocities)) do -- reverse to prioritize second sv in list
             if (svTimeDict[sv.StartTime]) then
-                svsToRemove[#svsToRemove + 1] = sv
+                table.insert(svsToRemove, sv)
             else
                 svTimeDict[sv.StartTime] = true
             end
         end
-        for _, ssf in ipairs(table.reverse(map.ScrollSpeedFactors)) do
+        for _, ssf in ipairs(table.reverse(map.ScrollSpeedFactors)) do -- reverse to prioritize second sv in list
             if (ssfTimeDict[ssf.StartTime]) then
-                ssfsToRemove[#ssfsToRemove + 1] = ssf
+                table.insert(ssfsToRemove, ssf)
             else
                 ssfTimeDict[ssf.StartTime] = true
             end
@@ -3791,7 +3813,7 @@ function mergeNotes()
             if (not noteDict[ho.StartTime][ho.Lane]) then
                 noteDict[ho.StartTime][ho.Lane] = true
             else
-                notesToRemove[#notesToRemove + 1] = ho
+                table.insert(notesToRemove, ho)
             end
         end
     end
@@ -3810,7 +3832,7 @@ function removeUnnecessarySVsAndSSFs()
         local prevMultiplier = state.SelectedScrollGroup.InitialScrollVelocity or map.InitialScrollVelocity or 1
         for _, sv in ipairs(map.ScrollVelocities) do
             local m = sv.Multiplier
-            if m == prevMultiplier then svsToRemove[#svsToRemove + 1] = sv end
+            if m == prevMultiplier then table.insert(svsToRemove, sv) end
             prevMultiplier = m
         end
         table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove, tg))
@@ -3823,7 +3845,7 @@ function removeUnnecessarySVsAndSSFs()
         for idx, ssf in ipairs(map.ScrollSpeedFactors) do
             if (idx == 1) then goto nextSSF end
             if (ssf.Multiplier == prevSSFMult and prevSSFMult == doublePrevSSFMult) then
-                ssfsToRemove[#ssfsToRemove + 1] = atRiskSSF
+                table.insert(ssfsToRemove, atRiskSSF)
             end
             ::nextSSF::
             doublePrevSSFMult = prevSSFMult
@@ -3852,7 +3874,7 @@ function removeAllHitSounds()
         local hs = tonumber(ho.HitSound)
         if hs > 1 then
             table.insert(hitsoundActions, createEA(action_type.RemoveHitsound, { ho }, hs))
-            objs[#objs + 1] = ho.StartTime .. '|' .. ho.Lane
+            table.insert(objs, ho.StartTime .. '|' .. ho.Lane)
         end
     end
     local type = isTruthy(hitsoundActions) and 's!' or 'w!'
@@ -3885,12 +3907,12 @@ function removePostTGSVsAndSSFs()
             local ssfsToRemove = {}
             for _, sv in pairs(map.ScrollVelocities) do
                 if (sv.StartTime > maxTime + 1) then
-                    svsToRemove[#svsToRemove + 1] = sv
+                    table.insert(svsToRemove, sv)
                 end
             end
             for _, ssf in pairs(map.ScrollSpeedFactors) do
                 if (ssf.StartTime > maxTime + 1) then
-                    ssfsToRemove[#ssfsToRemove + 1] = ssf
+                    table.insert(ssfsToRemove, ssf)
                 end
             end
             prepareDisplacingSVs(maxTime, svsToAdd, {}, nil,
@@ -3959,6 +3981,7 @@ function reverseScrollSVs(menuVars)
     local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
     addStartSVIfMissing(svsBetweenOffsets, startOffset)
     local sectionDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
+    -- opposite-sign distances and displacements b/c flips SV multiplier signs at the end
     local msxSeparatingDistance = -10000
     local teleportDistance = -sectionDistance + msxSeparatingDistance
     local noteDisplacement = -menuVars.distance
@@ -3980,7 +4003,7 @@ function reverseScrollSVs(menuVars)
     for k28 = 1, #svsBetweenOffsets do
         local sv = svsBetweenOffsets[k28]
         if (not svTimeIsAdded[sv.StartTime]) then
-            almostSVsToAdd[#almostSVsToAdd + 1] = sv
+            table.insert(almostSVsToAdd, sv)
         end
     end
     for k29 = 1, #almostSVsToAdd do
@@ -4103,12 +4126,12 @@ function splitNotes(menuVars)
         if (not table.includes(existingIds, id)) then
             local tg = createSG(svs, 1, color.rgbaToStr(generateRGBColor(false)))
             local ea = createEA(action_type.CreateTimingGroup, id, tg, noteList)
-            editorActions[#editorActions + 1] = ea
+            table.insert(editorActions, ea)
         else
             local ea = createEA(action_type.MoveObjectsToTimingGroup, noteList, id)
             local svEa = createEA(action_type.AddScrollVelocityBatch, svs, map.TimingGroups[id])
-            editorActions[#editorActions + 1] = ea
-            editorActions[#editorActions + 1] = svEa
+            table.insert(editorActions, ea)
+            table.insert(editorActions, svEa)
         end
     end
     actions.PerformBatch(editorActions)
@@ -4156,7 +4179,7 @@ function verticalShiftSVs(menuVars)
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
 function changeNoteLockMode()
-    local mode = state.GetValue("noteLockMode") or 0
+    local mode = cache.noteLockMode or 0
     mode = (mode + 1) % 4
     if mode == 0 then
         print('s', 'Notes have been unlocked.')
@@ -4176,19 +4199,19 @@ function changeNoteLockMode()
             'Notes can no longer be moved, only placed and deleted. To change the lock mode, press ' ..
             globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. '.')
     end
-    state.SetValue("noteLockMode", mode)
+    cache.noteLockMode = mode
 end
 function initializeNoteLockMode()
-    state.SetValue("noteLockMode", 0)
+    cache.noteLockMode = 0
     listen(function(action, type, fromLua)
         if fromLua then return end
         local actionIndex = tonumber(action.Type) ---@cast actionIndex EditorActionType
-        local mode = state.GetValue("noteLockMode") or 0
-        if mode == 1 then
+        local mode = cache.noteLockMode or 0
+        if mode == 1 then -- No note modification at all
             if actionIndex >= action_type.CreateLayer then return end
             actions.Undo()
         end
-        if mode == 2 then
+        if mode == 2 then -- Only place and delete notes
             local allowedActions = {
                 action_type.PlaceHitObject,
                 action_type.RemoveHitObject,
@@ -4200,7 +4223,7 @@ function initializeNoteLockMode()
             if (not table.contains(allowedActions, actionIndex)) then return end
             actions.Undo()
         end
-        if mode == 3 then
+        if mode == 3 then -- Only move notes
             local allowedActions = {
                 action_type.ResizeLongNote,
                 action_type.FlipHitObjects,
@@ -4213,7 +4236,7 @@ function initializeNoteLockMode()
     end)
 end
 function changeTGIndex(diff)
-    local groups = state.GetValue("tgList")
+    local groups = cache.tgList
     local selectedTgDict = {}
     if (not isTruthy(state.SelectedHitObjects) or not globalVars.useSelectionForNavigation) then
         globalVars.scrollGroupIndex = math.wrap(globalVars.scrollGroupIndex + diff, 1, #groups, true)
@@ -4251,7 +4274,7 @@ function jumpToTg()
     state.SelectedScrollGroupId = tgId
 end
 function checkForGlobalHotkeys()
-    if (isTruthy(state.GetValue('hotkey_awaitingIndex', 0))) then return end
+    if (isTruthy(state.GetValue('hotkey_awaitingIndex', 0))) then return end -- Disable hotkeys when editing keybinds
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_note_tg])) then jumpToTg() end
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.toggle_note_lock])) then changeNoteLockMode() end
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.toggle_end_offset])) then toggleUseEndOffsets() end
@@ -4290,11 +4313,11 @@ function getMapStats()
     print('s!',
         "That's an average of " ..
         math.round(svSum * 1000 / map.TrackLength, 2) ..
-        table.concat({' SVs per second, or ', math.round(ssfSum * 1000 / map.TrackLength, 2), ' SSFs per second.'}))
-    print('s!', table.concat({'This map also contains ', #map.TimingPoints, pluralize(' timing point.', #map.TimingPoints, -2)}))
+        ' SVs per second, or ' .. math.round(ssfSum * 1000 / map.TrackLength, 2) .. ' SSFs per second.')
+    print('s!', 'This map also contains ' .. #map.TimingPoints .. pluralize(' timing point.', #map.TimingPoints, -2))
     print('s!',
         'This map has ' ..
-        svSum .. table.concat({' SVs and ', ssfSum, ' SSFs across '}) .. #tgList .. pluralize(' timing group.', #tgList, -2))
+        svSum .. ' SVs and ' .. ssfSum .. ' SSFs across ' .. #tgList .. pluralize(' timing group.', #tgList, -2))
     print('w!',
         'Remember that the quality of map has no correlation with the object count! Try to be optimal in your object usage.')
     state.SelectedScrollGroupId = currentTG
@@ -4309,13 +4332,13 @@ function selectAlternating(menuVars)
     local times = {}
     for k36 = 1, #notes do
         local ho = notes[k36]
-        times[#times + 1] = ho.StartTime
+        table.insert(times, ho.StartTime)
     end
     times = table.dedupe(times)
     local allowedTimes = {}
     for i, time in pairs(times) do
         if ((i - menuVars.offset) % menuVars.every == 0) then
-            allowedTimes[#allowedTimes + 1] = time
+            table.insert(allowedTimes, time)
         end
     end
     local notesToSelect = {}
@@ -4328,7 +4351,7 @@ function selectAlternating(menuVars)
             index = index + 1
         end
         if (note.StartTime == currentTime) then
-            notesToSelect[#notesToSelect + 1] = note
+            table.insert(notesToSelect, note)
         end
     end
     actions.SetHitObjectSelection(notesToSelect)
@@ -4345,13 +4368,17 @@ function selectByChordSizes(menuVars)
     local noteTimeTable = {}
     for k38 = 1, #notes do
         local note = notes[k38]
-        noteTimeTable[#noteTimeTable + 1] = note.StartTime
+        table.insert(noteTimeTable, note.StartTime)
     end
     noteTimeTable = table.dedupe(noteTimeTable)
     local sizeDict = {}
     for idx = 1, game.keyCount do
-        sizeDict[#sizeDict + 1] = {}
+        table.insert(sizeDict, {})
     end
+    -- local allowedOrdering = {}
+    -- for n in tostring(menuVars.laneSelector):gmatch("%d") do
+    --     table.insert(allowedOrdering, tn(n))
+    -- end
     for k39 = 1, #noteTimeTable do
         local time = noteTimeTable[k39]
         local size = 0
@@ -4362,7 +4389,9 @@ function selectByChordSizes(menuVars)
             if (math.abs(note.StartTime - time) < 3) then
                 size = size + 1
                 curLane = curLane + 1
-                totalNotes[#totalNotes + 1] = note
+                -- if (table.contains(allowedOrdering, curLane)) then
+                table.insert(totalNotes, note)
+                -- end
             end
         end
         sizeDict[size] = table.combine(sizeDict[size], totalNotes)
@@ -4394,12 +4423,12 @@ function selectByNoteType(menuVars)
             if (note.Type == hitobject_type.Mine and not menuVars.mine) then
                 goto skipType
             end
-            if (note.EndTime == 0 and menuVars.rice) then notesToSelect[#notesToSelect + 1] = note end
-            if (note.EndTime ~= 0 and menuVars.ln) then notesToSelect[#notesToSelect + 1] = note end
+            if (note.EndTime == 0 and menuVars.rice) then table.insert(notesToSelect, note) end
+            if (note.EndTime ~= 0 and menuVars.ln) then table.insert(notesToSelect, note) end
             ::skipType::
         else
-            if (note.EndTime == 0 and menuVars.rice) then notesToSelect[#notesToSelect + 1] = note end
-            if (note.EndTime ~= 0 and menuVars.ln) then notesToSelect[#notesToSelect + 1] = note end
+            if (note.EndTime == 0 and menuVars.rice) then table.insert(notesToSelect, note) end
+            if (note.EndTime ~= 0 and menuVars.ln) then table.insert(notesToSelect, note) end
         end
     end
     actions.SetHitObjectSelection(notesToSelect)
@@ -4415,7 +4444,7 @@ function selectBySnap(menuVars)
     local notesToSelect = {}
     for _, note in pairs(notes) do
         local snap = game.get.snapAt(note.StartTime, true)
-        if (snap == menuVars.snap) then notesToSelect[#notesToSelect + 1] = note end
+        if (snap == menuVars.snap) then table.insert(notesToSelect, note) end
     end
     actions.SetHitObjectSelection(notesToSelect)
     print(isTruthy(notesToSelect) and 's!' or 'w!', #notesToSelect .. ' notes selected')
@@ -4431,7 +4460,7 @@ function selectByTimingGroup(menuVars)
     notes = sort(notes, sortAscendingNoteLaneTime)
     for _, note in pairs(notes) do
         if (note.TimingGroup == menuVars.designatedTimingGroup) then
-            notesToSelect[#notesToSelect + 1] = note
+            table.insert(notesToSelect, note)
         end
     end
     actions.SetHitObjectSelection(notesToSelect)
@@ -4463,12 +4492,12 @@ function renderDynamicConnection()
     local dim = imgui.GetWindowSize()
     local dt = state.DeltaTime * 0.05
     if (#nodes_xList < 18) then
-        nodes_xList[#nodes_xList + 1] = topLeft.x + math.random() * dim.x
-        nodes_yList[#nodes_yList + 1] = topLeft.y + math.random() * dim.y
-        nodes_vxList[#nodes_vxList + 1] = math.random() * 2 - 1
-        nodes_vyList[#nodes_vyList + 1] = math.random() * 2 - 1
-        nodes_lifetimes[#nodes_lifetimes + 1] = 0
-        nodes_distsToNearestEdge[#nodes_distsToNearestEdge + 1] = 67000
+        table.insert(nodes_xList, topLeft.x + math.random() * dim.x)
+        table.insert(nodes_yList, topLeft.y + math.random() * dim.y)
+        table.insert(nodes_vxList, math.random() * 2 - 1)
+        table.insert(nodes_vyList, math.random() * 2 - 1)
+        table.insert(nodes_lifetimes, 0)
+        table.insert(nodes_distsToNearestEdge, 67000)
     end
     local mainCol = imgui.GetColorU32('TabSelected', 6742069)
     local maxDist = (math.min(dim.x * 0.6, dim.y * 0.6)) ^ 2
@@ -4534,7 +4563,8 @@ function renderReactiveSingularities()
     local dimY = dim.y
     local sqrt = math.sqrt
     local clamp = math.clamp
-    local pulseStatus = state.GetValue("pulseValue") or 0
+    -- DOES NOT USE GETVARIABLES PARADIGM DUE TO FRAME RATE INEFFICIENCY
+    local pulseStatus = cache.pulseValue or 0
     local slowSpeedR = 89
     local slowSpeedG = 0
     local slowSpeedB = 255
@@ -4642,6 +4672,7 @@ function renderReactiveStars()
         local brightness = clamp(-8 * progress * (progress - 1), -1, 1)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
         if brightness < 0 then goto nextStar end
+        -- ctx.AddCircleFilled(pos, sz * 2, color.alterOpacity(color.int.white, (255 - math.floor(brightness * 255)) - 255))
         ctx.AddCircleFilled(pos, sz * 2, color.int.white + color.int.alphaMask * 255 * (brightness / 10 - 1))
         ctx.AddCircleFilled(pos, sz, color.int.white + color.int.alphaMask * 255 * (brightness - 1))
         ::nextStar::
@@ -4694,7 +4725,7 @@ function renderSVSpectrogram()
     local binScalingFactor = 1.1
     local taperMinTime = 50
     local taperMaxTime = 2000
-    local tgCount = #state.GetValue("tgList")
+    local tgCount = #cache.tgList
     for tgId, tg in pairs(map.TimingGroups) do
         local col
         local binValues = {}
@@ -4719,7 +4750,7 @@ function renderSVSpectrogram()
                 if (side == -1) then
                     table.insert(binValues, 1, str)
                 else
-                    binValues[#binValues + 1] = str
+                    table.insert(binValues, str)
                 end
             end
         end
@@ -4748,13 +4779,13 @@ function renderSVSpectrogram()
     end
 end
 function smoothenSpectrogram(data)
-    if (not state.GetValue("gaussianKernel")) then
+    if (not cache.gaussianKernel) then
         local k, r = math.createKernel('gaussian', { sigma = 2.6 })
-        state.SetValue("gaussianKernel", k)
-        state.SetValue("gaussianRadius", r)
+        cache.gaussianKernel = k
+        cache.gaussianRadius = r
     end
-    local kernel = state.GetValue("gaussianKernel")
-    local radius = state.GetValue("gaussianRadius")
+    local kernel = cache.gaussianKernel
+    local radius = cache.gaussianRadius
     local result = {}
     for i = 1, #data do
         local acc = 0
@@ -4792,10 +4823,15 @@ function drawCapybara()
     local eyeColor = color.rgbaToUint(30, 20, 35, 255)
     local earColor = color.rgbaToUint(62, 10, 145, 255)
     local stemColor = color.rgbaToUint(0, 255, 0, 255)
+    -- draws capybara ear
     o.AddCircleFilled(earCoords, earRadius, earColor)
+    -- draws capybara head
     drawHorizontalPillShape(o, headCoords1, headCoords2, headRadius, bodyColor, 12)
+    -- draw capybara eyes
     drawHorizontalPillShape(o, eyeCoords1, eyeCoords2, eyeRadius, eyeColor, 12)
+    -- draws capybara body
     o.AddRectFilled(table.vectorize2(sz), headCoords1, bodyColor)
+    -- draws capybara stem
     o.AddRectFilled(vector.New(stemCoords.x, stemCoords.y), vector.New(stemCoords.x + 10, stemCoords.y + 20),
         stemColor)
     o.AddRectFilled(vector.New(stemCoords.x - 10, stemCoords.y), vector.New(stemCoords.x + 20, stemCoords.y - 5),
@@ -4962,6 +4998,7 @@ end
 function drawCapybara312()
     if not globalVars.drawCapybara312 then return end
     local o = imgui.GetForegroundDrawList()
+    --local sz = state.WindowSize
     local outlineColor = color.vrgbaToUint(getCurrentRGBColors(globalVars.rgbPeriod, 1))
     local p1 = vector.New(42, 32)
     local p2 = vector.New(100, 78)
@@ -5012,6 +5049,14 @@ function drawCapybara312()
     o.AddCircleFilled(p26, eyeRadius, outlineColor, numSements)
     o.AddCircleFilled(p27, eyeRadius, outlineColor, numSements)
 end
+-- Draws a horizontal pill shape
+-- Parameters
+--    o              : imgui overlay drawlist [imgui.GetForegroundDrawList()]
+--    point1         : (x, y) coordiates of the center of the pill's first circle [Table]
+--    point2         : (x, y) coordiates of the center of the pill's second circle [Table]
+--    radius         : radius of the circle of the pill [Int/Float]
+--    color          : color of the pill represented as a uint [Int]
+--    circleSegments : number of segments to draw for the circles in the pill [Int]
 function drawHorizontalPillShape(o, point1, point2, radius, color, circleSegments)
     o.AddCircleFilled(point1, radius, color, circleSegments)
     o.AddCircleFilled(point2, radius, color, circleSegments)
@@ -5021,16 +5066,17 @@ function drawHorizontalPillShape(o, point1, point2, radius, color, circleSegment
 end
 function logoThread()
     curTime = state.UnixTime or 0
+    -- If state.DeltaTime is significantly off of the computed delta time, that means that the computed delta time was delayed in some way. This is used to detect when the plugin is turned off and on (not rapidly).
     if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 60000) then
-        state.SetValue("logoStartTime", clock.getTime())
-        if (state.GetValue("logoStartTime") < 2.5) then
-            state.SetValue("logoStartTime", state.GetValue("logoStartTime") + 0.75)
+        cache.logoStartTime = clock.getTime()
+        if (cache.logoStartTime < 2.5) then
+            cache.logoStartTime = cache.logoStartTime + 0.75
         end
     end
     prevTime = state.UnixTime
-    local currentTime = clock.getTime() - state.GetValue("logoStartTime")
+    local currentTime = clock.getTime() - cache.logoStartTime
     local logoLength = 3
-    if ((state.GetValue("logoStartTime") < 3 or loaded) and not globalVars.disableLoadup) then
+    if ((cache.logoStartTime < 3 or loaded) and not globalVars.disableLoadup) then
         if (currentTime >= 0 and currentTime <= logoLength) then
             drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
                 loadup.OpeningTextColor or DEFAULT_STYLE.loadupOpeningTextColor, 4,
@@ -5038,7 +5084,7 @@ function logoThread()
                 DEFAULT_STYLE.loadupPulseTextColorRight })
         end
     else
-        state.SetValue("logoStartTime", clock.getTime() - 5)
+        cache.logoStartTime = clock.getTime() - 5
     end
     loaded = true
 end
@@ -6099,13 +6145,16 @@ function drawCursorTrail()
     local m = imgui.GetMousePos()
     local t = clock.getTime()
     local sz = state.WindowSize
-    if cursorTrail ~= 'Snake' then state.SetValue("boolean.snakeTrailInitialized", false) end
-    if cursorTrail ~= 'Dust' then state.SetValue("boolean.dustParticlesInitialized", false) end
-    if cursorTrail ~= 'Sparkle' then state.SetValue("boolean.sparkleParticlesInitialized", false) end
+    if cursorTrail ~= 'Snake' then cache.boolean.snakeTrailInitialized = false end
+    if cursorTrail ~= 'Dust' then cache.boolean.dustParticlesInitialized = false end
+    if cursorTrail ~= 'Sparkle' then cache.boolean.sparkleParticlesInitialized = false end
     if cursorTrail == 'Snake' then drawSnakeTrail(o, m, t) end
     if cursorTrail == 'Dust' then drawDustTrail(o, m, t, sz) end
     if cursorTrail == 'Sparkle' then drawSparkleTrail(o, m, t, sz) end
 end
+--    o          : [imgui overlay drawlist]
+--    m          : current (x, y) mouse position [Table]
+--    t          : current in-game plugin time [Int/Float]
 function drawSnakeTrail(o, m, t)
     local trailPoints = globalVars.cursorTrailPoints
     local snakeTrailPoints = {}
@@ -6119,8 +6168,13 @@ function drawSnakeTrail(o, m, t)
     renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, globalVars.cursorTrailSize,
         globalVars.cursorTrailGhost, trailShape)
 end
+-- Initializes the points of the snake trail
+-- Parameters
+--    snakeTrailPoints : list of points used for the snake trail [Table]
+--    m                : current (x, y) mouse position [Table]
+--    trailPoints      : number of trail points for the snake trail [Int]
 function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
-    if (state.GetValue("boolean.snakeTrailInitialized")) then
+    if (cache.boolean.snakeTrailInitialized) then
         for i = 1, trailPoints do
             snakeTrailPoints[i] = {}
         end
@@ -6129,9 +6183,16 @@ function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
     for i = 1, trailPoints do
         snakeTrailPoints[i] = m
     end
-    state.SetValue("boolean.snakeTrailInitialized", true)
+    cache.boolean.snakeTrailInitialized = true
     cache.saveTable('snakeTrailPoints', snakeTrailPoints)
 end
+-- Updates the points of the snake trail
+-- Parameters
+--    snakeTrailPoints    : list of data used for the snake trail [Table]
+--    needTrailUpdate     : whether or not the trail info needs to be updated [Boolean]
+--    m                   : current (x, y) mouse position [Table]
+--    trailPoints         : number of trail points to update [Int]
+--    snakeSpringConstant : how much to update the trail points per frame (0.01 to 1) [Int/Float]
 function updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoints,
                                 snakeSpringConstant)
     if not needTrailUpdate then return end
@@ -6146,6 +6207,15 @@ function updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoint
         end
     end
 end
+-- Draws the points of the snake trail
+-- Parameters
+--    o                : [imgui overlay drawlist]
+--    m                : current (x, y) mouse position [Table]
+--    snakeTrailPoints : list of data used for the snake trail [Table]
+--    trailPoints      : number of trail points to draw [Int]
+--    cursorTrailSize  : size of the cursor trail points [Int]
+--    cursorTrailGhost : whether or not to make later trail points more transparent [Boolean]
+--    trailShape       : shape of the trail points to draw [String]
 function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrailSize,
                                 cursorTrailGhost, trailShape)
     for i = 1, trailPoints do
@@ -6162,6 +6232,13 @@ function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrail
         end
     end
 end
+-- Draws a point of the triangle snake trail
+-- Parameters
+--    o               : [imgui overlay drawlist]
+--    m               : current (x, y) mouse position [Table]
+--    point           : (x, y) coordinates [Table]
+--    cursorTrailSize : size of the cursor trail points [Int]
+--    color           : color of the triangle represented as a uint [Int]
 function drawTriangleTrailPoint(o, m, point, cursorTrailSize, color)
     local dx = m.x - point.x
     local dy = m.y - point.y
@@ -6172,6 +6249,10 @@ function drawTriangleTrailPoint(o, m, point, cursorTrailSize, color)
     if dx == 0 and dy < 0 then angle = angle + math.pi end
     drawEquilateralTriangle(o, point, cursorTrailSize, angle, color)
 end
+--    o          : [imgui overlay drawlist]
+--    m          : current (x, y) mouse position [Table]
+--    t          : current in-game plugin time [Int/Float]
+--    sz         : dimensions of the window for Quaver [Table]
 function drawDustTrail(o, m, t, sz)
     local dustSize = math.floor(sz[2] / 120)
     local dustDuration = 0.4
@@ -6183,8 +6264,15 @@ function drawDustTrail(o, m, t, sz)
     cache.saveTable('dustParticles', dustParticles)
     renderDustParticles(globalVars.rgbPeriod, o, t, dustParticles, dustDuration, dustSize)
 end
+-- Initializes the particles of the dust trail
+-- Parameters
+--    sz               : dimensions of the window for Quaver [Table]
+--    t                : current in-game plugin time [Int/Float]
+--    dustParticles    : list of dust particles [Table]
+--    numDustParticles : total number of dust particles [Int]
+--    dustDuration     : lifespan of a dust particle [Int/Float]
 function initializeDustParticles(_, t, dustParticles, numDustParticles, dustDuration)
-    if state.GetValue("boolean.dustParticlesInitialized") then
+    if cache.boolean.dustParticlesInitialized then
         for i = 1, numDustParticles do
             dustParticles[i] = {}
         end
@@ -6195,9 +6283,16 @@ function initializeDustParticles(_, t, dustParticles, numDustParticles, dustDura
         local showParticle = false
         dustParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
-    state.SetValue("boolean.dustParticlesInitialized", true)
+    cache.boolean.dustParticlesInitialized = true
     cache.saveTable('dustParticles', dustParticles)
 end
+-- Updates the particles of the dust trail
+-- Parameters
+--    t             : current in-game plugin time [Int/Float]
+--    m             : current (x, y) mouse position [Table]
+--    dustParticles : list of dust particles [Table]
+--    dustDuration  : lifespan of a dust particle [Int/Float]
+--    dustSize      : size of a dust particle [Int/Float]
 function updateDustParticles(t, m, dustParticles, dustDuration, dustSize)
     local yRange = 8 * dustSize * (math.random() - 0.5)
     local xRange = 8 * dustSize * (math.random() - 0.5)
@@ -6211,6 +6306,14 @@ function updateDustParticles(t, m, dustParticles, dustDuration, dustSize)
         end
     end
 end
+-- Draws the particles of the dust trail
+-- Parameters
+--    rgbPeriod     : length in seconds of one RGB color cycle [Int/Float]
+--    o             : [imgui overlay drawlist]
+--    t             : current in-game plugin time [Int/Float]
+--    dustParticles : list of dust particles [Table]
+--    dustDuration  : lifespan of a dust particle [Int/Float]
+--    dustSize      : size of a dust particle [Int/Float]
 function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustSize)
     local currentRGBColors = getCurrentRGBColors(rgbPeriod)
     for i = 1, #dustParticles do
@@ -6227,6 +6330,10 @@ function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustS
         end
     end
 end
+--    o          : [imgui overlay drawlist]
+--    m          : current (x, y) mouse position [Table]
+--    t          : current in-game plugin time [Int/Float]
+--    sz         : dimensions of the window for Quaver [Table]
 function drawSparkleTrail(o, m, t, sz)
     local sparkleSize = 10
     local sparkleDuration = 0.3
@@ -6238,8 +6345,15 @@ function drawSparkleTrail(o, m, t, sz)
     cache.saveTable('sparkleParticles', sparkleParticles)
     renderSparkleParticles(o, t, sparkleParticles, sparkleDuration, sparkleSize)
 end
+-- Initializes the particles of the sparkle trail
+-- Parameters
+--    sz                  : dimensions of the window for Quaver [Table]
+--    t                   : current in-game plugin time [Int/Float]
+--    sparkleParticles    : list of sparkle particles [Table]
+--    numSparkleParticles : total number of sparkle particles [Int]
+--    sparkleDuration     : lifespan of a sparkle particle [Int/Float]
 function initializeSparkleParticles(_, t, sparkleParticles, numSparkleParticles, sparkleDuration)
-    if state.GetValue("boolean.sparkleParticlesInitialized") then
+    if cache.boolean.sparkleParticlesInitialized then
         for i = 1, numSparkleParticles do
             sparkleParticles[i] = {}
         end
@@ -6250,9 +6364,16 @@ function initializeSparkleParticles(_, t, sparkleParticles, numSparkleParticles,
         local showParticle = false
         sparkleParticles[i] = generateParticle(0, 0, 0, 0, endTime, showParticle)
     end
-    state.SetValue("boolean.sparkleParticlesInitialized", true)
+    cache.boolean.sparkleParticlesInitialized = true
     cache.saveTable('sparkleParticles', sparkleParticles)
 end
+-- Updates the particles of the sparkle trail
+-- Parameters
+--    t                : current in-game plugin time [Int/Float]
+--    m                : current (x, y) mouse position [Table]
+--    sparkleParticles : list of sparkle particles [Table]
+--    sparkleDuration  : lifespan of a sparkle particle [Int/Float]
+--    sparkleSize      : size of a sparkle particle [Int/Float]
 function updateSparkleParticles(t, m, sparkleParticles, sparkleDuration, sparkleSize)
     for i = 1, #sparkleParticles do
         local sparkleParticle = sparkleParticles[i]
@@ -6268,6 +6389,13 @@ function updateSparkleParticles(t, m, sparkleParticles, sparkleDuration, sparkle
         end
     end
 end
+-- Draws the particles of the sparkle trail
+-- Parameters
+--    o                : [imgui overlay drawlist]
+--    t                : current in-game plugin time [Int/Float]
+--    sparkleParticles : list of sparkle particles [Table]
+--    sparkleDuration  : lifespan of a sparkle particle [Int/Float]
+--    sparkleSize      : size of a sparkle particle [Int/Float]
 function renderSparkleParticles(o, t, sparkleParticles, sparkleDuration, sparkleSize)
     for i = 1, #sparkleParticles do
         local sparkleParticle = sparkleParticles[i]
@@ -6277,12 +6405,21 @@ function renderSparkleParticles(o, t, sparkleParticles, sparkleDuration, sparkle
             local dy = -sparkleParticle.yRange * math.quadraticBezier(0, time)
             local sparkleY = sparkleParticle.y + dy
             local sparkleCoords = vector.New(sparkleX, sparkleY)
+            -- local alpha = math.round(255 * (1 - time), 0)
             local actualSize = sparkleSize * (1 - math.quadraticBezier(0, time))
             local sparkleColor = color.rgbaToUint(255, 255, 100, 30)
             drawGlare(o, sparkleCoords, actualSize, color.int.white, sparkleColor)
         end
     end
 end
+-- Generates and returns a particle [Table]
+-- Parameters
+--    x            : starting x coordiate of particle [Int/Float]
+--    y            : starting y coordiate of particle [Int/Float]
+--    xRange       : range of movement for the x coordiate of the particle [Int/Float]
+--    yRange       : range of movement for the y coordiate of the particle [Int/Float]
+--    endTime      : time to stop showing particle [Int/Float]
+--    showParticle : whether or not to render/draw the particle [Boolean]
 function generateParticle(x, y, xRange, yRange, endTime, showParticle)
     local particle = {
         x = x,
@@ -6294,12 +6431,22 @@ function generateParticle(x, y, xRange, yRange, endTime, showParticle)
     }
     return particle
 end
+-- Checks and returns whether or not the mouse position has changed [Boolean]
+-- Parameters
+--    currentMousePosition : current (x, y) coordinates of the mouse [Table]
 function checkIfMouseMoved(currentMousePosition)
-    oldMousePosition = state.GetValue("oldMousePosition") or vctr2(0)
+    oldMousePosition = cache.oldMousePosition or vctr2(0)
     local mousePositionChanged = currentMousePosition ~= oldMousePosition
-    state.SetValue("oldMousePosition", currentMousePosition)
+    cache.oldMousePosition = currentMousePosition
     return mousePositionChanged
 end
+-- Draws an equilateral triangle
+-- Parameters
+--    o           : imgui overlay drawlist [imgui.GetForegroundDrawList()]
+--    centerPoint : center point of the triangle [Table]
+--    size        : radius from triangle center to tip [Int/Float]
+--    angle       : rotation angle of the triangle [Int/Float]
+--    color       : color of the triangle represented as a uint [Int]
 function drawEquilateralTriangle(o, centerPoint, size, angle, color)
     local angle2 = 2 * math.pi / 3 + angle
     local angle3 = 4 * math.pi / 3 + angle
@@ -6314,6 +6461,13 @@ function drawEquilateralTriangle(o, centerPoint, size, angle, color)
     local p3 = vector.New(x3, y3)
     o.AddTriangleFilled(p1, p2, p3, color)
 end
+-- Draws a single glare
+-- Parameters
+--    o          : [imgui overlay drawlist]
+--    coords     : (x, y) coordinates of the glare [Int/Float]
+--    size       : size of the glare [Int/Float]
+--    glareColor : uint color of the glare [Int]
+--    auraColor  : uint color of the aura of the glare [Int]
 function drawGlare(o, coords, size, glareColor, auraColor)
     local outerRadius = size
     local innerRadius = outerRadius / 7
@@ -6343,7 +6497,7 @@ function pulseController()
         pulsedThisFrame = false,
     }
     cache.loadTable('pulseController', pulseVars)
-    local timeOffset = 50
+    local timeOffset = 50 -- [`state.SongTime`](lua://state.SongTime) isn't entirely accurate while the song is playing, so this aims to correct that.
     local timeSinceLastBar = ((state.SongTime + timeOffset) - game.get.timingPointAt(state.SongTime).StartTime) %
         ((60000 / game.get.timingPointAt(state.SongTime).Bpm))
     pulseVars.pulsedThisFrame = false
@@ -6359,14 +6513,14 @@ function pulseController()
         pulseVars.pulseStatus = 0
     end
     outputPulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
-    local borderColor = state.GetValue("borderColor") or vctr4(1)
+    local borderColor = cache.borderColor or vctr4(1)
     if (type(borderColor) == 'table') then borderColor = table.vectorize4(borderColor) end
     local negatedBorderColor = vctr4(1) - borderColor
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
     imgui.PushStyleColor(imgui_col.Border, pulseColor * outputPulseStatus + borderColor * (1 - outputPulseStatus))
     cache.saveTable('pulseController', pulseVars)
-    state.SetValue("pulseValue", math.max(pulseVars.pulseStatus, 0))
-    state.SetValue("pulsedThisFrame", pulseVars.pulsedThisFrame)
+    cache.pulseValue = math.max(pulseVars.pulseStatus, 0)
+    cache.pulsedThisFrame = pulseVars.pulsedThisFrame
 end
 function renderBackground()
     local idx = globalVars.dynamicBackgroundIndex
@@ -6391,7 +6545,7 @@ function setPluginAppearance()
 end
 function setPluginAppearanceStyles(styleTheme)
     local cornerRoundnessvalue = (styleTheme == 'Boxed' or
-        styleTheme == 'Boxed + Border') and 0 or 5
+        styleTheme == 'Boxed + Border') and 0 or 5 -- up to 12, 14 for WindowRounding and 16 for ChildRounding
     local borderSize = tn(styleTheme == 'Rounded + Border' or
         styleTheme == 'Boxed + Border')
     imgui.PushStyleVar(imgui_style_var.FrameBorderSize, borderSize)
@@ -6405,6 +6559,11 @@ function setPluginAppearanceStyles(styleTheme)
     imgui.PushStyleVar(imgui_style_var.GrabRounding, cornerRoundnessvalue)
     imgui.PushStyleVar(imgui_style_var.ScrollbarRounding, cornerRoundnessvalue)
     imgui.PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessvalue)
+    -- Doesn't work even though TabBorderSize is changeable in the style editor demo
+    -- imgui.PushStyleVar( imgui_style_var.TabBorderSize,      borderSize           )
+    -- https://github.com/ocornut/imgui/issues/7297
+    -- Apparently TabBorderSize doesn't have a imgui_style_var, so it can only be changed with
+    -- imgui.GetStyle() which hasn't worked from my testing in Quaver plugins
 end
 function setPluginAppearanceColors(colorTheme, hideBorder)
     local borderColor = nil
@@ -6429,7 +6588,7 @@ function setPluginAppearanceColors(colorTheme, hideBorder)
     imgui.PushStyleColor(imgui_col.TableHeaderBg, imgui.GetColorU32(imgui_col.Button, 0.3))
     if not borderColor then borderColor = setOriginalColors() end
     if hideBorder then return end
-    state.SetValue("borderColor", borderColor)
+    cache.borderColor = borderColor
 end
 function setOriginalColors()
     local borderColor = vector.New(0.81, 0.88, 1.00, 0.30)
@@ -6690,6 +6849,9 @@ function setIncognitoColors()
     loadup.BgBr = white
     return whiteTint
 end
+-- Sets plugin colors to the "Incognito + RGB" theme
+-- Parameters
+--    rgbPeriod : length in seconds of one RGB color cycle [Int/Float]
 function setIncognitoRGBColors(rgbPeriod)
     local black = vector.New(0.00, 0.00, 0.00, 1.00)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
@@ -6783,6 +6945,9 @@ function set7xbiGlassColors()
     loadup.BgBr = buttonColor / 2 + color.vctr.white / 2
     return frameColor
 end
+-- Sets plugin colors to the "7xbi's RGB Glass" theme
+-- Parameters
+--    rgbPeriod : length in seconds of one RGB color cycle [Int/Float]
 function set7xbiRGBGlassColors(rgbPeriod)
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.85)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
@@ -6874,6 +7039,9 @@ function setGlassColors()
     loadup.BgBr = transparentBlack / 2 + color.vctr.white / 2
     return transparentWhite
 end
+-- Sets plugin colors to the "Glass + RGB" theme
+-- Parameters
+--    rgbPeriod : length in seconds of one RGB color cycle [Int/Float]
 function setGlassRGBColors(rgbPeriod)
     local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
     local colorTint = rgbColor - vector.New(0, 0, 0, 0.5)
@@ -6919,6 +7087,9 @@ function setGlassRGBColors(rgbPeriod)
     loadup.BgBr = color.vctr.white / 2 + color.vctr.black / 2
     return rgbColor
 end
+-- Sets plugin colors to the "RGB Gamer Mode" theme
+-- Parameters
+--    rgbPeriod : length in seconds of one RGB color cycle [Int/Float]
 function setRGBGamerColors(rgbPeriod)
     local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
     local inactiveColor = rgbColor - vector.New(0, 0, 0, 0.3)
@@ -6965,6 +7136,9 @@ function setRGBGamerColors(rgbPeriod)
     loadup.BgBr = rgbColor / 2 + vctr4(0)
     return inactiveColor
 end
+-- Sets plugin colors to the "edom remag BGR" theme
+-- Parameters
+--    rgbPeriod : length in seconds of one RGB color cycle [Int/Float]
 function setInvertedRGBGamerColors(rgbPeriod)
     local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
     local inactiveColor = rgbColor - vector.New(0, 0, 0, 0.3)
@@ -7057,6 +7231,9 @@ function setInvertedIncognitoColors()
     loadup.BgBr = black
     return blackTint
 end
+-- Sets plugin colors to the "BGR + otingocnI" theme
+-- Parameters
+--    rgbPeriod : length in seconds of one RGB color cycle [Int/Float]
 function setInvertedIncognitoRGBColors(rgbPeriod)
     local black = vector.New(0.00, 0.00, 0.00, 1.00)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
@@ -7243,6 +7420,9 @@ function setCustomColors()
     loadup.BgBr = globalCustomStyle.loadupBgBr
     return borderColor
 end
+-- Returns the RGB colors based on the current time [Table]
+-- Parameters
+--    rgbPeriod : length in seconds for one complete RGB cycle (i.e. period) [Int/Float]
 ---Returns RGB coors based on the current time.
 ---@param rgbPeriod number The length (in seconds) for one complete RGB cycle.
 ---@param alpha? number
@@ -7289,6 +7469,12 @@ function PushGradientStyle(color1, color2, property, oscillationPeriod)
 end
 INSTRUCTION_COLOR = vector.New(1, 0.5, 0.5, 1)
 GUIDELINE_COLOR = vector.New(0.5, 0.5, 1, 1)
+-- Creates an imgui button
+-- Parameters
+--    text       : text on the button [String]
+--    size       : dimensions of the button [Table]
+--    func       : function to execute once button is pressed [Function]
+--    menuVars   : list of variables used for the current menu [Table]
 ---Creates an imgui button.
 ---@param text string The text that the button should have.
 ---@param size Vector2 The size of the button.
@@ -7383,7 +7569,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     hiddenGroups = hiddenGroups or {}
     if (colorList and isTruthy(colorList)) then
         colorList[newListIndex]:gsub('(%d+)', function(c)
-            rgb[#rgb + 1] = c
+            table.insert(rgb, c)
         end)
         local alpha = math.floor(imgui.GetColorU32(imgui_col.Text) / 16777216) / 255 or 1
         imgui.PushStyleColor(imgui_col.Text,
@@ -7398,7 +7584,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
         rgb = {}
         if (colorList and isTruthy(colorList)) then
             colorList[i]:gsub('(%d+)', function(c)
-                rgb[#rgb + 1] = c
+                table.insert(rgb, c)
             end)
             imgui.PushStyleColor(imgui_col.Text, vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, 1))
         end
@@ -7419,7 +7605,7 @@ end
 function ComputableInputFloat(label, value, decimalPlaces, suffix)
     local previousvalue = value
     local output = value
-    local fmt = table.concat({'%.', decimalPlaces, 'f'})
+    local fmt = '%.' .. decimalPlaces .. 'f'
     if suffix then fmt = fmt .. suffix end
     _, value = imgui.InputTextWithHint(label, '2, 4/3 + 1, etc.',
         string.format(fmt, value), 4096,
@@ -7430,7 +7616,7 @@ function ComputableInputFloat(label, value, decimalPlaces, suffix)
         if (output == nil) then output = value end
     end
     return tn(tostring(output):match('[%-]?%d+[%.]?%d+') or tostring(output):match('[%-]?%d+')),
-        previousvalue ~= output
+        previousvalue ~= output -- Need both matches due to modifiers not working on whole groups
 end
 function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
     local oldValue = value
@@ -7486,7 +7672,7 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * widthFactor - SAMELINE_SPACING)
-    local _, newValues = imgui.InputFloat2(label, oldValues, table.concat({'%.', digits, 'f'}) .. suffix)
+    local _, newValues = imgui.InputFloat2(label, oldValues, '%.' .. digits .. 'f' .. suffix)
     imgui.PopItemWidth()
     varsTable[lowerName] = newValues.x
     varsTable[higherName] = newValues.y
@@ -7523,8 +7709,8 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
     local initDragList = {}
     local initPointList = {}
     for i = 1, #points do
-        initDragList[#initDragList + 1] = false
-        initPointList[#initPointList + 1] = points[i].pos
+        table.insert(initDragList, false)
+        table.insert(initPointList, points[i].pos)
     end
     local dragList = state.GetValue(tableLabel, initDragList)
     local ctx = imgui.GetWindowDrawList()
@@ -7720,6 +7906,9 @@ function AddSeparator()
     imgui.Separator()
     AddPadding()
 end
+-- Creates a tooltip box when the last (most recently created) GUI item is hovered over
+-- Parameters
+--    text : text to appear in the tooltip box [String]
 function HoverToolTip(text)
     if not imgui.IsItemHovered() then return end
     imgui.BeginTooltip()
@@ -7728,6 +7917,9 @@ function HoverToolTip(text)
     imgui.PopTextWrapPos()
     imgui.EndTooltip()
 end
+-- Creates an inline, grayed-out '(?)' symbol that shows a tooltip box when hovered over
+-- Parameters
+--    text : text to show in the tooltip box [String]
 function HelpMarker(text)
     KeepSameLine()
     imgui.TextDisabled('(?)')
@@ -7783,6 +7975,13 @@ function checkEnoughSelectedNotes(minimumNotes)
     if (globalVars.useEndTimeOffsets and minimumNotes == 2 and selectedNotes[1].EndTime ~= 0) then return true end
     return selectedNotes[1].StartTime ~= selectedNotes[numSelectedNotes].StartTime
 end
+-- Shows the settings menu for the current SV type
+-- Returns whether or not any settings changed [Boolean]
+-- Parameters
+--    currentSVType : current SV type to choose the settings for [String]
+--    settingVars   : list of variables used for the current menu [Table]
+--    skipFinalSV   : whether or not to skip choosing the final SV [Boolean]
+--    svPointsForce : number of SV points to force [Int or nil]
 function showSettingsMenu(currentSVType, settingVars, skipFinalSV, svPointsForce, optionalLabel)
     if currentSVType == 'Linear' then
         return linearSettingsMenu(settingVars, skipFinalSV, svPointsForce)
@@ -7808,13 +8007,22 @@ function showSettingsMenu(currentSVType, settingVars, skipFinalSV, svPointsForce
         return codeSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     end
 end
+-- Returns coordinates relative to the plugin window [Table]
+-- Parameters
+--    x : x coordinate relative to the plugin window [Int]
+--    y : y coordinate relative to the plugin window [Int]
 function coordsRelativeToWindow(x, y)
     return vector.New(x, y) + imgui.GetWindowPos()
 end
+-- Returns a point relative to a given point [Table]
+-- Parameters
+--    point   : (x, y) coordinates [Table]
+--    xChange : change in x coordinate [Int]
+--    yChange : change in y coordinate [Int]
 function relativePoint(point, xChange, yChange)
     return point + vector.New(xChange, yChange)
 end
-CREATE_TYPES = {
+CREATE_TYPES = { -- general categories of SVs to place
     'Standard',
     'Special',
     'Still',
@@ -7919,7 +8127,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             local data = table.parse(preset.data)
             globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
             cache.saveTable(preset.menu .. preset.type .. 'Settings', data.settingVars)
-            cache.saveTable(table.concat({'place', preset.type, 'Menu'}), data.menuVars)
+            cache.saveTable('place' .. preset.type .. 'Menu', data.menuVars)
             globalVars.showPresetMenu = false
             return true
         end
@@ -7993,7 +8201,7 @@ function addFrameTimes(settingVars)
     if not imgui.Button('Add selected notes to use for frames', ACTION_BUTTON_SIZE) then return end
     local hasAlreadyAddedLaneTime = {}
     for _ = 1, game.keyCount do
-        hasAlreadyAddedLaneTime[#hasAlreadyAddedLaneTime + 1] = {}
+        table.insert(hasAlreadyAddedLaneTime, {})
     end
     local frameTimeToIndex = {}
     local totalTimes = #settingVars.frameTimes
@@ -8127,7 +8335,7 @@ function automateSVSettingsMenu(settingVars)
         imgui.PopItemWidth()
     end
 end
-SPECIAL_SVS = {
+SPECIAL_SVS = { -- types of special SVs
     'Stutter',
     'Teleport Stutter',
     'Frames Setup',
@@ -8387,7 +8595,7 @@ function linearVibratoMenu(menuVars, settingVars, separateWindow)
             separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     end
 end
-VIBRATO_SVS = {
+VIBRATO_SVS = { -- types of vibrato SVs
     'Linear##Vibrato',
     'Polynomial##Vibrato',
     'Exponential##Vibrato',
@@ -8409,7 +8617,7 @@ function placeVibratoSVMenu(separateWindow)
         if (not presetSelected) then
             cache.saveTable(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
                 settingVars)
-            cache.saveTable(table.concat({'placeVibrato', tostring(separateWindow), 'Menu'}), menuVars)
+            cache.saveTable('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
         end
         return
     end
@@ -8429,7 +8637,7 @@ function placeVibratoSVMenu(separateWindow)
     if currentSVType == 'Custom##Vibrato' then customVibratoMenu(menuVars, settingVars, separateWindow) end
     cache.saveTable(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
         settingVars)
-    cache.saveTable(table.concat({'placeVibrato', tostring(separateWindow), 'Menu'}), menuVars)
+    cache.saveTable('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
 end
 function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
     if (menuVars.vibratoMode == 1) then
@@ -8441,7 +8649,7 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         local func = function(t)
             return (settingVars.startMsx - settingVars.endMsx) *
                 (1 - math.clamp(math.evaluatePolynomial(settingVars.plotCoefficients, t * size) / size, 0, 1)) +
-                settingVars.endMsx
+                settingVars.endMsx -- Reversed due to the way imgui draws
         end
         simpleActionMenu('Vibrate', 2, function(v)
             svVibrato(v, func)
@@ -8485,7 +8693,7 @@ function PolynomialEditor(size, settingVars, separateWindow)
         for i, point in pairs(settingVars.controlPoints) do
             table.insert(mtrx, 1, {})
             for j = 1, pointCount do
-                mtrx[1][#mtrx[1] + 1] = (point.x * size) ^ (pointCount - j)
+                table.insert(mtrx[1], (point.x * size) ^ (pointCount - j))
             end
             table.insert(vctr, 1, size - point.y * size)
         end
@@ -8774,21 +8982,21 @@ function copyNPasteSettingsMenu(menuVars, actionable)
 end
 function updateDirectEdit()
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not isTruthy(offsets) and not isTruthy(state.GetValue("lists.directSVList"))) then return end
+    if (not isTruthy(offsets) and not isTruthy(cache.lists.directSVList)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     if (not isTruthy(offsets)) then
-        state.SetValue("lists.directSVList", {})
+        cache.lists.directSVList = {}
         return
     end
-    state.SetValue("lists.directSVList", game.get.svsBetweenOffsets(firstOffset - 50, lastOffset + 50))
+    cache.lists.directSVList = game.get.svsBetweenOffsets(firstOffset - 50, lastOffset + 50)
 end
 function directSVMenu()
     local menuVars = getMenuVars('directSV')
     if (clock.listen('directSV', 300)) then
         updateDirectEdit()
     end
-    local svs = state.GetValue("lists.directSVList") or {}
+    local svs = cache.lists.directSVList or {}
     if (not isTruthy(svs)) then
         menuVars.selectableIndex = 1
         if (not isTruthy(state.SelectedHitObjects)) then
@@ -8959,8 +9167,10 @@ function lintMapMenu()
     HoverToolTip('Removes stacked notes.')
     simpleActionMenu('Remove all hitsounds in selection', 0, removeAllHitSounds, nil, true, true)
     HoverToolTip('Self-explanatory.')
+    -- simpleActionMenu("DO IT ALLLLL", 0, DOITALL, nil, false, true)
+    -- HoverToolTip("RAHHHHHH")
 end
-EDIT_SV_TOOLS = {
+EDIT_SV_TOOLS = { -- tools for editing SVs
     'Add Teleport',
     'Change Groups',
     'Complete Duplicate',
@@ -9082,6 +9292,11 @@ function displayMeasuredStatsUnrounded(menuVars)
     CopiableBox('End displacement', '##endDisplacement', menuVars.endDisplacement)
     CopiableBox('True average SV', '##avgSVDisplaceless', menuVars.avgSVDisplaceless)
 end
+-- Creates a copy-pastable text box
+-- Parameters
+--    text    : text to put above the box [String]
+--    label   : label of the input text [String]
+--    content : content to put in the box [String]
 function CopiableBox(text, label, content)
     imgui.TextWrapped(text)
     imgui.PushItemWidth(imgui.GetContentRegionAvailWidth())
@@ -9099,6 +9314,7 @@ function reverseScrollSettingsMenu(menuVars)
     chooseDistance(menuVars)
     HelpMarker('Height at which reverse scroll notes are hit')
 end
+-- Creates the scale (displace) menu
 function scaleDisplaceMenu()
     local menuVars = getMenuVars('scaleDisplace')
     scaleDisplaceSettingsMenu(menuVars)
@@ -9182,14 +9398,14 @@ function infoTab()
         imgui.Dummy(vctr2(10))
     end
     if (imgui.Button('Edit Settings', HALF_ACTION_BUTTON_SIZE)) then
-        state.SetValue("windows.showSettingsWindow", not state.GetValue("windows.showSettingsWindow"))
+        cache.windows.showSettingsWindow = not cache.windows.showSettingsWindow
         local coordinatesToCenter = game.window.getCenter() - vector.New(216.5, 200)
         imgui.SetWindowPos('plumoguSV Settings', coordinatesToCenter)
     end
     HoverToolTip('Edit various functions of the plugin, such as the appearance or internal calculations.')
     KeepSameLine()
     if (imgui.Button('See Patch Notes', HALF_ACTION_BUTTON_SIZE)) then
-        state.SetValue("windows.showPatchNotesWindow", not state.GetValue("windows.showPatchNotesWindow"))
+        cache.windows.showPatchNotesWindow = not cache.windows.showPatchNotesWindow
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos('plumoguSV Patch Notes', coordinatesToCenter)
     end
@@ -9200,7 +9416,7 @@ function infoTab()
     HoverToolTip('A quick and easy way to view SV/SSF counts and some other minute pieces of data.')
     KeepSameLine()
     if (imgui.Button('View Tutorials', HALF_ACTION_BUTTON_SIZE)) then
-        state.SetValue("windows.showTutorialWindow", not state.GetValue("windows.showTutorialWindow"))
+        cache.windows.showTutorialWindow = not cache.windows.showTutorialWindow
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos('plumoguSV Tutorial Menu', coordinatesToCenter)
     end
@@ -9228,7 +9444,7 @@ function showPatchNotesWindow()
     local minHeight = imgui.GetWindowPos().y
     local maxHeight = minHeight + 400
     if (not patchNotesOpened) then
-        state.SetValue("windows.showPatchNotesWindow", false)
+        cache.windows.showPatchNotesWindow = false
     end
     showPatchNotesV211(color.int.white)
     showPatchNotesV210(minorUpdateLeftColor, minorUpdateRightColor)
@@ -12170,7 +12386,7 @@ function selectBookmarkMenu()
             end
             vPos = 126.5 + (idx - skippedBookmarks) * 32
             imgui.SetCursorPosY(vPos)
-            times[#times + 1] = bm.StartTime
+            table.insert(times, bm.StartTime)
             imgui.Text(bm.StartTime)
             imgui.NextColumn()
             imgui.SetCursorPosY(vPos)
@@ -12198,10 +12414,11 @@ function selectChordSizeMenu()
     local menuVars = getMenuVars('selectChordSize')
     for idx = 1, game.keyCount do
         local varLabel = 'select' .. idx
-        local label = table.concat({ table.concat({'Size ', idx, ' Chord'}) })
+        local label = table.concat({ 'Size ' .. idx .. ' Chord' })
         _, menuVars[varLabel] = imgui.Checkbox(label, menuVars[varLabel])
         if (idx % 2 == 1) then KeepSameLine() end
     end
+    -- BasicInputInt(menuVars, "laneSelector", "Lane Selector")
     simpleActionMenu('Select chords within region', 2, selectByChordSizes, menuVars)
     cache.saveTable('selectChordSizeMenu', menuVars)
 end
@@ -12262,7 +12479,7 @@ function selectBySnapMenu()
     BasicInputInt(menuVars, 'snap', 'Snap', { 1, 100 })
     cache.saveTable('selectBySnapMenu', menuVars)
     simpleActionMenu(
-        table.concat({'Select notes with 1/', menuVars.snap, ' snap'}),
+        'Select notes with 1/' .. menuVars.snap .. ' snap',
         2,
         selectBySnap, menuVars)
 end
@@ -12295,7 +12512,7 @@ end
 function chooseMaxDisplacementMultiplierExponent(forceCache)
     imgui.PushItemWidth(70)
     local oldMdme = globalVars.maxDisplacementMultiplierExponent
-    if (forceCache) then oldMdme = state.GetValue("displacementExponent") or 0 end
+    if (forceCache) then oldMdme = cache.displacementExponent or 0 end
     _, tempMDME = imgui.SliderInt('Max Displacement Multiplier Exp.',
         oldMdme, 0, 6)
     if (forceCache) then return end
@@ -12329,7 +12546,7 @@ function showAppearanceSettings()
             ::nextCustomStyle::
         end
         globalCustomStyle = customStyle
-        globalCustomStyle.border = state.GetValue("borderColor")
+        globalCustomStyle.border = cache.borderColor
         local newName = 'custom_Copy of ' .. globalVars.colorThemeName:gsub('^custom_', '')
         globalVars.colorThemeName = newName
         if (not globalVars.customStyles) then globalVars.customStyles = {} end
@@ -12344,9 +12561,9 @@ function showAppearanceSettings()
     end
     KeepSameLine()
     if (imgui.Button('Import Theme')) then
-        state.SetValue("boolean.importingCustomTheme", not state.GetValue("boolean.importingCustomTheme"))
+        cache.boolean.importingCustomTheme = not cache.boolean.importingCustomTheme
     end
-    if (state.GetValue("boolean.importingCustomTheme")) then
+    if (cache.boolean.importingCustomTheme) then
         local input = state.GetValue('importingCustomThemeInput', '')
         imgui.SetNextItemWidth(180)
         _, input = imgui.InputTextWithHint('##customThemeStr', 'Paste your theme string here.', input, 69420)
@@ -12355,7 +12572,7 @@ function showAppearanceSettings()
         if (imgui.Button('Send')) then
             setCustomStyleString(input)
             settingsChanged = true
-            state.SetValue("boolean.importingCustomTheme", false)
+            cache.boolean.importingCustomTheme = false
             state.SetValue('importingCustomThemeInput', '')
         end
     end
@@ -12372,7 +12589,7 @@ function showAppearanceSettings()
         'Disables the loadup animation when launching the editor.')
     KeepSameLine()
     if (imgui.Button('Play', vector.New(42, 24))) then
-        state.SetValue("logoStartTime", clock.getTime())
+        cache.logoStartTime = clock.getTime()
     end
     AddSeparator()
     GlobalCheckbox('drawCapybara', 'Capybara', 'Draws a capybara at the bottom right of the screen')
@@ -12385,9 +12602,9 @@ function showAppearanceSettings()
     if (not globalVars.useCustomPulseColor) then imgui.BeginDisabled() end
     KeepSameLine()
     if (imgui.Button('Edit Color')) then
-        state.SetValue("windows.showColorPicker", not state.GetValue("windows.showColorPicker"))
+        cache.windows.showColorPicker = not cache.windows.showColorPicker
     end
-    if (state.GetValue("windows.showColorPicker")) then
+    if (cache.windows.showColorPicker) then
         choosePulseColor()
     end
     if (not globalVars.useCustomPulseColor) then
@@ -12587,7 +12804,7 @@ function showCustomThemeSettings()
     end
     KeepSameLine()
     if (imgui.Button('Rename')) then
-        state.SetValue("boolean.renamingCustomTheme", not state.GetValue("boolean.renamingCustomTheme"))
+        cache.boolean.renamingCustomTheme = not cache.boolean.renamingCustomTheme
     end
     KeepSameLine()
     if (imgui.Button('Export')) then
@@ -12600,10 +12817,10 @@ function showCustomThemeSettings()
         print('e!', 'Deleted custom theme.')
         globalVars.customStyles[globalVars.colorThemeName] = nil
         globalVars.colorThemeName = 'Original'
-        state.SetValue("settingTypeIndex", table.indexOf(SETTING_TYPES, 'Appearance'))
+        cache.settingTypeIndex = table.indexOf(SETTING_TYPES, 'Appearance')
         write(globalVars)
     end
-    if (state.GetValue("boolean.renamingCustomTheme")) then
+    if (cache.boolean.renamingCustomTheme) then
         local input = state.GetValue('renamingCustomThemeInput', '')
         imgui.SetNextItemWidth(130)
         _, input = imgui.InputTextWithHint('##customThemeStr', 'New Custom Theme Name', input, 69420)
@@ -12615,12 +12832,12 @@ function showCustomThemeSettings()
             globalVars.customStyles[globalVars.colorThemeName] = nil
             globalVars.colorThemeName = newName
             settingsChanged = true
-            state.SetValue("boolean.renamingCustomTheme", false)
+            cache.boolean.renamingCustomTheme = false
             state.SetValue('renamingCustomThemeInput', '')
         end
         KeepSameLine()
         if (imgui.Button('X')) then
-            state.SetValue("boolean.renamingCustomTheme", false)
+            cache.boolean.renamingCustomTheme = false
             state.SetValue('renamingCustomThemeInput', '')
         end
     end
@@ -12706,13 +12923,13 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
                 k:gsub('loadup', '') ..
                 ' = vector.New(' ..
                 math.round(v.x, 2) ..
-                table.concat({', ', math.round(v.y, 2) .. ', ' .. math.round(v.z, 2) .. ', ' .. math.round(v.w, 2), ')\n'})
+                ', ' .. math.round(v.y, 2) .. ', ' .. math.round(v.z, 2) .. ', ' .. math.round(v.w, 2) .. ')\n'
         else
             outStr = outStr .. 'imgui.PushStyleColor(imgui_col.' ..
                 k:capitalize() ..
                 ', vector.New(' ..
                 math.round(v.x, 2) ..
-                table.concat({', ', math.round(v.y, 2) .. ', ' .. math.round(v.z, 2) .. ', ' .. math.round(v.w, 2), '))\n'})
+                ', ' .. math.round(v.y, 2) .. ', ' .. math.round(v.z, 2) .. ', ' .. math.round(v.w, 2) .. '))\n'
         end
     end
     imgui.SetClipboardText(outStr)
@@ -12854,6 +13071,20 @@ function showDefaultPropertiesSettings()
         cache.saveTable('deletePropertyMenu', menuVars)
     end
     imgui.SeparatorText('Select Tab Settings')
+    -- local selectTabDict = table.map(SELECT_TOOLS, function(element, idx)
+    --     return { label = element, fn = selectFnList[idx] }
+    -- end)
+    -- for _, tbl in pairs(selectFnList) do
+    --     local label = tbl.label
+    --     if (not tbl.fn) then goto continue end
+    --     if (imgui.CollapsingHeader(label .. " Settings")) then
+    --         local menuVars = getMenuVars(label, "Property")
+    --         tbl.fn(menuVars)
+    --         saveMenuPropertiesButton(menuVars, label)
+    --         cache.saveTable(label .. "PropertyMenu", menuVars)
+    --     end
+    --     ::continue::
+    -- end
     if (imgui.CollapsingHeader('Select Alternating Settings')) then
         local menuVars = getMenuVars('selectAlternating', 'Property')
         BasicInputInt(menuVars, 'every', 'Every __ notes', { 1, MAX_SV_POINTS })
@@ -12871,7 +13102,7 @@ function showDefaultPropertiesSettings()
         local menuVars = getMenuVars('selectChordSize', 'Property')
         for idx = 1, game.keyCount do
             local varLabel = 'select' .. idx
-            local label = table.concat({ table.concat({'Size ', idx, ' Chord'}) })
+            local label = table.concat({ 'Size ' .. idx .. ' Chord' })
             _, menuVars[varLabel] = imgui.Checkbox(label, menuVars[varLabel])
             if (idx % 2 == 1) then KeepSameLine() end
         end
@@ -13116,7 +13347,7 @@ function showPluginSettingsWindow()
     startNextWindowNotCollapsed('plumoguSV Settings')
     _, settingsOpened = imgui.Begin('plumoguSV Settings', true, 42)
     imgui.SetWindowSize('plumoguSV Settings', vector.New(433, 400))
-    local typeIndex = state.GetValue("settingTypeIndex") or 1
+    local typeIndex = cache.settingTypeIndex or 1
     imgui.Columns(2, 'settings_columnList', true)
     imgui.SetColumnWidth(0, 150)
     imgui.SetColumnWidth(1, 283)
@@ -13146,7 +13377,7 @@ function showPluginSettingsWindow()
     imgui.NextColumn()
     imgui.BeginChild('Settings Data')
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
-    state.SetValue("settingTypeIndex", typeIndex)
+    cache.settingTypeIndex = typeIndex
     if (SETTING_TYPES[typeIndex] == 'General') then
         showGeneralSettings()
     end
@@ -13172,8 +13403,8 @@ function showPluginSettingsWindow()
     imgui.EndChild()
     imgui.Columns(1)
     if (not settingsOpened) then
-        state.SetValue("windows.showSettingsWindow", false)
-        state.SetValue("settingTypeIndex", 1)
+        cache.windows.showSettingsWindow = false
+        cache.settingTypeIndex = 1
         state.SetValue('crazy', 'Crazy?')
         state.SetValue('activateCrazy', false)
         state.SetValue('crazyIdx', 1)
@@ -13193,10 +13424,10 @@ function renderMemeButtons()
     end
     HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
     if (GradientButton('fuck you and\nyour stupid editor', color.vctr.red, color.vctr.white, 1500)) then
-        state.SetValue("boolean.destroyEditor", true)
+        cache.boolean.destroyEditor = true
     end
     HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
-    if (state.GetValue("boolean.destroyEditor")) then
+    if (cache.boolean.destroyEditor) then
         actions.GoToObjects(math.floor(math.random() * map.TrackLength))
         local ho1 = map.HitObjects[1]
         actions.RemoveHitObject(ho1)
@@ -13250,7 +13481,7 @@ function showWindowSettings()
         imgui.EndDisabled()
     end
 end
-TAB_MENUS = {
+TAB_MENUS = { -- names of the tab menus
     'Info',
     'Select',
     'Create',
@@ -13304,7 +13535,7 @@ function showStillsAndDisplacementTutorial()
     imgui.TextWrapped(
         'So far, all effects have been done by selecting two notes with no notes between them. However, experienced SV mappers often select notes on a consistent beat (such as every 1/1 note). A naive approach would be to use the previous examples, but simply select two notes with notes in between them. This would produce a result such as the following:')
     gpsim('StillsAndDisplacementNaiveApproach', vctr2(1), function(t, idx)
-        return t * t - (4 - idx) ^ 2 / 30
+        return t ^ 2 - (4 - idx) ^ 2 / 30
     end, { { 3, 4 }, { 2 }, { 3 }, { 1 } }, 500)
     imgui.TextColored(vctr4(0.8), 'The above demonstrates a Standard > Linear 0x - 2x SV.')
     imgui.TextWrapped(
@@ -13315,7 +13546,7 @@ function showStillsAndDisplacementTutorial()
     imgui.TextWrapped(
         'The rest will be the same as before; simply input your desired parameters and click the "Place SVs between selected notes" button. This will make an effect where all notes have the same distance from each other:')
     gpsim('StillsAndDisplacementGoodApproach', vctr2(1), function(t)
-        return t * t
+        return t ^ 2
     end, { { 3, 4 }, { 2 }, { 3 }, { 1 } }, 500)
     imgui.TextWrapped(
         'You can adjust how far the notes are from each other by altering the "NOTE SPACING" setting. You can also change where the displacement "ends" by changing the "DISPLACEMENT" setting. Note that this is only useful when your average SV and your still note spacing are not equal.')
@@ -13368,7 +13599,7 @@ function showWorkingWithShapesTutorial()
     imgui.TextWrapped(
         'Take a look at the SV info window, and notice how the notes are jumping. This is exactly what the effect will look like when placed in game:')
     gpsim('Working With Shapes Jumping', vctr2(1), function(t)
-        return 0.9 - 2 * (t - t * t)
+        return 0.9 - 2 * (t - t ^ 2)
     end, { { 1, 2, 3, 4 }, {}, {}, {} }, 500)
     imgui.TextColored(GUIDELINE_COLOR,
         'Select more than 2 chords (at least 3 notes with different times),\nand place the SV using an aforementioned method.')
@@ -13534,8 +13765,8 @@ function showHotkeyTutorial()
     imgui.TextWrapped(
         'The most basic hotkeys are ones that can simply speed up your SV making process; whether that be placing SVs/SSFs or quickly editing settings.')
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
-    imgui.BulletText(table.concat({'Press "', globalVars.hotkeyList[hotkeys_enum.exec_primary], '" to quickly place SVs.'}))
-    imgui.BulletText(table.concat({'Press "', globalVars.hotkeyList[hotkeys_enum.exec_secondary], '" to quickly place SSFs.'}))
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[hotkeys_enum.exec_primary] .. '" to quickly place SVs.')
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[hotkeys_enum.exec_secondary] .. '" to quickly place SSFs.')
     imgui.BulletText('If you have a vibrato window, press "' ..
         globalVars.hotkeyList[hotkeys_enum.exec_vibrato] .. '" to quickly place vibrato.')
     imgui.BulletText('Press "' ..
@@ -13560,7 +13791,7 @@ function showHotkeyTutorial()
     imgui.TextWrapped(
         'Sometimes, typing letters/numbers on your keyboard will unintentionally interact with the editor in ways you don\'t want. You can remedy this by using the built-in "NOTE LOCK" feature.')
     imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
-    imgui.BulletText(table.concat({'Press "', globalVars.hotkeyList[hotkeys_enum.toggle_note_lock], '" to change the locking mode.'}))
+    imgui.BulletText('Press "' .. globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. '" to change the locking mode.')
     imgui.PopStyleColor()
 end
 function showWhatIsMsxTutorial()
@@ -13589,9 +13820,9 @@ function showTutorialWindow()
     imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
     startNextWindowNotCollapsed('plumoguSV Tutorial Menu')
     _, tutorialOpened = imgui.Begin('plumoguSV Tutorial Menu', true, 26)
-    local tutorialWindowName = state.GetValue("tutorialWindowName") or ''
+    local tutorialWindowName = cache.tutorialWindowName or ''
     if (not tutorialOpened) then
-        state.SetValue("windows.showTutorialWindow", false)
+        cache.windows.showTutorialWindow = false
     end
     local navigatorWidth = 200
     local nullFn = function()
@@ -13645,7 +13876,7 @@ function showTutorialWindow()
                 imgui.Selectable(text)
                 if (imgui.IsItemClicked()) then
                     tutorialWindowName = leafName
-                    state.SetValue("tutorialWindowName", tutorialWindowName)
+                    cache.tutorialWindowName = tutorialWindowName
                 end
             end
         end
@@ -13668,9 +13899,9 @@ function showTutorialWindow()
         imgui.Text('Please go to a 4K map to continue.')
         goto tutorialRenderSkip
     end
-    if (state.GetValue("tutorialWindowQueue")) then
-        tutorialWindowName = state.GetValue("tutorialWindowQueue")
-        state.SetValue("tutorialWindowQueue", nil)
+    if (cache.tutorialWindowQueue) then
+        tutorialWindowName = cache.tutorialWindowQueue
+        cache.tutorialWindowQueue = nil
     end
     if (tutorialWindowName == '') then
         nullFn()
@@ -13695,9 +13926,9 @@ function renderMeasureDataWidget()
     }
     cache.loadTable('measureWidget', widgetVars)
     local uniqueDict = {}
-    for _, ho in ipairs(state.SelectedHitObjects) do
+    for _, ho in ipairs(state.SelectedHitObjects) do -- game.get.uniqueSelectedNoteOffsets was not used here because this approach exits the function faster
         if (not table.contains(uniqueDict, ho.StartTime)) then
-            uniqueDict[#uniqueDict + 1] = ho.StartTime
+            table.insert(uniqueDict, ho.StartTime)
         end
         if (#uniqueDict > 2) then return end
     end
@@ -13710,8 +13941,8 @@ function renderMeasureDataWidget()
     uniqueDict = sort(uniqueDict, sortAscending) ---@type number[]
     local startOffset = uniqueDict[1]
     local endOffset = uniqueDict[2] or uniqueDict[1]
-    if (math.abs(endOffset - startOffset) < 1e-10 and not state.GetValue("boolean.changeOccurred") and state.SelectedScrollGroupId == widgetVars.tgName) then return end
-    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or state.GetValue("boolean.changeOccurred") or state.SelectedScrollGroupId ~= widgetVars.tgName) then
+    if (math.abs(endOffset - startOffset) < 1e-10 and not cache.boolean.changeOccurred and state.SelectedScrollGroupId == widgetVars.tgName) then return end
+    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or cache.boolean.changeOccurred or state.SelectedScrollGroupId ~= widgetVars.tgName) then
         svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
@@ -13723,9 +13954,9 @@ function renderMeasureDataWidget()
     end
     imgui.BeginTooltip()
     imgui.Text('Measure Info:')
-    imgui.Text(table.concat({'NSV Distance = ', widgetVars.nsvDistance, ' ms'}))
-    imgui.Text(table.concat({'SV Distance = ', widgetVars.roundedSVDistance, ' msx'}))
-    imgui.Text(table.concat({'Avg SV = ', widgetVars.roundedAvgSV, 'x'}))
+    imgui.Text('NSV Distance = ' .. widgetVars.nsvDistance .. ' ms')
+    imgui.Text('SV Distance = ' .. widgetVars.roundedSVDistance .. ' msx')
+    imgui.Text('Avg SV = ' .. widgetVars.roundedAvgSV .. 'x')
     imgui.EndTooltip()
     widgetVars.oldStartOffset = startOffset
     widgetVars.oldEndOffset = endOffset
@@ -13736,15 +13967,15 @@ function renderNoteDataWidget()
     imgui.BeginTooltip()
     imgui.Text('Note Info:')
     local selectedNote = state.SelectedHitObjects[1]
-    imgui.Text(table.concat({'StartTime = ', selectedNote.StartTime, ' ms'}))
+    imgui.Text('StartTime = ' .. selectedNote.StartTime .. ' ms')
     local noteIsNotLN = selectedNote.EndTime == 0
     if noteIsNotLN then
         imgui.EndTooltip()
         return
     end
     local lnLength = selectedNote.EndTime - selectedNote.StartTime
-    imgui.Text(table.concat({'EndTime = ', selectedNote.EndTime, ' ms'}))
-    imgui.Text(table.concat({'LN Length = ', lnLength, ' ms'}))
+    imgui.Text('EndTime = ' .. selectedNote.EndTime .. ' ms')
+    imgui.Text('LN Length = ' .. lnLength .. ' ms')
     imgui.EndTooltip()
 end
 function runTest()
@@ -13829,9 +14060,9 @@ function runTest()
     }
     local cameraPoints = {}
     local outputPoints = {}
-    if (not state.GetValue("theta")) then state.SetValue("theta", 0) end
-    state.SetValue("theta", state.GetValue("theta") + speed)
-    local theta = state.GetValue("theta")
+    if (not cache.theta) then cache.theta = 0 end
+    cache.theta = cache.theta + speed
+    local theta = cache.theta
     local matRotZ = {
         { math.cos(theta),  math.sin(theta), 0, 0 },
         { -math.sin(theta), math.cos(theta), 0, 0 },
@@ -13852,19 +14083,23 @@ function runTest()
     }
     for idx, point in pairs(inputPoints) do
         local inputPoint = table.map(point, function(i) return table.duplicate({ i }) end)
+        -- inputPoint = matrix.multiply(matRotX, inputPoint)
         inputPoint = matrix.multiply(matRotY, inputPoint)
+        -- inputPoint = matrix.multiply(matRotZ, inputPoint)
         inputPoint[1][1] = inputPoint[1][1] - cameraPos[1]
         inputPoint[2][1] = inputPoint[2][1] - cameraPos[2]
         inputPoint[3][1] = inputPoint[3][1] - cameraPos[3]
         local outputPoint = matrix.multiply(projectionMatrix, inputPoint)
         outputPoint = table.map(outputPoint, function(t) return t[1] end)
-        outputPoints[#outputPoints + 1] = outputPoint
+        table.insert(outputPoints, outputPoint)
         outputPoint = table.vectorize4(outputPoint)
         outputPoint = outputPoint / (outputPoint.w ~= 0 and outputPoint.w or 1) / 15 * zoom
         outputPoint = (outputPoint + vctr4(1)) / 2 *
             vector.New(screenWidth, screenHeight, 1, 1)
         local output2D = vector.New(outputPoint.x, outputPoint.y)
-        cameraPoints[#cameraPoints + 1] = output2D
+        table.insert(cameraPoints, output2D)
+        -- ctx.AddCircleFilled(topLeft + output2D, 5,
+        --     color.int.white)
     end
     local triangleBuffer = {}
     for k48 = 1, #surfaceIndices do
@@ -13964,8 +14199,8 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         normalizedPos2 = pos2 / 150
         imgui.Text('\n         Point 1:\n      (' ..
             string.format('%.2f', normalizedPos1.x) ..
-            table.concat({', ', string.format('%.2f', normalizedPos1.y), ')\n         Point 2:\n      ('}) ..
-            string.format('%.2f', normalizedPos2.x) .. table.concat({', ', string.format('%.2f', normalizedPos2.y), ')\n'}))
+            ', ' .. string.format('%.2f', normalizedPos1.y) .. ')\n         Point 2:\n      (' ..
+            string.format('%.2f', normalizedPos2.x) .. ', ' .. string.format('%.2f', normalizedPos2.y) .. ')\n')
         imgui.SetCursorPosY(80)
         imgui.SetCursorPosX(5)
         _, settingVars.freeMode = imgui.Checkbox('Free Mode##Bezier', settingVars.freeMode)
@@ -13998,8 +14233,8 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
     local oldP2 = settingVars.p2
     settingVars.p1 = normalizedPos1
     settingVars.p2 = normalizedPos2
-    state.SetValue("boolean.bezierFreeMode", settingVars.freeMode)
-    state.SetValue("boolean.bezierManualMode", settingVars.manualMode)
+    cache.boolean.bezierFreeMode = settingVars.freeMode
+    cache.boolean.bezierManualMode = settingVars.manualMode
     return oldP1 ~= settingVars.p1 or oldP2 ~= settingVars.p2
 end
 function chooseChinchillaIntensity(settingVars)
@@ -14287,8 +14522,8 @@ function chooseCurrentScrollGroup()
     local hiddenGroups = {}
     for tgId, tg in pairs(map.TimingGroups) do
         if string.find(tgId, '%$') then goto nextTG end
-        if (globalVars.hideAutomatic and string.find(tgId, 'automate_')) then hiddenGroups[#hiddenGroups + 1] = tgId end
-        groups[#groups + 1] = tgId
+        if (globalVars.hideAutomatic and string.find(tgId, 'automate_')) then table.insert(hiddenGroups, tgId) end
+        table.insert(groups, tgId)
         table.insert(cols, tg.ColorRgb or '255,255,255')
         ::nextTG::
     end
@@ -14315,7 +14550,7 @@ function chooseTimingGroup(label, previousGroup)
             table.insert(hiddenGroups,
                 tgId)
         end
-        groups[#groups + 1] = tgId
+        table.insert(groups, tgId)
         table.insert(cols, tg.ColorRgb or '255,255,255')
         ::nextTG::
     end
@@ -14526,7 +14761,7 @@ function choosePulseColor()
         write(globalVars)
     end
     if (not colorPickerOpened) then
-        state.SetValue("windows.showColorPicker", false)
+        cache.windows.showColorPicker = false
     end
     imgui.End()
 end
@@ -14566,6 +14801,11 @@ function chooseConvertSVSSFDirection(menuVars)
     menuVars.conversionDirection = RadioButtons('Direction:', menuVars.conversionDirection, { 'SSF -> SV', 'SV -> SSF' },
         { false, true })
 end
+-- Calculates the total msx displacements over time at offsets
+-- Returns a table of total displacements [Table]
+-- Parameters
+--    noteOffsets : list of offsets (milliseconds) to calculate displacement at [Table]
+--    noteSpacing : SV multiplier determining spacing [Int/Float]
 function calculateDisplacementsFromNotes(noteOffsets, noteSpacing)
     local totalDisplacement = 0
     local displacements = { 0 }
@@ -14573,13 +14813,24 @@ function calculateDisplacementsFromNotes(noteOffsets, noteSpacing)
         local time = (noteOffsets[i + 1] - noteOffsets[i])
         local distance = time * noteSpacing
         totalDisplacement = totalDisplacement + distance
-        displacements[#displacements + 1] = totalDisplacement
+        table.insert(displacements, totalDisplacement)
     end
     return displacements
 end
+-- Calculates the total msx displacement over time for a given set of SVs
+-- Returns a table of total displacements [Table]
+-- Parameters
+--    svs         : list of ordered svs to calculate displacement with [Table]
+--    startOffset : starting time for displacement calculation [Int/Float]
+--    endOffset   : ending time for displacement calculation [Int/Float]
 function calculateDisplacementFromSVs(svs, startOffset, endOffset)
     return calculateDisplacementsFromSVs(svs, { startOffset, endOffset })[2]
 end
+-- Calculates the total msx displacements over time at offsets for a given set of SVs
+-- Returns a table of total displacements [Table]
+-- Parameters
+--    svs     : list of ordered svs to calculate displacement with [Table]
+--    offsets : list of offsets (milliseconds) to calculate displacement at [Table]
 function calculateDisplacementsFromSVs(svs, offsets)
     local totalDisplacement = 0
     local displacements = {}
@@ -14596,7 +14847,7 @@ function calculateDisplacementsFromSVs(svs, offsets)
             if svToOffsetTime > 0 then
                 displacement = displacement + lastSV.Multiplier * svToOffsetTime
             end
-            displacements[#displacements + 1] = displacement
+            table.insert(displacements, displacement)
             j = j + 1
         end
         if svTimeDifference > 0 then
@@ -14605,14 +14856,21 @@ function calculateDisplacementsFromSVs(svs, offsets)
         end
     end
     table.remove(svs)
-    displacements[#displacements + 1] = totalDisplacement
+    table.insert(displacements, totalDisplacement)
     return displacements
 end
+-- Calculates still displacements
+-- Returns the still displacements [Table]
+-- Parameters
+--    stillType        : type of still [String]
+--    stillDistance    : distance of the still according to the still type [Int/Float]
+--    svDisplacements  : list of displacements of notes based on svs [Table]
+--    nsvDisplacements : list of displacements of notes based on notes only, no sv [Table]
 function calculateStillDisplacements(stillType, stillDistance, svDisplacements, nsvDisplacements)
     local finalDisplacements = {}
     for i = 1, #svDisplacements do
         local difference = nsvDisplacements[i] - svDisplacements[i]
-        finalDisplacements[#finalDisplacements + 1] = difference
+        table.insert(finalDisplacements, difference)
     end
     local extraDisplacement = stillDistance
     if stillType == 'End' or stillType == 'Otua' then
@@ -14625,15 +14883,26 @@ function calculateStillDisplacements(stillType, stillDistance, svDisplacements, 
     end
     return finalDisplacements
 end
+-- Returns a usable displacement multiplier for a given offset [Int/Float]
 --
+-- Current implementation:
+-- ...
+-- 64 until 2^18 = 262144 ms ~4.3 min, then —>
+-- 32 until 2^19 = 524288 ms ~8.7 min, then —>
+-- 16 until 2^20 = 1048576 ms ~17.4 min, then —>
+-- 8 until 2^21 = 2097152 ms ~34.9 min, then —>
+-- 4 until 2^22 = 4194304 ms ~69.9 min, then —>
+-- 2 until 2^23 = 8388608 ms ~139.8 min, then —> 1
 --
+-- Parameters
+--    offset: time in milliseconds [Int]
 function getUsableDisplacementMultiplier(offset)
     local exponent
     if (globalVars.useMinDisplacementMultiplier) then
-        if (not state.GetValue("displacementExponent")) then
+        if (not cache.displacementExponent) then
             initializeDisplacementExponentCache()
         end
-        return 2 ^ state.GetValue("displacementExponent")
+        return 2 ^ cache.displacementExponent
     else
         exponent = math.clamp(23 - math.floor(math.log(math.abs(offset) + 1, 2)), 0,
             globalVars.maxDisplacementMultiplierExponent)
@@ -14641,8 +14910,15 @@ function getUsableDisplacementMultiplier(offset)
     end
 end
 function initializeDisplacementExponentCache()
-    state.SetValue("displacementExponent", math.clamp(23 - math.floor(math.log(math.ceil(map.TrackLength) + 1, 2)), 0, 6))
+    cache.displacementExponent = math.clamp(23 - math.floor(math.log(math.ceil(map.TrackLength) + 1, 2)), 0, 6)
 end
+-- Adds a new displacing SV to a list of SVs to place and adds that SV time to a hash list
+-- Parameters
+--    svsToAdd               : list of displacing SVs to add to [Table]
+--    svTimeIsAdded          : hash list indicating whether an SV time exists already [Table]
+--    svTime                 : time to add the displacing SV at [Int/Float]
+--    displacement           : amount that the SV will displace [Int/Float]
+--    displacementMultiplier : displacement multiplier value [Int/Float]
 function prepareDisplacingSV(svsToAdd, svTimeIsAdded, svTime, displacement, displacementMultiplier, hypothetical, svs)
     svTimeIsAdded[svTime] = true
     local currentSVMultiplier = game.get.svMultiplierAt(svTime)
@@ -14652,6 +14928,14 @@ function prepareDisplacingSV(svsToAdd, svTimeIsAdded, svTime, displacement, disp
     local newSVMultiplier = displacementMultiplier * displacement + currentSVMultiplier
     addSVToList(svsToAdd, svTime, newSVMultiplier, true)
 end
+-- Adds new displacing SVs to a list of SVs to place and adds removable SV times to another list
+-- Parameters
+--    offset             : general offset in milliseconds to displace SVs at [Int]
+--    svsToAdd           : list of displacing SVs to add to [Table]
+--    svTimeIsAdded      : hash list indicating whether an SV time exists already [Table]
+--    beforeDisplacement : amount to displace before (nil value if not) [Int/Float]
+--    atDisplacement     : amount to displace at (nil value if not) [Int/Float]
+--    afterDisplacement  : amount to displace after (nil value if not) [Int/Float]
 function prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, beforeDisplacement, atDisplacement,
                               afterDisplacement, hypothetical, baseSVs)
     local displacementMultiplier = getUsableDisplacementMultiplier(offset)
@@ -14672,6 +14956,13 @@ function prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, beforeDisplacemen
             displacementMultiplier, hypothetical, baseSVs)
     end
 end
+-- Returns a set of cubic bezier values [Table]
+-- Parameters
+--    p1            : first (inputted) cubic bezier point [Int/Float]
+--    p2            : second (inputted) cubic bezier point [Int/Float]
+--    avgValue      : average value of the set [Int/Float]
+--    numValues     : total number of values in the bezier set [Int]
+--    verticalShift : constant to add to each value in the set at very the end [Int/Float]
 function generateBezierSet(p1, p2, avgValue, numValues, verticalShift)
     avgValue = avgValue - verticalShift
     local startingTimeGuess = 0.5
@@ -14681,8 +14972,8 @@ function generateBezierSet(p1, p2, avgValue, numValues, verticalShift)
     local xPosCount = numValues
     if (globalVars.equalizeLinear) then xPosCount = xPosCount - 1 end
     for i = 1, numValues do
-        timeGuesses[#timeGuesses + 1] = startingTimeGuess
-        targetXPositions[#targetXPositions + 1] = i / xPosCount
+        table.insert(timeGuesses, startingTimeGuess)
+        table.insert(targetXPositions, i / xPosCount)
     end
     for i = 1, iterations do
         local timeIncrement = 0.5 ^ (i + 1)
@@ -14698,12 +14989,12 @@ function generateBezierSet(p1, p2, avgValue, numValues, verticalShift)
     local yPositions = { 0 }
     for i = 1, #timeGuesses do
         local yPosition = math.cubicBezier(p1.y, p2.y, timeGuesses[i])
-        yPositions[#yPositions + 1] = yPosition
+        table.insert(yPositions, yPosition)
     end
     local bezierSet = {}
     for i = 1, #yPositions - 1 do
         local slope = (yPositions[i + 1] - yPositions[i]) * numValues
-        bezierSet[#bezierSet + 1] = slope
+        table.insert(bezierSet, slope)
     end
     bezierSet = table.normalize(bezierSet, avgValue, false)
     for i = 1, #bezierSet do
@@ -14720,7 +15011,7 @@ function generateChinchillaSet(settingVars)
     for i = 1, #percents do
         local currentPercent = percents[i]
         local newPercent = scalePercent(settingVars, currentPercent) --
-        newPercents[#newPercents + 1] = newPercent
+        table.insert(newPercents, newPercent)
     end
     local numValues = settingVars.svPoints
     for i = 1, numValues do
@@ -14732,9 +15023,10 @@ function generateChinchillaSet(settingVars)
     for i = 1, #chinchillaSet do
         chinchillaSet[i] = chinchillaSet[i] + settingVars.verticalShift
     end
-    chinchillaSet[#chinchillaSet + 1] = settingVars.avgSV
+    table.insert(chinchillaSet, settingVars.avgSV)
     return chinchillaSet
 end
+-- Scales a percent value based on the selected scale type
 function scalePercent(settingVars, percent)
     local behaviorType = SV_BEHAVIORS[settingVars.behaviorIndex]
     local slowDownType = behaviorType == 'Slow down'
@@ -14752,7 +15044,7 @@ function scalePercent(settingVars, percent)
     elseif scaleType == 'Circular' then
         if a == 0 then return percent end
         local b = 1 / (a ^ (a + 1))
-        local radicand = (b + 1) ^ 2 + b * b - (workingPercent + b) ^ 2
+        local radicand = (b + 1) ^ 2 + b ^ 2 - (workingPercent + b) ^ 2
         newPercent = b + 1 - math.sqrt(radicand)
     elseif scaleType == 'Sine Power' then
         local exponent = math.log(a + 1)
@@ -14766,6 +15058,12 @@ function scalePercent(settingVars, percent)
         local denominator = 1 + (workingPercent ^ -a)
         newPercent = 2 * workingPercent / denominator
     elseif 'Peter Stock' then
+        --[[
+        Algorithm based on a modified version of Peter Stock's StackExchange answer.
+        Peter Stock (https://math.stackexchange.com/users/1246531/peter-stock)
+        SmoothStep: Looking for a continuous family of interpolation functions
+        URL (version: 2023-11-04): https://math.stackexchange.com/q/4800509
+        --]]
         if a == 0 then return percent end
         local c = a / (1 - a)
         newPercent = (workingPercent ^ 2) * (1 + c) / (workingPercent + c)
@@ -14773,6 +15071,14 @@ function scalePercent(settingVars, percent)
     if slowDownType then newPercent = 1 - newPercent end
     return math.clamp(newPercent, 0, 1)
 end
+-- Returns a set of circular values [Table]
+-- Parameters
+--    behavior      : description of how the set changes (speeds up or slows down) [String]
+--    arcPercent    : arc percent of a semicircle to generate values from [Int]
+--    avgValue      : average value of the set [Int/Float]
+--    verticalShift : constant to add to each value in the set at very the end [Int/Float]
+--    numValues     : total number of values in the circular set [Int]
+--    dontNormalize : Whether or not to normalize values to the target average value [Boolean]
 function generateCircularSet(behavior, arcPercent, avgValue, verticalShift, numValues,
                              dontNormalize)
     local increaseValues = (behavior == 'Speed up')
@@ -14783,7 +15089,7 @@ function generateCircularSet(behavior, arcPercent, avgValue, verticalShift, numV
     for i = 1, #angles do
         local angle = math.round(angles[i], 8)
         local x = math.cos(angle)
-        yCoords[i] = -avgValue * math.sqrt(1 - x * x)
+        yCoords[i] = -avgValue * math.sqrt(1 - x ^ 2)
     end
     local circularSet = {}
     for i = 1, #yCoords - 1 do
@@ -14796,9 +15102,20 @@ function generateCircularSet(behavior, arcPercent, avgValue, verticalShift, numV
     for i = 1, #circularSet do
         circularSet[i] = circularSet[i] + verticalShift
     end
-    circularSet[#circularSet + 1] = avgValue
+    table.insert(circularSet, avgValue)
     return circularSet
 end
+-- Returns a set of combo values [Table]
+-- Parameters
+--    values1          : first set for the combo [Table]
+--    values2          : second set for the combo [Table]
+--    comboPhase       : amount to phase the second set of values into the first set [Int]
+--    comboType        : type of combo for overlapping/phased values [String]
+--    comboMultiplier1 : multiplying value for the first set in "Add" type combos [Int/Float]
+--    comboMultiplier2 : multiplying value for the second set in "Add" type combos [Int/Float]
+--    dontNormalize    : whether or not to normalize values to the avg value [Boolean]
+--    avgValue         : average value of the set [Int/Float]
+--    verticalShift    : constant to add to each value in the set at very the end [Int/Float]
 function generateComboSet(values1, values2, comboPhase, comboType, comboMultiplier1,
                           comboMultiplier2, dontNormalize, avgValue, verticalShift)
     local comboValues = {}
@@ -14814,10 +15131,10 @@ function generateComboSet(values1, values2, comboPhase, comboType, comboMultipli
         local endIndex2 = comboPhase - #values1
         local startIndex2 = #values1 + #values2 + 1 - comboPhase
         for i = 1, endIndex1 do
-            comboValues[#comboValues + 1] = values1[i]
+            table.insert(comboValues, values1[i])
         end
         for i = 1, endIndex2 do
-            comboValues[#comboValues + 1] = values2[i]
+            table.insert(comboValues, values2[i])
         end
         if comboType ~= 'Remove' then
             local comboValues1StartIndex = endIndex1 + 1
@@ -14826,11 +15143,11 @@ function generateComboSet(values1, values2, comboPhase, comboType, comboMultipli
             local comboValues2EndIndex = startIndex1 - 1
             local comboValues1 = {}
             for i = comboValues1StartIndex, comboValues1EndIndex do
-                comboValues1[#comboValues1 + 1] = values1[i]
+                table.insert(comboValues1, values1[i])
             end
             local comboValues2 = {}
             for i = comboValues2StartIndex, comboValues2EndIndex do
-                comboValues2[#comboValues2 + 1] = values2[i]
+                table.insert(comboValues2, values2[i])
             end
             for i = 1, #comboValues1 do
                 local comboValue1 = comboValues1[i]
@@ -14845,20 +15162,20 @@ function generateComboSet(values1, values2, comboPhase, comboType, comboMultipli
                 elseif comboType == 'Max' then
                     finalValue = math.max(comboValue1, comboValue2)
                 end
-                comboValues[#comboValues + 1] = finalValue
+                table.insert(comboValues, finalValue)
             end
         end
         for i = startIndex1, #values2 do
-            comboValues[#comboValues + 1] = values2[i]
+            table.insert(comboValues, values2[i])
         end
         for i = startIndex2, #values1 do
-            comboValues[#comboValues + 1] = values1[i]
+            table.insert(comboValues, values1[i])
         end
-        if not isTruthy(comboValues) then comboValues[#comboValues + 1] = 1 end
+        if not isTruthy(comboValues) then table.insert(comboValues, 1) end
         if (comboPhase - #values2 >= 0) then
-            comboValues[#comboValues + 1] = lastValue1
+            table.insert(comboValues, lastValue1)
         else
-            comboValues[#comboValues + 1] = lastValue2
+            table.insert(comboValues, lastValue2)
         end
     end
     avgValue = avgValue - verticalShift
@@ -14870,16 +15187,27 @@ function generateComboSet(values1, values2, comboPhase, comboType, comboMultipli
     end
     return comboValues
 end
+-- Returns a set of custom values [Table]
+-- Parameters
+--    values : list of custom values [Table]
 function generateCustomSet(values)
     local newValues = table.duplicate(values)
     local averageMultiplier = table.average(newValues, true)
-    newValues[#newValues + 1] = averageMultiplier
+    table.insert(newValues, averageMultiplier)
     return newValues
 end
+-- Returns a set of exponential values [Table]
+-- Parameters
+--    behavior      : behavior of the values (increase/speed up, or decrease/slow down) [String]
+--    numValues     : total number of values in the exponential set [Int]
+--    avgValue      : average value of the set [Int/Float]
+--    intensity     : value determining sharpness/rapidness of exponential change [Int/Float]
+--    verticalShift : constant to add to each value in the set at very the end [Int/Float]
 function generateExponentialSet(behavior, numValues, avgValue, intensity, verticalShift)
     avgValue = avgValue - verticalShift
     local exponentialIncrease = (behavior == 'Speed up')
     local exponentialSet = {}
+    -- reduce intensity scaling to produce more useful/practical values
     intensity = intensity * 0.2
     for i = 0, numValues - 1 do
         local x
@@ -14889,7 +15217,7 @@ function generateExponentialSet(behavior, numValues, avgValue, intensity, vertic
             x = (numValues - i - 0.5) * intensity / numValues
         end
         local y = math.exp(x - 1) / intensity
-        exponentialSet[#exponentialSet + 1] = y
+        table.insert(exponentialSet, y)
     end
     exponentialSet = table.normalize(exponentialSet, avgValue, false)
     for i = 1, #exponentialSet do
@@ -14899,6 +15227,7 @@ function generateExponentialSet(behavior, numValues, avgValue, intensity, vertic
 end
 function generateExponentialSet2(behavior, numValues, startValue, endValue, intensity)
     local exponentialSet = {}
+    -- reduce intensity scaling to produce more useful/practical values
     intensity = intensity * 0.2
     if (behavior == 'Slow down' and startValue ~= endValue) then
         startValue, endValue = endValue, startValue
@@ -14908,13 +15237,20 @@ function generateExponentialSet2(behavior, numValues, startValue, endValue, inte
         local x = i / (numValues - 1)
         local k = (endValue - startValue) / (math.exp(intensity) - 1)
         fx = k * math.exp(intensity * x) + startValue - k
-        exponentialSet[#exponentialSet + 1] = fx
+        table.insert(exponentialSet, fx)
     end
     if (behavior == 'Slow down' and startValue ~= endValue) then
         exponentialSet = table.reverse(exponentialSet)
     end
     return exponentialSet
 end
+-- Returns a set of hermite spline related (?) values [Table]
+-- Parameters
+--    startValue    : intended first value of the set [Int/Float]
+--    endValue      : intended last value of the set [Int/Float]
+--    verticalShift : constant to add to each value in the set at very the end [Int/Float]
+--    avgValue      : average value of the set [Int/Float]
+--    numValues     : total number of values in the bezier set [Int]
 function generateHermiteSet(startValue, endValue, verticalShift, avgValue, numValues)
     avgValue = avgValue - verticalShift
     local xCoords = generateLinearSet(0, 1, numValues)
@@ -14931,9 +15267,14 @@ function generateHermiteSet(startValue, endValue, verticalShift, avgValue, numVa
     for i = 1, #hermiteSet do
         hermiteSet[i] = hermiteSet[i] + verticalShift
     end
-    hermiteSet[#hermiteSet + 1] = avgValue
+    table.insert(hermiteSet, avgValue)
     return hermiteSet
 end
+-- Returns a set of linear values [Table]
+-- Parameters
+--    startValue : starting value of the linear set [Int/Float]
+--    endValue   : ending value of the linear set [Int/Float]
+--    numValues  : total number of values in the linear set [Int]
 function generateLinearSet(startValue, endValue, numValues, placingSV)
     local linearSet = { startValue }
     if numValues < 2 then return linearSet end
@@ -14943,15 +15284,22 @@ function generateLinearSet(startValue, endValue, numValues, placingSV)
     end
     local increment = (endValue - startValue) / (numValues - 1)
     for i = 1, (numValues - 1) do
-        linearSet[#linearSet + 1] = startValue + i * increment
+        table.insert(linearSet, startValue + i * increment)
     end
     return linearSet
 end
+-- Returns the average of two numbers [Int/Float]
+-- Returns a modified set of random values [Table]
+-- Parameters
+--    values        : list of random values [Table]
+--    avgValue      : average value of the set [Int/Float]
+--    verticalShift : constant to add to each value in the set at very the end [Int/Float]
+--    dontNormalize : whether or not to normalize values to the avg value [Boolean]
 function getRandomSet(values, avgValue, verticalShift, dontNormalize)
     avgValue = avgValue - verticalShift
     local randomSet = {}
     for i = 1, #values do
-        randomSet[#randomSet + 1] = values[i]
+        table.insert(randomSet, values[i])
     end
     if not dontNormalize then
         randomSet = table.normalize(randomSet, avgValue, false)
@@ -14961,22 +15309,37 @@ function getRandomSet(values, avgValue, verticalShift, dontNormalize)
     end
     return randomSet
 end
+-- Returns a set of random values [Table]
+-- Parameters
+--    numValues   : total number of values in the exponential set [Int]
+--    randomType  : type of random distribution to use [String]
+--    randomScale : how much to scale random values [Int/Float]
 function generateRandomSet(numValues, randomType, randomScale)
     local randomSet = {}
     for _ = 1, numValues do
         if randomType == 'Uniform' then
             local randomValue = randomScale * 2 * (0.5 - math.random())
-            randomSet[#randomSet + 1] = randomValue
+            table.insert(randomSet, randomValue)
         elseif randomType == 'Normal' then
+            -- Box-Muller transformation
             local u1 = math.random()
             local u2 = math.random()
             local randomIncrement = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2)
             local randomValue = randomScale * randomIncrement
-            randomSet[#randomSet + 1] = randomValue
+            table.insert(randomSet, randomValue)
         end
     end
     return randomSet
 end
+-- Returns a set of sinusoidal values [Table]
+-- Parameters
+--    startAmplitude         : starting amplitude of the sinusoidal wave [Int/Float]
+--    endAmplitude           : ending amplitude of the sinusoidal wave [Int/Float]
+--    periods                : number of periods/cycles of the sinusoidal wave [Int/Float]
+--    periodsShift           : number of periods/cycles to shift the sinusoidal wave [Int/Float]
+--    valuesPerQuarterPeriod : number of values to calculate per quarter period/cycle [Int/Float]
+--    verticalShift          : constant to add to each value in the set at very the end [Int/Float]
+--    curveSharpness         : value determining the curviness of the sine curve [Int/Float]
 function generateSinusoidalSet(startAmplitude, endAmplitude, periods, periodsShift,
                                valuesPerQuarterPeriod, verticalShift, curveSharpness)
     local sinusoidalSet = {}
@@ -14994,10 +15357,16 @@ function generateSinusoidalSet(startAmplitude, endAmplitude, periods, periodsShi
         local angle = (math.pi * 0.5) * ((i / valuesPerQuarterPeriod) + quarterPeriodsShift)
         local value = amplitudes[i + 1] * (math.abs(math.sin(angle)) ^ (normalizedSharpness))
         value = value * math.sign(math.sin(angle)) + verticalShift
-        sinusoidalSet[#sinusoidalSet + 1] = value
+        table.insert(sinusoidalSet, value)
     end
     return sinusoidalSet
 end
+-- Returns a set of stutter values [Table]
+-- Parameters
+--    stutterValue     : value of the stutter [Int/Float]
+--    stutterDuration  : duration of the stutter (out of 100) [Int]
+--    avgValue         : average value [Int/Float]
+--    controlLastValue : whether or not the provided SV is the second SV [Boolean]
 function generateStutterSet(stutterValue, stutterDuration, avgValue, controlLastValue)
     local durationPercent = stutterDuration * 0.01
     if controlLastValue then durationPercent = 1 - durationPercent end
@@ -15006,6 +15375,11 @@ function generateStutterSet(stutterValue, stutterDuration, avgValue, controlLast
     if controlLastValue then stutterSet = { otherValue, stutterValue, avgValue } end
     return stutterSet
 end
+-- Returns generated sv multipliers [Table]
+-- Parameters
+--    svType              : type of SV to generate [String]
+--    settingVars         : list of variables used for the current menu [Table]
+--    interlaceMultiplier : interlace multiplier [Int/Float]
 function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
     local multipliers = { 727, 69 } ---@type number[]
     if svType == 'Linear' then
@@ -15092,7 +15466,7 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
         multipliers = {}
         local fn = eval(settingVars.code) ---@type fun(t: number): number
         for i = 0, settingVars.svPoints do
-            multipliers[#multipliers + 1] = fn(i / settingVars.svPoints)
+            table.insert(multipliers, fn(i / settingVars.svPoints))
         end
     elseif svType == 'Stutter1' then
         multipliers = generateStutterSet(settingVars.startSV, settingVars.stutterDuration,
@@ -15104,8 +15478,8 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
     if interlaceMultiplier then
         local newMultipliers = {}
         for i = 1, #multipliers do
-            newMultipliers[#newMultipliers + 1] = multipliers[i]
-            newMultipliers[#newMultipliers + 1] = multipliers[i] * interlaceMultiplier
+            table.insert(newMultipliers, multipliers[i])
+            table.insert(newMultipliers, multipliers[i] * interlaceMultiplier)
         end
         if settingVars.avgSV and not settingVars.dontNormalize then
             newMultipliers = table.normalize(newMultipliers, settingVars.avgSV, false)
@@ -15114,6 +15488,12 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
     end
     return multipliers
 end
+-- Creates and returns a frameTime object [Table]
+-- Parameters
+--    thisTime     : time in milliseconds [Int]
+--    thisLanes    : note lanes [Table]
+--    thisFrame    : frame number [Int]
+--    thisPosition : msx position (height) on the frame [Int/Float]
 function createFrameTime(thisTime, thisLanes, thisFrame, thisPosition)
     local frameTime = {
         time = thisTime,
@@ -15125,7 +15505,7 @@ function createFrameTime(thisTime, thisLanes, thisFrame, thisPosition)
 end
 function listenForGeneralChanges()
     listen(function(_, _, _)
-        state.SetValue("boolean.changeOccurred", true)
+        cache.boolean.changeOccurred = true
     end)
 end
 function triggerListeners()
@@ -15133,11 +15513,11 @@ function triggerListeners()
     listenForGeneralChanges()
 end
 function listenForTimingGroupCount()
-    state.SetValue("tgList", game.get.timingGroupList())
+    cache.tgList = game.get.timingGroupList()
     listen(function(action, type, fromLua)
         local actionIndex = tonumber(action.Type)
         if (actionIndex < action_type.CreateTimingGroup and actionIndex ~= action_type.Batch) then return end
-        state.SetValue("tgList", game.get.timingGroupList())
+        cache.tgList = game.get.timingGroupList()
     end)
 end
 ---Returns true if the number of notes in the given [HitObject](lua://HitObject) list contains at least `requiredLNCount` long notes. If `requiredLNCount` isn't given, the default value 1 is used.
@@ -15154,11 +15534,11 @@ function checkNotesForLNs(hos, requiredLNCount)
 end
 ---Prints a warning message if legacy LN rendering isn't enabled.
 function printLegacyLNMessage()
-    if (not globalVars.printLegacyLNMessage or state.GetValue("disablePrintLegacyLNMessage")) then return end
+    if (not globalVars.printLegacyLNMessage or cache.disablePrintLegacyLNMessage) then return end
     if (not checkNotesForLNs(state.SelectedHitObjects) or map.LegacyLNRendering) then return end
     print('w!',
         'Using any sort of displacements with LNs while Legacy LN rendering is highly discouraged. Consider turning on Legacy LN Rendering in the F1 menu. You can permanently disable this message in the plumoguSV settings.')
-    state.SetValue("disablePrintLegacyLNMessage", true)
+    cache.disablePrintLegacyLNMessage = true
 end
 ---Alias for [`utils.CreateScrollVelocity`](lua://utils.CreateScrollVelocity).
 ---@param startTime number
@@ -15206,7 +15586,7 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
         createEA(action_type.AddScrollVelocityBatch, svsToAdd),
     }
     actions.PerformBatch(editorActions)
-    toggleablePrint('s!', table.concat({'Created ', #svsToAdd, pluralize(' SV.', #svsToAdd, -2)}))
+    toggleablePrint('s!', 'Created ' .. #svsToAdd .. pluralize(' SV.', #svsToAdd, -2))
 end
 function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
     if not isTruthy(ssfsToAdd) then return end
@@ -15215,8 +15595,13 @@ function removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
         createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
     }
     actions.PerformBatch(editorActions)
-    toggleablePrint('s!', table.concat({'Created ', #ssfsToAdd, pluralize(' SSF.', #ssfsToAdd, -2)}))
+    toggleablePrint('s!', 'Created ' .. #ssfsToAdd .. pluralize(' SSF.', #ssfsToAdd, -2))
 end
+-- Adds the final SV to the "svsToAdd" list if there isn't an SV at the end offset already
+-- Parameters
+--    svsToAdd     : list of SVs to add [Table]
+--    endOffset    : millisecond time of the final SV [Int]
+--    svMultiplier : the final SV's multiplier [Int/Float]
 function addFinalSV(svsToAdd, endOffset, svMultiplier, force)
     local sv = map.GetScrollVelocityAt(endOffset)
     local svExistsAtEndOffset = sv and (sv.StartTime == endOffset)
@@ -15236,14 +15621,24 @@ function addInitialSSF(ssfsToAdd, startOffset)
     if ssfExistsAtStartOffset then return end
     addSSFToList(ssfsToAdd, startOffset, ssf.Multiplier, true)
 end
+-- Adds an SV with the start offset into the list if there isn't an SV there already
+-- Parameters
+--    svs         : list of SVs [Table]
+--    startOffset : start offset in milliseconds for the list of SVs [Int]
 function addStartSVIfMissing(svs, startOffset)
     if #svs ~= 0 and svs[1].StartTime == startOffset then return end
     addSVToList(svs, startOffset, game.get.svMultiplierAt(startOffset), false)
 end
+-- Creates and adds a new SV to an existing list of SVs
+-- Parameters
+--    svList     : list of SVs [Table]
+--    offset     : offset in milliseconds for the new SV [Int/Float]
+--    multiplier : multiplier for the new SV [Int/Float]
+--    endOfList  : whether or not to add the SV to the end of the list (else, the front) [Boolean]
 function addSVToList(svList, offset, multiplier, endOfList)
     local newSV = createSV(offset, multiplier)
     if endOfList then
-        svList[#svList + 1] = newSV
+        table.insert(svList, newSV)
         return
     end
     table.insert(svList, 1, newSV)
@@ -15251,17 +15646,23 @@ end
 function addSSFToList(ssfList, offset, multiplier, endOfList)
     local newSSF = createSSF(offset, multiplier)
     if endOfList then
-        ssfList[#ssfList + 1] = newSSF
+        table.insert(ssfList, newSSF)
         return
     end
     table.insert(ssfList, 1, newSSF)
 end
+-- Gets removable SVs that are in the map at the exact time where an SV will get added
+-- Parameters
+--    svsToRemove   : list of SVs to remove [Table]
+--    svTimeIsAdded : list of SVs times added [Table]
+--    startOffset   : starting offset to remove after [Int]
+--    endOffset     : end offset to remove before [Int]
 function getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset, retroactiveSVRemovalTable)
     for _, sv in ipairs(map.ScrollVelocities) do
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime <= endOffset + 1
         if svIsInRange then
             local svIsRemovable = svTimeIsAdded[sv.StartTime]
-            if svIsRemovable then svsToRemove[#svsToRemove + 1] = sv end
+            if svIsRemovable then table.insert(svsToRemove, sv) end
         end
     end
     if (not retroactiveSVRemovalTable) then return end
@@ -15298,10 +15699,16 @@ function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     for k51 = 1, #svs do
         local sv = svs[k51]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
-        if svIsInRange then svsBetweenOffsets[#svsBetweenOffsets + 1] = sv end
+        if svIsInRange then table.insert(svsBetweenOffsets, sv) end
     end
     return sort(svsBetweenOffsets, sortAscendingStartTime)
 end
+-- Updates SVs and SV info stored in the menu
+-- Parameters
+--    currentSVType : current type of SV being updated [String]
+--    menuVars      : list of variables used for the place SV menu [Table]
+--    settingVars   : list of variables used for the current menu [Table]
+--    skipFinalSV   : whether or not to skip the final SV for updating menu SVs [Boolean]
 function updateMenuSVs(currentSVType, menuVars, settingVars, skipFinalSV)
     local interlaceMultiplier = nil
     if menuVars.interlace then interlaceMultiplier = menuVars.interlaceRatio end
@@ -15314,6 +15721,12 @@ function updateMenuSVs(currentSVType, menuVars, settingVars, skipFinalSV)
     updateSVStats(menuVars.svGraphStats, menuVars.svStats, menuVars.svMultipliers,
         svMultipliersNoEndSV, menuVars.svDistances)
 end
+-- Updates the final SV of the precalculated menu SVs
+-- Parameters
+--    finalSVIndex  : index value for the type of final SV [Int]
+--    svMultipliers : list of SV multipliers [Table]
+--    customSV      : custom SV value [Int/Float]
+--    skipFinalSV   : whether or not to skip the final SV for updating menu SVs [Boolean]
 function updateFinalSV(finalSVIndex, svMultipliers, customSV, skipFinalSV)
     if skipFinalSV then
         table.remove(svMultipliers)
@@ -15359,7 +15772,7 @@ function calculateDistanceVsTime(svValues)
     local svValuesBackwards = table.reverse(svValues)
     for i = 1, #svValuesBackwards do
         distance = distance + (multiplier * svValuesBackwards[i])
-        distancesBackwards[#distancesBackwards + 1] = distance
+        table.insert(distancesBackwards, distance)
     end
     return table.reverse(distancesBackwards)
 end
@@ -15371,9 +15784,12 @@ function calculatePlotScale(plotValues)
     local min = math.min(table.unpack(plotValues))
     local max = math.max(table.unpack(plotValues))
     local absMax = math.max(math.abs(min), math.abs(max))
+    -- as the default, set the plot range to +- the absolute max value
     local minScale = -absMax
     local maxScale = absMax
+    -- restrict the plot range to non-positive values when all values are non-positive
     if max <= 0 then maxScale = 0 end
+    -- restrict the plot range to non-negative values when all values are non-negative
     if min >= 0 then minScale = 0 end
     return minScale, maxScale
 end
@@ -15394,7 +15810,7 @@ function calculateStutterDistanceVsTime(svValues, stutterDuration, stuttersPerSe
         else
             distance = distance + svValues[1]
         end
-        distancesBackwards[#distancesBackwards + 1] = distance
+        table.insert(distancesBackwards, distance)
     end
     return table.reverse(distancesBackwards)
 end
@@ -15473,16 +15889,37 @@ function plotSigmoidalCurvature(settingVars)
     imgui.PopStyleColor()
     imgui.PopItemWidth()
 end
+-- Updates stats for the current menu's SVs
+-- Parameters
+--    svGraphStats         : list of stats for the SV graphs [Table]
+--    svStats              : list of stats for the current menu's SVs [Table]
+--    svMultipliers        : list of sv multipliers [Table]
+--    svMultipliersNoEndSV : list of sv multipliers, no end multiplier [Table]
+--    svDistances          : list of distances calculated from SV multipliers [Table]
 function updateSVStats(svGraphStats, svStats, svMultipliers, svMultipliersNoEndSV, svDistances)
     updateGraphStats(svGraphStats, svMultipliers, svDistances)
     svStats.minSV = math.round(math.min(table.unpack(svMultipliersNoEndSV)), 2)
     svStats.maxSV = math.round(math.max(table.unpack(svMultipliersNoEndSV)), 2)
     svStats.avgSV = math.round(table.average(svMultipliersNoEndSV, true), 3)
 end
+-- Updates scale stats for SV graphs
+-- Parameters
+--    graphStats : list of graph scale numbers [Table]
+--    svMultipliers : list of SV multipliers[Table]
+--    svDistances : list of SV distances [Table]
 function updateGraphStats(graphStats, svMultipliers, svDistances)
     graphStats.minScale, graphStats.maxScale = calculatePlotScale(svMultipliers)
     graphStats.distMinScale, graphStats.distMaxScale = calculatePlotScale(svDistances)
 end
+-- Creates a new window with plots/graphs and stats of the current menu's SVs
+-- Parameters
+--    windowText      : name of the window [String]
+--    svGraphStats    : stats of the SV graphs [Table]
+--    svStats         : stats of the SV multipliers [Table]
+--    svDistances     : distance vs time list [Table]
+--    svMultipliers   : multiplier values of the SVs [Table]
+--    stutterDuration : percent duration of first stutter (nil if not stutter SV) [Int]
+--    skipDistGraph   : whether or not to skip showing the distance graph [Boolean]
 function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMultipliers,
                           stutterDuration, skipDistGraph)
     if (globalVars.hideSVInfo) then return end
@@ -15554,6 +15991,10 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
     end
     imgui.End()
 end
+-- Displays stats for stutter SVs
+-- Parameters
+--    svMultipliers   : stutter multipliers [Table]
+--    stutterDuration : duration of the stutter (out of 100) [Int]
 function displayStutterSVStats(svMultipliers, stutterDuration)
     local firstSV = math.round(svMultipliers[1], 3)
     local secondSV = math.round(svMultipliers[2], 3)
@@ -15563,10 +16004,13 @@ function displayStutterSVStats(svMultipliers, stutterDuration)
     imgui.Text('First SV:')
     imgui.Text('Second SV:')
     imgui.NextColumn()
-    imgui.Text(firstSV .. table.concat({'x  (', firstDuration, '%% duration)'}))
-    imgui.Text(secondSV .. table.concat({'x  (', secondDuration, '%% duration)'}))
+    imgui.Text(firstSV .. 'x  (' .. firstDuration .. '%% duration)')
+    imgui.Text(secondSV .. 'x  (' .. secondDuration .. '%% duration)')
     imgui.Columns(1)
 end
+-- Displays stats for the current menu's SVs
+-- Parameters
+--    svStats : list of stats for the current menu [Table]
 function displaySVStats(svStats)
     imgui.Columns(2, 'SV Stats', false)
     imgui.Text('Max SV:')
@@ -15579,6 +16023,9 @@ function displaySVStats(svStats)
     HelpMarker('Rounded to 3 decimal places')
     imgui.Columns(1)
 end
+-- Makes the next plugin window not collapsed on startup
+-- Parameters
+--    windowName : key name for the next plugin window that opens [String]
 function startNextWindowNotCollapsed(windowName)
     if state.GetValue(windowName) then return end
     imgui.SetNextWindowCollapsed(false)
@@ -15698,7 +16145,7 @@ function importCustomSVs(settingVars)
         local regex = '(-?%d*%.?%d+)'
         local values = {}
         for value, _ in string.gmatch(customSVText, regex) do
-            values[#values + 1] = tn(value)
+            table.insert(values, tn(value))
         end
         if #values >= 1 then
             settingVars.svMultipliers = values
@@ -15824,125 +16271,99 @@ function toggleablePrint(type, msg)
     print(type, msg)
 end
 function awake()
-    loadup = {} -- later inserted to via setStyleVars.lua
-    local tempGlobalVars = read()
-    if (tempGlobalVars and tempGlobalVars.colorThemeIndex) then
-        print('w!',
-            'Due to an internal change, your selected theme may have been reset. Please reselect the theme in the plugin settings')
-    end
-    if (not tempGlobalVars) then
-        write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
-        ---@diagnostic disable-next-line: undefined-global
-        if (DISTRO == 'steam') then
-            print('w!',
-                "Additionally, Steam Workshop will reset your settings when the plugin is updated. To prevent this, please save your 'config.yaml' file after you're finished configuring settings, and drop it back in when an update comes around.")
-        end
-        print('w!',
-            'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.')
-        setPresets({})
-    else
-        setGlobalVars(tempGlobalVars)
-        loadDefaultProperties(tempGlobalVars.defaultProperties)
-        setPresets(tempGlobalVars.presets or {})
-    end
-    initializeNoteLockMode()
-    triggerListeners()
-    setPluginAppearance()
-    state.SelectedScrollGroupId = '$Default' or map.GetTimingGroupIds()[1]
-    if (not isTruthy(map.TimingPoints)) then
-        print('e!', 'Please place a timing point before attempting to use plumoguSV.')
-    end
-    if (state.Scale ~= 1) then
-        local printedScale = math.round(state.Scale * 100)
-        print('e!',
-            'Your ImGui scale is set to ' ..
-            printedScale .. '% instead of 100%. For visual purposes, please set it back to 100%.')
-    end
-    initializeDisplacementExponentCache()
-    clock.prevTime = state.UnixTime
-    game.keyCount = map.GetKeyCount()
+loadup = {} -- later inserted to via setStyleVars.lua
+local tempGlobalVars = read()
+if (tempGlobalVars and tempGlobalVars.colorThemeIndex) then
+    print('w!',
+        'Due to an internal change, your selected theme may have been reset. Please reselect the theme in the plugin settings')
 end
-function runOtherTest()
-    local ogTg = state.SelectedScrollGroupId
-    local svsToAdd = {}
-    for _, v in pairs(state.SelectedHitObjects) do
-        state.SelectedScrollGroupId = 'splitter_col_' .. v.Lane
-        local dist = getDist(v.StartTime, v.Lane)
-        local curSSF = map.GetScrollSpeedFactorAt(v.StartTime + 1).Multiplier
-        prepareDisplacingSVs(v.StartTime, svsToAdd, {}, dist * curSSF, -dist * curSSF, 0)
+if (not tempGlobalVars) then
+    write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
+    ---@diagnostic disable-next-line: undefined-global
+    if (DISTRO == 'steam') then
+        print('w!',
+            "Additionally, Steam Workshop will reset your settings when the plugin is updated. To prevent this, please save your 'config.yaml' file after you're finished configuring settings, and drop it back in when an update comes around.")
     end
-    actions.PlaceScrollVelocityBatch(svsToAdd)
-    state.SelectedScrollGroupId = ogTg
+    print('w!',
+        'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.')
+    setPresets({})
+else
+    setGlobalVars(tempGlobalVars)
+    loadDefaultProperties(tempGlobalVars.defaultProperties)
+    setPresets(tempGlobalVars.presets or {})
 end
-function getDist(t, l)
-    local ogTg = state.SelectedScrollGroupId
-    state.SelectedScrollGroupId = 'w_receptor_' .. l
-    svsBetweenOffsets = game.get.svsBetweenOffsets(t, 200479)
-    local nsvDistance = 200479 - t
-    addStartSVIfMissing(svsBetweenOffsets, t)
-    local totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, t, 200479) or 0
-    local roundedSVDistance = math.round(totalDistance, 3)
-    state.SelectedScrollGroupId = ogTg
-    return roundedSVDistance
+initializeNoteLockMode()
+triggerListeners()
+setPluginAppearance()
+state.SelectedScrollGroupId = '$Default' or map.GetTimingGroupIds()[1]
+if (not isTruthy(map.TimingPoints)) then
+    print('e!', 'Please place a timing point before attempting to use plumoguSV.')
+end
+if (state.Scale ~= 1) then
+    local printedScale = math.round(state.Scale * 100)
+    print('e!',
+        'Your ImGui scale is set to ' ..
+        printedScale .. '% instead of 100%. For visual purposes, please set it back to 100%.')
+end
+initializeDisplacementExponentCache()
+clock.prevTime = state.UnixTime
+game.keyCount = map.GetKeyCount()
 end
 function draw()
-    if (not state.CurrentTimingPoint or not imgui or not state) then return end
-    local performanceMode = globalVars.performanceMode
-    PLUGIN_NAME = 'plumoguSV-dev'
-    state.IsWindowHovered = imgui.IsWindowHovered()
-    startNextWindowNotCollapsed(PLUGIN_NAME)
-    imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
-    imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
-    if (not performanceMode) then
-        addGradient()
-        renderBackground()
-        drawCapybaraParent()
-        drawCursorTrail()
-        pulseController()
-        checkForGlobalHotkeys()
-        setPluginAppearance()
+if (not state.CurrentTimingPoint or not imgui or not state) then return end
+local performanceMode = globalVars.performanceMode
+PLUGIN_NAME = 'plumoguSV-dev'
+state.IsWindowHovered = imgui.IsWindowHovered()
+startNextWindowNotCollapsed(PLUGIN_NAME)
+imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
+imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
+if (not performanceMode) then
+    addGradient()
+    renderBackground()
+    drawCapybaraParent()
+    drawCursorTrail()
+    pulseController()
+    checkForGlobalHotkeys()
+    setPluginAppearance()
+end
+imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
+imgui.BeginTabBar('SV tabs')
+for i = 1, #TAB_MENUS do
+    createMenuTab(TAB_MENUS[i])
+end
+imgui.EndTabBar()
+if (not performanceMode) then
+    if (globalVars.showVibratoWidget) then
+        imgui.Begin('plumoguSV-vibrato', imgui_window_flags.AlwaysAutoResize)
+        imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
+        placeVibratoSVMenu(true)
+        imgui.End()
     end
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
-    imgui.BeginTabBar('SV tabs')
-    for i = 1, #TAB_MENUS do
-        createMenuTab(TAB_MENUS[i])
+    if (globalVars.showNoteDataWidget) then
+        renderNoteDataWidget()
     end
-    imgui.EndTabBar()
-    if (not performanceMode) then
-        if (globalVars.showVibratoWidget) then
-            imgui.Begin('plumoguSV-vibrato', imgui_window_flags.AlwaysAutoResize)
-            imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
-            placeVibratoSVMenu(true)
-            imgui.End()
-        end
-        if (globalVars.showNoteDataWidget) then
-            renderNoteDataWidget()
-        end
-        if (globalVars.showMeasureDataWidget) then
-            renderMeasureDataWidget()
-        end
+    if (globalVars.showMeasureDataWidget) then
+        renderMeasureDataWidget()
     end
-    if (state.GetValue("windows.showTutorialWindow")) then
-        showTutorialWindow()
-    end
-    if (state.GetValue("windows.showSettingsWindow")) then
-        showPluginSettingsWindow()
-    end
-    if (state.GetValue("windows.showPatchNotesWindow")) then
-        showPatchNotesWindow()
-    end
-    if (not performanceMode and map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ') then
-        runTest()
-    end
-    if (imgui.Button('run')) then
-        runOtherTest()
-    end
-    imgui.End()
-    logoThread()
-    state.SetValue("boolean.changeOccurred", false)
-    local groups = state.GetValue("tgList")
-    if (state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex]) then
-        globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
-    end
-    tempClockCount = 0
+end
+if (cache.windows.showTutorialWindow) then
+    showTutorialWindow()
+end
+if (cache.windows.showSettingsWindow) then
+    showPluginSettingsWindow()
+end
+if (cache.windows.showPatchNotesWindow) then
+    showPatchNotesWindow()
+end
+if (not performanceMode and map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ') then
+    runTest()
+end
+imgui.End()
+logoThread()
+cache.boolean.changeOccurred = false
+local groups = cache.tgList
+if (state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex]) then
+    globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
+end
+tempClockCount = 0
 end
