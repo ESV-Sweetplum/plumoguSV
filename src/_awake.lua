@@ -1,4 +1,4 @@
-loadup = {}     -- later inserted to via setStyleVars.lua
+loadup = {} -- later inserted to via setStyleVars.lua
 
 local tempGlobalVars = read()
 
@@ -8,7 +8,7 @@ if (tempGlobalVars and tempGlobalVars.colorThemeIndex) then
 end
 
 if (not tempGlobalVars) then
-    write(DEFAULT_GLOBAL_VARS)     -- First time launching plugin
+    write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
     ---@diagnostic disable-next-line: undefined-global
     if (DISTRO == 'steam') then
         print('w!',
