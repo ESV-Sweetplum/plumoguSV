@@ -16271,14 +16271,14 @@ function toggleablePrint(type, msg)
     print(type, msg)
 end
 function awake()
-loadup = {}     -- later inserted to via setStyleVars.lua
+loadup = {} -- later inserted to via setStyleVars.lua
 local tempGlobalVars = read()
 if (tempGlobalVars and tempGlobalVars.colorThemeIndex) then
     print('w!',
         'Due to an internal change, your selected theme may have been reset. Please reselect the theme in the plugin settings')
 end
 if (not tempGlobalVars) then
-    write(DEFAULT_GLOBAL_VARS)     -- First time launching plugin
+    write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
     ---@diagnostic disable-next-line: undefined-global
     if (DISTRO == 'steam') then
         print('w!',
