@@ -1,17 +1,14 @@
 math.randomseed(os.time())
 imgui_disable_vector_packing=true
 PLUGIN_NAME="plumoguSV";PLUGIN_VERSION="2.1.1";PLUGIN_AUTHOR="plummyyummy, kloi34";PLUGIN_DESCRIPTION="The ultimate community-driven and open-source competitive SV plugin, remastered for the modern age."
----@meta cache-class
 cache = {
     boolean = {},
     windows = {},
     lists = {},
 }
----@meta clock-class
 clock = {}; cache.clock = {}
 clock.prevTime = 0
 tempClockCount = 0
----@meta color-class
 color = {
     vctr = {},
     int = {},
@@ -21,14 +18,11 @@ color.int.redMask = 1
 color.int.greenMask = 256
 color.int.blueMask = 65536
 color.int.whiteMask = color.int.redMask + color.int.greenMask + color.int.blueMask
----@meta game-class
 game = {
     window = {},
     get = {},
 }
----@meta input-class
 kbm = {}
----@meta matrix-class
 matrix = {}
 ---#### (NOTE: This function is impure and has no return value. This should be changed eventually.)
 ---Gets a list of variables.
@@ -54,7 +48,6 @@ end
 function clock.getTime()
     return (state.UnixTime - clock.prevTime) / 1000
 end
-require('packages.cache.initialize.priority')
 ---Returns true every `interval` ms.
 ---@param id string The unique identifier of the clock.
 ---@param interval integer The interval at which the clock should run.
@@ -215,7 +208,6 @@ function generateRGBColor(includeAlpha)
     local a = math.random()
     return vector.New(r, g, b, includeAlpha and a or 1)
 end
-require('packages.table.searchClosest')
 ---Gets the most recent timing point, or a dummy timing point if none exists.
 ---@param offset number
 ---@return TimingPoint
@@ -385,8 +377,6 @@ function game.get.timingGroupList()
     if (globalVars.hideAutomatic) then table.filter(baseList, function(str) return not string.find(str, 'automate_') end) end
     return baseList
 end
-require('packages.table.dedupe')
-require('packages.table.sort')
 ---Finds and returns a list of all unique offsets of notes between selected notes [Table]
 ---@param includeLN? boolean
 ---@return number[]
@@ -509,7 +499,6 @@ ALPHABET_LIST = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M
 function kbm.numToKey(num)
     return ALPHABET_LIST[math.clamp(num - 64, 1, #ALPHABET_LIST)]
 end
-require('packages.table.contains')
 ---Returns true if the given key combo is pressed (e.g. "Ctrl+Shift+L")
 ---@param keyCombo string
 ---@return boolean
@@ -550,7 +539,6 @@ end
 function math.quadraticBezier(p2, t)
     return 2 * t * (1 - t) * p2 + t ^ 2
 end
-require('packages.math.factorial')
 ---Restricts a number to be within a chosen bound.
 ---@param number number
 ---@param lowerBound number
@@ -611,7 +599,6 @@ function math.expoClamp(n, lowerBound, upperBound, multiplicativeFactor)
     end
     return n
 end
-require('packages.math.round')
 ---Forces a number to have a quarterly decimal part.
 ---@param number number
 ---@return number
@@ -712,10 +699,6 @@ function matrix.scaleRow(mtrx, rowIdx, factor)
         mtrx[rowIdx][k] = v * factor
     end
 end
-require('packages.table.duplicate')
-require('packages.math.matrix.findZeroRow')
-require('packages.math.matrix.rowLinComb')
-require('packages.math.matrix.scaleRow')
 ---Given a square matrix A and equally-sized vector B, returns a vector x such that Ax=B.
 ---@param mtrx number[][]
 ---@param vctr number[]
@@ -801,8 +784,6 @@ function math.wrappedClamp(number, lowerBound, upperBound)
     if number > upperBound then return lowerBound end
     return number
 end
-require('packages.table.contains')
-require('packages.string.charAt')
 CONSONANTS = { 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Z' }
 ---Very rudimentary function that returns a string depending on whether or not it should be plural.
 ---@param str string The inital string, which should be a noun (e.g. `bookmark`)
@@ -832,7 +813,6 @@ function pluralize(str, val, pos)
     end
     return table.concat(finalStrTbl) .. (strEnding or '')
 end
-require('packages.string.charAt')
 ---Capitalizes the first letter of the given string. If `forceLowercase` is true, then all other letters will be forced into lowercase.
 ---@param str string
 ---@param forceLowercase? boolean
@@ -862,7 +842,6 @@ function string.fixToSize(str, targetSize)
     end
     return str .. '...'
 end
-require('packages.string.charAt')
 ---Removes spaces and turns a string into lowerCamelCase. Also removes special characters.
 ---@param str string
 ---@return string
@@ -871,7 +850,6 @@ function string.identify(str)
     newStr = newStr:charAt(1):lower() .. newStr:sub(2)
     return newStr
 end
-require('packages.kbm.numToKey')
 function string.obfuscate(str)
     local newStr = ''
     local originalSize = imgui.CalcTextSize(str).x
@@ -889,7 +867,6 @@ function string.obfuscate(str)
     end
     return newStr
 end
-require('packages.string.charAt')
 ---Lots of imgui functions have ## in them as identifiers. This will remove everything after the ##.
 ---@param str string
 ---@return string
@@ -901,8 +878,6 @@ function string.removeTrailingTag(str)
     end
     return table.concat(newStr)
 end
-require('packages.string.charAt')
-require('packages.table.contains')
 ---Removes vowels from a string.
 ---@param str string
 ---@return string
@@ -917,8 +892,6 @@ function string.removeVowels(str)
     end
     return newStr
 end
-require('packages.string.removeVowels')
-require('packages.string.charAt')
 ---Shortens a string to three consonants; the first, the second, and the last.
 ---@param str string
 ---@return string
@@ -971,7 +944,6 @@ function table.average(values, includeLastValue)
     end
     return sum / #values
 end
-require('packages.table.duplicate')
 ---Concatenates arrays together.
 ---@param t1 any[] The first table.
 ---@param ... any[] The next tables.
@@ -1035,7 +1007,6 @@ function table.dedupe(tbl)
     end
     return newTbl
 end
-require('packages.table.keys')
 ---Returns a deep copy of a table.
 ---@generic T : table
 ---@param tbl T The original table.
@@ -1073,8 +1044,6 @@ function table.indexOf(tbl, item)
     end
     return -1
 end
-require('packages.table.construct')
-require('packages.table.dedupe')
 ---Returns a table of keys from a table.
 ---@param tbl { [string]: any } The table to search in.
 ---@return string[] keys A list of keys.
@@ -1098,7 +1067,6 @@ function table.map(tbl, fn)
     end
     return newTbl
 end
-require('packages.table.slice')
 ---Navigates a tree with dot notation and returns the corresponding value. For example, if you had a table { foo = { bar = 1 } }, then this returns 1 if the given value is "foo.bar".
 ---@param tree { [string]: any }
 ---@param value string[]
@@ -1109,8 +1077,6 @@ function table.nestedValue(tree, value)
     end
     return tree[value[1]]
 end
-require('packages.table.average')
-require('packages.table.construct')
 ---Normalizes a table of numbers to achieve a target average.
 ---@param values number[] The table to normalize.
 ---@param targetAverage number The desired average value.
@@ -1125,9 +1091,6 @@ function table.normalize(values, targetAverage, includeLastValue)
     end
     return newValues
 end
-require('packages.table.contains')
-require('packages.string.charAt')
-require('packages.math.toNumber')
 ---Converts a string (generated from [table.stringify](lua://table.stringify)) into a table.
 ---@param str string
 ---@return any
@@ -1252,7 +1215,6 @@ end
 function table.slice(tbl, i, j)
     return { table.unpack(tbl, i, j or #tbl) }
 end
-require('packages.table.duplicate')
 ---Sorting function for sorting objects by their numerical value. Should be passed into [`table.sort`](lua://table.sort).
 ---@param a number
 ---@param b number
@@ -1286,8 +1248,6 @@ function sort(tbl, compFn)
     table.sort(newTbl, compFn)
     return newTbl
 end
-require('packages.truthy')
-require('packages.table.keys')
 ---Converts a table (or any other primitive values) to a string.
 ---@param var any
 ---@return string
@@ -1311,8 +1271,6 @@ function table.stringify(var)
     end
     return str:sub(1, -2) .. '}'
 end
-require('packages.table.keys')
-require('packages.table.contains')
 ---When given a dictionary and table of keys, returns a new table with only the specified keys and values.
 ---@generic T table
 ---@param checkList T The base table, which has a list of keys to include in the new table.
@@ -1338,7 +1296,6 @@ function table.validate(checkList, tbl, extrapolateData, inferTypes)
     end
     return outputTable
 end
-require('packages.table.construct')
 ---Returns a table of values from a table.
 ---@param tbl { [string]: any } The table to search in.
 ---@return string[] values A list of values.
@@ -16358,7 +16315,7 @@ local performanceMode = globalVars.performanceMode
 PLUGIN_NAME = 'plumoguSV-dev'
 state.IsWindowHovered = imgui.IsWindowHovered()
 startNextWindowNotCollapsed(PLUGIN_NAME)
-imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676)))     -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
+imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
 imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
 if (not performanceMode) then
     addGradient()
