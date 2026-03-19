@@ -1,3 +1,10 @@
 {
     "editor.defaultFormatter": "sumneko.lua",
+    "Lua.diagnostics.globals": [
+        "PLUGIN_NAME",
+        "PLUGIN_AUTHOR",
+        "PLUGIN_VERSION",
+        "PLUGIN_DESCRIPTION",
+        "imgui_disable_vector_packing"
+    ]
 }
