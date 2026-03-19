@@ -9,7 +9,6 @@ end
 
 if (not tempGlobalVars) then
     write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
-    ---@diagnostic disable-next-line: undefined-global
     if (DISTRO == 'steam') then
         print('w!',
             "Additionally, Steam Workshop will reset your settings when the plugin is updated. To prevent this, please save your 'config.yaml' file after you're finished configuring settings, and drop it back in when an update comes around.")
