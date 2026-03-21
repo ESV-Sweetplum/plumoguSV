@@ -18,7 +18,13 @@
     "workspace.ignoreSubmodules": true,
     "workspace.useGitIgnore": true,
     "diagnostics.globals": [
-        "devMode"
+        "PLUGIN_NAME",
+        "PLUGIN_AUTHOR",
+        "PLUGIN_VERSION",
+        "PLUGIN_DESCRIPTION",
+        "ENVIRONMENT",
+        "DISTRO",
+        "imgui_disable_vector_packing"
     ],
     "addonManager.enable": false,
     "diagnostics.groupSeverity": {
