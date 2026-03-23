@@ -19,6 +19,7 @@ function showPatchNotesWindow()
         cache.windows.showPatchNotesWindow = false
     end
 
+    showPatchNotesV212(color.int.white)
     showPatchNotesV211(color.int.white)
     showPatchNotesV210(minorUpdateLeftColor, minorUpdateRightColor)
     showPatchNotesV202(color.int.white)
