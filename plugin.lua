@@ -1879,7 +1879,7 @@ function setGlobalVars(tempGlobalVars)
             for k12 = 1, #forceVectorizeList do
                 local key = forceVectorizeList[k12]
                 if (themeData[key]) then
-                    globalVars.customStyles[themeName][key] = table.vectorize4(themeData[key])
+                    tempGlobalVars.customStyles[themeName][key] = table.vectorize4(themeData[key])
                 end
             end
         end
@@ -12583,6 +12583,8 @@ function showPatchNotesV212(lc, rc)
         'Fixed recompilation bug with the aho-corasick algorithm.',
         'Now correctly seeds the math module to ensure purely random results.',
         'Fixed the dust trail being entirely white.',
+        'Fixed the plugin executing actions accidentally while an input is being edited.',
+        'Fixed some custom theme parameters not correctly saving.',
     }
     local newFeatures = {
         'Added an error protector against faulty table parse attempts.',

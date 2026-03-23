@@ -5,6 +5,8 @@ function showPatchNotesV212(lc, rc)
         'Fixed recompilation bug with the aho-corasick algorithm.',
         'Now correctly seeds the math module to ensure purely random results.',
         'Fixed the dust trail being entirely white.',
+        'Fixed the plugin executing actions accidentally while an input is being edited.',
+        'Fixed some custom theme parameters not correctly saving.',
     }
 
     local newFeatures = {
