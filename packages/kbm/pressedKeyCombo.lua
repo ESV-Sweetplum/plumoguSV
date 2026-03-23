@@ -4,6 +4,7 @@ require('packages.table.contains')
 ---@param keyCombo string
 ---@return boolean
 function kbm.pressedKeyCombo(keyCombo)
+    if (imgui.IsAnyItemActive()) then return false end
     keyCombo = keyCombo:upper()
     local comboList = {}
     for v in keyCombo:gmatch('%u+') do
