@@ -116,6 +116,7 @@ DYNAMIC_BACKGROUND_TYPES = {
     'Reactive Stars',
     'Reactive Singularity',
     'Dynamic Connection',
+    'Topographic Map',
     'SV Spectrogram',
 }
 

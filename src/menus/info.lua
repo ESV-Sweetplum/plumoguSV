@@ -50,7 +50,7 @@ function infoTab()
     HoverToolTip('New to SV? View interactive tutorials that will help you navigate the plugin for your first time.')
     imgui.Dummy(vctr2(5))
 
-    imgui.SetCursorPosX(30)
+    imgui.SetCursorPosX(31)
     imgui.Text('To report issues, please join the')
     imgui.SameLine(0, 2)
     imgui.TextLinkOpenURL('Discord', 'https://discord.com/invite/gU4P5nPAMF')
