@@ -7730,7 +7730,7 @@ end
 function PresetButton()
     local buttonText = ': )'
     if globalVars.showPresetMenu then buttonText = 'X' end
-    local buttonPressed = imgui.Button(buttonText, EXPORT_BUTTON_SIZE)
+    local buttonPressed = imgui.Button(buttonText .. '##Preset', EXPORT_BUTTON_SIZE)
     HoverToolTip('View presets and export/import them.')
     KeepSameLine()
     if not buttonPressed then return end
@@ -8343,11 +8343,12 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         end
     end
     AddPadding()
-    InitializeTable('Preset Columns', 3, imgui_table_flags.BordersInner, { '  Name', ' Menu', ' Actions' }, {
-        { imgui_table_column_flags.WidthFixed, 80 },
-        { imgui_table_column_flags.WidthFixed, 63 },
-        { imgui_table_column_flags.WidthFixed, 85 },
-    }, true)
+    InitializeTable('Preset Columns', 3, imgui_table_flags.BordersInner,
+        { '  Name##Preset', ' Menu##Preset', ' Actions##Preset' }, {
+            { imgui_table_column_flags.WidthFixed, 80 },
+            { imgui_table_column_flags.WidthFixed, 63 },
+            { imgui_table_column_flags.WidthFixed, 85 },
+        }, true)
     for idx, preset in pairs(globalVars.presets) do
         imgui.PushID(idx)
         imgui.TableNextRow(0, 34)
@@ -8380,6 +8381,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             table.remove(globalVars.presets, idx)
             write(globalVars)
         end
+        imgui.PopID()
         imgui.NextColumn()
     end
     imgui.EndTable()

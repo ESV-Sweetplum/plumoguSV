@@ -21,7 +21,7 @@ end
 function PresetButton()
     local buttonText = ': )'
     if globalVars.showPresetMenu then buttonText = 'X' end
-    local buttonPressed = imgui.Button(buttonText, EXPORT_BUTTON_SIZE)
+    local buttonPressed = imgui.Button(buttonText .. '##Preset', EXPORT_BUTTON_SIZE)
     HoverToolTip('View presets and export/import them.')
     KeepSameLine()
     if not buttonPressed then return end

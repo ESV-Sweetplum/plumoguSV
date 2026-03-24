@@ -52,11 +52,12 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
 
     AddPadding()
 
-    InitializeTable('Preset Columns', 3, imgui_table_flags.BordersInner, { '  Name', ' Menu', ' Actions' }, {
-        { imgui_table_column_flags.WidthFixed, 80 },
-        { imgui_table_column_flags.WidthFixed, 63 },
-        { imgui_table_column_flags.WidthFixed, 85 },
-    }, true)
+    InitializeTable('Preset Columns', 3, imgui_table_flags.BordersInner,
+        { '  Name##Preset', ' Menu##Preset', ' Actions##Preset' }, {
+            { imgui_table_column_flags.WidthFixed, 80 },
+            { imgui_table_column_flags.WidthFixed, 63 },
+            { imgui_table_column_flags.WidthFixed, 85 },
+        }, true)
 
     for idx, preset in pairs(globalVars.presets) do
         imgui.PushID(idx)
@@ -90,6 +91,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             table.remove(globalVars.presets, idx)
             write(globalVars)
         end
+        imgui.PopID()
         imgui.NextColumn()
     end
 
