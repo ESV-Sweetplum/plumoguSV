@@ -346,8 +346,18 @@ DEFAULT_HOTKEY_LIST = { 'T', 'Shift+T', 'S', 'N', 'R', 'B', 'M', 'V', 'G', 'Ctrl
 
 HOTKEY_LABELS = { 'Execute Primary Action', 'Execute Secondary Action', 'Swap Primary Inputs',
     'Negate Primary Inputs', 'Reset Secondary Input', 'Go To Prev. Scroll Group', 'Go To Next Scroll Group',
-    'Execute Vibrato Separately', 'Go To TG of Selected Note', 'Toggle Note Lock Mode', 'Toggle Use End Offsets',
+    'Execute Vibrato Separately', 'Go To TG of Selected Note', 'Toggle Note Lock Mode', 'Toggle End Offsets Mode',
     'Move Selection To TG' }
+
+HOTKEY_SETTING_ORDER = { 1, 2, 3, 4, 5, 6, 7, 9, 12, 10, 11, 8 }
+
+--- Based on hotkey setting order
+HOTKEY_SEPARATORS = {
+    [3] = 'Input Adjustment Hotkeys',
+    [6] = 'Scroll Group Hotkeys',
+    [10] = 'Mode Adjustment Hotkeys',
+    [8] = 'Window Hotkeys',
+}
 
 ---@enum hotkeys
 hotkeys_enum = {

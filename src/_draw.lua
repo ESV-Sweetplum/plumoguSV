@@ -1,4 +1,4 @@
-if (not state.CurrentTimingPoint or not imgui or not state) then return end
+if (not state.CurrentTimingPoint or not imgui or not state or not map or not utils or not actions) then return end
 local performanceMode = globalVars.performanceMode
 
 PLUGIN_NAME = 'plumoguSV-dev'

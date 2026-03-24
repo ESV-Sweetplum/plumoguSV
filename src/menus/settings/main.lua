@@ -21,13 +21,13 @@ function showPluginSettingsWindow()
     end
     startNextWindowNotCollapsed('plumoguSV Settings')
     _, settingsOpened = imgui.Begin('plumoguSV Settings', true, 42)
-    imgui.SetWindowSize('plumoguSV Settings', vector.New(433, 400))
+    imgui.SetWindowSize('plumoguSV Settings', vector.New(450, 400))
 
     local typeIndex = cache.settingTypeIndex or 1
 
     imgui.Columns(2, 'settings_columnList', true)
     imgui.SetColumnWidth(0, 150)
-    imgui.SetColumnWidth(1, 283)
+    imgui.SetColumnWidth(1, 300)
 
     imgui.BeginChild('Setting Categories')
 
@@ -58,7 +58,7 @@ function showPluginSettingsWindow()
     imgui.EndChild()
     imgui.NextColumn()
 
-    imgui.BeginChild('Settings Data')
+    imgui.BeginChild('Settings Data', vector.New(283, 357))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
 
     cache.settingTypeIndex = typeIndex

@@ -1695,8 +1695,16 @@ DEFAULT_STYLE = {
 DEFAULT_HOTKEY_LIST = { 'T', 'Shift+T', 'S', 'N', 'R', 'B', 'M', 'V', 'G', 'Ctrl+Alt+L', 'Ctrl+Alt+E', 'O' }
 HOTKEY_LABELS = { 'Execute Primary Action', 'Execute Secondary Action', 'Swap Primary Inputs',
     'Negate Primary Inputs', 'Reset Secondary Input', 'Go To Prev. Scroll Group', 'Go To Next Scroll Group',
-    'Execute Vibrato Separately', 'Go To TG of Selected Note', 'Toggle Note Lock Mode', 'Toggle Use End Offsets',
+    'Execute Vibrato Separately', 'Go To TG of Selected Note', 'Toggle Note Lock Mode', 'Toggle End Offsets Mode',
     'Move Selection To TG' }
+HOTKEY_SETTING_ORDER = { 1, 2, 3, 4, 5, 6, 7, 9, 12, 10, 11, 8 }
+--- Based on hotkey setting order
+HOTKEY_SEPARATORS = {
+    [3] = 'Input Adjustment Hotkeys',
+    [6] = 'Scroll Group Hotkeys',
+    [10] = 'Mode Adjustment Hotkeys',
+    [8] = 'Window Hotkeys',
+}
 ---@enum hotkeys
 hotkeys_enum = {
     exec_primary = 1,
@@ -8302,7 +8310,11 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     _, newPresetName = imgui.InputText('##PresetName', newPresetName, 4096)
     imgui.PopItemWidth()
     imgui.SameLine()
-    if (imgui.Button('Save') and newPresetName:len() > 0) then
+    local saveButtonClicked = imgui.Button('Save')
+    if (saveButtonClicked and newPresetName:len() == 0) then
+        print('e!', 'Please enter a name for your new preset.')
+    end
+    if (saveButtonClicked and newPresetName:len() > 0) then
         preset = {}
         preset.name = newPresetName
         newPresetName = ''
@@ -8319,6 +8331,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         end
         table.insert(globalVars.presets, preset)
         write(globalVars)
+        print('i!', 'Saved preset "' .. preset.name .. '".')
     end
     state.SetValue('newPresetName', newPresetName)
     AddSeparator()
@@ -8378,6 +8391,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         HoverToolTip('Left-click to select this preset. Right-click to copy this preset to your clipboard.')
         KeepSameLine()
         if (imgui.Button('X##Preset' .. idx)) then
+            print('e!', 'Deleted preset "' .. globalVars.presets[idx].name .. '".')
             table.remove(globalVars.presets, idx)
             write(globalVars)
         end
@@ -13531,13 +13545,17 @@ function showKeybindSettings()
     local awaitingIndex = state.GetValue('hotkey_awaitingIndex', 0)
     local keybindHashmap = state.GetValue('hotkey_keybindHashmap', nil)
     if (not keybindHashmap) then keybindHashmap = reconstructKeybindHashmap() end
-    for hotkeyIndex, hotkeyCombo in pairs(globalVars.hotkeyList) do
+    for trueIdx, hotkeySettingNumber in pairs(HOTKEY_SETTING_ORDER) do
+        local hotkeyIndex = hotkeySettingNumber
+        local hotkeyCombo = globalVars.hotkeyList[hotkeyIndex or trueIdx]
+        local separator = HOTKEY_SEPARATORS[hotkeyIndex]
+        if (separator) then imgui.SeparatorText(separator) end
         local keyOccurrences = keybindHashmap.counts[hotkeyCombo]
         if (keyOccurrences > 1) then
             imgui.PushStyleColor(imgui_col.Text,
                 color.int.redMask * 200 + color.int.whiteMask * 55 + color.int.alphaMask * 255)
         end
-        if imgui.Button(awaitingIndex == hotkeyIndex and 'Listening...##listening' or hotkeyCombo:fixToSize(70) .. '##' .. hotkeyIndex) then
+        if imgui.Button(awaitingIndex == hotkeyIndex and 'Listening...##keybind' or hotkeyCombo:fixToSize(70) .. '##' .. hotkeyIndex) then
             if awaitingIndex == hotkeyIndex then
                 awaitingIndex = 0
             else
@@ -13545,15 +13563,16 @@ function showKeybindSettings()
             end
         end
         if (keyOccurrences > 1) then
-            HoverToolTip('This key is used in multiple keybind options:\n- ' ..
+            HoverToolTip('This key is used in multiple keybind options:\n\n- ' ..
                 table.concat(keybindHashmap.names[hotkeyCombo], '\n- ') ..
-                '\nPlease change a keybind to avoid collisions.')
+                '\n\nPlease change a keybind to avoid collisions.')
             imgui.PopStyleColor()
         end
         KeepSameLine()
         imgui.SetCursorPosX(90)
         imgui.Text(HOTKEY_LABELS[hotkeyIndex])
     end
+    imgui.SetCursorPos(imgui.GetCursorPos() + vctr2(5))
     simpleActionMenu('Reset Hotkey Settings', 0, function()
         globalVars.hotkeyList = table.duplicate(DEFAULT_HOTKEY_LIST)
         write(globalVars)
@@ -13611,11 +13630,11 @@ function showPluginSettingsWindow()
     end
     startNextWindowNotCollapsed('plumoguSV Settings')
     _, settingsOpened = imgui.Begin('plumoguSV Settings', true, 42)
-    imgui.SetWindowSize('plumoguSV Settings', vector.New(433, 400))
+    imgui.SetWindowSize('plumoguSV Settings', vector.New(450, 400))
     local typeIndex = cache.settingTypeIndex or 1
     imgui.Columns(2, 'settings_columnList', true)
     imgui.SetColumnWidth(0, 150)
-    imgui.SetColumnWidth(1, 283)
+    imgui.SetColumnWidth(1, 300)
     imgui.BeginChild('Setting Categories')
     imgui.Text('Setting Type')
     imgui.Separator()
@@ -13640,7 +13659,7 @@ function showPluginSettingsWindow()
     if (globalVars.advancedMode) then renderMemeButtons() end
     imgui.EndChild()
     imgui.NextColumn()
-    imgui.BeginChild('Settings Data')
+    imgui.BeginChild('Settings Data', vector.New(283, 357))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
     cache.settingTypeIndex = typeIndex
     if (SETTING_TYPES[typeIndex] == 'General') then
@@ -13737,7 +13756,7 @@ function showWindowSettings()
     if (globalVars.hideSVInfo) then imgui.EndDisabled() end
     GlobalCheckbox('showVibratoWidget', 'Separate Vibrato Into New Window',
         'For those who are used to having Vibrato as a separate plugin, this option makes a new, independent window with vibrato only.')
-    AddSeparator()
+    imgui.SeparatorText('Tooltip Widgets')
     GlobalCheckbox('showNoteDataWidget', 'Show Note Data Of Selection',
         'If one note is selected, shows simple data about that note.')
     GlobalCheckbox('showMeasureDataWidget', 'Show Measure Data Of Selection',
@@ -16574,7 +16593,7 @@ clock.prevTime = state.UnixTime
 game.keyCount = map.GetKeyCount()
 end
 function draw()
-if (not state.CurrentTimingPoint or not imgui or not state) then return end
+if (not state.CurrentTimingPoint or not imgui or not state or not map or not utils or not actions) then return end
 local performanceMode = globalVars.performanceMode
 PLUGIN_NAME = 'plumoguSV-dev'
 state.IsWindowHovered = imgui.IsWindowHovered()

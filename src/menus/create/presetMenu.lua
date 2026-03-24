@@ -7,7 +7,11 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     _, newPresetName = imgui.InputText('##PresetName', newPresetName, 4096)
     imgui.PopItemWidth()
     imgui.SameLine()
-    if (imgui.Button('Save') and newPresetName:len() > 0) then
+    local saveButtonClicked = imgui.Button('Save')
+    if (saveButtonClicked and newPresetName:len() == 0) then
+        print('e!', 'Please enter a name for your new preset.')
+    end
+    if (saveButtonClicked and newPresetName:len() > 0) then
         preset = {}
         preset.name = newPresetName
         newPresetName = ''
@@ -24,6 +28,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         end
         table.insert(globalVars.presets, preset)
         write(globalVars)
+        print('i!', 'Saved preset "' .. preset.name .. '".')
     end
     state.SetValue('newPresetName', newPresetName)
 
@@ -88,6 +93,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         HoverToolTip('Left-click to select this preset. Right-click to copy this preset to your clipboard.')
         KeepSameLine()
         if (imgui.Button('X##Preset' .. idx)) then
+            print('e!', 'Deleted preset "' .. globalVars.presets[idx].name .. '".')
             table.remove(globalVars.presets, idx)
             write(globalVars)
         end

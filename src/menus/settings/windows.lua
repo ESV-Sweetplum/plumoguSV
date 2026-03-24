@@ -12,7 +12,7 @@ function showWindowSettings()
     if (globalVars.hideSVInfo) then imgui.EndDisabled() end
     GlobalCheckbox('showVibratoWidget', 'Separate Vibrato Into New Window',
         'For those who are used to having Vibrato as a separate plugin, this option makes a new, independent window with vibrato only.')
-    AddSeparator()
+    imgui.SeparatorText('Tooltip Widgets')
     GlobalCheckbox('showNoteDataWidget', 'Show Note Data Of Selection',
         'If one note is selected, shows simple data about that note.')
     GlobalCheckbox('showMeasureDataWidget', 'Show Measure Data Of Selection',
