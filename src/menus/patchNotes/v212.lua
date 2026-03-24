@@ -9,6 +9,7 @@ function showPatchNotesV212(lc, rc)
         'Fixed some custom theme parameters not correctly saving.',
         'Fixed some tabs not being openable when the preset menu was opened.',
         'Fixed scientific notation not being supported in the table parser.',
+        'Fixed several hot-reload fails due to nonexistent globals.',
     }
 
     local newFeatures = {
@@ -19,6 +20,8 @@ function showPatchNotesV212(lc, rc)
         'Added the ability to use average SV targets for linear SV/SSF.',
         'Added a NONE option to final SV, which will omit the final SV/SSF no matter what.',
         'Added an alert when conflicting hotkeys are bound.',
+        'Updated the keybinds settings menu to be more organized.',
+        'Added the ability to have preset keybinds.',
     }
 
     showPatchNotesElement('v2.1.2', drawV211, 135, lc, bugFixes, newFeatures)

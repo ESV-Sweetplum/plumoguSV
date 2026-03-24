@@ -27,6 +27,7 @@ globalVars = {
     maxDisplacementMultiplierExponent = 6,
     performanceMode = false,
     placeTypeIndex = 1,
+    presetKeybinds = {},
     presets = {},
     printLegacyLNMessage = true,
     pulseCoefficient = 0,
@@ -80,6 +81,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.ignoreNotes = isTruthy(tempGlobalVars.ignoreNotesOutsideTg)
     globalVars.maxDisplacementMultiplierExponent = tn(tempGlobalVars.maxDisplacementMultiplierExponent)
     globalVars.performanceMode = isTruthy(tempGlobalVars.performanceMode)
+    globalVars.presetKeybinds = table.duplicate(tempGlobalVars.presetKeybinds)
     globalVars.printLegacyLNMessage = isTruthy(tempGlobalVars.printLegacyLNMessage, true)
     globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
     globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)

@@ -1813,6 +1813,7 @@ globalVars = {
     maxDisplacementMultiplierExponent = 6,
     performanceMode = false,
     placeTypeIndex = 1,
+    presetKeybinds = {},
     presets = {},
     printLegacyLNMessage = true,
     pulseCoefficient = 0,
@@ -1864,6 +1865,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.ignoreNotes = isTruthy(tempGlobalVars.ignoreNotesOutsideTg)
     globalVars.maxDisplacementMultiplierExponent = tn(tempGlobalVars.maxDisplacementMultiplierExponent)
     globalVars.performanceMode = isTruthy(tempGlobalVars.performanceMode)
+    globalVars.presetKeybinds = table.duplicate(tempGlobalVars.presetKeybinds)
     globalVars.printLegacyLNMessage = isTruthy(tempGlobalVars.printLegacyLNMessage, true)
     globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
     globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
@@ -12605,6 +12607,7 @@ function showPatchNotesV212(lc, rc)
         'Fixed some custom theme parameters not correctly saving.',
         'Fixed some tabs not being openable when the preset menu was opened.',
         'Fixed scientific notation not being supported in the table parser.',
+        'Fixed several hot-reload fails due to nonexistent globals.',
     }
     local newFeatures = {
         'Added an error protector against faulty table parse attempts.',
@@ -12614,6 +12617,8 @@ function showPatchNotesV212(lc, rc)
         'Added the ability to use average SV targets for linear SV/SSF.',
         'Added a NONE option to final SV, which will omit the final SV/SSF no matter what.',
         'Added an alert when conflicting hotkeys are bound.',
+        'Updated the keybinds settings menu to be more organized.',
+        'Added the ability to have preset keybinds.',
     }
     showPatchNotesElement('v2.1.2', drawV211, 135, lc, bugFixes, newFeatures)
 end
