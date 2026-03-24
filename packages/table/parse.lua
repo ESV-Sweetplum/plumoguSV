@@ -8,8 +8,8 @@ function table.parse(str)
     if (str == 'FALSE' or str == 'TRUE') then return str == 'TRUE' end
     if (str:charAt(1) == '"') then return str:sub(2, -2) end
     if (str:match('^%-?%d+$') or str:match('^%-?%d+E[%+%-]%d+$')) then return math.toNumber(str) end
-    if (str:match('^%-?%.%d+$') and str:match('^%-?%.%d+E[%+%-]%d+$')) then return math.toNumber(str) end
-    if (str:match('^%-?%d+%.%d+$') and str:match('^%-?%d+%.%d+E[%+%-]%d+$')) then return math.toNumber(str) end
+    if (str:match('^%-?%.%d+$') or str:match('^%-?%.%d+E[%+%-]%d+$')) then return math.toNumber(str) end
+    if (str:match('^%-?%d+%.%d+$') or str:match('^%-?%d+%.%d+E[%+%-]%d+$')) then return math.toNumber(str) end
     if (not table.contains({ '{', '[' }, str:charAt(1))) then
         print('e!',
             'Something really bad has happened with the parsing algorithm weewooweewoo please report this to the Discord thanks!!!!!!!!!')
