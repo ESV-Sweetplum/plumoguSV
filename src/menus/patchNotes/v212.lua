@@ -7,6 +7,8 @@ function showPatchNotesV212(lc, rc)
         'Fixed the dust trail being entirely white.',
         'Fixed the plugin executing actions accidentally while an input is being edited.',
         'Fixed some custom theme parameters not correctly saving.',
+        'Fixed some tabs not being openable when the preset menu was opened.',
+        'Fixed scientific notation not being supported in the table parser.',
     }
 
     local newFeatures = {
