@@ -867,7 +867,6 @@ function setAsterCatppuccinColors()
     loadup.BgBl = vector.New(0.2, 0.1, 0.17, 0.6)
     loadup.BgBr = vector.New(0.12, 0.12, 0.18, 0.6)
 
-
     return vector.New(0.42, 0.44, 0.53, 1)
 end
 

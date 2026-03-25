@@ -104,7 +104,6 @@ function setGlobalVars(tempGlobalVars)
     local forceVectorizeList = { 'border', 'loadupOpeningTextColor', 'loadupPulseTextColorLeft',
         'loadupPulseTextColorRight', 'loadupBgTl', 'loadupBgTr', 'loadupBgBl', 'loadupBgBr' }
 
-
     if (tempGlobalVars.customStyles) then
         for themeName, themeData in pairs(globalVars.customStyles) do
             for _, key in ipairs(forceVectorizeList) do

@@ -12,7 +12,6 @@ function pulseController()
     local timeSinceLastBar = ((state.SongTime + timeOffset) - game.get.timingPointAt(state.SongTime).StartTime) %
         ((60000 / game.get.timingPointAt(state.SongTime).Bpm))
 
-
     pulseVars.pulsedThisFrame = false
 
     if ((timeSinceLastBar < pulseVars.previousBar)) then

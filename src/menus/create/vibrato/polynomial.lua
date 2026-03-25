@@ -46,7 +46,6 @@ function PolynomialEditor(size, settingVars, separateWindow)
             { pos = table.vectorize2(point) * vctr2(size), col = color.int.white, size = 5 })
     end
 
-
     imgui.SetCursorPosX(26)
     imgui.BeginChild('Polynomial Vibrato Interactive Window' .. tostring(separateWindow), vctr2(size), 67, 31)
     local ctx, changedPoints = renderGraph('Polynomial Vibrato Menu' .. tostring(separateWindow), vctr2(size),

@@ -116,7 +116,6 @@ function runTest()
         { 0,                               0, 0,                              1 },
     }
 
-
     for idx, point in pairs(inputPoints) do
         local inputPoint = table.map(point, function(i) return table.duplicate({ i }) end)
         -- inputPoint = matrix.multiply(matRotX, inputPoint)
@@ -148,7 +147,6 @@ function runTest()
         local p2 = topLeft + cameraPoints[quad[2]]
         local p3 = topLeft + cameraPoints[quad[3]]
         local p4 = topLeft + cameraPoints[quad[4]]
-
 
         local distFromP1ToCamera = calculateDistance(outputPoints[quad[1]], cameraPos)
         local distFromP2ToCamera = calculateDistance(outputPoints[quad[2]], cameraPos)
