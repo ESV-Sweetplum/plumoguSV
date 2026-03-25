@@ -19,6 +19,10 @@ color.int.redMask = 1
 color.int.greenMask = 256
 color.int.blueMask = 65536
 color.int.whiteMask = color.int.redMask + color.int.greenMask + color.int.blueMask
+color.int.oRedMask = color.int.alphaMask + color.int.redMask
+color.int.oGreenMask = color.int.alphaMask + color.int.greenMask
+color.int.oBlueMask = color.int.alphaMask + color.int.blueMask
+color.int.oWhiteMask = color.int.alphaMask + color.int.whiteMask
 game = {
     window = {},
     get = {},
@@ -44,7 +48,7 @@ function cache.saveTable(listName, variables)
         state.SetValue(listName .. key, value)
     end
 end
----Returns the number of milliseconds the plugin has been active.
+---Returns the number of seconds that the plugin has been active.
 ---@return number lifetime
 function clock.getTime()
     return (state.UnixTime - clock.prevTime) / 1000
@@ -69,7 +73,7 @@ function clock.listen(id, interval)
 end
 ---Alters opacity of a given color.
 ---@param col integer
----@param additiveOpacity integer
+---@param additiveOpacity integer A number corresponding to the addition to the alpha channel (0-255).
 ---@return number
 ---@overload fun(col: Vector4, additiveOpacity: number): Vector4
 function color.alterOpacity(col, additiveOpacity)
@@ -81,12 +85,12 @@ end
 color.vctr.white = vector.New(1, 1, 1, 1)
 color.vctr.black = vector.New(0, 0, 0, 1)
 color.vctr.transparent = vector.New(0, 0, 0, 0)
-color.int.white = color.int.whiteMask * 255 + color.int.alphaMask * 255
+color.int.white = color.int.oWhiteMask * 255
 color.int.black = color.int.alphaMask * 255
 color.int.transparent = 0
 color.vctr.red = vector.New(1, 0, 0, 1)
 color.vctr.light_red = vector.New(1, 0.5, 0.5, 1)
-color.int.red = color.int.redMask * 255 + color.int.alphaMask * 255
+color.int.red = color.int.oRedMask * 255
 color.vctr.orange = vector.New(1, 0.5, 0, 1)
 color.vctr.light_orange = vector.New(1, 0.75, 0.5, 1)
 color.int.orange = 4278222975
@@ -95,13 +99,13 @@ color.vctr.light_yellow = vector.New(1, 1, 0.5, 1)
 color.int.yellow = 4278255615
 color.vctr.green = vector.New(0, 1, 0, 1)
 color.vctr.light_green = vector.New(0.5, 1, 0.5, 1)
-color.int.green = 4278255360
+color.int.green = color.int.oGreenMask * 255
 color.vctr.aqua = vector.New(0, 1, 1, 1)
 color.vctr.light_aqua = vector.New(0.5, 1, 1, 1)
 color.int.aqua = 4294967040
 color.vctr.blue = vector.New(0, 0, 1, 1)
 color.vctr.light_blue = vector.New(0.5, 0.5, 1, 1)
-color.int.blue = 4294901760
+color.int.blue = color.int.oBlueMask * 255
 color.vctr.purple = vector.New(1, 0, 1, 1)
 color.vctr.light_purple = vector.New(1, 0.5, 1, 1)
 color.int.purple = 4294901887
@@ -114,7 +118,7 @@ NONDUA = { '!', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/',
     'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f',
     'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}',
     '~' }
----Converts rgba to an unsigned integer (0-4294967295).
+---Converts rgba to an unsigned integer (0 - 4294967295).
 ---@param r integer
 ---@param g integer
 ---@param b integer
@@ -124,7 +128,7 @@ function color.rgbaToUint(r, g, b, a)
     local flr = math.floor
     return flr(a) * 16 ^ 6 + flr(b) * 16 ^ 4 + flr(g) * 16 ^ 2 + flr(r)
 end
----Converts rgba (in vector form) to an unsigned integer (0-4294967295).
+---Converts rgba (in vector form) to an unsigned integer (0 - 4294967295).
 ---@param col Vector4
 ---@return integer
 function color.vrgbaToUint(col)
@@ -4562,7 +4566,7 @@ function renderDynamicConnection()
         nodes_xList[i] = x + nodes_vxList[i] * dt
         nodes_yList[i] = y + nodes_vyList[i] * dt
         nodes_lifetimes[i] = nodes_lifetimes[i] + dt * 6
-        ctx.AddCircleFilled(vector.New(x, y), 3, mainCol - color.int.alphaMask * (255 - opacity))
+        ctx.AddCircleFilled(vector.New(x, y), 3, color.alterOpacity(mainCol, opacity - 255))
         ::nextNode::
     end
     for i = 1, #nodes_xList do
@@ -4714,8 +4718,8 @@ function renderReactiveStars()
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
         if brightness < 0 then goto nextStar end
         -- ctx.AddCircleFilled(pos, sz * 2, color.alterOpacity(color.int.white, (255 - math.floor(brightness * 255)) - 255))
-        ctx.AddCircleFilled(pos, sz * 2, color.int.white + color.int.alphaMask * 255 * (brightness / 10 - 1))
-        ctx.AddCircleFilled(pos, sz, color.int.white + color.int.alphaMask * 255 * (brightness - 1))
+        ctx.AddCircleFilled(pos, sz * 2, color.alterOpacity(color.int.white, 255 * (brightness / 10 - 1)))
+        ctx.AddCircleFilled(pos, sz, color.alterOpacity(color.int.white, 255 * (brightness - 1)))
         ::nextStar::
     end
 end
@@ -4796,7 +4800,7 @@ function renderSVSpectrogram()
             end
         end
         binValues = smoothenSpectrogram(binValues)
-        col = color.vrgbaToUint(color.strToRgba(tg.ColorRgb or '255,255,255')) - color.int.alphaMask * 200
+        col = color.alterOpacity(color.vrgbaToUint(color.strToRgba(tg.ColorRgb or '255,255,255')), -200)
         if (tgCount == 2) then
             col = imgui.GetColorU32(imgui_col.Text, 0.5)
             rCol = imgui.GetColorU32(imgui_col.CheckMark, 0.5)
@@ -4879,7 +4883,7 @@ function renderTopographicMap()
     end
     local lowestX = 1e69;
     local lowestY = 1e69;
-    local lineColor = color.int.white - color.int.alphaMask * 120
+    local lineColor = color.alterOpacity(color.int.white, -120)
     local edgeColor = color.int.white
     local edgeThickness = 2
     if (isTruthy(xCellCount % 2)) then
@@ -6599,7 +6603,7 @@ function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustS
             local dustY = dustParticle.y + dy
             local dustCoords = vector.New(dustX, dustY)
             local alpha = math.round(255 * (1 - time), 0)
-            local dustColor = color.vrgbaToUint(currentRGBColors) - (255 - alpha) * color.int.alphaMask
+            local dustColor = color.alterOpacity(color.vrgbaToUint(currentRGBColors), alpha - 255)
             o.AddCircleFilled(dustCoords, dustSize, dustColor)
         end
     end
@@ -8001,7 +8005,7 @@ end
 ---@return ImDrawListPtr
 ---@return boolean changed
 function renderGraph(label, size, points, preferForeground, gridSize, yScale)
-    local gray = color.int.whiteMask * 100 + color.int.alphaMask * 255
+    local gray = color.alterOpacity(color.int.whiteMask * 100, 255)
     local tableLabel = 'graph_points_' .. label
     local initDragList = {}
     local initPointList = {}
@@ -9782,7 +9786,7 @@ function showPatchNotesWindow()
     startNextWindowNotCollapsed('plumoguSV Patch Notes')
     _, patchNotesOpened = imgui.Begin('plumoguSV Patch Notes', true, imgui_window_flags.NoResize)
     imgui.SetWindowSize('plumoguSV Patch Notes', vector.New(500, 400))
-    imgui.PushStyleColor(imgui_col.Separator, color.int.white - color.int.alphaMask * 200)
+    imgui.PushStyleColor(imgui_col.Separator, color.alterOpacity(color.int.white, -200))
     local minorUpdateLeftColor = color.vrgbaToUint(color.hslaToRgba(math.sin(state.UnixTime / 500) * 60 + 300, 1, 0.7, 1))
     local minorUpdateRightColor = color.vrgbaToUint(color.hslaToRgba(-math.sin(state.UnixTime / 500) * 60 + 300, 1, 0.7,
         1))
@@ -13016,7 +13020,7 @@ function chooseColorTheme()
                 local pos = imgui.GetMousePos()
                 if (pos.x > topLeft.x and pos.x < topLeft.x + dim.x and pos.y > topLeft.y and pos.y < topLeft.y + dim.y) then
                     local ctx = imgui.GetWindowDrawList()
-                    ctx.AddRectFilled(topLeft, topLeft + dim, color.int.white - color.int.alphaMask * 200)
+                    ctx.AddRectFilled(topLeft, topLeft + dim, color.alterOpacity(color.int.white, -200))
                 end
                 if (type(item.textColor[1]) == 'table') then
                     local strLen = item.id:len()
@@ -13650,7 +13654,7 @@ function showKeybindSettings()
         local keyOccurrences = keybindHashmap.counts[hotkeyCombo]
         if (keyOccurrences > 1) then
             imgui.PushStyleColor(imgui_col.Text,
-                color.int.redMask * 200 + color.int.whiteMask * 55 + color.int.alphaMask * 255)
+                color.int.oRedMask * 200 + color.int.oWhiteMask * 55)
         end
         if imgui.Button(awaitingIndex == hotkeyIndex and 'Listening...##keybind' or hotkeyCombo:fixToSize(70) .. '##' .. hotkeyIndex) then
             if awaitingIndex == hotkeyIndex then

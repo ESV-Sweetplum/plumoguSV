@@ -9,4 +9,5 @@
     lineSeparator: "\n",                        // Consistent line separator for the plugin.
     disableVectorPacking: true,                 // Corresponds to the imgui_disable_vector_packing constant in Quaver. Should be true.
     dontRandomizeSeed: false,                   // If true, omits the math.randomseed(os.time()) line at the top of the plugin.
+    workshopFolder: "assets"
 }
