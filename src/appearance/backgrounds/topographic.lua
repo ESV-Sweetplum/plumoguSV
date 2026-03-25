@@ -44,7 +44,7 @@ function renderTopographicMap()
     local lowestX = 1e69;
     local lowestY = 1e69;
 
-    local lineColor = color.int.white - color.int.alphaMask * 120
+    local lineColor = color.alterOpacity(color.int.white, -120)
     local edgeColor = color.int.white
     local edgeThickness = 2
 

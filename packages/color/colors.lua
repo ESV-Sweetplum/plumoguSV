@@ -2,14 +2,14 @@ color.vctr.white = vector.New(1, 1, 1, 1)
 color.vctr.black = vector.New(0, 0, 0, 1)
 color.vctr.transparent = vector.New(0, 0, 0, 0)
 
-color.int.white = color.int.whiteMask * 255 + color.int.alphaMask * 255
+color.int.white = color.int.oWhiteMask * 255
 color.int.black = color.int.alphaMask * 255
 color.int.transparent = 0
 
 color.vctr.red = vector.New(1, 0, 0, 1)
 color.vctr.light_red = vector.New(1, 0.5, 0.5, 1)
 
-color.int.red = color.int.redMask * 255 + color.int.alphaMask * 255
+color.int.red = color.int.oRedMask * 255
 
 color.vctr.orange = vector.New(1, 0.5, 0, 1)
 color.vctr.light_orange = vector.New(1, 0.75, 0.5, 1)
@@ -24,7 +24,7 @@ color.int.yellow = 4278255615
 color.vctr.green = vector.New(0, 1, 0, 1)
 color.vctr.light_green = vector.New(0.5, 1, 0.5, 1)
 
-color.int.green = 4278255360
+color.int.green = color.int.oGreenMask * 255
 
 color.vctr.aqua = vector.New(0, 1, 1, 1)
 color.vctr.light_aqua = vector.New(0.5, 1, 1, 1)
@@ -34,7 +34,7 @@ color.int.aqua = 4294967040
 color.vctr.blue = vector.New(0, 0, 1, 1)
 color.vctr.light_blue = vector.New(0.5, 0.5, 1, 1)
 
-color.int.blue = 4294901760
+color.int.blue = color.int.oBlueMask * 255
 
 color.vctr.purple = vector.New(1, 0, 1, 1)
 color.vctr.light_purple = vector.New(1, 0.5, 1, 1)

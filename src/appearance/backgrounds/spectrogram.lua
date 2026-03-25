@@ -42,7 +42,7 @@ function renderSVSpectrogram()
         end
 
         binValues = smoothenSpectrogram(binValues)
-        col = color.vrgbaToUint(color.strToRgba(tg.ColorRgb or '255,255,255')) - color.int.alphaMask * 200
+        col = color.alterOpacity(color.vrgbaToUint(color.strToRgba(tg.ColorRgb or '255,255,255')), -200)
 
         if (tgCount == 2) then
             col = imgui.GetColorU32(imgui_col.Text, 0.5)

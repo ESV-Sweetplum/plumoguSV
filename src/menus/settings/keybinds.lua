@@ -10,7 +10,7 @@ function showKeybindSettings()
         local keyOccurrences = keybindHashmap.counts[hotkeyCombo]
         if (keyOccurrences > 1) then
             imgui.PushStyleColor(imgui_col.Text,
-                color.int.redMask * 200 + color.int.whiteMask * 55 + color.int.alphaMask * 255)
+                color.int.oRedMask * 200 + color.int.oWhiteMask * 55)
         end
         if imgui.Button(awaitingIndex == hotkeyIndex and 'Listening...##keybind' or hotkeyCombo:fixToSize(70) .. '##' .. hotkeyIndex) then
             if awaitingIndex == hotkeyIndex then

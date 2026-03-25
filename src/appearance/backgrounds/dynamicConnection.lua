@@ -49,7 +49,7 @@ function renderDynamicConnection()
         nodes_yList[i] = y + nodes_vyList[i] * dt
         nodes_lifetimes[i] = nodes_lifetimes[i] + dt * 6
 
-        ctx.AddCircleFilled(vector.New(x, y), 3, mainCol - color.int.alphaMask * (255 - opacity))
+        ctx.AddCircleFilled(vector.New(x, y), 3, color.alterOpacity(mainCol, opacity - 255))
         ::nextNode::
     end
 

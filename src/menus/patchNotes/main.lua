@@ -3,7 +3,7 @@ function showPatchNotesWindow()
     startNextWindowNotCollapsed('plumoguSV Patch Notes')
     _, patchNotesOpened = imgui.Begin('plumoguSV Patch Notes', true, imgui_window_flags.NoResize)
     imgui.SetWindowSize('plumoguSV Patch Notes', vector.New(500, 400))
-    imgui.PushStyleColor(imgui_col.Separator, color.int.white - color.int.alphaMask * 200)
+    imgui.PushStyleColor(imgui_col.Separator, color.alterOpacity(color.int.white, -200))
 
     local minorUpdateLeftColor = color.vrgbaToUint(color.hslaToRgba(math.sin(state.UnixTime / 500) * 60 + 300, 1, 0.7, 1))
     local minorUpdateRightColor = color.vrgbaToUint(color.hslaToRgba(-math.sin(state.UnixTime / 500) * 60 + 300, 1, 0.7,

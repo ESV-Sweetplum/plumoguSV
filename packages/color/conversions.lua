@@ -6,7 +6,7 @@ NONDUA = { '!', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/',
     'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}',
     '~' }
 
----Converts rgba to an unsigned integer (0-4294967295).
+---Converts rgba to an unsigned integer (0 - 4294967295).
 ---@param r integer
 ---@param g integer
 ---@param b integer
@@ -17,7 +17,7 @@ function color.rgbaToUint(r, g, b, a)
     return flr(a) * 16 ^ 6 + flr(b) * 16 ^ 4 + flr(g) * 16 ^ 2 + flr(r)
 end
 
----Converts rgba (in vector form) to an unsigned integer (0-4294967295).
+---Converts rgba (in vector form) to an unsigned integer (0 - 4294967295).
 ---@param col Vector4
 ---@return integer
 function color.vrgbaToUint(col)

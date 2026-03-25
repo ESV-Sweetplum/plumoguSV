@@ -115,7 +115,7 @@ function chooseColorTheme()
                 local pos = imgui.GetMousePos()
                 if (pos.x > topLeft.x and pos.x < topLeft.x + dim.x and pos.y > topLeft.y and pos.y < topLeft.y + dim.y) then
                     local ctx = imgui.GetWindowDrawList()
-                    ctx.AddRectFilled(topLeft, topLeft + dim, color.int.white - color.int.alphaMask * 200)
+                    ctx.AddRectFilled(topLeft, topLeft + dim, color.alterOpacity(color.int.white, -200))
                 end
                 if (type(item.textColor[1]) == 'table') then
                     local strLen = item.id:len()

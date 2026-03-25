@@ -196,7 +196,7 @@ function renderDustParticles(rgbPeriod, o, t, dustParticles, dustDuration, dustS
             local dustY = dustParticle.y + dy
             local dustCoords = vector.New(dustX, dustY)
             local alpha = math.round(255 * (1 - time), 0)
-            local dustColor = color.vrgbaToUint(currentRGBColors) - (255 - alpha) * color.int.alphaMask
+            local dustColor = color.alterOpacity(color.vrgbaToUint(currentRGBColors), alpha - 255)
             o.AddCircleFilled(dustCoords, dustSize, dustColor)
         end
     end
