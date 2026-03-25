@@ -1,10 +1,16 @@
 function setPresets(presetList)
     globalVars.presets = {}
-    for _, preset in pairs(presetList) do
+    for idx, preset in pairs(presetList) do
         local presetIsvalid, presetData = checkPresetValidity(preset)
         if (not presetIsvalid) then goto nextPreset end
         table.insert(globalVars.presets,
-            { name = preset.name, type = preset.type, menu = preset.menu, data = presetData })
+            {
+                name = preset.name,
+                type = preset.type,
+                menu = preset.menu,
+                data = presetData,
+                flags = preset.flags or { enabled = false, combo = idx <= 9 and 'Ctrl+Shift+' .. idx or 'NONE' },
+            })
         ::nextPreset::
     end
 end

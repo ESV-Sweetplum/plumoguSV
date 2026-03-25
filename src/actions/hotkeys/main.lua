@@ -7,4 +7,17 @@ function checkForGlobalHotkeys()
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.move_selection_to_tg])) then moveSelectionToTg() end
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_prev_tg])) then goToPrevTg() end
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_next_tg])) then goToNextTg() end
+
+    for _, preset in pairs(globalVars.presets) do
+        if (not preset.flags.enabled) then goto nextPreset end
+        if (kbm.pressedKeyCombo(preset.flags.combo)) then
+            print('i!', 'Activated hotkey for preset "' .. preset.name .. '".')
+            local data = table.parse(preset.data)
+            globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
+            cache.saveTable(preset.menu .. preset.type .. 'Settings', data.settingVars)
+            cache.saveTable('place' .. preset.type .. 'Menu', data.menuVars)
+            globalVars.showPresetMenu = false
+        end
+        ::nextPreset::
+    end
 end

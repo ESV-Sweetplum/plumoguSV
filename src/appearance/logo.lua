@@ -1,4 +1,8 @@
 function logoThread()
+    if (kbm.executedKeyCombo('Alt+L')) then
+        cache.logoStartTime = 10
+    end
+
     curTime = state.UnixTime or 0
     -- If state.DeltaTime is significantly off of the computed delta time, that means that the computed delta time was delayed in some way. This is used to detect when the plugin is turned off and on (not rapidly).
     if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 60000) then

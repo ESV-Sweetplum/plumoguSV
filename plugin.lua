@@ -504,10 +504,10 @@ end
 ---@param keyCombo string
 ---@return boolean
 function kbm.pressedKeyCombo(keyCombo)
-    if (imgui.IsAnyItemActive()) then return false end
+    if (imgui.IsAnyItemActive() or not keyCombo or keyCombo == 'NONE') then return false end
     keyCombo = keyCombo:upper()
     local comboList = {}
-    for v in keyCombo:gmatch('%u+') do
+    for v in keyCombo:gmatch('[%u%d]+') do
         table.insert(comboList, v)
     end
     local keyReq = comboList[#comboList]
@@ -523,7 +523,14 @@ function kbm.pressedKeyCombo(keyCombo)
     if (table.contains(comboList, 'ALT') ~= altHeld) then
         return false
     end
-    return utils.IsKeyPressed(keys[keyReq])
+    local keyReqNum = keys[keyReq]
+    if (keyReq:find('^%d$')) then
+        keyReqNum = tn(keyReq) + 48
+    end
+    if (not keyReqNum) then
+        return false
+    end
+    return utils.IsKeyPressed(keyReqNum)
 end
 kbm.executedKeyCombo = kbm.pressedKeyCombo
 ---Evaluates a simplified one-dimensional cubic bezier expression with points (0, p2, p3, 1).
@@ -2097,11 +2104,17 @@ function getMenuVars(menuType, optionalLabel)
 end
 function setPresets(presetList)
     globalVars.presets = {}
-    for _, preset in pairs(presetList) do
+    for idx, preset in pairs(presetList) do
         local presetIsvalid, presetData = checkPresetValidity(preset)
         if (not presetIsvalid) then goto nextPreset end
         table.insert(globalVars.presets,
-            { name = preset.name, type = preset.type, menu = preset.menu, data = presetData })
+            {
+                name = preset.name,
+                type = preset.type,
+                menu = preset.menu,
+                data = presetData,
+                flags = preset.flags or { enabled = false, combo = idx <= 9 and 'Ctrl+Shift+' .. idx or 'NONE' },
+            })
         ::nextPreset::
     end
 end
@@ -4297,6 +4310,18 @@ function checkForGlobalHotkeys()
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.move_selection_to_tg])) then moveSelectionToTg() end
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_prev_tg])) then goToPrevTg() end
     if (kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.go_to_next_tg])) then goToNextTg() end
+    for _, preset in pairs(globalVars.presets) do
+        if (not preset.flags.enabled) then goto nextPreset end
+        if (kbm.pressedKeyCombo(preset.flags.combo)) then
+            print('i!', 'Activated hotkey for preset "' .. preset.name .. '".')
+            local data = table.parse(preset.data)
+            globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
+            cache.saveTable(preset.menu .. preset.type .. 'Settings', data.settingVars)
+            cache.saveTable('place' .. preset.type .. 'Menu', data.menuVars)
+            globalVars.showPresetMenu = false
+        end
+        ::nextPreset::
+    end
 end
 function moveSelectionToTg()
     if (not isTruthy(state.SelectedHitObjects)) then return end
@@ -5311,6 +5336,9 @@ function drawHorizontalPillShape(o, point1, point2, radius, color, circleSegment
     o.AddRectFilled(rectangleStartCoords, rectangleEndCoords, color)
 end
 function logoThread()
+    if (kbm.executedKeyCombo('Alt+L')) then
+        cache.logoStartTime = 10
+    end
     curTime = state.UnixTime or 0
     -- If state.DeltaTime is significantly off of the computed delta time, that means that the computed delta time was delayed in some way. This is used to detect when the plugin is turned off and on (not rapidly).
     if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 60000) then
@@ -8324,103 +8352,145 @@ function chooseCreateTool()
     return oldPlaceTypeIndex ~= globalVars.placeTypeIndex
 end
 function renderPresetMenu(menuLabel, menuVars, settingVars)
-    local newPresetName = state.GetValue('newPresetName', '')
-    imgui.AlignTextToFramePadding()
-    imgui.Text('New Preset Name:')
-    KeepSameLine()
-    imgui.PushItemWidth(90)
-    _, newPresetName = imgui.InputTextWithHint('##PresetName', 'e.g. Jump', newPresetName, 4096)
-    imgui.PopItemWidth()
-    imgui.SameLine()
-    local saveButtonClicked = imgui.Button('Save')
-    if (saveButtonClicked and newPresetName:len() == 0) then
-        print('e!', 'Please enter a name for your new preset.')
-    end
-    if (saveButtonClicked and newPresetName:len() > 0) then
-        preset = {}
-        preset.name = newPresetName
-        newPresetName = ''
-        preset.data = table.stringify({ menuVars = menuVars, settingVars = settingVars })
-        preset.type = menuLabel
-        if (menuLabel == 'Standard' or menuLabel == 'Still') then
-            preset.menu = STANDARD_SVS[menuVars.svTypeIndex]
-        end
-        if (menuLabel == 'Special') then
-            preset.menu = SPECIAL_SVS[menuVars.svTypeIndex]
-        end
-        if (menuLabel == 'Vibrato') then
-            preset.menu = VIBRATO_SVS[menuVars.svTypeIndex]
-        end
-        table.insert(globalVars.presets, preset)
-        write(globalVars)
-        print('i!', 'Saved preset "' .. preset.name .. '".')
-    end
-    state.SetValue('newPresetName', newPresetName)
-    local importCustomPreset = state.GetValue('importCustomPreset', '')
-    imgui.AlignTextToFramePadding()
-    imgui.Text('Import Preset:')
-    KeepSameLine()
-    imgui.PushItemWidth(103)
-    _, importCustomPreset = imgui.InputTextWithHint('##CustomPreset', 'Exported Str.', importCustomPreset,
-        MAX_IMPORT_CHARACTER_LIMIT)
-    state.SetValue('importCustomPreset', importCustomPreset)
-    imgui.PopItemWidth()
-    imgui.SameLine()
-    if (imgui.Button('Import##CustomPreset')) then
-        local parsedTable = table.parse(importCustomPreset)
-        if (table.includes(table.property(globalVars.presets, 'name'), parsedTable.name)) then
-            print('e!',
-                'A preset with this name already exists. Please remove it or change the name in the import string.')
-        else
-            table.insert(globalVars.presets, parsedTable)
-            importCustomPreset = ''
-            write(globalVars)
-        end
-    end
+    local newPresetName = cache.newPresetName or ''
+    imgui.SetCursorPosX(26)
+    cache.presetEditModeEnabled = RadioButtons('', cache.presetEditModeEnabled or false, { 'Select Mode', 'Edit Mode' },
+        { false, true },
+        'Changes the preset menu mode.')
     AddSeparator()
-    InitializeTable('Preset Columns', 3, imgui_table_flags.BordersInner,
-        { '  Name##Preset', ' Menu##Preset', ' Actions##Preset' }, {
-            { imgui_table_column_flags.WidthFixed, 80 },
-            { imgui_table_column_flags.WidthFixed, 63 },
-            { imgui_table_column_flags.WidthFixed, 85 },
-        }, true)
-    for idx, preset in pairs(globalVars.presets) do
-        imgui.PushID(idx)
-        imgui.TableNextRow(0, 34)
-        imgui.TableSetColumnIndex(0)
+    if (not cache.presetEditModeEnabled) then
         imgui.AlignTextToFramePadding()
-        imgui.SetCursorPosY(imgui.GetCursorPosY() + 2)
-        imgui.Text('  ' .. preset.name)
-        imgui.TableSetColumnIndex(1)
-        imgui.AlignTextToFramePadding()
-        imgui.SetCursorPosY(imgui.GetCursorPosY() + 3.4)
-        imgui.Text(table.concat({ '  ', preset.type:shorten(), ' > ', preset.menu:removeTrailingTag():sub(1, 3) }))
-        imgui.TableSetColumnIndex(2)
-        imgui.SetCursorPosX(imgui.GetCursorPosX() + 2)
-        imgui.SetCursorPosY(imgui.GetCursorPosY() + 3.4)
-        if (imgui.Button('Select##Preset' .. idx)) then
-            local data = table.parse(preset.data)
-            globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
-            cache.saveTable(preset.menu .. preset.type .. 'Settings', data.settingVars)
-            cache.saveTable('place' .. preset.type .. 'Menu', data.menuVars)
-            globalVars.showPresetMenu = false
-            return true
-        end
-        if (imgui.IsItemClicked('Right')) then
-            imgui.SetClipboardText(table.stringify(preset))
-            print('i!', 'Exported preset to your clipboard.')
-        end
-        HoverToolTip('Left-click to select this preset. Right-click to copy this preset to your clipboard.')
+        imgui.Text('New Preset Name:')
         KeepSameLine()
-        if (imgui.Button('X##Preset' .. idx)) then
-            print('e!', 'Deleted preset "' .. globalVars.presets[idx].name .. '".')
-            table.remove(globalVars.presets, idx)
+        imgui.PushItemWidth(90)
+        _, newPresetName = imgui.InputTextWithHint('##PresetName', 'e.g. Jump', newPresetName, 4096)
+        imgui.PopItemWidth()
+        imgui.SameLine()
+        local saveButtonClicked = imgui.Button('Save')
+        HoverToolTip('Saves the current menu as a preset.')
+        if (saveButtonClicked and newPresetName:len() == 0) then
+            print('e!', 'Please enter a name for your new preset.')
+        elseif (saveButtonClicked and newPresetName:len() > 0) then
+            preset = {}
+            preset.name = newPresetName
+            newPresetName = ''
+            preset.data = table.stringify({ menuVars = menuVars, settingVars = settingVars })
+            preset.type = menuLabel
+            preset.flags = {
+                enabled = false,
+                combo = #globalVars.presets <= 8 and 'Ctrl+Shift+' .. (#globalVars.presets + 1) or 'NONE',
+            }
+            if (menuLabel == 'Standard' or menuLabel == 'Still') then
+                preset.menu = STANDARD_SVS[menuVars.svTypeIndex]
+            end
+            if (menuLabel == 'Special') then
+                preset.menu = SPECIAL_SVS[menuVars.svTypeIndex]
+            end
+            if (menuLabel == 'Vibrato') then
+                preset.menu = VIBRATO_SVS[menuVars.svTypeIndex]
+            end
+            table.insert(globalVars.presets, preset)
             write(globalVars)
+            print('i!', 'Saved preset "' .. preset.name .. '".')
         end
-        imgui.PopID()
-        imgui.NextColumn()
+        cache.newPresetName = newPresetName
+    else
+        local importCustomPreset = cache.importCustomPreset or ''
+        imgui.AlignTextToFramePadding()
+        imgui.Text('Import Preset:')
+        KeepSameLine()
+        imgui.PushItemWidth(103)
+        _, importCustomPreset = imgui.InputTextWithHint('##CustomPreset', 'Exported Str.', importCustomPreset,
+            MAX_IMPORT_CHARACTER_LIMIT)
+        cache.importCustomPreset = importCustomPreset
+        imgui.PopItemWidth()
+        imgui.SameLine()
+        if (imgui.Button('Import##CustomPreset')) then
+            local parsedTable = table.parse(importCustomPreset)
+            if (table.includes(table.property(globalVars.presets, 'name'), parsedTable.name)) then
+                print('e!',
+                    'A preset with this name already exists. Please remove it or change the name in the import string.')
+            else
+                table.insert(globalVars.presets, parsedTable)
+                importCustomPreset = ''
+                write(globalVars)
+            end
+        end
     end
-    imgui.EndTable()
+    AddPadding()
+    if (not cache.presetEditModeEnabled) then
+        InitializeTable('Preset Columns', 3, 1920,
+            { '  Name##Preset', ' Menu##Preset', ' Actions##Preset' }, {
+                { imgui_table_column_flags.WidthFixed, 80 },
+                { imgui_table_column_flags.WidthFixed, 60 },
+                { imgui_table_column_flags.WidthFixed, 85 },
+            }, true)
+        for idx, preset in pairs(globalVars.presets) do
+            imgui.PushID(idx)
+            imgui.TableNextRow(0, 34)
+            imgui.TableSetColumnIndex(0)
+            imgui.AlignTextToFramePadding()
+            imgui.SetCursorPosY(imgui.GetCursorPosY() + 2)
+            imgui.Text('  ' .. preset.name)
+            imgui.TableSetColumnIndex(1)
+            imgui.AlignTextToFramePadding()
+            imgui.SetCursorPosY(imgui.GetCursorPosY() + 3.4)
+            imgui.Text(table.concat({ '  ', preset.type:shorten(), ' > ', preset.menu:removeTrailingTag():sub(1, 3) }))
+            imgui.TableSetColumnIndex(2)
+            imgui.SetCursorPosX(imgui.GetCursorPosX() + 2)
+            imgui.SetCursorPosY(imgui.GetCursorPosY() + 3.4)
+            if (imgui.Button('Select##Preset' .. idx)) then
+                local data = table.parse(preset.data)
+                globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
+                cache.saveTable(preset.menu .. preset.type .. 'Settings', data.settingVars)
+                cache.saveTable('place' .. preset.type .. 'Menu', data.menuVars)
+                globalVars.showPresetMenu = false
+                return true
+            end
+            if (imgui.IsItemClicked('Right')) then
+                imgui.SetClipboardText(table.stringify(preset))
+                print('i!', 'Exported preset to your clipboard.')
+            end
+            HoverToolTip('Left-click to select this preset. Right-click to copy this preset to your clipboard.')
+            KeepSameLine()
+            if (imgui.Button('X##Preset' .. idx)) then
+                print('e!', 'Deleted preset "' .. globalVars.presets[idx].name .. '".')
+                table.remove(globalVars.presets, idx)
+                write(globalVars)
+            end
+            imgui.PopID()
+        end
+        imgui.EndTable()
+    else
+        InitializeTable('Preset Columns', 2, 1920,
+            { '  Name##Preset', ' Flags##Preset' }, {
+                { imgui_table_column_flags.WidthFixed, 80 },
+                { imgui_table_column_flags.WidthFixed, 148 },
+            }, true)
+        for idx, preset in pairs(globalVars.presets) do
+            imgui.PushID(idx)
+            imgui.TableNextRow(0, 34)
+            imgui.TableSetColumnIndex(0)
+            imgui.AlignTextToFramePadding()
+            imgui.SetCursorPosY(imgui.GetCursorPosY() + 2)
+            imgui.Text('  ' .. preset.name)
+            imgui.TableSetColumnIndex(1)
+            imgui.AlignTextToFramePadding()
+            imgui.SetCursorPosY(imgui.GetCursorPosY() + 3.4)
+            preset.flags.enabled = isTruthy(preset.flags.enabled)
+            local oldEnabled = preset.flags.enabled
+            BasicCheckbox(preset.flags, 'enabled', 'CMB:##PresetEditEnabled' .. idx)
+            HoverToolTip('If enabled, the key combo next to this button will trigger the preset.')
+            KeepSameLine()
+            imgui.SetNextItemWidth(100)
+            _, preset.flags.combo = imgui.InputText('##PresetEditCombo' .. idx, preset.flags.combo, 4096)
+            if (imgui.IsItemDeactivatedAfterEdit() or preset.flags.enabled ~= oldEnabled) then
+                write(globalVars)
+            end
+            imgui.PopID()
+        end
+        imgui.EndTable()
+    end
 end
 function animationFramesSetupMenu(settingVars)
     chooseMenuStep(settingVars)

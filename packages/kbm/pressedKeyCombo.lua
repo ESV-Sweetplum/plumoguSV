@@ -4,10 +4,10 @@ require('packages.table.contains')
 ---@param keyCombo string
 ---@return boolean
 function kbm.pressedKeyCombo(keyCombo)
-    if (imgui.IsAnyItemActive()) then return false end
+    if (imgui.IsAnyItemActive() or not keyCombo or keyCombo == 'NONE') then return false end
     keyCombo = keyCombo:upper()
     local comboList = {}
-    for v in keyCombo:gmatch('%u+') do
+    for v in keyCombo:gmatch('[%u%d]+') do
         table.insert(comboList, v)
     end
     local keyReq = comboList[#comboList]
@@ -23,7 +23,14 @@ function kbm.pressedKeyCombo(keyCombo)
     if (table.contains(comboList, 'ALT') ~= altHeld) then
         return false
     end
-    return utils.IsKeyPressed(keys[keyReq])
+    local keyReqNum = keys[keyReq]
+    if (keyReq:find('^%d$')) then
+        keyReqNum = tn(keyReq) + 48
+    end
+    if (not keyReqNum) then
+        return false
+    end
+    return utils.IsKeyPressed(keyReqNum)
 end
 
 kbm.executedKeyCombo = kbm.pressedKeyCombo
