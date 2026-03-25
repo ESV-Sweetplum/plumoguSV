@@ -15,7 +15,7 @@
         "plugin.lua"
     ],
     "codeLens.enable": true,
-    "workspace.ignoreSubmodules": true,
+    "workspace.ignoreSubmodules": false,
     "workspace.useGitIgnore": true,
     "diagnostics.globals": [
         "PLUGIN_NAME",

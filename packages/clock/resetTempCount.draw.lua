@@ -1,1 +1,0 @@
-tempClockCount = 0

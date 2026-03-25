@@ -1,3 +1,0 @@
----@meta matrix-class
-
-matrix = {}
