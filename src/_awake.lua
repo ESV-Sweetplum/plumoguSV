@@ -7,7 +7,7 @@ if (tempGlobalVars and tempGlobalVars.colorThemeIndex) then
         'Due to an internal change, your selected theme may have been reset. Please reselect the theme in the plugin settings')
 end
 
-if (not tempGlobalVars) then
+if (not tempGlobalVars and state and map and utils and actions) then
     write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
     if (DISTRO == 'steam') then
         print('w!',

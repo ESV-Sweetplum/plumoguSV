@@ -4,7 +4,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     imgui.Text('New Preset Name:')
     KeepSameLine()
     imgui.PushItemWidth(90)
-    _, newPresetName = imgui.InputText('##PresetName', newPresetName, 4096)
+    _, newPresetName = imgui.InputTextWithHint('##PresetName', 'e.g. Jump', newPresetName, 4096)
     imgui.PopItemWidth()
     imgui.SameLine()
     local saveButtonClicked = imgui.Button('Save')
@@ -32,14 +32,13 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     end
     state.SetValue('newPresetName', newPresetName)
 
-    AddSeparator()
-
     local importCustomPreset = state.GetValue('importCustomPreset', '')
     imgui.AlignTextToFramePadding()
     imgui.Text('Import Preset:')
     KeepSameLine()
     imgui.PushItemWidth(103)
-    _, importCustomPreset = imgui.InputText('##CustomPreset', importCustomPreset, MAX_IMPORT_CHARACTER_LIMIT)
+    _, importCustomPreset = imgui.InputTextWithHint('##CustomPreset', 'Exported Str.', importCustomPreset,
+        MAX_IMPORT_CHARACTER_LIMIT)
     state.SetValue('importCustomPreset', importCustomPreset)
     imgui.PopItemWidth()
     imgui.SameLine()
@@ -55,7 +54,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         end
     end
 
-    AddPadding()
+    AddSeparator()
 
     InitializeTable('Preset Columns', 3, imgui_table_flags.BordersInner,
         { '  Name##Preset', ' Menu##Preset', ' Actions##Preset' }, {

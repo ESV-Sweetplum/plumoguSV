@@ -8329,7 +8329,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     imgui.Text('New Preset Name:')
     KeepSameLine()
     imgui.PushItemWidth(90)
-    _, newPresetName = imgui.InputText('##PresetName', newPresetName, 4096)
+    _, newPresetName = imgui.InputTextWithHint('##PresetName', 'e.g. Jump', newPresetName, 4096)
     imgui.PopItemWidth()
     imgui.SameLine()
     local saveButtonClicked = imgui.Button('Save')
@@ -8356,13 +8356,13 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
         print('i!', 'Saved preset "' .. preset.name .. '".')
     end
     state.SetValue('newPresetName', newPresetName)
-    AddSeparator()
     local importCustomPreset = state.GetValue('importCustomPreset', '')
     imgui.AlignTextToFramePadding()
     imgui.Text('Import Preset:')
     KeepSameLine()
     imgui.PushItemWidth(103)
-    _, importCustomPreset = imgui.InputText('##CustomPreset', importCustomPreset, MAX_IMPORT_CHARACTER_LIMIT)
+    _, importCustomPreset = imgui.InputTextWithHint('##CustomPreset', 'Exported Str.', importCustomPreset,
+        MAX_IMPORT_CHARACTER_LIMIT)
     state.SetValue('importCustomPreset', importCustomPreset)
     imgui.PopItemWidth()
     imgui.SameLine()
@@ -8377,7 +8377,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             write(globalVars)
         end
     end
-    AddPadding()
+    AddSeparator()
     InitializeTable('Preset Columns', 3, imgui_table_flags.BordersInner,
         { '  Name##Preset', ' Menu##Preset', ' Actions##Preset' }, {
             { imgui_table_column_flags.WidthFixed, 80 },
@@ -13050,6 +13050,7 @@ customStyleIds = {
     'tabActive',
     'tabHovered',
     'tableBorderLight',
+    'tableBorderStrong',
     'text',
     'textSelectedBg',
     'titleBg',
@@ -13091,6 +13092,7 @@ local customStyleNames = {
     'Tab\n(Active)',
     'Tab\n(Hovered)',
     'Table Border\n(Light)',
+    'Table Border\n(Strong)',
     'Text',
     'Text Selected\n(BG)',
     'Title BG',
@@ -16586,7 +16588,7 @@ if (tempGlobalVars and tempGlobalVars.colorThemeIndex) then
     print('w!',
         'Due to an internal change, your selected theme may have been reset. Please reselect the theme in the plugin settings')
 end
-if (not tempGlobalVars) then
+if (not tempGlobalVars and state and map and utils and actions) then
     write(DEFAULT_GLOBAL_VARS) -- First time launching plugin
     if (DISTRO == 'steam') then
         print('w!',
