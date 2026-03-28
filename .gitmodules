@@ -1,6 +1,6 @@
 [submodule "Luaver"]
 	path = Luaver
 	url = https://github.com/ESV-Sweetplum/Luaver
-[submodule "qParcel"]
-	path = qParcel
+[submodule "QParcel"]
+	path = QParcel
 	url = https://github.com/ESV-Sweetplum/qParcel
