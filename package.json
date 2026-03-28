@@ -5,7 +5,8 @@
     "scripts": {
         "dev": "tsc && node dist/watch",
         "build": "tsc && node dist/build",
-        "watch": "npm run dev"
+        "watch": "npm run dev",
+        "update": "git submodule update --remote --recursive"
     },
     "repository": {
         "type": "git",
