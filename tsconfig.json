@@ -1,15 +1,9 @@
 {
     "compilerOptions": {
-        "target": "ES2022",
         "module": "commonjs",
         "rootDir": "Luaver/src",
         "outDir": "dist",
         "strict": false,
-        "lib": [
-            "DOM",
-            "DOM.Iterable",
-            "ES2023"
-        ],
         "types": [
             "node"
         ],
