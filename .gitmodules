@@ -3,4 +3,4 @@
 	url = https://github.com/ESV-Sweetplum/Luaver
 [submodule "QParcel"]
 	path = QParcel
-	url = https://github.com/ESV-Sweetplum/qParcel
+	url = https://github.com/ESV-Sweetplum/QParcel
