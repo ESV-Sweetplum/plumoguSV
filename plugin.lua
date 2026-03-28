@@ -1,6 +1,6 @@
 math.randomseed(os.time())
 imgui_disable_vector_packing=true
-PLUGIN_NAME="plumoguSV";PLUGIN_VERSION="2.2.0";PLUGIN_AUTHOR="plummyyummy, kloi34";PLUGIN_DESCRIPTION="The ultimate community-driven and open-source competitive SV plugin, remastered for the modern age."
+PLUGIN_NAME="plumoguSV";PLUGIN_VERSION="2.2.0a";PLUGIN_AUTHOR="plummyyummy, kloi34";PLUGIN_DESCRIPTION="The ultimate community-driven and open-source competitive SV plugin, remastered for the modern age."
 ENVIRONMENT="development";DISTRO="development"
 cache = {
     boolean = {},
@@ -9811,7 +9811,7 @@ function showPatchNotesWindow()
     imgui.PopStyleColor()
     imgui.End()
 end
-function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugFixes, newFeatures)
+function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugFixes, newFeatures, devUpdates)
     AddPadding()
     imgui.BeginChild(version .. 'Bezier', vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
@@ -9848,6 +9848,13 @@ function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugF
     for k43 = 1, #newFeatures do
         local v = newFeatures[k43]
         imgui.BulletText(v)
+    end
+    if (devUpdates) then
+        imgui.SeparatorText('Development Updates')
+        for k44 = 1, #devUpdates do
+            local v = devUpdates[k44]
+            imgui.BulletText(v)
+        end
     end
 end
 function showPatchNotesV100(lc, rc)
@@ -12714,7 +12721,14 @@ function showPatchNotesV220(lc, rc)
         'Updated the keybinds settings menu to be more organized.',
         'Added the ability to have preset keybinds.',
     }
-    showPatchNotesElement('v2.2.0', drawV220, 142, { lc, rc }, bugFixes, newFeatures)
+    local devUpdates = {
+        'Moved the entire plugin over to Luaver2.',
+        'Migrated from TypeScript 5 to TypeScript 6.',
+        'Introduced several new packages to facilitate string processors.',
+        'Moved packages folder to separate qua specific submodule.',
+        'Changed a bit of naming to make things more clear.',
+    }
+    showPatchNotesElement('v2.2.0', drawV220, 142, { lc, rc }, bugFixes, newFeatures, devUpdates)
 end
 -- Replaced    vector.New\(([0-9\.]+), ([0-9\.]+)\), col
 -- with        vector.New($1, $2), colFn($1)
@@ -13158,8 +13172,8 @@ function showAppearanceSettings()
     if (imgui.Button('Copy Current Theme')) then
         setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
-        for k44 = 1, #customStyleIds do
-            local id = customStyleIds[k44]
+        for k45 = 1, #customStyleIds do
+            local id = customStyleIds[k45]
             local query = id:capitalize()
             if (query:match('%u%l+') == 'Loadup') then
                 customStyle[id] = loadup[query:sub(7)]
@@ -13249,14 +13263,14 @@ function chooseColorTheme()
         local padding = 10
         if (tree[1]) then
             local maxItemSize = 0
-            for k45 = 1, #tree do
-                local item = tree[k45]
+            for k46 = 1, #tree do
+                local item = tree[k46]
                 if (imgui.CalcTextSize(item.id).x > maxItemSize) then
                     maxItemSize = imgui.CalcTextSize(item.id).x * 1.03
                 end
             end
-            for k46 = 1, #tree do
-                local item = tree[k46]
+            for k47 = 1, #tree do
+                local item = tree[k47]
                 local col = item.textColor
                 local sz = vector.New(maxItemSize, imgui.CalcTextSize(item.id).y) + vector.New(padding, 0)
                 imgui.BeginChild('themetree' .. item.id, sz)
@@ -13496,8 +13510,8 @@ end
 function stringifyCustomStyle(customStyle)
     local keys = table.keys(customStyle)
     local resultStr = 'v2 '
-    for k47 = 1, #keys do
-        local key = keys[k47]
+    for k48 = 1, #keys do
+        local key = keys[k48]
         local value = customStyle[key]
         keyId = convertStrToShort(key)
         if (key:sub(1, 6) == 'loadup') then keyId = keyId .. key:sub(-1):upper() end
@@ -14732,8 +14746,8 @@ function runTest()
         --     color.int.white)
     end
     local triangleBuffer = {}
-    for k48 = 1, #surfaceIndices do
-        local quad = surfaceIndices[k48]
+    for k49 = 1, #surfaceIndices do
+        local quad = surfaceIndices[k49]
         local p1 = topLeft + cameraPoints[quad[1]]
         local p2 = topLeft + cameraPoints[quad[2]]
         local p3 = topLeft + cameraPoints[quad[3]]
@@ -14751,12 +14765,12 @@ function runTest()
     local sortedBuffer = sort(triangleBuffer, function(a, b)
         return a[4] > b[4]
     end)
-    for k49 = 1, #sortedBuffer do
-        local tri = sortedBuffer[k49]
+    for k50 = 1, #sortedBuffer do
+        local tri = sortedBuffer[k50]
         ctx.AddTriangleFilled(tri[1], tri[2], tri[3], tri[5])
     end
-    for k50 = 1, #edgeIndices do
-        local pair = edgeIndices[k50]
+    for k51 = 1, #edgeIndices do
+        local pair = edgeIndices[k51]
         local p1 = topLeft + cameraPoints[pair[1]]
         local p2 = topLeft + cameraPoints[pair[2]]
         ctx.AddLine(p1, p2, color.int.white, 2)
@@ -16326,8 +16340,8 @@ end
 ---@return ScrollVelocity[] svs All of the [scroll velocities](lua://ScrollVelocity) within the area.
 function getHypotheticalSVsBetweenOffsets(svs, startOffset, endOffset)
     local svsBetweenOffsets = {} ---@type ScrollVelocity[]
-    for k51 = 1, #svs do
-        local sv = svs[k51]
+    for k52 = 1, #svs do
+        local sv = svs[k52]
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime < endOffset + 1
         if svIsInRange then table.insert(svsBetweenOffsets, sv) end
     end

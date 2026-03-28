@@ -35,7 +35,7 @@ function showPatchNotesWindow()
     imgui.End()
 end
 
-function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugFixes, newFeatures)
+function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugFixes, newFeatures, devUpdates)
     AddPadding()
     imgui.BeginChild(version .. 'Bezier', vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
@@ -73,5 +73,11 @@ function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugF
     imgui.SeparatorText('New Features')
     for _, v in ipairs(newFeatures) do
         imgui.BulletText(v)
+    end
+    if (devUpdates) then
+        imgui.SeparatorText('Development Updates')
+        for _, v in ipairs(devUpdates) do
+            imgui.BulletText(v)
+        end
     end
 end

@@ -24,7 +24,15 @@ function showPatchNotesV220(lc, rc)
         'Added the ability to have preset keybinds.',
     }
 
-    showPatchNotesElement('v2.2.0', drawV220, 142, { lc, rc }, bugFixes, newFeatures)
+    local devUpdates = {
+        'Moved the entire plugin over to Luaver2.',
+        'Migrated from TypeScript 5 to TypeScript 6.',
+        'Introduced several new packages to facilitate string processors.',
+        'Moved packages folder to separate qua specific submodule.',
+        'Changed a bit of naming to make things more clear.',
+    }
+
+    showPatchNotesElement('v2.2.0', drawV220, 142, { lc, rc }, bugFixes, newFeatures, devUpdates)
 end
 
 -- Replaced    vector.New\(([0-9\.]+), ([0-9\.]+)\), col

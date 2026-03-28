@@ -1,6 +1,6 @@
 {
     pluginName: "plumoguSV",                    // Also exposed to the PLUGIN_NAME global in Lua.
-    pluginVersion: "2.2.0",                     // Also exposed to the PLUGIN_VERSION global in Lua.
+    pluginVersion: "2.2.0a",                    // Also exposed to the PLUGIN_VERSION global in Lua.
     pluginAuthor: "plummyyummy, kloi34",        // Also exposed to the PLUGIN_AUTHOR global in Lua.
     pluginDescription: "The ultimate community-driven and open-source competitive SV plugin, remastered for the modern age.",                                          // Also exposed to the PLUGIN_DESCRIPTION global in Lua.
     includeVersionInPluginName: false,           // If true, will put the version into the plugin name in the settings.ini file.
