@@ -1,17 +1,12 @@
-if (not state
-        or not state.CurrentTimingPoint
-        or not imgui
-        or not map
-        or not utils
-        or not actions) then
+PLUGIN_NAME = 'plumoguSV-dev'
+
+if (globalVars.capybaraMode) then
+    cache.windows.showSettingsWindow = false
+    capybaraModeWindow()
     return
 end
 
 local performanceMode = globalVars.performanceMode
-
-PLUGIN_NAME = 'plumoguSV-dev'
-
-state.IsWindowHovered = imgui.IsWindowHovered()
 
 startNextWindowNotCollapsed(PLUGIN_NAME)
 imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
