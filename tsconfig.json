@@ -3,7 +3,7 @@
         "module": "commonjs",
         "rootDir": "Luaver/src",
         "outDir": "dist",
-        "strict": false,
+        "strict": true,
         "types": ["node"],
         "esModuleInterop": true,
         "lib": ["ES2024"]

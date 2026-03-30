@@ -654,14 +654,7 @@ function math.hermite(m1, m2, y2, t)
     local c = m1
     return a * t ^ 3 + b * t ^ 2 + c * t
 end
----Returns the weight of a number between `lowerBound` and `upperBound`.
----@param num number
----@param lowerBound number
----@param upperBound number
----@return number
-function math.inverseLerp(num, lowerBound, upperBound)
-    return (num - lowerBound) / (upperBound - lowerBound)
-end
+math.iLerp = math.inverseLerp
 ---Returns the index of a zero row, or `nil` if none are found.
 ---@param mtrx number[][]
 ---@return integer?
@@ -2835,8 +2828,8 @@ function ssfVibrato(menuVars, func1, func2)
     local ssfs = { createSSF(startTime - 1 / getUsableDisplacementMultiplier(startTime),
         game.get.ssfMultiplierAt(time)) }
     while time < endTime do
-        local x = math.inverseLerp(time, startTime, endTime)
-        local y = math.inverseLerp(time + delta, startTime, endTime)
+        local x = math.iLerp(startTime, endTime, time)
+        local y = math.iLerp(startTime, endTime, time + delta)
         table.insert(ssfs,
             createSSF(time, func2(x)
             ))
