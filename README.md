@@ -1,4 +1,4 @@
-# plumoguSV v2.1.1
+# plumoguSV v2.2.0
 
 <img src="./assets/logo.png" alt="plumoguSV Logo">
 
