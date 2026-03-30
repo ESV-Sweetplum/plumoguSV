@@ -4,3 +4,5 @@ builds
 .DS_store
 bezier/out
 config.yaml
+plugin.lua
+settings.ini
