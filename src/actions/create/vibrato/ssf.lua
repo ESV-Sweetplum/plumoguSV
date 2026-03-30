@@ -10,8 +10,8 @@ function ssfVibrato(menuVars, func1, func2)
     local ssfs = { createSSF(startTime - 1 / getUsableDisplacementMultiplier(startTime),
         game.get.ssfMultiplierAt(time)) }
     while time < endTime do
-        local x = math.inverseLerp(time, startTime, endTime)
-        local y = math.inverseLerp(time + delta, startTime, endTime)
+        local x = math.iLerp(startTime, endTime, time)
+        local y = math.iLerp(startTime, endTime, time + delta)
         table.insert(ssfs,
             createSSF(time, func2(x)
             ))

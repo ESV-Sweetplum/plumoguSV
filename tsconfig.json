@@ -4,10 +4,9 @@
         "rootDir": "Luaver/src",
         "outDir": "dist",
         "strict": false,
-        "types": [
-            "node"
-        ],
-        "esModuleInterop": true
+        "types": ["node"],
+        "esModuleInterop": true,
+        "lib": ["ES2024"]
     },
     "include": [
         "Luaver/src/**/*"
