@@ -56,8 +56,27 @@ end
 if (not performanceMode and map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ') then
     runTest()
 end
-
 imgui.End()
+
+imgui.Text('debug')
+local ctx = imgui.GetWindowDrawList()
+local topLeft = imgui.GetWindowPos()
+local dim = imgui.GetWindowSize()
+if (not points) then
+    points = {}
+    for _ = 1, 10 do
+        table.insert(points, _ / 10 * dim.y + math.random())
+    end
+end
+
+local fn = math.interpolateBasic(points)
+
+for i = 0, dim.x, 1 do
+    ctx.AddCircleFilled(topLeft + vector.New(i, fn(i / dim.x * (#points - 1))), 2, color.int.white)
+end
+for x, y in pairs(points) do
+    ctx.AddCircleFilled(topLeft + vector.New((x - 1) / (#points - 1) * dim.x, y), 10, color.int.oRedMask * 100)
+end
 
 logoThread()
 
