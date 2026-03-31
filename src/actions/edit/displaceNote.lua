@@ -12,8 +12,7 @@ function displaceNoteSVsParent(menuVars)
     for _, offset in ipairs(offsets) do
         local displaceNoteResults = displaceNoteSVs(
             {
-                distance = (offset - offsets[1]) / (offsets[#offsets] - offsets[1]) *
-                    (menuVars.distance2 - menuVars.distance1) + menuVars.distance1,
+                distance = math.map(offsets[1], offsets[#offsets], offset, menuVars.distance1, menuVars.distance2),
             },
             false, offset)
         svsToRemove = table.combine(svsToRemove, displaceNoteResults.svsToRemove)
