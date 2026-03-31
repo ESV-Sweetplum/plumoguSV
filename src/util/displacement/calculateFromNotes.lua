@@ -7,8 +7,8 @@ function calculateDisplacementsFromNotes(noteOffsets, noteSpacing)
     local totalDisplacement = 0
     local displacements = { 0 }
     for i = 1, #noteOffsets - 1 do
-        local time = (noteOffsets[i + 1] - noteOffsets[i])
-        local distance = time * noteSpacing
+        local deltaTime = noteOffsets[i + 1] - noteOffsets[i]
+        local distance = deltaTime * noteSpacing
         totalDisplacement = totalDisplacement + distance
         table.insert(displacements, totalDisplacement)
     end
