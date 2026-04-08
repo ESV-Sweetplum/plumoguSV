@@ -52,6 +52,9 @@ function scaleMultiplySVs(menuVars)
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
             endOffset)
         local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
+        if (currentDistance == 0) then
+            currentDistance = (endOffset - startOffset) * game.get.svMultiplierAt(startOffset)
+        end
         if scaleType == 'Average SV' then
             local currentAvgSV = currentDistance / (endOffset - startOffset)
             scalingFactor = menuVars.avgSV / currentAvgSV
