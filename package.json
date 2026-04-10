@@ -3,8 +3,9 @@
     "version": "2.2.0",
     "description": "The ultimate SV plugin for Quaver.",
     "scripts": {
-        "dev": "tsc && node dist/watch",
-        "build": "tsc && node dist/build",
+        "compile": "tsc -b",
+        "dev": "npm run compile && node dist/watch",
+        "build": "npm run compile && node dist/build",
         "watch": "npm run dev",
         "update": "git submodule update --remote --recursive"
     },
