@@ -16,7 +16,9 @@ function getMapStats()
     print('s!',
         'This map has ' ..
         svSum .. ' SVs and ' .. ssfSum .. ' SSFs across ' .. #tgList .. pluralize(' timing group.', #tgList, -2))
-    print('w!',
-        'Remember that the quality of map has no correlation with the object count! Try to be optimal in your object usage.')
+    if (not globalVars.advancedMode) then
+        print('w!',
+            'Remember that the quality of map has no correlation with the object count! Try to be optimal in your object usage.')
+    end
     state.SelectedScrollGroupId = currentTG
 end
