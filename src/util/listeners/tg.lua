@@ -8,6 +8,8 @@ function listenForTimingGroupCount()
         cache.tgList = baseList
     end
 
+    refreshTgList()
+
     listen(function(action, type, fromLua)
         local actionIndex = tonumber(action.Type)
         if (actionIndex < action_type.CreateTimingGroup and actionIndex ~= action_type.Batch) then return end
