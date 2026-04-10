@@ -10,6 +10,7 @@ function showPatchNotesV220(lc, rc)
         'Fixed some tabs not being openable when the preset menu was opened.',
         'Fixed scientific notation not being supported in the table parser.',
         'Fixed several hot-reload fails due to nonexistent globals.',
+        'Updated timing group listener to correctly listen to batch arguments.',
     }
 
     local newFeatures = {
@@ -22,6 +23,7 @@ function showPatchNotesV220(lc, rc)
         'Added an alert when conflicting hotkeys are bound.',
         'Updated the keybinds settings menu to be more organized.',
         'Added the ability to have preset keybinds.',
+        "Added capybara mode for those who don't make SV.",
     }
 
     local devUpdates = {
@@ -30,6 +32,7 @@ function showPatchNotesV220(lc, rc)
         'Introduced several new packages to facilitate string processors.',
         'Moved packages folder to separate qua specific submodule.',
         'Changed a bit of naming to make things more clear.',
+        'Finalized QParcel submodule.',
     }
 
     showPatchNotesElement('v2.2.0', drawV220, 142, { lc, rc }, bugFixes, newFeatures, devUpdates)
