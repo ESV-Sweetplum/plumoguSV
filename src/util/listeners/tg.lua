@@ -10,7 +10,7 @@ function listenForTimingGroupCount()
 
     listen(function(action, type, fromLua)
         local actionIndex = tonumber(action.Type)
-        if (actionIndex < action_type.CreateTimingGroup) then return end
+        if (actionIndex < action_type.CreateTimingGroup and actionIndex ~= action_type.Batch) then return end
 
         refreshTgList()
     end)
