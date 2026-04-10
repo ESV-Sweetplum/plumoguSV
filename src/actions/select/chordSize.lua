@@ -1,6 +1,6 @@
 function selectByChordSizes(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not isTruthy(offsets)) then return end
+    if (not truthy(offsets)) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
 
@@ -54,5 +54,5 @@ function selectByChordSizes(menuVars)
     end
 
     actions.SetHitObjectSelection(notesToSelect)
-    print(isTruthy(notesToSelect) and 's!' or 'w!', #notesToSelect .. ' notes selected')
+    print(truthy(notesToSelect) and 's!' or 'w!', #notesToSelect .. ' notes selected')
 end

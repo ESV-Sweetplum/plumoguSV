@@ -130,7 +130,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             imgui.TableSetColumnIndex(1)
             imgui.AlignTextToFramePadding()
             imgui.SetCursorPosY(imgui.GetCursorPosY() + 3.4)
-            preset.flags.enabled = isTruthy(preset.flags.enabled)
+            preset.flags.enabled = truthy(preset.flags.enabled)
             local oldEnabled = preset.flags.enabled
             BasicCheckbox(preset.flags, 'enabled', 'CMB:##PresetEditEnabled' .. idx)
             HoverToolTip('If enabled, the key combo next to this button will trigger the preset.')

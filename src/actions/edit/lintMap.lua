@@ -17,10 +17,10 @@ function alignTimingLines()
 
     for time = starttime, endtime, msptl do
         local originalTime = math.floor(time)
-        while (isTruthy(noteTimes) and (noteTimes[1] < originalTime - 5)) do
+        while (truthy(noteTimes) and (noteTimes[1] < originalTime - 5)) do
             table.remove(noteTimes, 1)
         end
-        if (not isTruthy(noteTimes)) then
+        if (not truthy(noteTimes)) then
             table.insert(times, originalTime)
         elseif (math.abs(noteTimes[1] - originalTime) <= 5) then
             table.insert(times, noteTimes[1])
@@ -41,7 +41,7 @@ function alignTimingLines()
     })
 
     toggleablePrint('s!', 'Created ' .. #tpsToAdd .. pluralize(' timing point.', #tpsToAdd, -2))
-    if (isTruthy(tpsToRemove)) then
+    if (truthy(tpsToRemove)) then
         toggleablePrint('e!',
             'Deleted ' .. #tpsToRemove .. pluralize(' timing point.', #tpsToRemove, -2))
     end
@@ -91,7 +91,7 @@ function fixFlippedLNEnds()
         createEA(action_type.AddScrollVelocityBatch, svsToAdd),
     })
 
-    local type = isTruthy(fixedLNEndsCount) and 's!' or 'w!'
+    local type = truthy(fixedLNEndsCount) and 's!' or 'w!'
     print(type, 'Fixed ' .. fixedLNEndsCount .. pluralize(' flipped LN end.', fixedLNEndsCount, -2))
     state.SelectedScrollGroupId = ogTg
 end
@@ -131,8 +131,8 @@ function mergeSVsAndSSFs()
         ssfSum = ssfSum + #ssfsToRemove
     end
 
-    if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
-    local type = isTruthy(svSum + ssfSum) and 's!' or 'w!'
+    if (truthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = truthy(svSum + ssfSum) and 's!' or 'w!'
     print(type,
         table.concat({ 'Removed ', svSum, pluralize(' SV', svSum), ' and ', ssfSum, pluralize(
             ' SSF.', ssfSum, -2) }))
@@ -154,8 +154,8 @@ function mergeNotes()
             end
         end
     end
-    if (isTruthy(notesToRemove)) then actions.RemoveHitObjectBatch(notesToRemove) end
-    local type = isTruthy(notesToRemove) and 's!' or 'w!'
+    if (truthy(notesToRemove)) then actions.RemoveHitObjectBatch(notesToRemove) end
+    local type = truthy(notesToRemove) and 's!' or 'w!'
     print(type, 'Removed ' .. #notesToRemove .. pluralize(' note.', #notesToRemove, -2))
 end
 
@@ -194,8 +194,8 @@ function removeUnnecessarySVsAndSSFs()
         table.insert(editorActions, createEA(action_type.RemoveScrollSpeedFactorBatch, ssfsToRemove, tg))
         ssfSum = ssfSum + #ssfsToRemove
     end
-    if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
-    local type = isTruthy(svSum + ssfSum) and 's!' or 'w!'
+    if (truthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = truthy(svSum + ssfSum) and 's!' or 'w!'
     print(type,
         table.concat({ 'Removed ', svSum, pluralize(' SV', svSum), ' and ', ssfSum, pluralize(' SSF.', ssfSum, -2) }))
     state.SelectedScrollGroupId = ogTG
@@ -204,7 +204,7 @@ end
 function removeAllHitSounds()
     local hitsoundActions = {}
     local objs = {}
-    if (not isTruthy(#state.SelectedHitObjects)) then
+    if (not truthy(#state.SelectedHitObjects)) then
         print('e!', 'You are not currently selecting anything.')
         return
     end
@@ -216,7 +216,7 @@ function removeAllHitSounds()
             table.insert(objs, ho.StartTime .. '|' .. ho.Lane)
         end
     end
-    local type = isTruthy(hitsoundActions) and 's!' or 'w!'
+    local type = truthy(hitsoundActions) and 's!' or 'w!'
     print(type,
         'Removed ' ..
         #hitsoundActions .. pluralize(' hitsound.', #hitsoundActions, -2))
@@ -265,8 +265,8 @@ function removePostTGSVsAndSSFs()
         end
         ::nextTG::
     end
-    if (isTruthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
-    local type = isTruthy(svSum + ssfSum) and 's!' or 'w!'
+    if (truthy(svSum + ssfSum)) then actions.PerformBatch(editorActions) end
+    local type = truthy(svSum + ssfSum) and 's!' or 'w!'
     print(type,
         table.concat({ 'Removed ', svSum, pluralize(' SV', svSum), ' and ', ssfSum, pluralize(' SSF.', ssfSum, -2) }))
     state.SelectedScrollGroupId = ogTG

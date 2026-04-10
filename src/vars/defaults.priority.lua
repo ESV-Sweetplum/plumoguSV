@@ -39,7 +39,7 @@ function parseDefaultProperty(v, default)
         return tn(v)
     end
     if (type(default) == 'boolean') then
-        return isTruthy(v)
+        return truthy(v)
     end
     if (type(default) == 'string') then
         return v

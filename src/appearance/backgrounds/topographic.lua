@@ -48,7 +48,7 @@ function renderTopographicMap()
     local edgeColor = color.int.white
     local edgeThickness = 2
 
-    if (isTruthy(xCellCount % 2)) then
+    if (truthy(xCellCount % 2)) then
         local centerX = dim.x / 2
         local xPos = centerX - CELL_SIZE / 2
         while (xPos > 0) do
@@ -66,7 +66,7 @@ function renderTopographicMap()
         lowestX = xPos
     end
 
-    if (isTruthy(yCellCount % 2)) then
+    if (truthy(yCellCount % 2)) then
         local centerY = dim.y / 2
         local yPos = centerY - CELL_SIZE / 2
         while (yPos > 0) do
@@ -100,10 +100,10 @@ function renderTopographicMap()
 
     for y = 1, yCellCount do
         for x = 1, xCellCount do
-            local tlState = isTruthy(map[y][x]) and 1 or 0
-            local trState = isTruthy(map[y][x + 1]) and 1 or 0
-            local blState = isTruthy(map[y + 1][x]) and 1 or 0
-            local brState = isTruthy(map[y + 1][x + 1]) and 1 or 0
+            local tlState = truthy(map[y][x]) and 1 or 0
+            local trState = truthy(map[y][x + 1]) and 1 or 0
+            local blState = truthy(map[y + 1][x]) and 1 or 0
+            local brState = truthy(map[y + 1][x + 1]) and 1 or 0
 
             local cellState = tlState + trState * 2 + blState * 4 + brState * 8
             local topZeroLocation = -map[y][x] / (map[y][x + 1] - map[y][x] + math.epsilon)

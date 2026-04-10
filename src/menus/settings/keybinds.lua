@@ -41,7 +41,7 @@ function showKeybindSettings()
     local prefixes, key = kbm.listenForAnyKeyPressed()
     if (key == -1) then return end
     globalVars.hotkeyList[awaitingIndex] = table.concat(prefixes, '+') ..
-        (isTruthy(prefixes) and '+' or '') .. kbm.numToKey(key)
+        (truthy(prefixes) and '+' or '') .. kbm.numToKey(key)
     awaitingIndex = 0
     write(globalVars)
     reconstructKeybindHashmap()

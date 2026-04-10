@@ -28,7 +28,7 @@ setPluginAppearance()
 
 state.SelectedScrollGroupId = '$Default' or map.GetTimingGroupIds()[1]
 
-if (not isTruthy(map.TimingPoints)) then
+if (not truthy(map.TimingPoints)) then
     print('e!', 'Please place a timing point before attempting to use plumoguSV.')
 end
 

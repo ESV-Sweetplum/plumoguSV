@@ -15,7 +15,7 @@ STANDARD_SVS = {
 function placeStandardSVMenu()
     PresetButton()
     local menuVars = getMenuVars('placeStandard')
-    local needSVUpdate = not isTruthy(menuVars.svMultipliers)
+    local needSVUpdate = not truthy(menuVars.svMultipliers)
     needSVUpdate = chooseStandardSVType(menuVars, false) or needSVUpdate
 
     AddSeparator()

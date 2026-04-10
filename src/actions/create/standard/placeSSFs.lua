@@ -2,7 +2,7 @@ function placeSSFs(menuVars)
     local finalSVType = FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex]
     local numMultipliers = #menuVars.svMultipliers
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not isTruthy(offsets)) then return end
+    if (not truthy(offsets)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local ssfsToAdd = {}
