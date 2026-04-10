@@ -1,8 +1,8 @@
 node_modules
-dist
-builds
-.DS_store
-bezier/out
+**/dist
+**/out
+**/builds
+.DS_Store
 config.yaml
 plugin.lua
 settings.ini
