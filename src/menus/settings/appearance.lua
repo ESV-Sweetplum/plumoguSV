@@ -9,7 +9,7 @@ function showAppearanceSettings()
     if (imgui.Button('Copy Current Theme')) then
         setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
-        for _, id in ipairs(customStyleIds) do
+        for id, _ in pairs(DEFAULT_STYLE) do
             local query = id:capitalize()
             if (query:match('%u%l+') == 'Loadup') then
                 customStyle[id] = loadup[query:sub(7)]

@@ -1,89 +1,3 @@
-customStyleIds = {
-    'border',
-    'button',
-    'buttonActive',
-    'buttonHovered',
-    'checkMark',
-    'frameBg',
-    'frameBgActive',
-    'frameBgHovered',
-    'header',
-    'headerActive',
-    'headerHovered',
-    'loadupBgBl',
-    'loadupBgBr',
-    'loadupBgTl',
-    'loadupBgTr',
-    'loadupOpeningTextColor',
-    'loadupPulseTextColorLeft',
-    'loadupPulseTextColorRight',
-    'plotHistogram',
-    'plotHistogramHovered',
-    'plotLines',
-    'plotLinesHovered',
-    'popupBg',
-    'scrollbarGrab',
-    'scrollbarGrabActive',
-    'scrollbarGrabHovered',
-    'separator',
-    'sliderGrab',
-    'sliderGrabActive',
-    'tab',
-    'tabActive',
-    'tabHovered',
-    'tableBorderLight',
-    'tableBorderStrong',
-    'text',
-    'textSelectedBg',
-    'titleBg',
-    'titleBgActive',
-    'titleBgCollapsed',
-    'windowBg',
-}
-
-local customStyleNames = {
-    'Border',
-    'Button',
-    'Button\n(Active)',
-    'Button\n(Hovered)',
-    'Checkmark',
-    'Frame BG',
-    'Frame BG\n(Active)',
-    'Frame BG\n(Hovered)',
-    'Header',
-    'Header\n(Active)',
-    'Header\n(Hovered)',
-    'Loadup BG\n(Bottom Left)',
-    'Loadup BG\n(Bottom Right)',
-    'Loadup BG\n(Top Left)',
-    'Loadup BG\n(Top Right)',
-    'Loadup\nOpening Text',
-    'Loadup Pulse\nText (Left)',
-    'Loadup Pulse\nText (Right)',
-    'Plot Histogram',
-    'Plot Histogram\n(Hovered)',
-    'Plot Lines',
-    'Plot Lines\n(Hovered)',
-    'Popup BG',
-    'Scrollbar Grab',
-    'Scrollbar Grab\n(Active)',
-    'Scrollbar Grab\n(Hovered)',
-    'Separator',
-    'Slider Grab',
-    'Slider Grab\n(Active)',
-    'Tab',
-    'Tab\n(Active)',
-    'Tab\n(Hovered)',
-    'Table Border\n(Light)',
-    'Table Border\n(Strong)',
-    'Text',
-    'Text Selected\n(BG)',
-    'Title BG',
-    'Title BG\n(Active)',
-    'Title BG\n(Collapsed)',
-    'Window BG',
-}
-
 function showCustomThemeSettings()
     local settingsChanged = false
     imgui.SeparatorText("Editing '" .. globalVars.colorThemeName:gsub('custom_', '') .. "'")
@@ -141,8 +55,8 @@ function showCustomThemeSettings()
     state.SetValue('customTheme_searchText', searchText)
     imgui.PopItemWidth()
 
-    for idx, id in ipairs(customStyleIds) do
-        local name = customStyleNames[idx]
+    for _, id in ipairs(table.keys(DEFAULT_STYLE)) do
+        local name = DEFAULT_STYLE_NAMES[id]
         if (not name:lower():find(searchText:lower())) then goto nextId end
         settingsChanged = ColorInput(globalCustomStyle, id, name) or settingsChanged
         ::nextId::
