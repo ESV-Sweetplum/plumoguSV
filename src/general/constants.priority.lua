@@ -281,65 +281,89 @@ end
 VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
 
 DEFAULT_STYLE = {
-    windowBg = vector.New(0.00, 0.00, 0.00, 1.00),
-    popupBg = vector.New(0.08, 0.08, 0.08, 0.94),
     border = vector.New(0.00, 0.00, 0.00, 0.00),
-    frameBg = vector.New(0.14, 0.24, 0.28, 1.00),
-    frameBgHovered =
-        vector.New(0.24, 0.34, 0.38, 1.00),
-    frameBgActive =
-        vector.New(0.29, 0.39, 0.43, 1.00),
-    titleBg = vector.New(0.14, 0.24, 0.28, 1.00),
-    titleBgActive =
-        vector.New(0.51, 0.58, 0.75, 1.00),
-    titleBgCollapsed =
-        vector.New(0.51, 0.58, 0.75, 0.50),
-    checkMark = vector.New(0.81, 0.88, 1.00, 1.00),
-    sliderGrab =
-        vector.New(0.56, 0.63, 0.75, 1.00),
-    sliderGrabActive =
-        vector.New(0.61, 0.68, 0.80, 1.00),
     button = vector.New(0.31, 0.38, 0.50, 1.00),
-    buttonHovered =
-        vector.New(0.41, 0.48, 0.60, 1.00),
-    buttonActive =
-        vector.New(0.51, 0.58, 0.70, 1.00),
-    tab = vector.New(0.31, 0.38, 0.50, 1.00),
-    tabHovered =
-        vector.New(0.51, 0.58, 0.75, 1.00),
-    tabActive =
-        vector.New(0.51, 0.58, 0.75, 1.00),
+    buttonActive = vector.New(0.51, 0.58, 0.70, 1.00),
+    buttonHovered = vector.New(0.41, 0.48, 0.60, 1.00),
+    checkMark = vector.New(0.81, 0.88, 1.00, 1.00),
+    frameBg = vector.New(0.14, 0.24, 0.28, 1.00),
+    frameBgActive = vector.New(0.29, 0.39, 0.43, 1.00),
+    frameBgHovered = vector.New(0.24, 0.34, 0.38, 1.00),
     header = vector.New(0.81, 0.88, 1.00, 0.40),
-    headerHovered =
-        vector.New(0.81, 0.88, 1.00, 0.50),
-    headerActive =
-        vector.New(0.81, 0.88, 1.00, 0.54),
-    separator = vector.New(0.81, 0.88, 1.00, 0.30),
-    tableBorderLight = vector.New(0.81, 0.88, 1.00, 0.30),
-    text = vector.New(1.00, 1.00, 1.00, 1.00),
-    textSelectedBg =
-        vector.New(0.81, 0.88, 1.00, 0.40),
-    scrollbarGrab =
-        vector.New(0.31, 0.38, 0.50, 1.00),
-    scrollbarGrabHovered =
-        vector.New(0.41, 0.48, 0.60, 1.00),
-    scrollbarGrabActive =
-        vector.New(0.51, 0.58, 0.70, 1.00),
-    plotLines =
-        vector.New(0.61, 0.61, 0.61, 1.00),
-    plotLinesHovered =
-        vector.New(1.00, 0.43, 0.35, 1.00),
-    plotHistogram =
-        vector.New(0.90, 0.70, 0.00, 1.00),
-    plotHistogramHovered =
-        vector.New(1.00, 0.60, 0.00, 1.00),
+    headerActive = vector.New(0.81, 0.88, 1.00, 0.54),
+    headerHovered = vector.New(0.81, 0.88, 1.00, 0.50),
+    loadupBgBl = vector.New(0.31, 0.38, 0.50, 0.67),
+    loadupBgBr = vector.New(0.62, 0.76, 1, 1.00),
+    loadupBgTl = vector.New(0.00, 0.00, 0.00, 0.39),
+    loadupBgTr = vector.New(0.31, 0.38, 0.50, 0.67),
     loadupOpeningTextColor = vector.New(1.00, 1.00, 1.00, 1.00),
     loadupPulseTextColorLeft = vector.New(0.00, 0.50, 1.00, 1.00),
     loadupPulseTextColorRight = vector.New(0.00, 0.00, 1.00, 1.00),
-    loadupBgTl = vector.New(0.00, 0.00, 0.00, 0.39),
-    loadupBgTr = vector.New(0.31, 0.38, 0.50, 0.67),
-    loadupBgBl = vector.New(0.31, 0.38, 0.50, 0.67),
-    loadupBgBr = vector.New(0.62, 0.76, 1, 1.00),
+    plotHistogram = vector.New(0.90, 0.70, 0.00, 1.00),
+    plotHistogramHovered = vector.New(1.00, 0.60, 0.00, 1.00),
+    plotLines = vector.New(0.61, 0.61, 0.61, 1.00),
+    plotLinesHovered = vector.New(1.00, 0.43, 0.35, 1.00),
+    popupBg = vector.New(0.08, 0.08, 0.08, 0.94),
+    scrollbarGrab = vector.New(0.31, 0.38, 0.50, 1.00),
+    scrollbarGrabActive = vector.New(0.51, 0.58, 0.70, 1.00),
+    scrollbarGrabHovered = vector.New(0.41, 0.48, 0.60, 1.00),
+    separator = vector.New(0.81, 0.88, 1.00, 0.30),
+    sliderGrab = vector.New(0.56, 0.63, 0.75, 1.00),
+    sliderGrabActive = vector.New(0.61, 0.68, 0.80, 1.00),
+    tab = vector.New(0.31, 0.38, 0.50, 1.00),
+    tabActive = vector.New(0.51, 0.58, 0.75, 1.00),
+    tabHovered = vector.New(0.51, 0.58, 0.75, 1.00),
+    tableBorderLight = vector.New(0.81, 0.88, 1.00, 0.30),
+    tableBorderStrong = vector.New(0.81, 0.88, 1.00, 0.30),
+    text = vector.New(1.00, 1.00, 1.00, 1.00),
+    textSelectedBg = vector.New(0.81, 0.88, 1.00, 0.40),
+    titleBg = vector.New(0.14, 0.24, 0.28, 1.00),
+    titleBgActive = vector.New(0.51, 0.58, 0.75, 1.00),
+    titleBgCollapsed = vector.New(0.51, 0.58, 0.75, 0.50),
+    windowBg = vector.New(0.00, 0.00, 0.00, 1.00),
+}
+
+DEFAULT_STYLE_NAMES = {
+    border = 'Border',
+    button = 'Button',
+    buttonActive = 'Button\n(Active)',
+    buttonHovered = 'Button\n(Hovered)',
+    checkMark = 'Checkmark',
+    frameBg = 'Frame BG',
+    frameBgActive = 'Frame BG\n(Active)',
+    frameBgHovered = 'Frame BG\n(Hovered)',
+    header = 'Header',
+    headerActive = 'Header\n(Active)',
+    headerHovered = 'Header\n(Hovered)',
+    loadupBgBl = 'Loadup BG\n(Bottom Left)',
+    loadupBgBr = 'Loadup BG\n(Bottom Right)',
+    loadupBgTl = 'Loadup BG\n(Top Left)',
+    loadupBgTr = 'Loadup BG\n(Top Right)',
+    loadupOpeningTextColor = 'Loadup\nOpening Text',
+    loadupPulseTextColorLeft = 'Loadup Pulse\nText (Left)',
+    loadupPulseTextColorRight = 'Loadup Pulse\nText (Right)',
+    plotHistogram = 'Plot Histogram',
+    plotHistogramHovered = 'Plot Histogram\n(Hovered)',
+    plotLines = 'Plot Lines',
+    plotLinesHovered = 'Plot Lines\n(Hovered)',
+    popupBg = 'Popup BG',
+    scrollbarGrab = 'Scrollbar Grab',
+    scrollbarGrabActive = 'Scrollbar Grab\n(Active)',
+    scrollbarGrabHovered = 'Scrollbar Grab\n(Hovered)',
+    separator = 'Separator',
+    sliderGrab = 'Slider Grab',
+    sliderGrabActive = 'Slider Grab\n(Active)',
+    tab = 'Tab',
+    tabActive = 'Tab\n(Active)',
+    tabHovered = 'Tab\n(Hovered)',
+    tableBorderLight = 'Table Border\n(Light)',
+    tableBorderStrong = 'Table Border\n(Strong)',
+    text = 'Text',
+    textSelectedBg = 'Text Selected\n(BG)',
+    titleBg = 'Title BG',
+    titleBgActive = 'Title BG\n(Active)',
+    titleBgCollapsed = 'Title BG\n(Collapsed)',
+    windowBg = 'Window BG',
 }
 
 DEFAULT_HOTKEY_LIST = { 'T', 'Shift+T', 'S', 'N', 'R', 'B', 'M', 'V', 'G', 'Ctrl+Alt+L', 'Ctrl+Alt+E', 'O' }
