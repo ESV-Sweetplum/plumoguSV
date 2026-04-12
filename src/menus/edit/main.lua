@@ -77,5 +77,5 @@ function chooseEditTool()
     globalVars.editToolIndex = Combo('##edittool', EDIT_SV_TOOLS, oldEditToolIndex, nil, nil, tooltipList)
 
     HoverToolTip(tooltipList[globalVars.editToolIndex])
-    return oldEditToolIndex ~= globalVars.editToolIndex
+    return oldEditToolIndex != globalVars.editToolIndex
 end

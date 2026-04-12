@@ -1,5 +1,5 @@
 function renderNoteDataWidget()
-    if (#state.SelectedHitObjects ~= 1) then return end
+    if (#state.SelectedHitObjects != 1) then return end
     imgui.BeginTooltip()
     imgui.Text('Note Info:')
     local selectedNote = state.SelectedHitObjects[1]

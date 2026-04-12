@@ -19,11 +19,11 @@ function selectByNoteType(menuVars)
                 goto skipType
             end
             if (note.EndTime == 0 and menuVars.rice) then table.insert(notesToSelect, note) end
-            if (note.EndTime ~= 0 and menuVars.ln) then table.insert(notesToSelect, note) end
+            if (note.EndTime != 0 and menuVars.ln) then table.insert(notesToSelect, note) end
             ::skipType::
         else
             if (note.EndTime == 0 and menuVars.rice) then table.insert(notesToSelect, note) end
-            if (note.EndTime ~= 0 and menuVars.ln) then table.insert(notesToSelect, note) end
+            if (note.EndTime != 0 and menuVars.ln) then table.insert(notesToSelect, note) end
         end
     end
 

@@ -32,7 +32,7 @@ function generateComboSet(values1, values2, comboPhase, comboType, comboMultipli
             table.insert(comboValues, values2[i])
         end
 
-        if comboType ~= 'Remove' then
+        if comboType != 'Remove' then
             local comboValues1StartIndex = endIndex1 + 1
             local comboValues1EndIndex = startIndex2 - 1
             local comboValues2StartIndex = endIndex2 + 1

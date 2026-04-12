@@ -9,5 +9,5 @@ function ColorInput(customStyle, parameterName, label, tooltipText)
     local oldCode = customStyle[parameterName]
     _, customStyle[parameterName] = imgui.ColorPicker4(label, customStyle[parameterName] or DEFAULT_STYLE[parameterName])
     if tooltipText then HoverToolTip(tooltipText) end
-    return oldCode ~= customStyle[parameterName]
+    return oldCode != customStyle[parameterName]
 end

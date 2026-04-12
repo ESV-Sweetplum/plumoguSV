@@ -15,7 +15,7 @@ function calculateStillDisplacements(stillType, stillDistance, svDisplacements, 
     if stillType == 'End' or stillType == 'Otua' then
         extraDisplacement = stillDistance - finalDisplacements[#finalDisplacements]
     end
-    if stillType ~= 'No' then
+    if stillType != 'No' then
         for i = 1, #finalDisplacements do
             finalDisplacements[i] = finalDisplacements[i] + extraDisplacement
         end

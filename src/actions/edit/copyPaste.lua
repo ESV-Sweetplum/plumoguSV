@@ -122,7 +122,7 @@ function pasteItems(menuVars)
         local ignoranceTolerance = 0.01
         for _, line in ipairs(menuVars.copied.lines[menuVars.curSlot]) do
             local timeToPasteLine = pasteOffset + line.relativeOffset
-            if (math.abs(timeToPasteLine - nextOffset) < ignoranceTolerance and i ~= #offsets) then
+            if (math.abs(timeToPasteLine - nextOffset) < ignoranceTolerance and i != #offsets) then
                 goto nextLine
             end
             table.insert(linesToAdd, utils.CreateTimingPoint(timeToPasteLine, line.bpm, line.signature, line.hidden))
@@ -130,7 +130,7 @@ function pasteItems(menuVars)
         end
         for _, sv in ipairs(menuVars.copied.SVs[menuVars.curSlot]) do
             local timeToPasteSV = pasteOffset + sv.relativeOffset
-            if (math.abs(timeToPasteSV - nextOffset) < ignoranceTolerance and i ~= #offsets) then
+            if (math.abs(timeToPasteSV - nextOffset) < ignoranceTolerance and i != #offsets) then
                 goto nextSV
             end
             if menuVars.tryAlign then
@@ -141,7 +141,7 @@ function pasteItems(menuVars)
         end
         for _, ssf in ipairs(menuVars.copied.SSFs[menuVars.curSlot]) do
             local timeToPasteSSF = pasteOffset + ssf.relativeOffset
-            if (math.abs(timeToPasteSSF - nextOffset) < ignoranceTolerance and i ~= #offsets) then
+            if (math.abs(timeToPasteSSF - nextOffset) < ignoranceTolerance and i != #offsets) then
                 goto nextSSF
             end
             table.insert(ssfsToAdd, createSSF(timeToPasteSSF, ssf.multiplier))
@@ -149,7 +149,7 @@ function pasteItems(menuVars)
         end
         for _, bm in ipairs(menuVars.copied.BMs[menuVars.curSlot]) do
             local timeToPasteBM = pasteOffset + bm.relativeOffset
-            if (math.abs(timeToPasteBM - nextOffset) < ignoranceTolerance and i ~= #offsets) then
+            if (math.abs(timeToPasteBM - nextOffset) < ignoranceTolerance and i != #offsets) then
                 goto nextBM
             end
             table.insert(bmsToAdd, utils.CreateBookmark(timeToPasteBM, bm.note))

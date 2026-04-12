@@ -6,9 +6,9 @@ function drawCursorTrail()
     local m = imgui.GetMousePos()
     local t = clock.getTime()
     local sz = state.WindowSize
-    if cursorTrail ~= 'Snake' then cache.boolean.snakeTrailInitialized = false end
-    if cursorTrail ~= 'Dust' then cache.boolean.dustParticlesInitialized = false end
-    if cursorTrail ~= 'Sparkle' then cache.boolean.sparkleParticlesInitialized = false end
+    if cursorTrail != 'Snake' then cache.boolean.snakeTrailInitialized = false end
+    if cursorTrail != 'Dust' then cache.boolean.dustParticlesInitialized = false end
+    if cursorTrail != 'Sparkle' then cache.boolean.sparkleParticlesInitialized = false end
 
     if cursorTrail == 'Snake' then drawSnakeTrail(o, m, t) end
     if cursorTrail == 'Dust' then drawDustTrail(o, m, t, sz) end
@@ -111,7 +111,7 @@ function drawTriangleTrailPoint(o, m, point, cursorTrailSize, color)
     local dy = m.y - point.y
     if dx == 0 and dy == 0 then return end
     local angle = math.pi * 0.5
-    if dx ~= 0 then angle = math.atan(dy / dx) end
+    if dx != 0 then angle = math.atan(dy / dx) end
     if dx < 0 then angle = angle + math.pi end
     if dx == 0 and dy < 0 then angle = angle + math.pi end
     drawEquilateralTriangle(o, point, cursorTrailSize, angle, color)
@@ -313,7 +313,7 @@ end
 --    currentMousePosition : current (x, y) coordinates of the mouse [Table]
 function checkIfMouseMoved(currentMousePosition)
     oldMousePosition = cache.oldMousePosition or vctr2(0)
-    local mousePositionChanged = currentMousePosition ~= oldMousePosition
+    local mousePositionChanged = currentMousePosition != oldMousePosition
     cache.oldMousePosition = currentMousePosition
     return mousePositionChanged
 end

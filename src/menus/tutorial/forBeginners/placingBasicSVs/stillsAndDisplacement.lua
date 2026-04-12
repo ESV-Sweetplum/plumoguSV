@@ -11,7 +11,7 @@ function showStillsAndDisplacementTutorial()
         'Notice how the notes are not the same distance from each other; this is because the SVs between the first two notes have a different average value than the SVs between the second two notes. To fix this, instead of using standard, we will use the "STILL" menu.')
     imgui.TextColored(INSTRUCTION_COLOR,
         'Select "STILL" under the "TYPE" dropdown.')
-    if (globalVars.placeTypeIndex ~= 3) then return end
+    if (globalVars.placeTypeIndex != 3) then return end
     imgui.TextWrapped(
         'The rest will be the same as before; simply input your desired parameters and click the "Place SVs between selected notes" button. This will make an effect where all notes have the same distance from each other:')
     gpsim('StillsAndDisplacementGoodApproach', vctr2(1), function(t)

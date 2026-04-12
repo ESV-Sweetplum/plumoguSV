@@ -1,6 +1,6 @@
 function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance, queuedSVs)
     local finalSVType = FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex]
-    local placingStillSVs = menuVars.noteSpacing ~= nil
+    local placingStillSVs = menuVars.noteSpacing != nil
     local numMultipliers = #menuVars.svMultipliers
     local offsets = game.get.uniqueSelectedNoteOffsets()
     if (not truthy(offsets)) then return end
@@ -26,7 +26,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
         for j = 1, #svOffsets - 1 do
             local offset = svOffsets[j]
             local multiplier = menuVars.svMultipliers[j]
-            if optionalDistance ~= nil then
+            if optionalDistance != nil then
                 multiplier = optionalDistance / (endOffset - startOffset) * math.abs(multiplier)
             end
             addSVToList(svsToAdd, offset, multiplier, true)
@@ -39,7 +39,7 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
                 sort(svsToAdd, sortAscendingStartTime), svsToAdd)
             svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
         end
-        if (finalSVType ~= 'None') then
+        if (finalSVType != 'None') then
             addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
         end
         removeAndAddSVs(svsToRemove, svsToAdd)

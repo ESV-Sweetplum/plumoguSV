@@ -12,7 +12,7 @@ function BasicInputInt(varsTable, parameterName, label, bounds, tooltipText)
     if (bounds and bounds[1] and bounds[2]) then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
     end
-    return oldValue ~= varsTable[parameterName]
+    return oldValue != varsTable[parameterName]
 end
 
 function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipText)
@@ -36,5 +36,5 @@ function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipTex
     if (bounds and bounds[1] and bounds[2]) then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
     end
-    return oldValue ~= varsTable[parameterName]
+    return oldValue != varsTable[parameterName]
 end

@@ -62,6 +62,6 @@ logoThread()
 
 cache.boolean.changeOccurred = false
 local groups = cache.tgList
-if (state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex]) then
+if (state.SelectedScrollGroupId != groups[globalVars.scrollGroupIndex]) then
     globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
 end

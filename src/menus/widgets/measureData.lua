@@ -19,7 +19,7 @@ function renderMeasureDataWidget()
         end
         if (#uniqueDict > 2) then return end
     end
-    if (#state.SelectedHitObjects == 1 and state.SelectedHitObjects[1].EndTime ~= 0) then
+    if (#state.SelectedHitObjects == 1 and state.SelectedHitObjects[1].EndTime != 0) then
         uniqueDict = { state.SelectedHitObjects[1].StartTime, state.SelectedHitObjects[1].EndTime }
         imgui.BeginTooltip()
         AddSeparator()
@@ -29,7 +29,7 @@ function renderMeasureDataWidget()
     local startOffset = uniqueDict[1]
     local endOffset = uniqueDict[2] or uniqueDict[1]
     if (math.abs(endOffset - startOffset) < 1e-10 and not cache.boolean.changeOccurred and state.SelectedScrollGroupId == widgetVars.tgName) then return end
-    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or cache.boolean.changeOccurred or state.SelectedScrollGroupId ~= widgetVars.tgName) then
+    if (endOffset != widgetVars.oldEndOffset or startOffset != widgetVars.oldStartOffset or cache.boolean.changeOccurred or state.SelectedScrollGroupId != widgetVars.tgName) then
         svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)

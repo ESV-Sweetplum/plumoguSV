@@ -65,7 +65,7 @@ function selectBookmarkMenu()
             end
             imgui.NextColumn()
 
-            if (idx ~= #bookmarks) then imgui.Separator() end
+            if (idx != #bookmarks) then imgui.Separator() end
             ::nextBookmark::
         end
 

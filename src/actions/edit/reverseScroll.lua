@@ -20,7 +20,7 @@ function reverseScrollSVs(menuVars)
         local beforeDisplacement = nil
         local atDisplacement = 0
         local afterDisplacement = 0
-        if i ~= 1 then
+        if i != 1 then
             beforeDisplacement = noteDisplacement
             atDisplacement = -noteDisplacement
         end

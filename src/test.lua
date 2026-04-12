@@ -130,7 +130,7 @@ function runTest()
         outputPoint = table.map(outputPoint, |t| t[1])
         table.insert(outputPoints, outputPoint)
         outputPoint = table.vectorize4(outputPoint)
-        outputPoint = outputPoint / (outputPoint.w ~= 0 and outputPoint.w or 1) / 15 * zoom
+        outputPoint = outputPoint / (outputPoint.w != 0 and outputPoint.w or 1) / 15 * zoom
 
         outputPoint = (outputPoint + vctr4(1)) / 2 *
             vector.New(screenWidth, screenHeight, 1, 1)

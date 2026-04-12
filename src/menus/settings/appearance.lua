@@ -28,7 +28,7 @@ function showAppearanceSettings()
         print('s!', 'Duplicated the current theme into your custom theme list.')
         write(globalVars)
     end
-    if (globalVars.colorThemeName:sub(1, 7) ~= 'custom_') then
+    if (globalVars.colorThemeName:sub(1, 7) != 'custom_') then
         HoverToolTip(
             "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
     end
@@ -87,7 +87,7 @@ function showAppearanceSettings()
     AddSeparator()
     local oldDynamicBgIndex = globalVars.dynamicBackgroundIndex
     globalVars.dynamicBackgroundIndex = Combo('Dynamic BG', DYNAMIC_BACKGROUND_TYPES, oldDynamicBgIndex)
-    if (oldDynamicBgIndex ~= globalVars.dynamicBackgroundIndex) then
+    if (oldDynamicBgIndex != globalVars.dynamicBackgroundIndex) then
         write(globalVars)
     end
     if (globalVars.performanceMode) then

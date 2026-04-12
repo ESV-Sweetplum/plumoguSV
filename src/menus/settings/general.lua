@@ -31,7 +31,7 @@ function chooseUpscroll()
     local oldUpscroll = globalVars.upscroll
     globalVars.upscroll = RadioButtons('Scroll Direction:', globalVars.upscroll, { 'Down', 'Up' }, { false, true },
         'Orientation for distance graphs and visuals.')
-    if (oldUpscroll ~= globalVars.upscroll) then
+    if (oldUpscroll != globalVars.upscroll) then
         write(globalVars)
     end
 end
@@ -44,7 +44,7 @@ function chooseStepSize()
         'Changes what the exponential intensity slider will round the nearest to. Recommended to keep this as a factor of 100 (1, 2, 5, 10, etc).')
     globalVars.stepSize = math.clamp(tempStepSize, 1, 100)
     imgui.PopItemWidth()
-    if (oldStepSize ~= globalVars.stepSize) then
+    if (oldStepSize != globalVars.stepSize) then
         write(globalVars)
     end
 end

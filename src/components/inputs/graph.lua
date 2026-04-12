@@ -59,7 +59,7 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
         end
     end
 
-    if gridSize ~= 1 then
+    if gridSize != 1 then
         for i = 0, size.x, gridSize do
             local lineCol = gray
             if (truthy(i % 4)) then
@@ -92,7 +92,7 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
 
     local pointChanged = false
     for i = 1, #points do
-        if (points[i].pos ~= initPointList[i]) then
+        if (points[i].pos != initPointList[i]) then
             pointChanged = true
             break
         end

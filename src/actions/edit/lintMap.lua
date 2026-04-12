@@ -57,7 +57,7 @@ function fixFlippedLNEnds()
     for _, ho in ipairs(map.HitObjects) do
         state.SelectedScrollGroupId = ho.TimingGroup
         local lnEndTime = ho.EndTime
-        local isLN = lnEndTime ~= 0
+        local isLN = lnEndTime != 0
         local endHasNegativeSV = (game.get.svMultiplierAt(lnEndTime) <= 0)
         local hasntAlreadyBeenFixed = lnEndTimeFixed[lnEndTime] == nil
         if isLN and endHasNegativeSV and hasntAlreadyBeenFixed then

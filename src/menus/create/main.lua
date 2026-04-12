@@ -35,5 +35,5 @@ function chooseCreateTool()
 
     HoverToolTip(tooltipList[globalVars.placeTypeIndex])
 
-    return oldPlaceTypeIndex ~= globalVars.placeTypeIndex
+    return oldPlaceTypeIndex != globalVars.placeTypeIndex
 end

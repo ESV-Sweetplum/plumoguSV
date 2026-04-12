@@ -33,7 +33,7 @@ end
 --    svs         : list of SVs [Table]
 --    startOffset : start offset in milliseconds for the list of SVs [Int]
 function addStartSVIfMissing(svs, startOffset)
-    if #svs ~= 0 and svs[1].StartTime == startOffset then return end
+    if #svs != 0 and svs[1].StartTime == startOffset then return end
     addSVToList(svs, startOffset, game.get.svMultiplierAt(startOffset), false)
 end
 
