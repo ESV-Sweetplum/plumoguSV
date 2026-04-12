@@ -43,8 +43,8 @@ THEME_TREE = {
             textColor = { { 153, 102, 204 }, { 170, 120, 255 } },
         },
         {
-            id = 'Tree',
-            textColor = { 150, 111, 51 },
+            id = 'Verdant',
+            textColor = { { 50, 255, 80 }, { 25, 180, 25 } },
         },
         {
             id = 'Barbie',
