@@ -2,8 +2,7 @@ function listenForTimingGroupCount()
     local function refreshTgList()
         local baseList = game.get.timingGroupList()
         if (globalVars.hideAutomatic) then
-            table.filter(baseList,
-                function(str) return not string.find(str, 'automate_') end)
+            table.filter(baseList, |str| not string.find(str, 'automate_'))
         end
         cache.tgList = baseList
     end

@@ -1,5 +1,5 @@
 function listenForGeneralChanges()
-    listen(function(_, _, _)
+    listen(function()
         cache.boolean.changeOccurred = true
     end)
 end

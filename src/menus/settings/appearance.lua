@@ -157,13 +157,13 @@ function chooseColorTheme()
                         if (not globalVars.customStyles or not next(globalVars.customStyles)) then
                             imgui.Text('No Custom Themes')
                         else
-                            renderThemeTree(table.map(table.keys(globalVars.customStyles), function(s)
-                                return {
+                            renderThemeTree(table.map(table.keys(globalVars.customStyles), |s|
+                                {
                                     id = s:sub(8),
                                     textColor = { 255, 255, 255 },
                                     internalId = s,
                                 }
-                            end))
+                            ))
                         end
                         imgui.EndMenu()
                     end

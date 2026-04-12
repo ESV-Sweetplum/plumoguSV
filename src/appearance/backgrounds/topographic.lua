@@ -229,22 +229,22 @@ end
 -- Gradient function finds dot product between pseudorandom gradient vector
 -- and the vector from input coordinate to a unit cube vertex
 perlin.dot_product = {
-    [0x0] = function(x, y, z) return x + y end,
-    [0x1] = function(x, y, z) return -x + y end,
-    [0x2] = function(x, y, z) return x - y end,
-    [0x3] = function(x, y, z) return -x - y end,
-    [0x4] = function(x, y, z) return x + z end,
-    [0x5] = function(x, y, z) return -x + z end,
-    [0x6] = function(x, y, z) return x - z end,
-    [0x7] = function(x, y, z) return -x - z end,
-    [0x8] = function(x, y, z) return y + z end,
-    [0x9] = function(x, y, z) return -y + z end,
-    [0xA] = function(x, y, z) return y - z end,
-    [0xB] = function(x, y, z) return -y - z end,
-    [0xC] = function(x, y, z) return y + x end,
-    [0xD] = function(x, y, z) return -y + z end,
-    [0xE] = function(x, y, z) return y - x end,
-    [0xF] = function(x, y, z) return -y - z end,
+    [0x0] = |x,y,z| x + y,
+    [0x1] = |x,y,z| -x + y,
+    [0x2] = |x,y,z| x - y,
+    [0x3] = |x,y,z| -x - y,
+    [0x4] = |x,y,z| x + z,
+    [0x5] = |x,y,z| -x + z,
+    [0x6] = |x,y,z| x - z,
+    [0x7] = |x,y,z| -x - z,
+    [0x8] = |x,y,z| y + z,
+    [0x9] = |x,y,z| -y + z,
+    [0xA] = |x,y,z| y - z,
+    [0xB] = |x,y,z| -y - z,
+    [0xC] = |x,y,z| y + x,
+    [0xD] = |x,y,z| -y + z,
+    [0xE] = |x,y,z| y - x,
+    [0xF] = |x,y,z| -y - z,
 }
 function perlin.grad(hash, x, y, z)
     return perlin.dot_product[bit32.band(hash, 0xF)](x, y, z)

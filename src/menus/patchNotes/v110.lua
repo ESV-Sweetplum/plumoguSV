@@ -27,9 +27,8 @@ end
 function drawV110(ctx, location, scale, thickness)
     location = location - vector.New(64.5, 24) * scale
     local lightnessAdjust = (state.UnixTime % 2400) / 1200 * math.pi
-    local colFn = function(x)
-        return color.vrgbaToUint(color.hslaToRgba(x + 200, 1, math.sin(lightnessAdjust + x / 20) / 5 + 0.67, 1))
-    end
+    local colFn = |x| color.vrgbaToUint(color.hslaToRgba(x + 200, 1, math.sin(lightnessAdjust + x / 20) / 5 + 0.67, 1))
+
     ctx.AddBezierCubic(location + scale * vector.New(24.43, 21.16), location + scale * vector.New(24.43, 21.16),
         location + scale * vector.New(14.35, 48.44), location + scale * vector.New(14.35, 48.44), colFn(14.35), thickness)
     ctx.AddBezierCubic(location + scale * vector.New(14.35, 48.44), location + scale * vector.New(14.35, 48.44),

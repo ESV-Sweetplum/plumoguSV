@@ -34,7 +34,7 @@ function sinusoidalVibratoMenu(menuVars, settingVars, separateWindow)
             return settingVars.higherStart + t * (settingVars.higherEnd - settingVars.higherStart)
         end
 
-        simpleActionMenu('Vibrate', 2, function(v) ssfVibrato(v, func1, func2) end, menuVars, false, false,
+        simpleActionMenu('Vibrate', 2, |v| ssfVibrato(v, func1, func2), menuVars, false, false,
             separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
     end
 end

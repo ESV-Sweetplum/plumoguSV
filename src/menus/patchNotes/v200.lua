@@ -91,9 +91,8 @@ end
 function drawV200(ctx, location, scale, thickness)
     location = location - vector.New(72, 24) * scale
     local hueDegreeAdjust = (state.UnixTime % 7200) / 20 + 67
-    local colFn = function(x)
-        return color.vrgbaToUint(color.hslaToRgba(x + hueDegreeAdjust, 1, 0.7, 1))
-    end
+    local colFn = |x| color.vrgbaToUint(color.hslaToRgba(x + hueDegreeAdjust, 1, 0.7, 1))
+
     ctx.AddBezierCubic(location + scale * vector.New(24.43, 21.16), location + scale * vector.New(24.43, 21.16),
         location + scale * vector.New(14.35, 48.44), location + scale * vector.New(14.35, 48.44),
         colFn(14.35), thickness)

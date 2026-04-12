@@ -14,9 +14,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     hiddenGroups = hiddenGroups or {}
 
     if (colorList and truthy(colorList)) then
-        colorList[newListIndex]:gsub('(%d+)', function(c)
-            table.insert(rgb, c)
-        end)
+        colorList[newListIndex]:gsub('(%d+)', |c| table.insert(rgb, c))
         local alpha = math.floor(imgui.GetColorU32(imgui_col.Text) / 16777216) / 255 or 1
         imgui.PushStyleColor(imgui_col.Text,
             vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, alpha))
@@ -31,9 +29,7 @@ function Combo(label, list, listIndex, colorList, hiddenGroups, tooltipList)
     for i = 1, #list do
         rgb = {}
         if (colorList and truthy(colorList)) then
-            colorList[i]:gsub('(%d+)', function(c)
-                table.insert(rgb, c)
-            end)
+            colorList[i]:gsub('(%d+)', |c| table.insert(rgb, c))
             imgui.PushStyleColor(imgui_col.Text, vector.New(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255, 1))
         end
         local listItem = list[i]

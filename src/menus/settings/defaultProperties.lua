@@ -126,9 +126,7 @@ function showDefaultPropertiesSettings()
 
     imgui.SeparatorText('Edit Tab Settings')
 
-    local editTabDict = table.map(EDIT_SV_TOOLS, function(element, idx)
-        return { label = element, fn = editFnList[idx] }
-    end)
+    local editTabDict = table.map(EDIT_SV_TOOLS, |elem, idx| { label = elem, fn = editFnList[idx] })
 
     for _, tbl in pairs(editTabDict) do
         local label = tbl.label
@@ -219,9 +217,7 @@ function showDefaultPropertiesSettings()
 
     imgui.SeparatorText('Standard/Still Settings')
 
-    local standardMenuDict = table.map(STANDARD_SVS, function(element, idx)
-        return { label = element, fn = standardFnList[idx] }
-    end)
+    local standardMenuDict = table.map(STANDARD_SVS, |elem, idx| { label = elem, fn = standardFnList[idx] })
 
     for _, tbl in pairs(standardMenuDict) do
         local label = tbl.label
@@ -235,9 +231,7 @@ function showDefaultPropertiesSettings()
 
     imgui.SeparatorText('Special Settings')
 
-    local specialMenuDict = table.map(SPECIAL_SVS, function(element, idx)
-        return { label = element, fn = specialFnList[idx] }
-    end)
+    local specialMenuDict = table.map(SPECIAL_SVS, |elem, idx| { label = elem, fn = specialFnList[idx] })
 
     for _, tbl in pairs(specialMenuDict) do
         local label = tbl.label
