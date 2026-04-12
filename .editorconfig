@@ -18,3 +18,6 @@ trailing_table_separator = smart
 
 [.version]
 insert_final_newline = false
+
+[**/intellisense.lua]
+insert_final_newline = false
