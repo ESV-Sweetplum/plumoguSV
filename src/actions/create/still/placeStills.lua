@@ -37,7 +37,7 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
     if (not noteOffsets) then return { svsToRemove = {}, svsToAdd = {} } end
     local firstOffset = noteOffsets[1]
     local lastOffset = noteOffsets[#noteOffsets]
-    local svMultFn = truthy(queuedSVs) and function(t) return getHypotheticalSVMultiplierAt(queuedSVs, t) end or
+    local svMultFn = truthy(queuedSVs) and (|t| getHypotheticalSVMultiplierAt(queuedSVs, t)) or
         game.get.svMultiplierAt
     if stillType == 'Auto' then
         local multiplier = getUsableDisplacementMultiplier(firstOffset)

@@ -42,5 +42,6 @@
         "strong": "Warning",
         "unbalanced": "Error"
     },
-    "diagnostics.libraryFiles": "Disable"
+    "diagnostics.libraryFiles": "Disable",
+    "runtime.nonstandardSymbol": ["|lambda|", "!="]
 }

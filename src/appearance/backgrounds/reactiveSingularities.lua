@@ -41,9 +41,7 @@ function renderReactiveSingularities()
     updateParticles(dimX, dimY,
         state.DeltaTime * speed, multiplier)
 
-    local lerp = function(w, l, h)
-        return w * h + (1 - w) * l
-    end
+    local lerp = math.lerp
 
     for i = 1, #singularity_xList do
         local x = singularity_xList[i]
@@ -53,9 +51,9 @@ function renderReactiveSingularities()
 
         local s = sqrt(vx ^ 2 + vy ^ 2)
         local clampedSpeed = clamp(s / 5, 0, 1)
-        local r = lerp(clampedSpeed, slowSpeedR, fastSpeedR)
-        local g = lerp(clampedSpeed, slowSpeedG, fastSpeedG)
-        local b = lerp(clampedSpeed, slowSpeedB, fastSpeedB)
+        local r = lerp(slowSpeedR, fastSpeedR, clampedSpeed)
+        local g = lerp(slowSpeedG, fastSpeedG, clampedSpeed)
+        local b = lerp(slowSpeedB, fastSpeedB, clampedSpeed)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
         ctx.AddCircleFilled(pos, 2,
             color.rgbaToUint(r, g, b, 100 + pulseStatus * 155))

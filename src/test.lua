@@ -117,7 +117,7 @@ function runTest()
     }
 
     for idx, point in pairs(inputPoints) do
-        local inputPoint = table.map(point, function(i) return table.duplicate({ i }) end)
+        local inputPoint = table.map(point, |i| table.duplicate({ i }))
         -- inputPoint = matrix.multiply(matRotX, inputPoint)
         inputPoint = matrix.multiply(matRotY, inputPoint)
         -- inputPoint = matrix.multiply(matRotZ, inputPoint)
@@ -127,7 +127,7 @@ function runTest()
         inputPoint[3][1] = inputPoint[3][1] - cameraPos[3]
         local outputPoint = matrix.multiply(projectionMatrix, inputPoint)
 
-        outputPoint = table.map(outputPoint, function(t) return t[1] end)
+        outputPoint = table.map(outputPoint, |t| t[1])
         table.insert(outputPoints, outputPoint)
         outputPoint = table.vectorize4(outputPoint)
         outputPoint = outputPoint / (outputPoint.w ~= 0 and outputPoint.w or 1) / 15 * zoom
@@ -162,9 +162,7 @@ function runTest()
         table.insert(triangleBuffer, { p4, p2, p3, closestVertexDistance2, col })
     end
 
-    local sortedBuffer = sort(triangleBuffer, function(a, b)
-        return a[4] > b[4]
-    end)
+    local sortedBuffer = sort(triangleBuffer, |a, b| a[4] > b[4])
 
     for _, tri in ipairs(sortedBuffer) do
         ctx.AddTriangleFilled(tri[1], tri[2], tri[3], tri[5])
