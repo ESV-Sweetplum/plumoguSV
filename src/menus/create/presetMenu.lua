@@ -137,7 +137,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             KeepSameLine()
             imgui.SetNextItemWidth(100)
             _, preset.flags.combo = imgui.InputText('##PresetEditCombo' .. idx, preset.flags.combo, 4096)
-            if (imgui.IsItemDeactivatedAfterEdit() or preset.flags.enabled ~= oldEnabled) then
+            if (imgui.IsItemDeactivatedAfterEdit() or preset.flags.enabled != oldEnabled) then
                 write(globalVars)
             end
             imgui.PopID()

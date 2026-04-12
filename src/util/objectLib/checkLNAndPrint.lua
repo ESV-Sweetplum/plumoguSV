@@ -6,7 +6,7 @@ function checkNotesForLNs(hos, requiredLNCount)
     requiredLNCount = requiredLNCount or 1
     local lnCount = 0
     for _, ho in pairs(hos) do
-        if (ho.EndTime ~= 0) then lnCount = lnCount + 1 end
+        if (ho.EndTime != 0) then lnCount = lnCount + 1 end
     end
 
     return lnCount >= requiredLNCount

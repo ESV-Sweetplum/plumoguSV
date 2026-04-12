@@ -4,7 +4,7 @@ function showWorkingWithShapesTutorial()
         'So far, we\'ve only been working with stutters, but the core of SV is being able to make cohesive and/or fluid movement. We do this by working with particular shapes in the "STANDARD" tab.')
     imgui.TextColored(INSTRUCTION_COLOR,
         'Select "STANDARD" under the "TYPE" dropdown.')
-    if (globalVars.placeTypeIndex ~= 1) then return end
+    if (globalVars.placeTypeIndex != 1) then return end
     imgui.Dummy(vector.New(0, 10))
     if (globalVars.hideSVInfo) then
         imgui.TextColored(INSTRUCTION_COLOR, 'Please disable the "HIDE SV INFO" option in settings to continue.')
@@ -15,7 +15,7 @@ function showWorkingWithShapesTutorial()
     imgui.TextColored(INSTRUCTION_COLOR,
         'Under the "STANDARD" tab, select "EXPONENTIAL".')
     local menuVars = getMenuVars('placeStandard')
-    if (menuVars.svTypeIndex ~= 2 and not state.GetValue('workingWithShapes_pg')) then return end
+    if (menuVars.svTypeIndex != 2 and not state.GetValue('workingWithShapes_pg')) then return end
     imgui.Dummy(vector.New(0, 10))
     state.SetValue('workingWithShapes_pg', true)
     imgui.TextWrapped(
@@ -23,7 +23,7 @@ function showWorkingWithShapesTutorial()
     local settingVars = getSettingVars('Exponential', 'Standard')
     imgui.TextColored(INSTRUCTION_COLOR,
         'Change the exponential type to "SPEED UP", either via\nthe dropdown or by pressing "S" on your keyboard. Note that\nany parameter with a button next to it labelled "SWAP" or "S"\ncan be changed with this keybind. Hotkeys will be reviewed later.')
-    if (settingVars.behaviorIndex ~= 2) then return end
+    if (settingVars.behaviorIndex != 2) then return end
     imgui.Dummy(vector.New(0, 10))
 
     imgui.TextWrapped(
@@ -32,7 +32,7 @@ function showWorkingWithShapesTutorial()
         'Select the "LINEAR" shape. Set the start SV to -1.5x,\nand the end SV to 1.5x. Don\'t worry about SV points or final SV.')
     settingVars = getSettingVars('Linear', 'Standard')
     ForceHeight(520)
-    if (menuVars.svTypeIndex ~= 1 or math.abs(settingVars.startSV + 1.5) > 0.001 or math.abs(settingVars.endSV - 1.5) > 0.001) then return end
+    if (menuVars.svTypeIndex != 1 or math.abs(settingVars.startSV + 1.5) > 0.001 or math.abs(settingVars.endSV - 1.5) > 0.001) then return end
     ForceHeight(490)
     imgui.TextWrapped(
         'Take a look at the SV info window, and notice how the notes are jumping. This is exactly what the effect will look like when placed in game:')

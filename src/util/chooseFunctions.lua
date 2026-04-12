@@ -4,13 +4,13 @@ function chooseAddComboMultipliers(settingVars)
     HelpMarker('a = multiplier for SV Type 1, b = multiplier for SV Type 2')
     settingVars.comboMultiplier1 = newValues.x
     settingVars.comboMultiplier2 = newValues.y
-    return oldValues ~= newValues
+    return oldValues != newValues
 end
 
 function chooseArcPercent(settingVars)
     local oldPercent = settingVars.arcPercent
     _, settingVars.arcPercent = imgui.SliderInt('Arc Percent', math.clamp(oldPercent, 1, 99), 1, 99, oldPercent .. '%%')
-    return oldPercent ~= settingVars.arcPercent
+    return oldPercent != settingVars.arcPercent
 end
 
 function chooseAverageSV(menuVars)
@@ -119,7 +119,7 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
     cache.boolean.bezierFreeMode = settingVars.freeMode
     cache.boolean.bezierManualMode = settingVars.manualMode
 
-    return oldP1 ~= settingVars.p1 or oldP2 ~= settingVars.p2
+    return oldP1 != settingVars.p1 or oldP2 != settingVars.p2
 end
 
 function chooseChinchillaIntensity(settingVars)
@@ -127,13 +127,13 @@ function chooseChinchillaIntensity(settingVars)
     local _, newIntensity = imgui.SliderFloat('Intensity##chinchilla', oldIntensity, 0, 10, '%.3f')
     HelpMarker('Ctrl + click slider to input a specific number')
     settingVars.chinchillaIntensity = math.clamp(newIntensity, 0, 727)
-    return oldIntensity ~= settingVars.chinchillaIntensity
+    return oldIntensity != settingVars.chinchillaIntensity
 end
 
 function chooseChinchillaType(settingVars)
     local oldIndex = settingVars.chinchillaTypeIndex
     settingVars.chinchillaTypeIndex = Combo('Chinchilla Type', CHINCHILLA_TYPES, oldIndex)
-    return oldIndex ~= settingVars.chinchillaTypeIndex
+    return oldIndex != settingVars.chinchillaTypeIndex
 end
 
 function chooseComboSVOption(settingVars, maxComboPhase)
@@ -141,13 +141,13 @@ function chooseComboSVOption(settingVars, maxComboPhase)
     settingVars.comboTypeIndex = Combo('Combo Type', COMBO_SV_TYPE, settingVars.comboTypeIndex)
     local currentComboType = COMBO_SV_TYPE[settingVars.comboTypeIndex]
     local addTypeChanged = false
-    if currentComboType ~= 'SV Type 1 Only' and currentComboType ~= 'SV Type 2 Only' then
+    if currentComboType != 'SV Type 1 Only' and currentComboType != 'SV Type 2 Only' then
         addTypeChanged = BasicInputInt(settingVars, 'comboPhase', 'Combo Phase', { 0, maxComboPhase }) or addTypeChanged
     end
     if currentComboType == 'Add' then
         addTypeChanged = chooseAddComboMultipliers(settingVars) or addTypeChanged
     end
-    return (oldIndex ~= settingVars.comboTypeIndex) or addTypeChanged
+    return (oldIndex != settingVars.comboTypeIndex) or addTypeChanged
 end
 
 function chooseConstantShift(settingVars, defaultShift)
@@ -172,7 +172,7 @@ function chooseControlSecondSV(settingVars)
     if oldChoice then stutterControlsIndex = 2 end
     local newStutterControlsIndex = Combo('Control SV', STUTTER_CONTROLS, stutterControlsIndex)
     settingVars.controlLastSV = newStutterControlsIndex == 2
-    local choiceChanged = oldChoice ~= settingVars.controlLastSV
+    local choiceChanged = oldChoice != settingVars.controlLastSV
     if choiceChanged then settingVars.stutterDuration = 100 - settingVars.stutterDuration end
     return choiceChanged
 end
@@ -198,20 +198,20 @@ end
 function chooseCursorTrail()
     local oldCursorTrailIndex = globalVars.cursorTrailIndex
     globalVars.cursorTrailIndex = Combo('Cursor Trail', CURSOR_TRAILS, oldCursorTrailIndex)
-    if (oldCursorTrailIndex ~= globalVars.cursorTrailIndex) then
+    if (oldCursorTrailIndex != globalVars.cursorTrailIndex) then
         write(globalVars)
     end
 end
 
 function chooseCursorTrailGhost()
     local currentTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
-    if currentTrail ~= 'Snake' then return end
+    if currentTrail != 'Snake' then return end
     GlobalCheckbox('cursorTrailGhost', 'No Ghost')
 end
 
 function chooseCursorTrailPoints()
     local currentTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
-    if currentTrail ~= 'Snake' then return end
+    if currentTrail != 'Snake' then return end
 
     local settingChanged = BasicInputInt(globalVars, 'cursorTrailPoints', 'Trail Points')
     if settingChanged then
@@ -221,19 +221,19 @@ end
 
 function chooseCursorTrailShape()
     local currentTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
-    if currentTrail ~= 'Snake' then return end
+    if currentTrail != 'Snake' then return end
 
     local label = 'Trail Shape'
     local oldTrailShapeIndex = globalVars.cursorTrailShapeIndex
     globalVars.cursorTrailShapeIndex = Combo(label, TRAIL_SHAPES, oldTrailShapeIndex)
-    if (oldTrailShapeIndex ~= globalVars.cursorTrailShapeIndex) then
+    if (oldTrailShapeIndex != globalVars.cursorTrailShapeIndex) then
         write(globalVars)
     end
 end
 
 function chooseCursorShapeSize()
     local currentTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
-    if currentTrail ~= 'Snake' then return end
+    if currentTrail != 'Snake' then return end
 
     local settingChanged = BasicInputInt(globalVars, 'cursorTrailSize', 'Shape Size')
     if settingChanged then
@@ -251,7 +251,7 @@ function chooseCurveSharpness(settingVars)
     local _, newSharpness = imgui.SliderInt('Curve Sharpness', settingVars.curveSharpness, 1, 100, '%d%%')
     imgui.PopItemWidth()
     settingVars.curveSharpness = newSharpness
-    return oldSharpness ~= newSharpness
+    return oldSharpness != newSharpness
 end
 
 function chooseCustomMultipliers(settingVars)
@@ -267,13 +267,13 @@ function chooseCustomMultipliers(settingVars)
     local oldMultiplier = settingVars.svMultipliers[index]
     local _, newMultiplier = imgui.InputFloat('SV Multiplier', oldMultiplier, 0, 0, '%.2fx')
     settingVars.svMultipliers[index] = newMultiplier
-    return oldMultiplier ~= newMultiplier
+    return oldMultiplier != newMultiplier
 end
 
 function chooseDistance(menuVars)
     local oldDistance = menuVars.distance
     menuVars.distance = NegatableComputableInputFloat('Distance', menuVars.distance, 3, ' msx')
-    return oldDistance ~= menuVars.distance
+    return oldDistance != menuVars.distance
 end
 
 function chooseVaryingDistance(settingVars)
@@ -286,7 +286,7 @@ end
 
 function chooseEffectFPS()
     local currentTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
-    if currentTrail ~= 'Snake' then return end
+    if currentTrail != 'Snake' then return end
     local settingChanged = BasicInputInt(globalVars, 'effectFPS', 'Effect FPS', { 2, 1000 },
         'Set this to a multiple of UPS or FPS to make cursor effects smooth')
     if settingChanged then
@@ -300,7 +300,7 @@ function chooseFinalSV(settingVars, skipFinalSV)
     local oldIndex = settingVars.finalSVIndex
     local oldCustomSV = settingVars.customSV
     local finalSVType = FINAL_SV_TYPES[settingVars.finalSVIndex]
-    if finalSVType ~= 'Normal' and finalSVType ~= 'None' then
+    if finalSVType != 'Normal' and finalSVType != 'None' then
         imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.35)
         _, settingVars.customSV = imgui.InputFloat('SV', settingVars.customSV, 0, 0, '%.2fx')
         KeepSameLine()
@@ -315,7 +315,7 @@ function chooseFinalSV(settingVars, skipFinalSV)
         imgui.Unindent(DEFAULT_WIDGET_WIDTH * 0.35 + 25)
     end
     imgui.PopItemWidth()
-    return (oldIndex ~= settingVars.finalSVIndex) or (oldCustomSV ~= settingVars.customSV)
+    return (oldIndex != settingVars.finalSVIndex) or (oldCustomSV != settingVars.customSV)
 end
 
 function chooseFrameSpacing(settingVars)
@@ -351,7 +351,7 @@ function chooseIntensity(settingVars)
     local newIntensity = newStepIndex * userStepSize + 99 % userStepSize + 1
     settingVars.intensity = math.clamp(newIntensity, 1, 100)
 
-    return oldIntensity ~= settingVars.intensity
+    return oldIntensity != settingVars.intensity
 end
 
 function chooseInterlace(menuVars)
@@ -363,7 +363,7 @@ function chooseInterlace(menuVars)
     _, menuVars.interlaceRatio = imgui.InputFloat('Ratio##interlace', menuVars.interlaceRatio,
         0, 0, '%.2f')
     imgui.PopItemWidth()
-    return interlaceChanged or oldRatio ~= menuVars.interlaceRatio
+    return interlaceChanged or oldRatio != menuVars.interlaceRatio
 end
 
 function chooseMainSV(settingVars)
@@ -420,7 +420,7 @@ function chooseNumPeriods(settingVars)
     newPeriods = math.quarter(newPeriods)
     newPeriods = math.clamp(newPeriods, 0.25, 69420)
     settingVars.periods = newPeriods
-    return oldPeriods ~= newPeriods
+    return oldPeriods != newPeriods
 end
 
 function choosePeriodShift(settingVars)
@@ -433,7 +433,7 @@ function choosePeriodShift(settingVars)
         newShift = math.wrappedClamp(newShift, -1, 1)
     end
     settingVars.periodsShift = newShift
-    return oldShift ~= newShift
+    return oldShift != newShift
 end
 
 function chooseCurrentScrollGroup()
@@ -456,7 +456,7 @@ function chooseCurrentScrollGroup()
     globalVars.scrollGroupIndex = Combo('##scrollGroup', groups, globalVars.scrollGroupIndex, cols, hiddenGroups)
     imgui.PopItemWidth()
     AddSeparator()
-    if (prevIndex ~= globalVars.scrollGroupIndex) then
+    if (prevIndex != globalVars.scrollGroupIndex) then
         state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
     end
 end
@@ -493,22 +493,22 @@ function chooseRandomScale(settingVars)
     local oldScale = settingVars.randomScale
     local _, newScale = imgui.InputFloat('Random Scale', oldScale, 0, 0, '%.2fx')
     settingVars.randomScale = newScale
-    return oldScale ~= newScale
+    return oldScale != newScale
 end
 
 function chooseRandomType(settingVars)
     local oldIndex = settingVars.randomTypeIndex
     settingVars.randomTypeIndex = Combo('Random Type', RANDOM_TYPES, settingVars.randomTypeIndex)
-    return oldIndex ~= settingVars.randomTypeIndex
+    return oldIndex != settingVars.randomTypeIndex
 end
 
 function chooseRGBPeriod()
     local oldRGBPeriod = globalVars.rgbPeriod
     _, globalVars.rgbPeriod = imgui.InputFloat('RGB cycle length', oldRGBPeriod, 0, 0,
-        '%.0f second' .. (math.round(globalVars.rgbPeriod) ~= 1 and 's' or ''))
+        '%.0f second' .. (math.round(globalVars.rgbPeriod) != 1 and 's' or ''))
     globalVars.rgbPeriod = math.clamp(globalVars.rgbPeriod, MIN_RGB_CYCLE_TIME,
         MAX_RGB_CYCLE_TIME)
-    if (oldRGBPeriod ~= globalVars.rgbPeriod) then
+    if (oldRGBPeriod != globalVars.rgbPeriod) then
         write(globalVars)
     end
 end
@@ -525,13 +525,13 @@ end
 
 function chooseSnakeSpringConstant()
     local currentTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
-    if currentTrail ~= 'Snake' then return end
+    if currentTrail != 'Snake' then return end
 
     local oldValue = globalVars.snakeSpringConstant
     _, globalVars.snakeSpringConstant = imgui.InputFloat('Reactiveness##snake', oldValue, 0, 0, '%.2f')
     HelpMarker('Pick any number from 0.01 to 1')
     globalVars.snakeSpringConstant = math.clamp(globalVars.snakeSpringConstant, 0.01, 1)
-    if (globalVars.snakeSpringConstant ~= oldValue) then
+    if (globalVars.snakeSpringConstant != oldValue) then
         write(globalVars)
     end
 end
@@ -566,7 +566,7 @@ function chooseStandardSVType(menuVars, excludeCombo)
     local svTypeList = STANDARD_SVS
     if excludeCombo then svTypeList = STANDARD_SVS_NO_COMBO end
     menuVars.svTypeIndex = Combo(label, svTypeList, menuVars.svTypeIndex)
-    return oldIndex ~= menuVars.svTypeIndex
+    return oldIndex != menuVars.svTypeIndex
 end
 
 function chooseStandardSVTypes(settingVars)
@@ -574,14 +574,14 @@ function chooseStandardSVTypes(settingVars)
     local oldIndex2 = settingVars.svType2Index
     settingVars.svType1Index = Combo('SV Type 1', STANDARD_SVS_NO_COMBO, settingVars.svType1Index)
     settingVars.svType2Index = Combo('SV Type 2', STANDARD_SVS_NO_COMBO, settingVars.svType2Index)
-    return (oldIndex2 ~= settingVars.svType2Index) or (oldIndex1 ~= settingVars.svType1Index)
+    return (oldIndex2 != settingVars.svType2Index) or (oldIndex1 != settingVars.svType1Index)
 end
 
 function chooseStartEndSVs(settingVars)
     if settingVars.linearlyChange == false then
         local oldValue = settingVars.startSV
         _, settingVars.startSV = imgui.InputFloat('SV Value', oldValue, 0, 0, '%.2fx')
-        return oldValue ~= settingVars.startSV
+        return oldValue != settingVars.startSV
     end
     return SwappableNegatableInputFloat2(settingVars, 'startSV', 'endSV', 'Start/End SV')
 end
@@ -638,7 +638,7 @@ function chooseStutterDuration(settingVars)
     if settingVars.controlLastSV then oldDuration = 100 - oldDuration end
     local _, newDuration = imgui.SliderInt('Duration', oldDuration, 1, 99, oldDuration .. '%%')
     newDuration = math.clamp(newDuration, 1, 99)
-    local durationChanged = oldDuration ~= newDuration
+    local durationChanged = oldDuration != newDuration
     if settingVars.controlLastSV then newDuration = 100 - newDuration end
     settingVars.stutterDuration = newDuration
     return durationChanged
@@ -647,7 +647,7 @@ end
 function chooseStyleTheme()
     local oldStyleTheme = globalVars.styleThemeIndex
     globalVars.styleThemeIndex = Combo('Style Theme', STYLE_THEMES, oldStyleTheme)
-    if (oldStyleTheme ~= globalVars.styleThemeIndex) then
+    if (oldStyleTheme != globalVars.styleThemeIndex) then
         write(globalVars)
     end
 end
@@ -665,7 +665,7 @@ function chooseSVBehavior(settingVars)
         settingVars.behaviorIndex = tn(oldBehaviorIndex == 1) + 1
     end
     imgui.PopStyleVar()
-    return oldBehaviorIndex ~= settingVars.behaviorIndex
+    return oldBehaviorIndex != settingVars.behaviorIndex
 end
 
 function chooseSVPerQuarterPeriod(settingVars)
@@ -675,7 +675,7 @@ function chooseSVPerQuarterPeriod(settingVars)
     local maxSVsPerQuarterPeriod = MAX_SV_POINTS / (4 * settingVars.periods)
     newPoints = math.clamp(newPoints, 1, maxSVsPerQuarterPeriod)
     settingVars.svsPerQuarterPeriod = newPoints
-    return oldPoints ~= newPoints
+    return oldPoints != newPoints
 end
 
 function chooseSVPoints(settingVars, svPointsForce)
@@ -690,13 +690,13 @@ end
 function chooseLinearDistanceMode(menuVars)
     local oldMode = menuVars.distanceMode
     menuVars.distanceMode = Combo('Distance Type', LINEAR_DISTANCE_TYPES, menuVars.distanceMode)
-    return oldMode ~= menuVars.distanceMode
+    return oldMode != menuVars.distanceMode
 end
 
 function chooseExponentialDistanceMode(menuVars)
     local oldMode = menuVars.distanceMode
     menuVars.distanceMode = Combo('Distance Type', EXPONENTIAL_DISTANCE_TYPES, menuVars.distanceMode)
-    return oldMode ~= menuVars.distanceMode
+    return oldMode != menuVars.distanceMode
 end
 
 function choosePulseCoefficient()
@@ -704,7 +704,7 @@ function choosePulseCoefficient()
     _, globalVars.pulseCoefficient = imgui.SliderFloat('Pulse Strength', oldCoefficient, 0, 1,
         math.round(globalVars.pulseCoefficient * 100) .. '%%')
     globalVars.pulseCoefficient = math.clamp(globalVars.pulseCoefficient, 0, 1)
-    if (oldCoefficient ~= globalVars.pulseCoefficient) then
+    if (oldCoefficient != globalVars.pulseCoefficient) then
         write(globalVars)
     end
 end
@@ -714,7 +714,7 @@ function choosePulseColor()
         imgui_window_flags.AlwaysAutoResize)
     local oldColor = globalVars.pulseColor
     _, globalVars.pulseColor = imgui.ColorPicker4('Pulse Color', globalVars.pulseColor)
-    if (oldColor ~= globalVars.pulseColor) then
+    if (oldColor != globalVars.pulseColor) then
         write(globalVars)
     end
     if (not colorPickerOpened) then

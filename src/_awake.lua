@@ -32,7 +32,7 @@ if (not truthy(map.TimingPoints)) then
     print('e!', 'Please place a timing point before attempting to use plumoguSV.')
 end
 
-if (state.Scale ~= 1) then
+if (state.Scale != 1) then
     local printedScale = math.round(state.Scale * 100)
     print('e!',
         'Your ImGui scale is set to ' ..

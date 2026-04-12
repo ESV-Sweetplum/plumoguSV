@@ -12,7 +12,7 @@ function displaceViewSVs(menuVars)
         local beforeDisplacement = nil
         local atDisplacement = displaceAmount
         local afterDisplacement = 0 ---@type number|nil
-        if i ~= 1 then beforeDisplacement = -displaceAmount end
+        if i != 1 then beforeDisplacement = -displaceAmount end
         if i == #offsets then
             atDisplacement = 0
             afterDisplacement = nil

@@ -25,8 +25,8 @@ function changeGroups(menuVars)
     end
 
     local actionList = {}
-    local willChangeSVs = menuVars.changeSVs and #svsToRemove ~= 0
-    local willChangeSSFs = menuVars.changeSSFs and #ssfsToRemove ~= 0
+    local willChangeSVs = menuVars.changeSVs and #svsToRemove != 0
+    local willChangeSSFs = menuVars.changeSSFs and #ssfsToRemove != 0
     if willChangeSVs then
         if (not menuVars.clone) then
             table.insert(actionList, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))

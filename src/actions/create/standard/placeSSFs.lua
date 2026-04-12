@@ -21,7 +21,7 @@ function placeSSFs(menuVars)
         end
     end
     local lastMultiplier = menuVars.svMultipliers[numMultipliers]
-    if (finalSVType ~= 'None') then
+    if (finalSVType != 'None') then
         addFinalSSF(ssfsToAdd, lastOffset, lastMultiplier)
     end
     addInitialSSF(ssfsToAdd, firstOffset - 1 / getUsableDisplacementMultiplier(firstOffset))

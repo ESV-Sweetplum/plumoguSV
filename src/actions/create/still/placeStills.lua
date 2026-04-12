@@ -22,7 +22,7 @@ function placeStillSVsParent(menuVars)
         svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
         svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
     end
-    if (finalSVType ~= 'None') then
+    if (finalSVType != 'None') then
         addFinalSV(svsToAdd, offsets[#offsets], menuVars.svMultipliers[#menuVars.svMultipliers],
             finalSVType == 'Override')
     end
@@ -65,11 +65,11 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
         local beforeDisplacement = nil
         local atDisplacement = 0
         local afterDisplacement = nil
-        if i ~= #noteOffsets then
+        if i != #noteOffsets then
             atDisplacement = -finalDisplacements[i]
             afterDisplacement = 0
         end
-        if i ~= 1 then
+        if i != 1 then
             beforeDisplacement = finalDisplacements[i]
         end
         local baseSVs = table.duplicate(svs)

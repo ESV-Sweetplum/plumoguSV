@@ -30,18 +30,18 @@ function showYourSecondEffectTutorial()
         "Notice how on the left, the stutter makes the notes visibly move down, but on the right, the teleport stutter (for self-explanatory reasons) makes the notes teleport. Let's try using teleport stutter now.")
     imgui.TextColored(INSTRUCTION_COLOR,
         'Select "SPECIAL" under the "TYPE" dropdown.')
-    if (globalVars.placeTypeIndex ~= 2) then return end
+    if (globalVars.placeTypeIndex != 2) then return end
     imgui.TextColored(INSTRUCTION_COLOR,
         'Now, under the "SPECIAL" tab, make sure that the effect\n"TELEPORT STUTTER" is selected.')
     local menuVars = getMenuVars('placeSpecial')
-    if (menuVars.svTypeIndex ~= 2) then return end
+    if (menuVars.svTypeIndex != 2) then return end
     imgui.TextWrapped(
         "Teleport Stutter differs from normal stutter, in that you don't control the speed at which the note moves, but rather how far down the note teleports. For example, if your start SV is 75%%, then your note will start 75%% of the way down. If you want the note to land on the receptor, you must make the start SV %% (in decimal form, not percent) and the main SV add up to the average SV.")
     imgui.TextColored(INSTRUCTION_COLOR,
         'Set the main SV to 0.2x. Then, set the start SV %% to be the\npercentage required to have the notes land on the receptor.\nHINT: 1.00x - 0.20x = ??%%')
     local settingVars = getSettingVars('Teleport Stutter', 'Special')
     ForceHeight(490)
-    if (not settingVars.linearlyChange and (math.abs(settingVars.mainSV - 0.2) > 0.001 or settingVars.svPercent ~= 80)) then return end
+    if (not settingVars.linearlyChange and (math.abs(settingVars.mainSV - 0.2) > 0.001 or settingVars.svPercent != 80)) then return end
     ForceHeight(450)
     imgui.TextColored(GUIDELINE_COLOR,
         'Similarly, select a note representing a strong sound, and\nthe note after it. Either hit the "T" button on your keyboard or click\nthe "Place SVs between selected notes" button. Alternatively,\nyou can try selecting all the notes which you want to have SV.')
@@ -58,7 +58,7 @@ function showYourSecondEffectTutorial()
     imgui.TextColored(INSTRUCTION_COLOR,
         'Set the Start SV %% (start) to 100%%, the main SV (start) to 0.00x,\nand main SV (end) to whichever value it must be such that the\nnote lines up with the receptor. HINT: 0%% + ?.??x = 1.00x')
     ForceHeight(820)
-    if (math.abs(settingVars.mainSV) > 0.001 or math.abs(settingVars.mainSV2 - 1) > 0.001 or settingVars.svPercent ~= 100 or settingVars.svPercent2 ~= 0) then return end
+    if (math.abs(settingVars.mainSV) > 0.001 or math.abs(settingVars.mainSV2 - 1) > 0.001 or settingVars.svPercent != 100 or settingVars.svPercent2 != 0) then return end
     ForceHeight(800)
     imgui.TextWrapped(
         "What we have set up here is a teleport stutter that initially has a very strong teleporting strength (start SV 100%%, main SV 0.00x, so the notes don't appear to move at all) to an extremely weak strength (start SV 0%%, main SV 1.00x, so it's as if they haven't even teleported). All of the notes between will lie somewhere within its boundary.")

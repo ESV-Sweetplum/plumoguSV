@@ -38,5 +38,5 @@ function chooseSelectTool()
         SELECT_TAB_TOOLTIP_LIST)
 
     HoverToolTip(SELECT_TAB_TOOLTIP_LIST[globalVars.selectTypeIndex])
-    return oldSelectTypeIndex ~= globalVars.selectTypeIndex
+    return oldSelectTypeIndex != globalVars.selectTypeIndex
 end

@@ -32,7 +32,7 @@ function placeVibratoSVMenu(separateWindow)
     menuVars.vibratoMode = Combo('Vibrato Mode', VIBRATO_TYPES, menuVars.vibratoMode)
 
     chooseVibratoQuality(menuVars)
-    if (menuVars.vibratoMode ~= 2) then
+    if (menuVars.vibratoMode != 2) then
         chooseVibratoDeviance(menuVars)
         chooseVibratoSides(menuVars)
     end

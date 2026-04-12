@@ -6,7 +6,7 @@ function exponentialSettingsMenu(settingVars, skipFinalSV, svPointsForce)
     if (globalVars.advancedMode) then
         settingsChanged = chooseExponentialDistanceMode(settingVars) or settingsChanged
     end
-    if (settingVars.distanceMode ~= 3) then
+    if (settingVars.distanceMode != 3) then
         settingsChanged = chooseConstantShift(settingVars, 0) or settingsChanged
     end
     if (settingVars.distanceMode == 1) then

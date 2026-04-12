@@ -17,11 +17,11 @@ function showYourFirstEffectTutorial()
         'To implement this effect, we will need to create some SV. Head to the CREATE tab in your plugin, and locate the dropdown with the word "TYPE" next to it.')
     imgui.TextColored(INSTRUCTION_COLOR,
         'Select "SPECIAL" under the "TYPE" dropdown. The tutorial will\ncontinue when you\'ve done so. In the future, all tutorials will go to\nthe next step when the instructions in RED TEXT are completed.')
-    if (globalVars.placeTypeIndex ~= 2) then return end
+    if (globalVars.placeTypeIndex != 2) then return end
     imgui.TextColored(INSTRUCTION_COLOR,
         'Now, under the "SPECIAL" tab, make sure "STUTTER" is selected.')
     local menuVars = getMenuVars('placeSpecial')
-    if (menuVars.svTypeIndex ~= 1) then return end
+    if (menuVars.svTypeIndex != 1) then return end
     local settingVars = getSettingVars('Stutter', 'Special')
     imgui.Dummy(vector.New(0, 10))
     imgui.TextWrapped(
@@ -29,7 +29,7 @@ function showYourFirstEffectTutorial()
     imgui.TextColored(INSTRUCTION_COLOR,
         'Set the SV value to 4.00x by clicking on the input and inputting "4".')
     ForceHeight(480)
-    if (settingVars.startSV ~= 4) then return end
+    if (settingVars.startSV != 4) then return end
     ForceHeight(440)
     imgui.Dummy(vector.New(0, 10))
     imgui.TextWrapped(
@@ -37,7 +37,7 @@ function showYourFirstEffectTutorial()
     imgui.TextColored(INSTRUCTION_COLOR,
         'Set the duration to be 20%%. Either drag the slider along,\nor hold Ctrl and click to edit the slider directly.')
     ForceHeight(610)
-    if (settingVars.stutterDuration ~= 20) then return end
+    if (settingVars.stutterDuration != 20) then return end
     ForceHeight(570)
     imgui.TextColored(vctr4(0), 'penis')
     imgui.TextWrapped(

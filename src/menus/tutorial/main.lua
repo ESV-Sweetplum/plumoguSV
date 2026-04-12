@@ -93,7 +93,7 @@ function showTutorialWindow()
         imgui.TextColored(vctr4(0), 'penis')
     end
 
-    if (game.keyCount ~= 4) then
+    if (game.keyCount != 4) then
         imgui.SeparatorText('This tutorial does not support this key mode.')
         imgui.Text('Please go to a 4K map to continue.')
         goto tutorialRenderSkip

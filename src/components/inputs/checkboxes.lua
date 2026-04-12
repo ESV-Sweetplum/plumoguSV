@@ -8,7 +8,7 @@ function BasicCheckbox(varsTable, parameterName, label, tooltipText)
     local oldValue = varsTable[parameterName]
     _, varsTable[parameterName] = imgui.Checkbox(label, oldValue)
     if tooltipText then HelpMarker(tooltipText) end
-    return oldValue ~= varsTable[parameterName]
+    return oldValue != varsTable[parameterName]
 end
 
 ---Creates a checkbox that directly saves to globalVars and the universal `.yaml` file.
@@ -19,7 +19,7 @@ function GlobalCheckbox(parameterName, label, tooltipText)
     local oldValue = globalVars[parameterName] ---@cast oldValue boolean
     _, globalVars[parameterName] = imgui.Checkbox(label, oldValue)
     if tooltipText then HoverToolTip(tooltipText) end
-    if (oldValue ~= globalVars[parameterName]) then
+    if (oldValue != globalVars[parameterName]) then
         write(globalVars)
     end
 end
