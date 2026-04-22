@@ -19,6 +19,7 @@ function showPatchNotesWindow()
         cache.windows.showPatchNotesWindow = false
     end
 
+    showPatchNotesV221(color.int.white)
     showPatchNotesV220(minorUpdateLeftColor, minorUpdateRightColor)
     showPatchNotesV211(color.int.white)
     showPatchNotesV210(minorUpdateLeftColor, minorUpdateRightColor)
@@ -66,15 +67,19 @@ function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugF
     end
     ::skipLogoRender::
     imgui.EndChild()
-    imgui.SeparatorText('Bug Fixes / Minor Changes')
-    for _, v in ipairs(bugFixes) do
-        imgui.BulletText(v)
+    if (truthy(bugFixes)) then
+        imgui.SeparatorText('Bug Fixes / Minor Changes')
+        for _, v in ipairs(bugFixes) do
+            imgui.BulletText(v)
+        end
     end
-    imgui.SeparatorText('New Features')
-    for _, v in ipairs(newFeatures) do
-        imgui.BulletText(v)
+    if (truthy(newFeatures)) then
+        imgui.SeparatorText('New Features')
+        for _, v in ipairs(newFeatures) do
+            imgui.BulletText(v)
+        end
     end
-    if (devUpdates) then
+    if (truthy(devUpdates)) then
         imgui.SeparatorText('Development Updates')
         for _, v in ipairs(devUpdates) do
             imgui.BulletText(v)
