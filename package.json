@@ -1,6 +1,6 @@
 {
     "name": "plumogu-sv",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "description": "The ultimate SV plugin for Quaver.",
     "scripts": {
         "compile": "tsc -b",
