@@ -65,3 +65,6 @@ local groups = cache.tgList
 if (state.SelectedScrollGroupId != groups[globalVars.scrollGroupIndex]) then
     globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
 end
+
+_QParcelConfig.ignoreNotesOutsideTg = globalVars.ignoreNotesOutsideTg
+_QParcelConfig.useEndTimeOffsets = globalVars.useEndTimeOffsets
