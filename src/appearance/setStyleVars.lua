@@ -1004,7 +1004,7 @@ local THEMES = {
     ["plum's purple palace"] = getPlumPurplePalaceTheme,
 }
 
-local function applyTheme(themeData)
+function applyTheme(themeData)
     if themeData.imguiData then
         for styleKey, colorObj in pairs(themeData.imguiData) do
             local imguiId = imgui_col[styleKey]
