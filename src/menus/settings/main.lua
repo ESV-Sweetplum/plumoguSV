@@ -12,7 +12,7 @@ function showPluginSettingsWindow()
     if (not globalVars.performanceMode) then
         local bgColor = vector.New(0.2, 0.2, 0.2, 1)
         imgui.PopStyleColor(20)
-        setIncognitoColors()
+        applyTheme(getIncognitoTheme())
         setPluginAppearanceStyles('Rounded + Border')
         imgui.PushStyleColor(imgui_col.WindowBg, bgColor)
         imgui.PushStyleColor(imgui_col.TitleBg, bgColor)
