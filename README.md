@@ -6,11 +6,16 @@
 
 This is a plugin for [Quaver](https://github.com/Quaver), the ultimate community-driven and open-source competitive rhythm game. Originally made by [amogu](https://github.com/kloi34), this fork aims to continue the legacy that he left behind. The plugin has support for manipulating SVs (scroll velocities) and SSFs (scroll speed factors) in all sorts of ways, and it is the de facto plugin for SV mapmaking.
 
-## Installation
+## Installation (from Steam)
+
+1. Subscribe to the [plumoguSV plugin](https://steamcommunity.com/sharedfiles/filedetails/?id=3615855143) on Steam Workshop.
+2. You should see the plugin show up in the editor, under Plugins -> Workshop -> plumoguSV.
+
+## Installation (from GitHub)
 
 1. Go to the releases tab on the right, and download the latest release's `.zip` file.
 2. Extract the downloaded `.zip` file to get the plumoguSV-main folder.
-3. Move the plumoguSV-main folder into the `/Plugins` folder (located in the `/Quaver` folder).
+3. Move the plumoguSV-main folder into the `Quaver/Plugins` folder.
 
 ## Tech Stack
 
