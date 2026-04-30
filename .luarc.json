@@ -1,5 +1,5 @@
 {
-    "Lua.workspace.library": ["intellisense.lua"],
+    "workspace.library": ["intellisense.lua"],
     "type.castNumberToInteger": true,
     "type.inferParamType": true,
     "type.checkTableShape": true,
