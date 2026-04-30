@@ -9,7 +9,10 @@ class Point {
     ) {}
 
     equals(pt: Point) {
-        return Math.abs(this.x - pt.x) < this.tolerance && Math.abs(this.y - pt.y) < this.tolerance;
+        return (
+            Math.abs(this.x - pt.x) < this.tolerance &&
+            Math.abs(this.y - pt.y) < this.tolerance
+        );
     }
 
     stringify() {
@@ -37,17 +40,26 @@ class CubicBezier {
     }
 
     stringify() {
-        return [this.p1.stringify(), this.p2.stringify(), this.p3.stringify(), this.p4.stringify()];
+        return [
+            this.p1.stringify(),
+            this.p2.stringify(),
+            this.p3.stringify(),
+            this.p4.stringify(),
+        ];
     }
 }
 
-const files = fs.readdirSync(path.join('modules', 'bezier', 'data')).filter((p: string) => p.endsWith('.bezier'));
+const files = fs
+    .readdirSync(path.join('modules', 'bezier', 'data'))
+    .filter((p: string) => p.endsWith('.bezier'));
 
 function vectorize(str: string): Point {
     const params = str.split(/, ?/);
     const roundingFactor = 0.01;
-    const x = Math.round(parseFloat(params[0]) / roundingFactor) * roundingFactor;
-    const y = Math.round(parseFloat(params[1]) / roundingFactor) * roundingFactor;
+    const x =
+        Math.round(parseFloat(params[0]) / roundingFactor) * roundingFactor;
+    const y =
+        Math.round(parseFloat(params[1]) / roundingFactor) * roundingFactor;
     return new Point(x, y);
 }
 
@@ -80,8 +92,17 @@ location = location - vector.New(${dim.x / 2}, ${dim.y / 2}) * scale
             currentLocation = vectorize(line.split('M, ')[1]);
         } else if (line.startsWith('C, ')) {
             const pointList = line.split('C, ')[1];
-            const matches = (pointList.match(/[0-9\.]+, [0-9\.]+/g) ?? []).map((match: string) => vectorize(match));
-            curveList.push(new CubicBezier(currentLocation, matches[0], matches[1], matches[2]));
+            const matches = (pointList.match(/[0-9\.]+, [0-9\.]+/g) ?? []).map(
+                (match: string) => vectorize(match),
+            );
+            curveList.push(
+                new CubicBezier(
+                    currentLocation,
+                    matches[0],
+                    matches[1],
+                    matches[2],
+                ),
+            );
             currentLocation = matches[2];
         }
     }
