@@ -3,9 +3,8 @@
     pluginVersion: "2.2.1",
     pluginAuthor: "plummyyummy, kloi34",
     pluginDescription: "The ultimate community-driven and open-source competitive SV plugin, remastered for the modern age.",
-    buildVersionInPluginName: true,
     sources: ["QParcel", "src"],
     outDir: "/",
-    dontRandomizeSeed: false,
+    buildVersionInPluginName: true,
     workshopFolder: "assets"
 }

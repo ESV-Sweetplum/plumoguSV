@@ -1,8 +1,6 @@
 {
-    "workspace.library": ["intellisense.lua"],
-    "type.castNumberToInteger": true,
-    "type.inferParamType": true,
-    "type.checkTableShape": true,
+    "addonManager.enable": false,
+    "codeLens.enable": true,
     "diagnostics.disable": [
         "lowercase-global",
         "duplicate-set-field",
@@ -10,11 +8,6 @@
         "unused-local",
         "duplicate-doc-field"
     ],
-    "runtime.version": "Lua 5.2",
-    "workspace.ignoreDir": [".vscode", "plugin.lua"],
-    "codeLens.enable": true,
-    "workspace.ignoreSubmodules": false,
-    "workspace.useGitIgnore": true,
     "diagnostics.globals": [
         "PLUGIN_NAME",
         "PLUGIN_AUTHOR",
@@ -24,37 +17,52 @@
         "DISTRO",
         "imgui_disable_vector_packing"
     ],
-    "addonManager.enable": false,
     "diagnostics.groupSeverity": {
-        "type-check": "Error",
-        "unused": "Warning",
-        "strict": "Error",
-        "duplicate": "Warning",
         "ambiguity": "Error",
-        "luadoc": "Warning",
         "await": "Error",
         "codestyle": "Error",
         "conventions": "Fallback",
+        "duplicate": "Warning",
         "global": "Fallback",
+        "luadoc": "Warning",
         "redefined": "Fallback",
+        "strict": "Error",
         "strong": "Warning",
-        "unbalanced": "Error"
+        "type-check": "Error",
+        "unbalanced": "Error",
+        "unused": "Warning"
     },
     "diagnostics.libraryFiles": "Disable",
-    "runtime.nonstandardSymbol": ["|lambda|", "!="],
-    "Lua.format.enable": true,
-    "Lua.format.defaultConfig": {
-        "indent_style": "space",
-        "indent_size": "4",
-        "end_of_line": "lf",
-        "charset": "utf-8",
-        "spelling_language": "en-us",
-        "trim_trailing_whitespace": "true",
-        "insert_final_newline": "true",
-        "quote_style": "single",
-        "max_line_length": "120",
-        "continuation_indent": "4",
+    "format.defaultConfig": {
         "call_arg_parentheses": "keep",
-        "trailing_table_separator": "smart"
-    }
+        "charset": "utf-8",
+        "continuation_indent": "4",
+        "end_of_line": "lf",
+        "indent_size": "4",
+        "indent_style": "space",
+        "insert_final_newline": "true",
+        "max_line_length": "120",
+        "quote_style": "single",
+        "spelling_language": "en-us",
+        "trailing_table_separator": "smart",
+        "trim_trailing_whitespace": "true"
+    },
+    "format.enable": true,
+    "runtime.nonstandardSymbol": [
+        "|lambda|",
+        "!="
+    ],
+    "runtime.version": "Lua 5.2",
+    "type.castNumberToInteger": true,
+    "type.checkTableShape": true,
+    "type.inferParamType": true,
+    "workspace.ignoreDir": [
+        ".vscode",
+        "plugin.lua"
+    ],
+    "workspace.ignoreSubmodules": false,
+    "workspace.library": [
+        "intellisense.lua"
+    ],
+    "workspace.useGitIgnore": true
 }
