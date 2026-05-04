@@ -19,6 +19,7 @@ if (not performanceMode) then
     drawCursorTrail()
     pulseController()
     checkForGlobalHotkeys()
+    checkForActionWheel()
     setPluginAppearance()
 end
 
