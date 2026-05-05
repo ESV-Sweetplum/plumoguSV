@@ -25,7 +25,6 @@ function checkForActionWheel()
         cache.actionWheelSize = 0
     end
 
-
     if (not cache.actionWheelPos or cache.actionWheelSize == 0) then
         cache.previousSegment = -1
         cache.previousSegmentTime = 0
@@ -37,11 +36,6 @@ function checkForActionWheel()
         imgui.GetColorU32(imgui_col.ButtonActive), 128, BORDER_WIDTH)
     ctx.AddCircleFilled(cache.actionWheelPos or vctr2(0), cache.actionWheelSize - BORDER_WIDTH,
         imgui.GetColorU32(imgui_col.Button, 0.6))
-    -- ctx.PathLineTo(cache.actionWheelPos)
-    -- ctx.PathArcTo(cache.actionWheelPos, cache.actionWheelSize, -1, 1, 32)
-    -- ctx.PathLineTo(cache.actionWheelPos)
-    -- ctx.PathFillConvex(color.int.red)
-    -- ctx.PathClear()
 
     local deltaPos = imgui.GetMousePos() - cache.actionWheelPos
     local angle = (math.pi * 2 - math.atan2(deltaPos.y, deltaPos.x) - math.pi / 2) % (math.pi * 2)
