@@ -366,7 +366,7 @@ DEFAULT_STYLE_NAMES = {
     windowBg = 'Window BG',
 }
 
-DEFAULT_HOTKEY_LIST = { 'T', 'Shift+T', 'S', 'N', 'R', 'B', 'M', 'V', 'G', 'Ctrl+Alt+L', 'Ctrl+Alt+E', 'O' }
+DEFAULT_HOTKEY_LIST = { 'T', 'Shift+T', 'S', 'N', 'R', 'B', 'M', 'V', 'G', 'Ctrl+Alt+L', 'Ctrl+Alt+E', 'O', 'Alt' }
 
 HOTKEY_LABELS = { 'Execute Primary Action', 'Execute Secondary Action', 'Swap Primary Inputs',
     'Negate Primary Inputs', 'Reset Secondary Input', 'Go To Prev. Scroll Group', 'Go To Next Scroll Group',
@@ -378,7 +378,7 @@ HOTKEY_SETTING_ORDER = { 1, 2, 3, 4, 5, 13, 6, 7, 9, 12, 10, 11, 8 }
 --- Based on hotkey setting order
 HOTKEY_SEPARATORS = {
     [3] = 'Input Adjustment Hotkeys',
-    [7] = 'Scroll Group Hotkeys',
+    [6] = 'Scroll Group Hotkeys',
     [11] = 'Mode Adjustment Hotkeys',
     [9] = 'Window Hotkeys',
 }

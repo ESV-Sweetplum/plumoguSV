@@ -6,6 +6,7 @@ SETTING_TYPES = {
     'Default Properties',
     'Windows + Widgets',
     'Keybinds',
+    'Action Wheel',
 }
 
 function showPluginSettingsWindow()
@@ -38,6 +39,7 @@ function showPluginSettingsWindow()
     local hideSettingDict = {
         ['Advanced'] = not globalVars.advancedMode,
         ['Custom Theme'] = (globalVars.colorThemeName:sub(1, 7) != 'custom_' or globalVars.performanceMode),
+        ['Action Wheel'] = not globalVars.advancedMode,
     }
 
     for idx, v in pairs(SETTING_TYPES) do
@@ -83,6 +85,9 @@ function showPluginSettingsWindow()
     end
     if (SETTING_TYPES[typeIndex] == 'Keybinds') then
         showKeybindSettings()
+    end
+    if (SETTING_TYPES[typeIndex] == 'Action Wheel') then
+        showActionWheelSettings()
     end
 
     imgui.PopItemWidth()
