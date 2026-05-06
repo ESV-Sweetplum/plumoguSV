@@ -440,17 +440,9 @@ function chooseCurrentScrollGroup()
     imgui.AlignTextToFramePadding()
     imgui.Text('  Timing Group: ')
     KeepSameLine()
-    local groups = { '$Default', '$Global' }
-    local cols = { map.TimingGroups['$Default'].ColorRgb or '86,253,110', map.TimingGroups['$Global'].ColorRgb or
-    '255,255,255' }
-    local hiddenGroups = {}
-    for tgId, tg in pairs(map.TimingGroups) do
-        if string.find(tgId, '%$') then goto nextTG end
-        if (globalVars.hideAutomatic and string.find(tgId, 'automate_')) then table.insert(hiddenGroups, tgId) end
-        table.insert(groups, tgId)
-        table.insert(cols, tg.ColorRgb or '255,255,255')
-        ::nextTG::
-    end
+
+    local groups, cols, hiddenGroups = game.get.timingGroupsAndColors(|c| globalVars.hideAutomatic and string.find(c, 'automate_'))
+
     local prevIndex = globalVars.scrollGroupIndex
     imgui.PushItemWidth(155)
     globalVars.scrollGroupIndex = Combo('##scrollGroup', groups, globalVars.scrollGroupIndex, cols, hiddenGroups)
@@ -466,20 +458,8 @@ function chooseTimingGroup(label, previousGroup)
     imgui.Text(label)
     KeepSameLine()
 
-    local groups = { '$Default', '$Global' }
-    local cols = { map.TimingGroups['$Default'].ColorRgb or '86,253,110', map.TimingGroups['$Global'].ColorRgb or
-    '255,255,255' }
-    local hiddenGroups = {}
-    for tgId, tg in pairs(map.TimingGroups) do
-        if string.find(tgId, '%$') then goto nextTG end
-        if (globalVars.hideAutomatic and string.find(tgId, 'automate_')) then
-            table.insert(hiddenGroups,
-                tgId)
-        end
-        table.insert(groups, tgId)
-        table.insert(cols, tg.ColorRgb or '255,255,255')
-        ::nextTG::
-    end
+    local groups, cols, hiddenGroups = game.get.timingGroupsAndColors(|c| globalVars.hideAutomatic and string.find(c, 'automate_'))
+
     imgui.PushItemWidth(155)
     local previousIndex = table.indexOf(groups, previousGroup)
     local newIndex = Combo('##changingScrollGroup', groups, previousIndex, cols, hiddenGroups)
