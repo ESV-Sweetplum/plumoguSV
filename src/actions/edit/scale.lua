@@ -16,7 +16,7 @@ function scaleDisplaceSVs(menuVars)
         local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, note1Offset,
             note2Offset)
         local scalingDistance
-        if scaleType == 'Average SV' then
+        if scaleType == 'Average Value' then
             local targetDistance = menuVars.avgSV * (note2Offset - note1Offset)
             scalingDistance = targetDistance - currentDistance
             print(scalingDistance)
@@ -55,7 +55,7 @@ function scaleMultiplySVs(menuVars)
         if (currentDistance == 0) then
             currentDistance = (endOffset - startOffset) * game.get.svMultiplierAt(startOffset)
         end
-        if scaleType == 'Average SV' then
+        if scaleType == 'Average Value' then
             local currentAvgSV = currentDistance / (endOffset - startOffset)
             scalingFactor = menuVars.avgSV / currentAvgSV
         elseif scaleType == 'Absolute Distance' then
@@ -67,4 +67,30 @@ function scaleMultiplySVs(menuVars)
         end
     end
     removeAndAddSVs(svsToRemove, svsToAdd)
+end
+
+function scaleMultiplySSFs(menuVars)
+    local offsets = game.get.uniqueSelectedNoteOffsets()
+    if (not truthy(offsets)) then return end
+    local ssfsToAdd = {}
+    local ssfsToRemove = game.get.ssfsBetweenOffsets(offsets[1], offsets[#offsets])
+    for i = 1, (#offsets - 1) do
+        local startOffset = offsets[i]
+        local endOffset = offsets[i + 1]
+        local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
+        local ssfsBetweenOffsets = game.get.ssfsBetweenOffsets(startOffset, endOffset)
+        local scalingFactor = menuVars.ratio
+        if (currentDistance == 0) then
+            currentDistance = (endOffset - startOffset) * game.get.ssfMultiplierAt(startOffset)
+        end
+        if scaleType == 'Average Value' then
+            local currentAvgSV = currentDistance / (endOffset - startOffset)
+            scalingFactor = menuVars.avgSV / currentAvgSV
+        end
+        for _, ssf in ipairs(ssfsBetweenOffsets) do
+            local newSSFMultiplier = scalingFactor * ssf.Multiplier
+            addSSFToList(ssfsToAdd, ssf.StartTime, newSSFMultiplier, true)
+        end
+    end
+    removeAndAddSSFs(ssfsToRemove, ssfsToAdd)
 end

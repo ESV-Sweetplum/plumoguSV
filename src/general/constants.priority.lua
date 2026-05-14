@@ -187,7 +187,7 @@ RANDOM_TYPES = {
 }
 
 SCALE_TYPES = {
-    'Average SV',
+    'Average Value',
     'Absolute Distance',
     'Relative Ratio',
 }
