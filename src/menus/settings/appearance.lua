@@ -19,7 +19,6 @@ function showAppearanceSettings()
             ::nextCustomStyle::
         end
         globalCustomStyle = customStyle
-        globalCustomStyle.border = cache.borderColor
         local newName = 'custom_Copy of ' .. globalVars.colorThemeName:gsub('^custom_', '')
         globalVars.colorThemeName = newName
         if (not globalVars.customStyles) then globalVars.customStyles = {} end

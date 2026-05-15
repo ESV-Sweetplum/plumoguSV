@@ -33,7 +33,7 @@ function pulseController()
 
     local borderColor = cache.borderColor or vctr4(1)
     if (type(borderColor) == 'table') then borderColor = table.vectorize4(borderColor) end
-    local defaultPulseColor = vctr4(1) - borderColor
+    local defaultPulseColor = cache.defaultPulseColor
 
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or defaultPulseColor
 
