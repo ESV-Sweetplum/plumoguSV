@@ -1,4 +1,4 @@
-function kusaMovementDisplay(pos, size, segment)
+function kusaMovementDisplay(pos, size, selectedSegment)
     local ctx = imgui.GetForegroundDrawList()
     local topCenter = pos - vector.New(0, size / 1.75)
     local rightCenter = pos + vector.New(size / 1.75, 0)
@@ -8,10 +8,10 @@ function kusaMovementDisplay(pos, size, segment)
     local upDownScalingFactor = 0.8
     local leftRightScalingFactor = 1.2
 
-    local topColor = segment == 0 and color.int.black or color.int.white
-    local rightColor = segment == 1 and color.int.black or color.int.white
-    local bottomColor = segment == 2 and color.int.black or color.int.white
-    local leftColor = segment == 3 and color.int.black or color.int.white
+    local topColor = selectedSegment == 0 and color.int.black or color.int.white
+    local rightColor = selectedSegment == 1 and color.int.black or color.int.white
+    local bottomColor = selectedSegment == 2 and color.int.black or color.int.white
+    local leftColor = selectedSegment == 3 and color.int.black or color.int.white
 
     -- Top Display
 

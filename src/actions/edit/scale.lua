@@ -78,14 +78,16 @@ function scaleMultiplySSFs(menuVars)
         local startOffset = offsets[i]
         local endOffset = offsets[i + 1]
         local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
-        local ssfsBetweenOffsets = game.get.ssfsBetweenOffsets(startOffset, endOffset)
+        local ssfsBetweenOffsets = game.get.ssfsBetweenOffsets(startOffset, endOffset, true)
         local scalingFactor = menuVars.ratio
-        if (currentDistance == 0) then
-            currentDistance = (endOffset - startOffset) * game.get.ssfMultiplierAt(startOffset)
-        end
         if scaleType == 'Average Value' then
-            local currentAvgSV = currentDistance / (endOffset - startOffset)
-            scalingFactor = menuVars.avgSV / currentAvgSV
+            local ssfSum = 0
+            for idx, ssf in ipairs(ssfsBetweenOffsets) do
+                if (idx == #ssfsBetweenOffsets) then break end
+                ssfSum = ssfSum + ssf.Multiplier * (ssfsBetweenOffsets[idx + 1].StartTime - ssf.StartTime)
+            end
+            local currentAvgSSF = ssfSum / (endOffset - startOffset)
+            scalingFactor = menuVars.avgSV / currentAvgSSF
         end
         for _, ssf in ipairs(ssfsBetweenOffsets) do
             local newSSFMultiplier = scalingFactor * ssf.Multiplier

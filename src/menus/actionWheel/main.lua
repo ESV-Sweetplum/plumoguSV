@@ -79,14 +79,14 @@ function checkForActionWheel()
     local offset = math.pi / SEGMENT_COUNT
     local movedMouse = vector.Dot(vector.Abs(deltaPos), vctr2(1)) >= 1
 
-    local segment = 0
+    local selectedSegment = 0
 
     if (angle >= offset and angle <= math.pi * 2 - offset) then
-        segment = math.ceil((angle - offset) / SEGMENT_SIZE)
+        selectedSegment = math.ceil((angle - offset) / SEGMENT_SIZE)
     end
 
-    if (segment != actionWheelData.prevSegment) then
-        actionWheelData.prevSegment = segment
+    if (selectedSegment != actionWheelData.prevSegment) then
+        actionWheelData.prevSegment = selectedSegment
         actionWheelData.prevSegmentTime = 0
     else
         actionWheelData.prevSegmentTime = actionWheelData.prevSegmentTime + state.DeltaTime
@@ -100,8 +100,8 @@ function checkForActionWheel()
 
     ctx.PathLineTo(actionWheelData.pos)
     ctx.PathArcTo(actionWheelData.pos, actionWheelData.size - BORDER_WIDTH,
-        segment * SEGMENT_SIZE - offset - math.pi / 2,
-        segment * SEGMENT_SIZE + offset - math.pi / 2, 64)
+        selectedSegment * SEGMENT_SIZE - offset - math.pi / 2,
+        selectedSegment * SEGMENT_SIZE + offset - math.pi / 2, 64)
     ctx.PathLineTo(actionWheelData.pos)
 
     local HOVER_TIME = 100
@@ -114,9 +114,9 @@ function checkForActionWheel()
     ctx.PathClear()
 
     if (utils.IsKeyReleased(keys.LeftAlt)) then
-        ACTION_WHEEL_FUNCTIONS[globalVars.actionWheelTypeIndex][segment + 1]()
+        ACTION_WHEEL_FUNCTIONS[globalVars.actionWheelTypeIndex][selectedSegment + 1]()
     end
 
     cache.saveTable('actionWheel', actionWheelData)
-    ACTION_WHEEL_DISPLAYS[globalVars.actionWheelTypeIndex](actionWheelData.pos, actionWheelData.size, segment)
+    ACTION_WHEEL_DISPLAYS[globalVars.actionWheelTypeIndex](actionWheelData.pos, actionWheelData.size, selectedSegment)
 end

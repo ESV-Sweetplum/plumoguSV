@@ -498,7 +498,7 @@ function chooseScaleType(menuVars)
     menuVars.scaleTypeIndex = Combo(label, SCALE_TYPES, menuVars.scaleTypeIndex)
 
     local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
-    if scaleType == 'Average SV' then chooseAverageSV(menuVars) end
+    if scaleType == 'Average Value' then chooseAverageSV(menuVars) end
     if scaleType == 'Absolute Distance' then chooseDistance(menuVars) end
     if scaleType == 'Relative Ratio' then menuVars.ratio = ComputableInputFloat('Ratio', menuVars.ratio, 3) end
 end
