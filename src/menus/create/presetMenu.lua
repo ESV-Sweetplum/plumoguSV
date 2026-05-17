@@ -4,7 +4,8 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
     imgui.SetCursorPosX(26)
     cache.presetEditModeEnabled = RadioButtons('', cache.presetEditModeEnabled or false, { 'Select Mode', 'Edit Mode' },
         { false, true },
-        'Changes the preset menu mode.')
+        { 'Allows you to select/delete presets.',
+            'Allows you to setup preset shortcuts.' })
     AddSeparator()
     if (not cache.presetEditModeEnabled) then
         imgui.AlignTextToFramePadding()

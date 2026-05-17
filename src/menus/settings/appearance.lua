@@ -4,6 +4,7 @@ function showAppearanceSettings()
             'Performance mode is currently enabled.\nPlease disable it to access appearance features.')
         imgui.BeginDisabled()
     end
+    imgui.SeparatorText("Plugin Theme")
     chooseStyleTheme()
     chooseColorTheme()
     if (imgui.Button('Copy Current Theme')) then
@@ -48,7 +49,7 @@ function showAppearanceSettings()
             state.SetValue('importingCustomThemeInput', '')
         end
     end
-    AddSeparator()
+    imgui.SeparatorText("Cursor Trail")
     chooseCursorTrail()
     chooseCursorTrailShape()
     chooseEffectFPS()
@@ -56,19 +57,19 @@ function showAppearanceSettings()
     chooseCursorShapeSize()
     chooseSnakeSpringConstant()
     chooseCursorTrailGhost()
-    AddSeparator()
+    imgui.SeparatorText("Loadup Animation")
     GlobalCheckbox('disableLoadup', 'Disable Loadup Animation',
         'Disables the loadup animation when launching the editor.')
     KeepSameLine()
     if (imgui.Button('Play', vector.New(42, 24))) then
         cache.logoStartTime = clock.getTime()
     end
-    AddSeparator()
+    imgui.SeparatorText("Capybaras")
     GlobalCheckbox('drawCapybara', 'Capybara', 'Draws a capybara at the bottom right of the screen')
     imgui.SameLine(0, RADIO_BUTTON_SPACING)
     GlobalCheckbox('drawCapybara2', 'Capybara 2', 'Draws a capybara at the bottom left of the screen')
     GlobalCheckbox('drawCapybara312', 'Capybara 312', 'Draws a capybara???!?!??!!!!? AGAIN?!?!')
-    AddSeparator()
+    imgui.SeparatorText("Plugin Pulse")
     choosePulseCoefficient()
     GlobalCheckbox('useCustomPulseColor', 'Use Custom Color?')
     if (not globalVars.useCustomPulseColor) then imgui.BeginDisabled() end
@@ -83,9 +84,9 @@ function showAppearanceSettings()
         imgui.EndDisabled()
         state.SetValue('showColorPicker', false)
     end
-    AddSeparator()
+imgui.SeparatorText("Dynamic Background")
     local oldDynamicBgIndex = globalVars.dynamicBackgroundIndex
-    globalVars.dynamicBackgroundIndex = Combo('Dynamic BG', DYNAMIC_BACKGROUND_TYPES, oldDynamicBgIndex)
+    globalVars.dynamicBackgroundIndex = Combo('Background Type', DYNAMIC_BACKGROUND_TYPES, oldDynamicBgIndex)
     if (oldDynamicBgIndex ~= globalVars.dynamicBackgroundIndex) then
         write(globalVars)
     end

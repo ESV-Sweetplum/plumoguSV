@@ -1,4 +1,5 @@
 function showWindowSettings()
+    imgui.SeparatorText('Windows')
     GlobalCheckbox('hideSVInfo', 'Hide SV Info Window',
         'Disables the window that shows note distances when placing Standard, Special, or Still SVs.')
     if (globalVars.performanceMode) then
@@ -6,10 +7,10 @@ function showWindowSettings()
             'Performance mode is currently enabled.\nPlease disable it to access widgets and windows.')
         imgui.BeginDisabled()
     end
-    if (globalVars.hideSVInfo) then imgui.BeginDisabled() end
-    GlobalCheckbox('showSVInfoVisualizer', 'Show SV Info Visualizer',
-        'Enables a visualizer behind the SV info window that shows the general movement of the notes.')
-    if (globalVars.hideSVInfo) then imgui.EndDisabled() end
+    if (not globalVars.hideSVInfo) then
+        GlobalCheckbox('showSVInfoVisualizer', 'Show SV Info Visualizer',
+            'Enables a visualizer behind the SV info window that shows the general movement of the notes.')
+    end
     GlobalCheckbox('showVibratoWidget', 'Separate Vibrato Into New Window',
         'For those who are used to having Vibrato as a separate plugin, this option makes a new, independent window with vibrato only.')
     imgui.SeparatorText('Tooltip Widgets')

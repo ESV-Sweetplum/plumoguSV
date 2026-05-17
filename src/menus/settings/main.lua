@@ -65,30 +65,19 @@ function showPluginSettingsWindow()
 
     cache.settingTypeIndex = typeIndex
 
-    if (SETTING_TYPES[typeIndex] == 'General') then
-        showGeneralSettings()
-    end
-    if (SETTING_TYPES[typeIndex] == 'Advanced') then
-        showAdvancedSettings()
-    end
-    if (SETTING_TYPES[typeIndex] == 'Default Properties') then
-        showDefaultPropertiesSettings()
-    end
-    if (SETTING_TYPES[typeIndex] == 'Windows + Widgets') then
-        showWindowSettings()
-    end
-    if (SETTING_TYPES[typeIndex] == 'Appearance') then
-        showAppearanceSettings()
-    end
-    if (SETTING_TYPES[typeIndex] == 'Custom Theme') then
-        showCustomThemeSettings()
-    end
-    if (SETTING_TYPES[typeIndex] == 'Keybinds') then
-        showKeybindSettings()
-    end
-    if (SETTING_TYPES[typeIndex] == 'Action Wheel') then
-        showActionWheelSettings()
-    end
+    local settingMenuFunctionMap = {
+        General = showGeneralSettings,
+        Advanced = showAdvancedSettings,
+        Appearance = showAppearanceSettings,
+        ['Custom Theme'] = showCustomThemeSettings,
+        ['Default Properties'] = showDefaultPropertiesSettings,
+        ['Windows + Widgets'] = showWindowSettings,
+        Keybinds = showKeybindSettings,
+        ['Action Wheel'] = showActionWheelSettings,
+    }
+
+    local fn = settingMenuFunctionMap[SETTING_TYPES[typeIndex]]
+    if (fn) then fn() end
 
     imgui.PopItemWidth()
     imgui.EndChild()

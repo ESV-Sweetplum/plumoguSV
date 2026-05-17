@@ -197,7 +197,7 @@ end
 
 function chooseCursorTrail()
     local oldCursorTrailIndex = globalVars.cursorTrailIndex
-    globalVars.cursorTrailIndex = Combo('Cursor Trail', CURSOR_TRAILS, oldCursorTrailIndex)
+    globalVars.cursorTrailIndex = Combo('Trail Effect', CURSOR_TRAILS, oldCursorTrailIndex)
     if (oldCursorTrailIndex ~= globalVars.cursorTrailIndex) then
         write(globalVars)
     end

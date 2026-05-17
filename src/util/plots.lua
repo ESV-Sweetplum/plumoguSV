@@ -216,7 +216,7 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
                         topLeft.y + dim.y * (y + (1 - 2 * math.min(apx, 0.5)) / (#svMultipliers + 1))),
                     vector.New(topLeft.x + dim.x * x,
                         topLeft.y + dim.y * (y + 2 * (1 - math.max(apx, 0.5)) / (#svMultipliers + 1))),
-                    imgui.GetColorU32(imgui_col.PlotHistogram, (apx - apx * apx) * 2))
+                    imgui.GetColorU32(imgui_col.PlotHistogram, (apx - apx * apx) * 2 + 0.1))
                 ::nextMultiplier::
             end
         end

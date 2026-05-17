@@ -1,6 +1,7 @@
 function showActionWheelSettings()
     local oldActionWheelTypeIndex = globalVars.actionWheelTypeIndex
     imgui.SeparatorText('Activation Mode')
+    HoverToolTip('How the action wheel should open, and how you should execute actions.')
     globalVars.actionWheelActivationIndex = RadioButtons('',
         globalVars.actionWheelActivationIndex, { 'Hover/Release', 'Tap/Click' }, { 1, 2 },
         { 'Hover over the desired item (while holding the action wheel key), then release the action wheel key to activate it.',

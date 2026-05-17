@@ -1,12 +1,12 @@
 function showAdvancedSettings()
+    imgui.SeparatorText('Timing Group Related')
     GlobalCheckbox('hideAutomatic', 'Hide Automatically Placed TGs',
         'Timing groups placed by the "Automatic" feature will not be shown in the plumoguSV timing group selector.')
-    GlobalCheckbox('useEndTimeOffsets', 'Use LN Ends As Offsets',
-        "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets.")
-    GlobalCheckbox('ignoreNotesOutsideTg', 'Ignore Notes Not In Current Timing Group',
-        'Notes that are in a timing group outside of the current one will be ignored by stills, selection checks, etc.')
     GlobalCheckbox('useSelectionForNavigation', 'Use Selection for TG Navigation',
         'If enabled, pressing the keybinds to switch to prev/next TGs will only cycle through TGs that include at least one note within your current selection.')
+    GlobalCheckbox('ignoreNotesOutsideTg', 'Ignore Notes Not In Current Timing Group',
+        'Notes that are in a timing group outside of the current one will be ignored by stills, selection checks, etc.')
+    imgui.SeparatorText('Displacement Related')
     GlobalCheckbox('useMinDisplacementMultiplier', 'Use Displacement Multiplier Supremum',
         'Uses the greatest minimum possible displacement multiplier throughout the whole map to ensure that copy-paste is possible while maintaining consistency.')
     if (globalVars.useMinDisplacementMultiplier) then
@@ -16,6 +16,9 @@ function showAdvancedSettings()
     if (globalVars.useMinDisplacementMultiplier) then
         imgui.EndDisabled()
     end
+    imgui.SeparatorText('Long Note Related')
+    GlobalCheckbox('useEndTimeOffsets', 'Use LN Ends As Offsets',
+        "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets.")
 end
 
 function chooseMaxDisplacementMultiplierExponent(forceCache)

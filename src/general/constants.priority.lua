@@ -377,6 +377,7 @@ HOTKEY_SETTING_ORDER = { 1, 2, 3, 4, 5, 6, 7, 9, 12, 10, 11, 8 }
 
 --- Based on hotkey setting order
 HOTKEY_SEPARATORS = {
+    [1] = 'Action Hotkeys',
     [3] = 'Input Adjustment Hotkeys',
     [6] = 'Scroll Group Hotkeys',
     [11] = 'Mode Adjustment Hotkeys',

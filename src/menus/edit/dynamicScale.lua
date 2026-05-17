@@ -28,7 +28,7 @@ function dynamicScaleMenu()
     local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
 
     local settingVars = getSettingVars(currentSVType, 'DynamicScale')
-    needSVUpdate = showSettingsMenu(currentSVType, settingVars, true, numSVPoints, 'DynamicScale') or needSVUpdate
+    needSVUpdate = svSettingsMenu(currentSVType, settingVars, true, numSVPoints, 'DynamicScale') or needSVUpdate
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, true) end
 
     startNextWindowNotCollapsed('SV Info')

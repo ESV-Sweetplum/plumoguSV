@@ -19,7 +19,8 @@ function changeGroupsSettingsMenu(menuVars)
     KeepSameLine()
     _, menuVars.changeSSFs = imgui.Checkbox('Change SSFs?', menuVars.changeSSFs)
 
-    menuVars.clone = RadioButtons('Mode: ', menuVars.clone, { 'Clone', 'Move' }, { true, false })
+    imgui.AlignTextToFramePadding()
+    menuVars.clone = RadioButtons('Mode:', menuVars.clone, { 'Clone', 'Move' }, { true, false })
 
     return action
 end

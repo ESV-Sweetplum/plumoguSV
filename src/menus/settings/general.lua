@@ -1,4 +1,5 @@
 function showGeneralSettings()
+    imgui.SeparatorText('Plugin Modes')
     GlobalCheckbox('performanceMode', 'Enable Performance Mode',
         'Disables some visual enhancement to boost performance.')
     GlobalCheckbox('advancedMode', 'Enable Advanced Mode',
