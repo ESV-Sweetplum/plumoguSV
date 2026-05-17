@@ -1,4 +1,6 @@
 globalVars = {
+    actionWheelActivationIndex = 1,
+    actionWheelTypeIndex = 1,
     advancedMode = false,
     capybaraMode = false,
     colorThemeName = 'Original',
@@ -55,16 +57,24 @@ globalVars = {
 
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
 
+function setGlobalNumber(tempGlobalVars, key)
+    local v = tempGlobalVars[key]
+    if (not v) then return DEFAULT_GLOBAL_VARS[key] end ---@type number
+    return tn(v)
+end
+
 function setGlobalVars(tempGlobalVars)
+    globalVars.actionWheelActivationIndex = setGlobalNumber(tempGlobalVars, 'actionWheelActivationIndex')
+    globalVars.actionWheelTypeIndex = setGlobalNumber(tempGlobalVars, 'actionWheelTypeIndex')
     globalVars.advancedMode = truthy(tempGlobalVars.advancedMode)
     globalVars.capybaraMode = truthy(tempGlobalVars.capybaraMode)
     globalVars.colorThemeName = tempGlobalVars.colorThemeName or 'Original'
     globalVars.comboizeSelect = truthy(tempGlobalVars.comboizeSelect)
     globalVars.cursorTrailGhost = truthy(tempGlobalVars.cursorTrailGhost)
-    globalVars.cursorTrailIndex = tn(tempGlobalVars.cursorTrailIndex)
-    globalVars.cursorTrailPoints = math.clamp(tn(tempGlobalVars.cursorTrailPoints), 0, 100)
-    globalVars.cursorTrailShapeIndex = tn(tempGlobalVars.cursorTrailShapeIndex)
-    globalVars.cursorTrailSize = tn(tempGlobalVars.cursorTrailSize)
+    globalVars.cursorTrailIndex = setGlobalNumber(tempGlobalVars, 'cursorTrailIndex')
+    globalVars.cursorTrailPoints = setGlobalNumber(tempGlobalVars, 'cursorTrailPoints')
+    globalVars.cursorTrailShapeIndex = setGlobalNumber(tempGlobalVars, 'cursorTrailShapeIndex')
+    globalVars.cursorTrailSize = setGlobalNumber(tempGlobalVars, 'cursorTrailSize')
     -- `table.duplicate` must be used to prevent YAML issues; more specifically, when setting a table's value to nil (which should erase the key) and writing, the YAML file contains the key with a null parameter. To fix this, we iterate over the table and reconstruct it from scratch (which is what `table.duplicate` does).
     globalVars.customStyles = table.duplicate(tempGlobalVars.customStyles)
     globalVars.disableKofiMessage = truthy(tempGlobalVars.disableKofiMessage)
@@ -74,28 +84,28 @@ function setGlobalVars(tempGlobalVars)
     globalVars.drawCapybara = truthy(tempGlobalVars.drawCapybara)
     globalVars.drawCapybara2 = truthy(tempGlobalVars.drawCapybara2)
     globalVars.drawCapybara312 = truthy(tempGlobalVars.drawCapybara312)
-    globalVars.dynamicBackgroundIndex = tn(tempGlobalVars.dynamicBackgroundIndex)
-    globalVars.effectFPS = tn(tempGlobalVars.effectFPS)
+    globalVars.dynamicBackgroundIndex = setGlobalNumber(tempGlobalVars, 'dynamicBackgroundIndex')
+    globalVars.effectFPS = setGlobalNumber(tempGlobalVars, 'effectFPS')
     globalVars.equalizeLinear = truthy(tempGlobalVars.equalizeLinear, true)
     globalVars.hideAutomatic = truthy(tempGlobalVars.hideAutomatic)
     globalVars.hideSVInfo = truthy(tempGlobalVars.hideSVInfo)
     globalVars.hotkeyList = table.validate(DEFAULT_HOTKEY_LIST, table.duplicate(tempGlobalVars.hotkeyList), true)
     globalVars.ignoreNotesOutsideTg = truthy(tempGlobalVars.ignoreNotesOutsideTg)
-    globalVars.maxDisplacementMultiplierExponent = tn(tempGlobalVars.maxDisplacementMultiplierExponent)
+    globalVars.maxDisplacementMultiplierExponent = setGlobalNumber(tempGlobalVars, 'maxDisplacementMultiplierExponent')
     globalVars.performanceMode = truthy(tempGlobalVars.performanceMode)
     globalVars.presetKeybinds = table.duplicate(tempGlobalVars.presetKeybinds)
     globalVars.printLegacyLNMessage = truthy(tempGlobalVars.printLegacyLNMessage, true)
-    globalVars.pulseCoefficient = tn(tempGlobalVars.pulseCoefficient)
+    globalVars.pulseCoefficient = setGlobalNumber(tempGlobalVars, 'pulseCoefficient')
     globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
     globalVars.restrictSinusoidalPeriod = truthy(tempGlobalVars.restrictSinusoidalPeriod, true)
-    globalVars.rgbPeriod = tn(tempGlobalVars.rgbPeriod)
+    globalVars.rgbPeriod = setGlobalNumber(tempGlobalVars, 'rgbPeriod')
     globalVars.showMeasureDataWidget = truthy(tempGlobalVars.showMeasureDataWidget)
     globalVars.showNoteDataWidget = truthy(tempGlobalVars.showNoteDataWidget)
     globalVars.showSVInfoVisualizer = truthy(tempGlobalVars.showSVInfoVisualizer, true)
     globalVars.showVibratoWidget = truthy(tempGlobalVars.showVibratoWidget)
-    globalVars.snakeSpringConstant = tn(tempGlobalVars.snakeSpringConstant)
-    globalVars.stepSize = tn(tempGlobalVars.stepSize)
-    globalVars.styleThemeIndex = tn(tempGlobalVars.styleThemeIndex)
+    globalVars.snakeSpringConstant = setGlobalNumber(tempGlobalVars, 'snakeSpringConstant')
+    globalVars.stepSize = setGlobalNumber(tempGlobalVars, 'stepSize')
+    globalVars.styleThemeIndex = setGlobalNumber(tempGlobalVars, 'styleThemeIndex')
     globalVars.upscroll = truthy(tempGlobalVars.upscroll)
     globalVars.useCustomPulseColor = truthy(tempGlobalVars.useCustomPulseColor)
     globalVars.useEndTimeOffsets = truthy(tempGlobalVars.useEndTimeOffsets)

@@ -33,9 +33,9 @@ function pulseController()
 
     local borderColor = cache.borderColor or vctr4(1)
     if (type(borderColor) == 'table') then borderColor = table.vectorize4(borderColor) end
-    local negatedBorderColor = vctr4(1) - borderColor
+    local defaultPulseColor = cache.pulseColor
 
-    local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or negatedBorderColor
+    local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or defaultPulseColor
 
     imgui.PushStyleColor(imgui_col.Border, pulseColor * outputPulseStatus + borderColor * (1 - outputPulseStatus))
 

@@ -4,7 +4,7 @@ local tempGlobalVars = read()
 
 if (tempGlobalVars and tempGlobalVars.colorThemeIndex) then
     print('w!',
-        'Due to an internal change, your selected theme may have been reset. Please reselect the theme in the plugin settings')
+        'Due to an internal change, your selected theme may have been reset. Please reselect the theme in the plugin settings.')
 end
 
 if (not tempGlobalVars and state and map and utils and actions) then
@@ -32,7 +32,7 @@ if (not truthy(map.TimingPoints)) then
     print('e!', 'Please place a timing point before attempting to use plumoguSV.')
 end
 
-if (state.Scale != 1) then
+if (state.Scale ~= 1) then
     local printedScale = math.round(state.Scale * 100)
     print('e!',
         'Your ImGui scale is set to ' ..

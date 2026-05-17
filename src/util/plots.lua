@@ -72,11 +72,17 @@ function plotSVs(svVals, minScale, maxScale)
     imgui.PlotHistogram('##svplot', svVals, #svVals, 0, '', minScale, maxScale, plotSize)
 end
 
-function plotExponentialCurvature(settingVars)
+function initializeCurvaturePlot()
     imgui.PushItemWidth(28)
     imgui.PushStyleColor(imgui_col.FrameBg, 0)
+    return {}
+end
+
+function plotExponentialCurvature(settingVars)
     local RESOLUTION = 32
-    local values = table.construct()
+    local values = initializeCurvaturePlot()
+    local trueStart = settingVars.startMsx or settingVars.lowerStart
+    local trueEnd = settingVars.endMsx or settingVars.lowerEnd
     for i = 1, RESOLUTION do
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local t = i / RESOLUTION
@@ -86,23 +92,21 @@ function plotExponentialCurvature(settingVars)
         else
             value = (1 - (1 - t) ^ (1 / curvature))
         end
-        if ((settingVars.startMsx or settingVars.lowerStart) > (settingVars.endMsx or settingVars.lowerEnd)) then
+        if (trueStart > trueEnd) then
             value = 1 - value
-        elseif ((settingVars.startMsx or settingVars.lowerStart) == (settingVars.endMsx or settingVars.lowerEnd)) then
+        elseif (trueStart == trueEnd) then
             value = 0.5
         end
-        values:insert(value)
+        table.insert(values, value)
     end
-    imgui.PlotLines('##CurvaturePlot', values, #values, 0, '', 0, 1)
+    imgui.PlotLines('##ExponentialCurvaturePlot', values, #values, 0, '', 0, 1)
     imgui.PopStyleColor()
     imgui.PopItemWidth()
 end
 
 function plotSigmoidalCurvature(settingVars)
-    imgui.PushItemWidth(28)
-    imgui.PushStyleColor(imgui_col.FrameBg, 0)
     local RESOLUTION = 32
-    local values = table.construct()
+    local values = initializeCurvaturePlot()
     for i = 1, RESOLUTION do
         local curvature = VIBRATO_CURVATURES[settingVars.curvatureIndex]
         local t = i / RESOLUTION * 2
@@ -126,9 +130,9 @@ function plotSigmoidalCurvature(settingVars)
         elseif ((settingVars.startMsx or settingVars.lowerStart) == (settingVars.endMsx or settingVars.lowerEnd)) then
             value = 0.5
         end
-        values:insert(value)
+        table.insert(values, value)
     end
-    imgui.PlotLines('##CurvaturePlot', values, #values, 0, '', 0, 1)
+    imgui.PlotLines('##SigmoidalCurvaturePlot', values, #values, 0, '', 0, 1)
     imgui.PopStyleColor()
     imgui.PopItemWidth()
 end

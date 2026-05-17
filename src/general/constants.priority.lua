@@ -187,7 +187,7 @@ RANDOM_TYPES = {
 }
 
 SCALE_TYPES = {
-    'Average SV',
+    'Average Value',
     'Absolute Distance',
     'Relative Ratio',
 }
@@ -379,8 +379,8 @@ HOTKEY_SETTING_ORDER = { 1, 2, 3, 4, 5, 6, 7, 9, 12, 10, 11, 8 }
 HOTKEY_SEPARATORS = {
     [3] = 'Input Adjustment Hotkeys',
     [6] = 'Scroll Group Hotkeys',
-    [10] = 'Mode Adjustment Hotkeys',
-    [8] = 'Window Hotkeys',
+    [11] = 'Mode Adjustment Hotkeys',
+    [9] = 'Window Hotkeys',
 }
 
 ---@enum hotkeys
@@ -397,4 +397,14 @@ hotkeys_enum = {
     toggle_note_lock = 10,
     toggle_end_offset = 11,
     move_selection_to_tg = 12,
+}
+
+ACTION_WHEEL_TYPES = {
+    "kusa's Movement",
+    "kusa's Snap Colors",
+}
+
+ACTION_WHEEL_TOOLTIP_LIST = {
+    'Allows you to move selected notes up/down by 1ms, and side to side without adjusting offset.',
+    'Allows selected notes to be changed to the given color.',
 }
