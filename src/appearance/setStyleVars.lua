@@ -1033,7 +1033,7 @@ function setPluginAppearanceColors(colorTheme, hideBorder)
     end
 
     local borderColor = applyTheme(themeData).borderColor
-    local pulseColor = applyTheme(themeData).pulseColor
+    local pulseColor = applyTheme(themeData).pulseColor or borderColor
 
     imgui.PushStyleColor(imgui_col.TableHeaderBg, imgui.GetColorU32(imgui_col.Button, 0.3))
 

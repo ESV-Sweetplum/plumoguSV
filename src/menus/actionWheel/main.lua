@@ -85,7 +85,7 @@ function checkForActionWheel()
         selectedSegment = math.ceil((angle - offset) / SEGMENT_SIZE)
     end
 
-    if (selectedSegment != actionWheelData.prevSegment) then
+    if (selectedSegment ~= actionWheelData.prevSegment) then
         actionWheelData.prevSegment = selectedSegment
         actionWheelData.prevSegmentTime = 0
     else

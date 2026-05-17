@@ -43,7 +43,7 @@ function kusaGeneralColor(n)
     end
 
     --remove any timing points from a previous override
-    if #currenttimingpoints != 0 then
+    if #currenttimingpoints ~= 0 then
         actions.RemoveTimingPointBatch(currenttimingpoints)
     end
 

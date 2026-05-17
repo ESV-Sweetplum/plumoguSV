@@ -10,7 +10,7 @@ function showPatchNotesV221(lc)
     local devUpdates = {
         'Changed some anonymous functions to use metalua lambda syntax.',
         'Added back bezier module.',
-        'Migrated to != notation instead of ~= notation.',
+        'Migrated to ~= notation instead of ~= notation.',
         'Updated to the latest version of Luaver.',
     }
 

@@ -1,4 +1,5 @@
 globalVars = {
+    actionWheelActivationIndex = 1,
     actionWheelTypeIndex = 1,
     advancedMode = false,
     capybaraMode = false,
@@ -63,6 +64,7 @@ function setGlobalNumber(tempGlobalVars, key)
 end
 
 function setGlobalVars(tempGlobalVars)
+    globalVars.actionWheelActivationIndex = setGlobalNumber(tempGlobalVars, 'actionWheelActivationIndex')
     globalVars.actionWheelTypeIndex = setGlobalNumber(tempGlobalVars, 'actionWheelTypeIndex')
     globalVars.advancedMode = truthy(tempGlobalVars.advancedMode)
     globalVars.capybaraMode = truthy(tempGlobalVars.capybaraMode)

@@ -38,7 +38,7 @@ function showPluginSettingsWindow()
     --- Key is name of setting. If value with respect to key is true, will hide setting at the left
     local hideSettingDict = {
         ['Advanced'] = not globalVars.advancedMode,
-        ['Custom Theme'] = (globalVars.colorThemeName:sub(1, 7) != 'custom_' or globalVars.performanceMode),
+        ['Custom Theme'] = (globalVars.colorThemeName:sub(1, 7) ~= 'custom_' or globalVars.performanceMode),
         ['Action Wheel'] = not globalVars.advancedMode,
     }
 
