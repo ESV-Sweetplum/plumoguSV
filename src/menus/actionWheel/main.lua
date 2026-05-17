@@ -36,10 +36,13 @@ function checkForActionWheel()
 
     cache.loadTable('actionWheel', actionWheelData)
 
-    local actionWheelKeyCombo = 'Alt'
-    actionWheelData.state = kbm.holdingKeyCombo(actionWheelKeyCombo) or false
+    if (globalVars.actionWheelActivationIndex == 1) then     -- Hover/Release
+        actionWheelData.state = utils.IsKeyDown(keys.LeftAlt) or false
+    elseif (globalVars.actionWheelActivationIndex == 2) then -- Tap/Click
+        if (utils.IsKeyPressed(keys.LeftAlt)) then actionWheelData.state = not actionWheelData.state end
+    end
 
-    if (kbm.pressedKeyCombo(actionWheelKeyCombo)) then
+    if (utils.IsKeyPressed(keys.LeftAlt) and actionWheelData.state) then
         actionWheelData.pos = imgui.GetMousePos()
     end
 
@@ -113,8 +116,12 @@ function checkForActionWheel()
     ctx.PathFillConvex(col)
     ctx.PathClear()
 
-    if (utils.IsKeyReleased(keys.LeftAlt)) then
+    if (utils.IsKeyReleased(keys.LeftAlt) and globalVars.actionWheelActivationIndex == 1) then
         ACTION_WHEEL_FUNCTIONS[globalVars.actionWheelTypeIndex][selectedSegment + 1]()
+    end
+    if (imgui.IsMouseClicked('Left') and globalVars.actionWheelActivationIndex == 2) then
+        ACTION_WHEEL_FUNCTIONS[globalVars.actionWheelTypeIndex][selectedSegment + 1]()
+        actionWheelData.state = false
     end
 
     cache.saveTable('actionWheel', actionWheelData)
