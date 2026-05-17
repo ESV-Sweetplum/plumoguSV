@@ -38,6 +38,7 @@ function getOriginalTheme()
     local borderColor = vector.New(0.81, 0.88, 1.00, 0.30)
     return {
         borderColor = borderColor,
+        pulseColor = vector.New(0.51, 0.58, 0.75, 1.00),
         imguiData = {
             Button = vector.New(0.31, 0.38, 0.50, 1.00),
             ButtonActive = vector.New(0.51, 0.58, 0.70, 1.00),
@@ -88,6 +89,7 @@ function getStrawberryTheme()
     local borderColor = vector.New(1.00, 0.81, 0.88, 0.30)
     return {
         borderColor = borderColor,
+        pulseColor = vector.New(0.75, 0.51, 0.58, 1.00),
         imguiData = {
             Button = vector.New(0.50, 0.31, 0.38, 1.00),
             ButtonActive = vector.New(0.70, 0.51, 0.58, 1.00),
@@ -135,9 +137,10 @@ function getStrawberryTheme()
 end
 
 function getAmethystTheme()
-    local borderColor = vector.New(0.90, 0.00, 0.81, 0.30)
+    local borderColor = vector.New(0.50, 0.20, 0.50, 0.30)
     return {
         borderColor = borderColor,
+        pulseColor = vector.New(0.70, 0.50, 0.70, 1.00),
         imguiData = {
             Button = vector.New(0.60, 0.40, 0.60, 1.00),
             ButtonActive = vector.New(0.80, 0.60, 0.80, 1.00),
@@ -195,6 +198,7 @@ function getVerdantTheme()
     local lightPalette3 = color.hexaToRgba('6FCF97')
     return {
         borderColor = color.hexaToRgba('091413aa'),
+        pulseColor = lightPalette2,
         imguiData = {
             Button = darkPalette1,
             ButtonActive = lightPalette2,
@@ -252,6 +256,7 @@ function getTransientTheme()
     local fgColor = color.hexaToRgba('000000')
     return {
         borderColor = color.hexaToRgba('00000077'),
+        pulseColor = pastelBlue,
         imguiData = {
             Button = pink,
             ButtonActive = darkPink,
