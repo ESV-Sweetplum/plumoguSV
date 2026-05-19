@@ -15,7 +15,7 @@ function showPatchNotesV112(c)
         'Added colors to the TG selector to easily distinguish groups.',
     }
 
-    showPatchNotesElement('v1.1.2', drawV112, 127, c, bugFixes, newFeatures)
+    showPatchNotesElement('v1.1.2', drawV112, 127, c, { bugFixes = bugFixes, newFeatures = newFeatures })
 end
 
 ---Draws v112 on screen, with dimensions = scale * [127,48].

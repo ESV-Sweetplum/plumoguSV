@@ -26,7 +26,7 @@ function showPatchNotesV210(lc, rc)
         'Added the ability to clone and delete SVs from the Direct SV menu.',
     }
 
-    showPatchNotesElement('v2.1.0', drawV210, 136, { lc, rc }, bugFixes, newFeatures)
+    showPatchNotesElement('v2.1.0', drawV210, 136, { lc, rc }, {bugFixes = bugFixes, newFeatures = newFeatures})
 end
 
 ---Draws v210 on screen, with dimensions = scale * [136,37].

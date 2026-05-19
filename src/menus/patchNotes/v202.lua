@@ -15,7 +15,7 @@ function showPatchNotesV202(c)
         'Added text to give me money like mr krabs.',
     }
 
-    showPatchNotesElement('v2.0.2', drawV202, 147, c, bugFixes, newFeatures)
+    showPatchNotesElement('v2.0.2', drawV202, 147, c, { bugFixes = bugFixes, newFeatures = newFeatures })
 end
 
 ---Draws v202 on screen, with dimensions = scale * [142,37].

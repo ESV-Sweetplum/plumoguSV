@@ -8,7 +8,7 @@ function showPatchNotesV111(c)
         'Added a new TG selector.',
     }
 
-    showPatchNotesElement('v1.1.1', drawV111, 111, c, bugFixes, newFeatures)
+    showPatchNotesElement('v1.1.1', drawV111, 111, c, { bugFixes = bugFixes, newFeatures = newFeatures })
 end
 
 ---Draws v111 on screen, with dimensions = scale * [111,48].

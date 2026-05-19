@@ -16,7 +16,7 @@ function showPatchNotesV110(lc, rc)
         'New setting was added to allow you to ignore notes outside the current TG.',
     }
 
-    showPatchNotesElement('v1.1.0', drawV110, 129, { lc, rc }, bugFixes, newFeatures)
+    showPatchNotesElement('v1.1.0', drawV110, 129, { lc, rc }, {bugFixes = bugFixes, newFeatures = newFeatures})
 end
 
 ---Draws v110 on screen, with dimensions = scale * [129,48].

@@ -14,7 +14,8 @@ function showPatchNotesV221(lc)
         'Updated to the latest version of Luaver.',
     }
 
-    showPatchNotesElement('v2.2.1', drawV221, 131, lc, bugFixes, newFeatures, devUpdates)
+    showPatchNotesElement('v2.2.1', drawV221, 137, lc,
+        { bugFixes = bugFixes, newFeatures = newFeatures, devUpdates = devUpdates })
 end
 
 ---Draws v221 on screen, with dimensions = scale * {"x":131,"y":37,"tolerance":1e-8}.

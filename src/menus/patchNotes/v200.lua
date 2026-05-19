@@ -80,7 +80,7 @@ function showPatchNotesV200(lc, rc)
         'Added hotkey to move all selected notes to the selected TG.',
     }
 
-    showPatchNotesElement('v2.0.0', drawV200, 144, { lc, rc }, bugFixes, newFeatures)
+    showPatchNotesElement('v2.0.0', drawV200, 144, { lc, rc }, {bugFixes = bugFixes, newFeatures = newFeatures})
 end
 
 ---Draws v200 on screen, with dimensions = scale * [144,48].

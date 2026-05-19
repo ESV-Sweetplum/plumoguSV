@@ -8,7 +8,7 @@ function showPatchNotesV100(lc, rc)
         'Added the Select tab, which allows users to quickly select desired notes based on\na variety of conditions. Currently, there is the Alternate option and the Snap option.',
     }
 
-    showPatchNotesElement('v1.0.0', drawV100, 137, { lc, rc }, bugFixes, newFeatures)
+    showPatchNotesElement('v1.0.0', drawV100, 137, { lc, rc }, {bugFixes = bugFixes, newFeatures = newFeatures})
 end
 
 ---Draws v100 on screen, with dimensions = scale * [137,48].

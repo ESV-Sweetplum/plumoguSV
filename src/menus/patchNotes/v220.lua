@@ -35,7 +35,7 @@ function showPatchNotesV220(lc, rc)
         'Finalized QParcel submodule.',
     }
 
-    showPatchNotesElement('v2.2.0', drawV220, 142, { lc, rc }, bugFixes, newFeatures, devUpdates)
+    showPatchNotesElement('v2.2.0', drawV220, 142, { lc, rc }, {bugFixes = bugFixes, newFeatures = newFeatures, devUpdates = devUpdates})
 end
 
 -- Replaced    vector.New\(([0-9\.]+), ([0-9\.]+)\), col

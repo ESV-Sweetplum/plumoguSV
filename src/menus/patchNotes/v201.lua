@@ -20,7 +20,7 @@ function showPatchNotesV201(c)
         'Added a small gradient in the background to enhance appearance.',
     }
 
-    showPatchNotesElement('v2.0.1', drawV201, 132, c, bugFixes, newFeatures)
+    showPatchNotesElement('v2.0.1', drawV201, 132, c, { bugFixes = bugFixes, newFeatures = newFeatures })
 end
 
 ---Draws v201 on screen, with dimensions = scale * [132,37].

@@ -36,37 +36,42 @@ function showPatchNotesWindow()
     imgui.End()
 end
 
-function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugFixes, newFeatures, devUpdates)
+function showPatchNotesElement(version, logoFn, logoWidth, colorData, updateData)
     local minHeight = imgui.GetWindowPos().y
     AddPadding()
+
     imgui.BeginChild(version .. 'Bezier', vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
 
     local maxHeight = minHeight + 400
+    logoWidth = logoWidth + 5
 
     if (topLeft.y - maxHeight > 0) then goto skipLogoRender end
     if (topLeft.y - minHeight < 0) then goto skipLogoRender end
     do
         local leftColor, rightColor
         if (type(colorData) == 'table') then
-            logoFunction(ctx, topLeft + vector.New(243, 17), 1, 1)
+            logoFn(ctx, topLeft + vector.New(243, 16), 1, 1)
             leftColor, rightColor = colorData[1], colorData[2]
         else
-            logoFunction(ctx, topLeft + vector.New(243, 17), 1, colorData, 1)
+            logoFn(ctx, topLeft + vector.New(243, 16), 1, colorData, 1)
             leftColor, rightColor = colorData, colorData
         end
 
         ctx.AddRectFilledMultiColor(topLeft + vector.New(0, 25), topLeft + vector.New(243 - logoWidth / 2 - 10, 28),
             leftColor,
             rightColor, rightColor, leftColor)
-        ctx.AddRectFilledMultiColor(topLeft + vector.New(243 + logoWidth / 2 + 10, 25), topLeft + vector.New(486, 28),
+        ctx.AddRectFilledMultiColor(topLeft + vector.New(243 + logoWidth / 2 + 13, 25), topLeft + vector.New(486, 28),
             rightColor,
             leftColor, leftColor, rightColor)
     end
     ::skipLogoRender::
     imgui.EndChild()
+    local bugFixes = updateData.bugFixes
+    local newFeatures = updateData.newFeatures
+    local devUpdates = updateData.devUpdates
     if (truthy(bugFixes)) then
         imgui.SeparatorText('Bug Fixes / Minor Changes')
         for _, v in ipairs(bugFixes) do

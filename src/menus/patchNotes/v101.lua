@@ -11,7 +11,7 @@ function showPatchNotesV101(c)
         'Changed the Delete menu to allow deleting SVs or SSFs.',
     }
 
-    showPatchNotesElement('v1.0.1', drawV101, 125, c, bugFixes, newFeatures)
+    showPatchNotesElement('v1.0.1', drawV101, 125, c, { bugFixes = bugFixes, newFeatures = newFeatures })
 end
 
 ---Draws v101 on screen, with dimensions = scale * [125,48].
