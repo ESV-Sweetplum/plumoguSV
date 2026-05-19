@@ -46,6 +46,7 @@ function showPatchNotesElement(version, logoWidth, colorData, updateData)
     local dim = imgui.GetWindowSize()
 
     local maxHeight = minHeight + 400
+    logoWidth = logoWidth + 5
 
     if (topLeft.y - maxHeight > 0) then goto skipLogoRender end
     if (topLeft.y - minHeight < 0) then goto skipLogoRender end

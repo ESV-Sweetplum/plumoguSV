@@ -20,12 +20,12 @@ function rasterizeVersionString(str, location, scale, colFn)
 
     for char in str:gmatch('.') do
         local charTexture = getTexture(char)
-        pointer = rasterizeTexture(charTexture, pointer, scale, colFn)
+        pointer = rasterizeTexture(charTexture, pointer, scale, char == '.' and 10 or nil, colFn)
         pointer.x = pointer.x + spacingMap[char]
     end
 end
 
-function rasterizeTexture(tex, ptr, scale, colFn)
+function rasterizeTexture(tex, ptr, scale, forcedSpace, colFn)
     local ctx = imgui.GetWindowDrawList()
     local maxX = -1
     local maxY = -1
@@ -48,7 +48,7 @@ function rasterizeTexture(tex, ptr, scale, colFn)
         ctx.AddBezierCubic(p1, p2, p3, p4, col, 1)
     end
 
-    return ptr + vector.New(maxX, 0)
+    return ptr + vector.New(forcedSpace or maxX, 0)
 end
 
 function getTexture(char)

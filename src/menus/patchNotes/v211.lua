@@ -10,5 +10,5 @@ function showPatchNotesV211(lc, rc)
         'Reworked the DELETE menu, now having multiple buttons. An option was added\nto switch back to the checkbox mode seen in previous versions.',
     }
 
-    showPatchNotesElement('v2.1.1', 128, { rect = lc }, { bugFixes = bugFixes, newFeatures = newFeatures })
+    showPatchNotesElement('v2.1.1', 124, { rect = lc }, { bugFixes = bugFixes, newFeatures = newFeatures })
 end
