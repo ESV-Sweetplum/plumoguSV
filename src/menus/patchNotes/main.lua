@@ -47,7 +47,7 @@ function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugF
     local maxHeight = minHeight + 400
 
     if (topLeft.y - maxHeight > 0) then goto skipLogoRender end
-    if (topLeft.y - minHeight < -50) then goto skipLogoRender end
+    if (topLeft.y - minHeight < 0) then goto skipLogoRender end
     do
         local leftColor, rightColor
         if (type(colorData) == 'table') then

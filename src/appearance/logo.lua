@@ -33,8 +33,9 @@ local function l(p1, p2, p3, p4, progress, timeProgress)
 end
 
 function logoThread()
-    if (kbm.executedKeyCombo('Alt+L')) then
-        cache.logoStartTime = 10
+    if (kbm.executedKeyCombo('Ctrl+L')) then
+        cache.logoStartTime = 1e10
+        loaded = true
     end
 
     curTime = state.UnixTime or 0
