@@ -1023,31 +1023,7 @@ local THEMES = {
     ["plum's purple palace"] = getPlumPurplePalaceTheme,
 }
 
-function applyTheme(themeData, imguiOnly)
-    if themeData.imguiData then
-        for styleKey, colorObj in pairs(themeData.imguiData) do
-            local imguiId = imgui_col[styleKey]
-            if imguiId then
-                imgui.PushStyleColor(imguiId, colorObj)
-            end
-        end
-    end
-
-    if themeData.loadupData and not imguiOnly then
-        for varName, colorObj in pairs(themeData.loadupData) do
-            globalCustomStyle['loadup' .. varName] = colorObj
-        end
-    end
-
-    if (not imguiOnly) then
-        globalCustomStyle.border = themeData.border
-        globalCustomStyle.pulse = themeData.pulse
-    end
-
-    return themeData
-end
-
-function setPluginAppearanceColors(themeName, hideBorder)
+function setPluginAppearanceColors(themeName, disableBorderOverwrite)
     local themeData
     if themeName and themeName:sub(1, 7) == 'custom_' then
         themeData = getCustomTheme(themeName)
@@ -1063,40 +1039,8 @@ function setPluginAppearanceColors(themeName, hideBorder)
 
     imgui.PushStyleColor(imgui_col.TableHeaderBg, imgui.GetColorU32(imgui_col.Button, 0.3))
 
-    if hideBorder then return end
+    if disableBorderOverwrite then return end
 
-    cache.borderColor = border or getOriginalTheme().border
+    cache.baseBorderColor = border or getOriginalTheme().border
     cache.pulseColor = pulse or getOriginalTheme().pulse
-end
-
-function getCurrentRGBColors(rgbPeriod, alpha)
-    local currentTime = clock.getTime()
-    local percentIntoRGBCycle = (currentTime % rgbPeriod) / rgbPeriod
-    local stagesElapsed = 6 * percentIntoRGBCycle
-    local currentStageNumber = math.floor(stagesElapsed)
-    local percentIntoStage = math.clamp(stagesElapsed - currentStageNumber, 0, 1)
-
-    local red = 0
-    local green = 0
-    local blue = 0
-    if currentStageNumber == 0 then
-        green = 1 - percentIntoStage
-        blue = 1
-    elseif currentStageNumber == 1 then
-        blue = 1
-        red = percentIntoStage
-    elseif currentStageNumber == 2 then
-        blue = 1 - percentIntoStage
-        red = 1
-    elseif currentStageNumber == 3 then
-        green = percentIntoStage
-        red = 1
-    elseif currentStageNumber == 4 then
-        green = 1
-        red = 1 - percentIntoStage
-    else
-        blue = percentIntoStage
-        green = 1
-    end
-    return vector.New(red, green, blue, alpha or 1)
 end

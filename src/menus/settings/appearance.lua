@@ -19,7 +19,6 @@ function showAppearanceSettings()
             customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[query]))
             ::nextCustomStyle::
         end
-        print(globalCustomStyle.border)
         globalCustomStyle = customStyle
         local newName = 'custom_Copy of ' .. globalVars.colorThemeName:gsub('^custom_', '')
         globalVars.colorThemeName = newName
