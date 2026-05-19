@@ -34,27 +34,27 @@ function setPluginAppearanceStyles(styleTheme)
     -- imgui.GetStyle() which hasn't worked from my testing in Quaver plugins
 end
 
-local THEMES = {
-    ['Original'] = getOriginalTheme,
-    ['Strawberry'] = getStrawberryTheme,
-    ['Amethyst'] = getAmethystTheme,
-    ['Verdant'] = getVerdantTheme,
-    ['Transient'] = getTransientTheme,
-    ['Incognito'] = getIncognitoTheme,
-    ['Incognito + RGB'] = getIncognitoRGBTheme,
-    ['otingocnI'] = getInvertedIncognitoTheme,
-    ['BGR + otingocnI'] = getInvertedIncognitoRGBTheme,
-    ['Glass'] = getGlassTheme,
-    ['Glass + RGB'] = getGlassRGBTheme,
-    ['RGB Gamer Mode'] = getRGBGamerTheme,
-    ['edom remag BGR'] = getInvertedRGBGamerTheme,
-    ["7xbi's Glass"] = get7xbiGlassTheme,
-    ["7xbi's RGB Glass"] = get7xbiRGBGlassTheme,
-    ["aster's catppuccin"] = getAsterCatppuccinTheme,
-    ["plum's purple palace"] = getPlumPurplePalaceTheme,
-}
-
 function setPluginAppearanceColors(themeName, disableBorderOverwrite)
+    local THEMES = {
+        ['Original'] = getOriginalTheme,
+        ['Strawberry'] = getStrawberryTheme,
+        ['Amethyst'] = getAmethystTheme,
+        ['Verdant'] = getVerdantTheme,
+        ['Transient'] = getTransientTheme,
+        ['Incognito'] = getIncognitoTheme,
+        ['Incognito + RGB'] = getIncognitoRGBTheme,
+        ['otingocnI'] = getInvertedIncognitoTheme,
+        ['BGR + otingocnI'] = getInvertedIncognitoRGBTheme,
+        ['Glass'] = getGlassTheme,
+        ['Glass + RGB'] = getGlassRGBTheme,
+        ['RGB Gamer Mode'] = getRGBGamerTheme,
+        ['edom remag BGR'] = getInvertedRGBGamerTheme,
+        ["7xbi's Glass"] = get7xbiGlassTheme,
+        ["7xbi's RGB Glass"] = get7xbiRGBGlassTheme,
+        ["aster's catppuccin"] = getAsterCatppuccinTheme,
+        ["plum's purple palace"] = getPlumPurplePalaceTheme,
+    }
+
     local themeData
     if themeName and themeName:sub(1, 7) == 'custom_' then
         themeData = getCustomTheme(themeName)
