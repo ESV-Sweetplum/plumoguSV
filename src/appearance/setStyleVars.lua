@@ -952,11 +952,9 @@ function getCustomTheme(themeName)
     if themeStyle == nil then
         return getOriginalTheme()
     end
-    local border = themeStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
-    local pulse = themeStyle.pulse or vector.New(0.51, 0.58, 0.75, 1.00)
     return {
-        border = border,
-        pulse = pulse,
+        border = themeStyle.border or vector.New(0.81, 0.88, 1.00, 0.30),
+        pulse = themeStyle.pulse or vector.New(0.51, 0.58, 0.75, 1.00),
         imguiData = {
             WindowBg = themeStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00),
             PopupBg = themeStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94),
@@ -1034,13 +1032,11 @@ function setPluginAppearanceColors(themeName, disableBorderOverwrite)
 
     local outputData = applyTheme(themeData)
 
-    local border = themeData.border
-    local pulse = themeData.pulse or border
-
     imgui.PushStyleColor(imgui_col.TableHeaderBg, imgui.GetColorU32(imgui_col.Button, 0.3))
 
     if disableBorderOverwrite then return end
+    local originalTheme = getOriginalTheme()
 
-    cache.baseBorderColor = border or getOriginalTheme().border
-    cache.pulseColor = pulse or getOriginalTheme().pulse
+    cache.baseBorderColor = themeData.border or originalTheme.border
+    cache.pulseColor = themeData.pulse or themeData.border or originalTheme.pulse
 end
