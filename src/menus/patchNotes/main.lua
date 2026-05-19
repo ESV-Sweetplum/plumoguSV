@@ -37,13 +37,13 @@ function showPatchNotesWindow()
 end
 
 function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugFixes, newFeatures, devUpdates)
+    local minHeight = imgui.GetWindowPos().y
     AddPadding()
     imgui.BeginChild(version .. 'Bezier', vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
 
-    local minHeight = imgui.GetWindowPos().y
     local maxHeight = minHeight + 400
 
     if (topLeft.y - maxHeight > 0) then goto skipLogoRender end
