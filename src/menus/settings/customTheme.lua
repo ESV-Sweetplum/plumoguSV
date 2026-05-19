@@ -131,25 +131,4 @@ function parseCustomStyleV2(str, keyIdDict, exportInstead)
         print('s!', 'Imported a new theme into your custom theme list.')
         return
     end
-
-    local outStr = ''
-
-    for k, v in pairs(customStyle) do
-        if (k:find('loadup')) then
-            outStr = outStr ..
-                'loadup.' ..
-                k:gsub('loadup', '') ..
-                ' = vector.New(' ..
-                math.round(v.x, 2) ..
-                ', ' .. math.round(v.y, 2) .. ', ' .. math.round(v.z, 2) .. ', ' .. math.round(v.w, 2) .. ')\n'
-        else
-            outStr = outStr .. 'imgui.PushStyleColor(imgui_col.' ..
-                k:capitalize() ..
-                ', vector.New(' ..
-                math.round(v.x, 2) ..
-                ', ' .. math.round(v.y, 2) .. ', ' .. math.round(v.z, 2) .. ', ' .. math.round(v.w, 2) .. '))\n'
-        end
-    end
-
-    imgui.SetClipboardText(outStr)
 end

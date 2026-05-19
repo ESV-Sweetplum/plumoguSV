@@ -12,18 +12,19 @@ function showAppearanceSettings()
         local customStyle = {}
         for id, _ in pairs(DEFAULT_STYLE) do
             local query = id:capitalize()
-            if (query:match('%u%l+') == 'Loadup') then
-                customStyle[id] = loadup[query:sub(7)]
+            if (id == "border" or id == "pulse" or query:match('%u%l+') == 'Loadup') then
+                customStyle[id] = globalCustomStyle[id]
                 goto nextCustomStyle
             end
             customStyle[id] = color.uintToRgba(imgui.GetColorU32(imgui_col[query]))
             ::nextCustomStyle::
         end
+        print(globalCustomStyle.border)
         globalCustomStyle = customStyle
         local newName = 'custom_Copy of ' .. globalVars.colorThemeName:gsub('^custom_', '')
         globalVars.colorThemeName = newName
         if (not globalVars.customStyles) then globalVars.customStyles = {} end
-        globalVars.customStyles[newName] = globalCustomStyle
+        globalVars.customStyles[newName] = customStyle
         setPluginAppearanceColors(newName)
         print('s!', 'Duplicated the current theme into your custom theme list.')
         write(globalVars)

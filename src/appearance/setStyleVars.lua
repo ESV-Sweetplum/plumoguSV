@@ -35,10 +35,9 @@ function setPluginAppearanceStyles(styleTheme)
 end
 
 function getOriginalTheme()
-    local borderColor = vector.New(0.81, 0.88, 1.00, 0.30)
     return {
-        borderColor = borderColor,
-        pulseColor = vector.New(0.51, 0.58, 0.75, 1.00),
+        border = vector.New(0.81, 0.88, 1.00, 0.30),
+        pulse = vector.New(0.51, 0.58, 0.75, 1.00),
         imguiData = {
             Button = vector.New(0.31, 0.38, 0.50, 1.00),
             ButtonActive = vector.New(0.51, 0.58, 0.70, 1.00),
@@ -86,10 +85,9 @@ function getOriginalTheme()
 end
 
 function getStrawberryTheme()
-    local borderColor = vector.New(1.00, 0.81, 0.88, 0.30)
     return {
-        borderColor = borderColor,
-        pulseColor = vector.New(0.75, 0.51, 0.58, 1.00),
+        border = vector.New(1.00, 0.81, 0.88, 0.30),
+        pulse = vector.New(0.75, 0.51, 0.58, 1.00),
         imguiData = {
             Button = vector.New(0.50, 0.31, 0.38, 1.00),
             ButtonActive = vector.New(0.70, 0.51, 0.58, 1.00),
@@ -137,10 +135,9 @@ function getStrawberryTheme()
 end
 
 function getAmethystTheme()
-    local borderColor = vector.New(0.50, 0.20, 0.50, 0.30)
     return {
-        borderColor = borderColor,
-        pulseColor = vector.New(0.70, 0.50, 0.70, 1.00),
+        border = vector.New(0.50, 0.20, 0.50, 0.30),
+        pulse = vector.New(0.70, 0.50, 0.70, 1.00),
         imguiData = {
             Button = vector.New(0.60, 0.40, 0.60, 1.00),
             ButtonActive = vector.New(0.80, 0.60, 0.80, 1.00),
@@ -197,8 +194,8 @@ function getVerdantTheme()
     local lightPalette2 = color.hexaToRgba('2FA084')
     local lightPalette3 = color.hexaToRgba('6FCF97')
     return {
-        borderColor = color.hexaToRgba('091413aa'),
-        pulseColor = lightPalette2,
+        border = color.hexaToRgba('091413aa'),
+        pulse = lightPalette2,
         imguiData = {
             Button = darkPalette1,
             ButtonActive = lightPalette2,
@@ -255,8 +252,8 @@ function getTransientTheme()
     local darkBlue = color.hexaToRgba('079BD5')
     local fgColor = color.hexaToRgba('000000')
     return {
-        borderColor = color.hexaToRgba('00000077'),
-        pulseColor = pastelBlue,
+        border = color.hexaToRgba('00000077'),
+        pulse = darkPink,
         imguiData = {
             Button = pink,
             ButtonActive = darkPink,
@@ -306,20 +303,22 @@ end
 function getIncognitoTheme()
     local black = vector.New(0.00, 0.00, 0.00, 1.00)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
-    local grey = vector.New(0.20, 0.20, 0.20, 1.00)
+    local gray = vector.New(0.20, 0.20, 0.20, 1.00)
+    local transparentGray = color.alterOpacity(gray, -0.5)
     local whiteTint = vector.New(1.00, 1.00, 1.00, 0.40)
     local red = vector.New(1.00, 0.00, 0.00, 1.00)
     return {
-        borderColor = whiteTint,
+        border = whiteTint,
+        pulse = white,
         imguiData = {
-            Button = grey,
+            Button = gray,
             ButtonActive = whiteTint,
             ButtonHovered = whiteTint,
             CheckMark = white,
-            FrameBg = grey,
+            FrameBg = gray,
             FrameBgActive = whiteTint,
             FrameBgHovered = whiteTint,
-            Header = grey,
+            Header = gray,
             HeaderActive = whiteTint,
             HeaderHovered = whiteTint,
             PlotHistogram = white,
@@ -333,15 +332,15 @@ function getIncognitoTheme()
             Separator = whiteTint,
             SliderGrab = whiteTint,
             SliderGrabActive = white,
-            Tab = grey,
+            Tab = gray,
             TabActive = whiteTint,
             TabHovered = whiteTint,
             TableBorderLight = whiteTint,
             TableBorderStrong = whiteTint,
             Text = white,
             TextSelectedBg = whiteTint,
-            TitleBg = grey,
-            TitleBgActive = grey,
+            TitleBg = gray,
+            TitleBgActive = gray,
             TitleBgCollapsed = black,
             WindowBg = black,
         },
@@ -349,10 +348,10 @@ function getIncognitoTheme()
             OpeningTextColor = vector.New(0.00, 0.00, 0.00, 1.00),
             PulseTextColorLeft = vector.New(1.00, 1.00, 1.00, 1.00),
             PulseTextColorRight = vector.New(1.00, 1.00, 1.00, 1.00),
-            BgTl = vector.New(0.00, 0, 0.00, 0.39),
-            BgTr = grey,
-            BgBl = grey,
-            BgBr = white,
+            BgTl = vector.New(0.00, 0.00, 0.00, 0.39),
+            BgTr = transparentGray,
+            BgBl = transparentGray,
+            BgBr = whiteTint,
         },
     }
 end
@@ -360,20 +359,22 @@ end
 function getIncognitoRGBTheme(rgbPeriod)
     local black = vector.New(0.00, 0.00, 0.00, 1.00)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
-    local grey = vector.New(0.20, 0.20, 0.20, 1.00)
+    local gray = vector.New(0.20, 0.20, 0.20, 1.00)
+    local transparentGray = color.alterOpacity(gray, -0.5)
     local whiteTint = vector.New(1.00, 1.00, 1.00, 0.40)
     local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
     return {
-        borderColor = rgbColor,
+        border = rgbColor,
+        pulse = black,
         imguiData = {
-            Button = grey,
+            Button = gray,
             ButtonActive = rgbColor,
             ButtonHovered = whiteTint,
             CheckMark = white,
-            FrameBg = grey,
+            FrameBg = gray,
             FrameBgActive = rgbColor,
             FrameBgHovered = whiteTint,
-            Header = grey,
+            Header = gray,
             HeaderActive = rgbColor,
             HeaderHovered = whiteTint,
             PlotHistogram = white,
@@ -385,17 +386,17 @@ function getIncognitoRGBTheme(rgbPeriod)
             ScrollbarGrabActive = rgbColor,
             ScrollbarGrabHovered = white,
             Separator = rgbColor,
-            SliderGrab = grey,
+            SliderGrab = gray,
             SliderGrabActive = rgbColor,
-            Tab = grey,
+            Tab = gray,
             TabActive = rgbColor,
             TabHovered = whiteTint,
             TableBorderLight = rgbColor,
             TableBorderStrong = rgbColor,
             Text = white,
             TextSelectedBg = rgbColor,
-            TitleBg = grey,
-            TitleBgActive = grey,
+            TitleBg = gray,
+            TitleBgActive = gray,
             TitleBgCollapsed = black,
             WindowBg = black,
         },
@@ -404,8 +405,8 @@ function getIncognitoRGBTheme(rgbPeriod)
             PulseTextColorLeft = rgbColor,
             PulseTextColorRight = rgbColor,
             BgTl = vector.New(0.00, 0, 0.00, 0.39),
-            BgTr = grey,
-            BgBl = grey,
+            BgTr = transparentGray,
+            BgBl = transparentGray,
             BgBr = white,
         },
     }
@@ -419,7 +420,8 @@ function get7xbiGlassTheme()
     local frameColor = vector.New(0.24, 0.34, 0.38, 1.00)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     return {
-        borderColor = frameColor,
+        border = frameColor,
+        pulse = whiteTint,
         imguiData = {
             Button = buttonColor,
             ButtonActive = whiteTint,
@@ -473,7 +475,8 @@ function get7xbiRGBGlassTheme(rgbPeriod)
     local colorTint = rgbColor - vector.New(0, 0, 0, 0.5)
     local buttonColor = vector.New(0.10, 0.18, 0.21, 0.80)
     return {
-        borderColor = rgbColor,
+        border = rgbColor,
+        pulse = transparentBlack,
         imguiData = {
             Button = buttonColor,
             ButtonActive = colorTint,
@@ -526,7 +529,8 @@ function getGlassTheme()
     local whiteTint = vector.New(1.00, 1.00, 1.00, 0.30)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     return {
-        borderColor = transparentWhite,
+        border = transparentBlack,
+        pulse = transparentWhite,
         imguiData = {
             Button = transparentBlack,
             ButtonActive = whiteTint,
@@ -575,11 +579,12 @@ end
 
 function getGlassRGBTheme(rgbPeriod)
     local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
-    local colorTint = rgbColor - vector.New(0, 0, 0, 0.5)
+    local colorTint = color.alterOpacity(rgbColor, -0.5)
     local transparentBlack = vector.New(0.00, 0.00, 0.00, 0.25)
     local white = vector.New(1.00, 1.00, 1.00, 1.00)
     return {
-        borderColor = rgbColor,
+        border = colorTint,
+        pulse = white,
         imguiData = {
             Button = transparentBlack,
             ButtonActive = colorTint,
@@ -633,7 +638,8 @@ function getRGBGamerTheme(rgbPeriod)
     local clearWhite = vector.New(1.00, 1.00, 1.00, 0.40)
     local black = vector.New(0.00, 0.00, 0.00, 1.00)
     return {
-        borderColor = inactiveColor,
+        border = inactiveColor,
+        pulse = black,
         imguiData = {
             Button = inactiveColor,
             ButtonActive = rgbColor,
@@ -687,7 +693,8 @@ function getInvertedRGBGamerTheme(rgbPeriod)
     local clearBlack = vector.New(0.00, 0.00, 0.00, 0.40)
     local black = vector.New(0.00, 0.00, 0.00, 1.00)
     return {
-        borderColor = inactiveColor,
+        border = inactiveColor,
+        pulse = black,
         imguiData = {
             Button = inactiveColor,
             ButtonActive = rgbColor,
@@ -741,7 +748,8 @@ function getInvertedIncognitoTheme()
     local blackTint = vector.New(0.00, 0.00, 0.00, 0.40)
     local notRed = vector.New(0.00, 1.00, 1.00, 1.00)
     return {
-        borderColor = blackTint,
+        border = black,
+        pulse = white,
         imguiData = {
             Button = grey,
             ButtonActive = blackTint,
@@ -795,7 +803,8 @@ function getInvertedIncognitoRGBTheme(rgbPeriod)
     local blackTint = vector.New(0.00, 0.00, 0.00, 0.40)
     local rgbColor = getCurrentRGBColors(rgbPeriod, 0.8)
     return {
-        borderColor = rgbColor,
+        border = rgbColor,
+        pulse = blackTint,
         imguiData = {
             Button = grey,
             ButtonActive = rgbColor,
@@ -844,7 +853,8 @@ end
 
 function getAsterCatppuccinTheme()
     return {
-        borderColor = vector.New(0.42, 0.44, 0.53, 1),
+        border = vector.New(0.42, 0.44, 0.53, 1),
+        pulse = vector.New(0.8, 0.65, 0.97, 1),
         imguiData = {
             Button = vector.New(0.19, 0.2, 0.27, 1),
             ButtonActive = vector.New(0.8, 0.65, 0.97, 1),
@@ -891,7 +901,8 @@ end
 
 function getPlumPurplePalaceTheme()
     return {
-        borderColor = vector.New(0, 0, 0, 1),
+        border = vector.New(0, 0, 0, 1),
+        pulse = vector.New(0.49, 0.2, 0.82, 1),
         imguiData = {
             Button = vector.New(0.18, 0.03, 0.37, 0.8),
             ButtonActive = vector.New(0.49, 0.2, 0.82, 1),
@@ -936,55 +947,58 @@ function getPlumPurplePalaceTheme()
     }
 end
 
-function getCustomTheme()
-    if globalCustomStyle == nil then
+function getCustomTheme(themeName)
+    local themeStyle = globalVars.customStyles[themeName]
+    if themeStyle == nil then
         return getOriginalTheme()
     end
-    local borderColor = globalCustomStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
+    local border = themeStyle.border or vector.New(0.81, 0.88, 1.00, 0.30)
+    local pulse = themeStyle.pulse or vector.New(0.51, 0.58, 0.75, 1.00)
     return {
-        borderColor = borderColor,
+        border = border,
+        pulse = pulse,
         imguiData = {
-            WindowBg = globalCustomStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00),
-            PopupBg = globalCustomStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94),
-            FrameBg = globalCustomStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00),
-            TitleBg = globalCustomStyle.titleBg or vector.New(0.41, 0.48, 0.65, 1.00),
-            CheckMark = globalCustomStyle.checkMark or vector.New(0.81, 0.88, 1.00, 1.00),
-            SliderGrab = globalCustomStyle.sliderGrab or vector.New(0.56, 0.63, 0.75, 1.00),
-            Button = globalCustomStyle.button or vector.New(0.31, 0.38, 0.50, 1.00),
-            Tab = globalCustomStyle.tab or vector.New(0.31, 0.38, 0.50, 1.00),
-            TabHovered = globalCustomStyle.tabHovered or vector.New(0.51, 0.58, 0.75, 1.00),
-            TabActive = globalCustomStyle.tabActive or vector.New(0.51, 0.58, 0.75, 1.00),
-            Header = globalCustomStyle.header or vector.New(0.81, 0.88, 1.00, 0.40),
-            Separator = globalCustomStyle.separator or vector.New(0.81, 0.88, 1.00, 0.30),
-            Text = globalCustomStyle.text or vector.New(1.00, 1.00, 1.00, 1.00),
-            PlotLines = globalCustomStyle.plotLines or vector.New(0.61, 0.61, 0.61, 1.00),
-            FrameBgHovered = globalCustomStyle.frameBgHovered or vector.New(0.24, 0.34, 0.38, 1.00),
-            FrameBgActive = globalCustomStyle.frameBgActive or vector.New(0.29, 0.39, 0.43, 1.00),
-            TitleBgActive = globalCustomStyle.titleBgActive or vector.New(0.51, 0.58, 0.75, 1.00),
-            TitleBgCollapsed = globalCustomStyle.titleBgCollapsed or vector.New(0.51, 0.58, 0.75, 0.50),
-            SliderGrabActive = globalCustomStyle.sliderGrabActive or vector.New(0.61, 0.68, 0.80, 1.00),
-            ButtonHovered = globalCustomStyle.buttonHovered or vector.New(0.41, 0.48, 0.60, 1.00),
-            ButtonActive = globalCustomStyle.buttonActive or vector.New(0.51, 0.58, 0.70, 1.00),
-            HeaderHovered = globalCustomStyle.headerHovered or vector.New(0.81, 0.88, 1.00, 0.50),
-            HeaderActive = globalCustomStyle.headerActive or vector.New(0.81, 0.88, 1.00, 0.54),
-            TableBorderLight = globalCustomStyle.tableBorderLight or vector.New(0.81, 0.88, 1.00, 0.30),
-            TableBorderStrong = globalCustomStyle.tableBorderStrong or vector.New(0.81, 0.88, 1.00, 0.30),
-            TextSelectedBg = globalCustomStyle.textSelectedBg or vector.New(0.81, 0.88, 1.00, 0.40),
-            ScrollbarGrab = globalCustomStyle.scrollbarGrab or vector.New(0.31, 0.38, 0.50, 1.00),
-            ScrollbarGrabHovered = globalCustomStyle.scrollbarGrabHovered or vector.New(0.41, 0.48, 0.60, 1.00),
-            ScrollbarGrabActive = globalCustomStyle.scrollbarGrabActive or vector.New(0.51, 0.58, 0.70, 1.00),
-            PlotLinesHovered = globalCustomStyle.plotLinesHovered or vector.New(1.00, 0.43, 0.35, 1.00),
-            PlotHistogram = globalCustomStyle.plotHistogram or vector.New(0.90, 0.70, 0.00, 1.00),
-            PlotHistogramHovered = globalCustomStyle.plotHistogramHovered or vector.New(1.00, 0.60, 0.00, 1.00),
+            WindowBg = themeStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00),
+            PopupBg = themeStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94),
+            FrameBg = themeStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00),
+            TitleBg = themeStyle.titleBg or vector.New(0.41, 0.48, 0.65, 1.00),
+            CheckMark = themeStyle.checkMark or vector.New(0.81, 0.88, 1.00, 1.00),
+            SliderGrab = themeStyle.sliderGrab or vector.New(0.56, 0.63, 0.75, 1.00),
+            Button = themeStyle.button or vector.New(0.31, 0.38, 0.50, 1.00),
+            Tab = themeStyle.tab or vector.New(0.31, 0.38, 0.50, 1.00),
+            TabHovered = themeStyle.tabHovered or vector.New(0.51, 0.58, 0.75, 1.00),
+            TabActive = themeStyle.tabActive or vector.New(0.51, 0.58, 0.75, 1.00),
+            Header = themeStyle.header or vector.New(0.81, 0.88, 1.00, 0.40),
+            Separator = themeStyle.separator or vector.New(0.81, 0.88, 1.00, 0.30),
+            Text = themeStyle.text or vector.New(1.00, 1.00, 1.00, 1.00),
+            PlotLines = themeStyle.plotLines or vector.New(0.61, 0.61, 0.61, 1.00),
+            FrameBgHovered = themeStyle.frameBgHovered or vector.New(0.24, 0.34, 0.38, 1.00),
+            FrameBgActive = themeStyle.frameBgActive or vector.New(0.29, 0.39, 0.43, 1.00),
+            TitleBgActive = themeStyle.titleBgActive or vector.New(0.51, 0.58, 0.75, 1.00),
+            TitleBgCollapsed = themeStyle.titleBgCollapsed or vector.New(0.51, 0.58, 0.75, 0.50),
+            SliderGrabActive = themeStyle.sliderGrabActive or vector.New(0.61, 0.68, 0.80, 1.00),
+            ButtonHovered = themeStyle.buttonHovered or vector.New(0.41, 0.48, 0.60, 1.00),
+            ButtonActive = themeStyle.buttonActive or vector.New(0.51, 0.58, 0.70, 1.00),
+            HeaderHovered = themeStyle.headerHovered or vector.New(0.81, 0.88, 1.00, 0.50),
+            HeaderActive = themeStyle.headerActive or vector.New(0.81, 0.88, 1.00, 0.54),
+            TableBorderLight = themeStyle.tableBorderLight or vector.New(0.81, 0.88, 1.00, 0.30),
+            TableBorderStrong = themeStyle.tableBorderStrong or vector.New(0.81, 0.88, 1.00, 0.30),
+            TextSelectedBg = themeStyle.textSelectedBg or vector.New(0.81, 0.88, 1.00, 0.40),
+            ScrollbarGrab = themeStyle.scrollbarGrab or vector.New(0.31, 0.38, 0.50, 1.00),
+            ScrollbarGrabHovered = themeStyle.scrollbarGrabHovered or vector.New(0.41, 0.48, 0.60, 1.00),
+            ScrollbarGrabActive = themeStyle.scrollbarGrabActive or vector.New(0.51, 0.58, 0.70, 1.00),
+            PlotLinesHovered = themeStyle.plotLinesHovered or vector.New(1.00, 0.43, 0.35, 1.00),
+            PlotHistogram = themeStyle.plotHistogram or vector.New(0.90, 0.70, 0.00, 1.00),
+            PlotHistogramHovered = themeStyle.plotHistogramHovered or vector.New(1.00, 0.60, 0.00, 1.00),
         },
         loadupData = {
-            OpeningTextColor = globalCustomStyle.loadupOpeningTextColor,
-            PulseTextColorLeft = globalCustomStyle.loadupPulseTextColorLeft,
-            PulseTextColorRight = globalCustomStyle.loadupPulseTextColorRight,
-            BgTl = globalCustomStyle.loadupBgTl,
-            BgTr = globalCustomStyle.loadupBgTr,
-            BgBl = globalCustomStyle.loadupBgBl,
-            BgBr = globalCustomStyle.loadupBgBr,
+            OpeningTextColor = themeStyle.loadupOpeningTextColor,
+            PulseTextColorLeft = themeStyle.loadupPulseTextColorLeft,
+            PulseTextColorRight = themeStyle.loadupPulseTextColorRight,
+            BgTl = themeStyle.loadupBgTl,
+            BgTr = themeStyle.loadupBgTr,
+            BgBl = themeStyle.loadupBgBl,
+            BgBr = themeStyle.loadupBgBr,
         },
     }
 end
@@ -1009,7 +1023,7 @@ local THEMES = {
     ["plum's purple palace"] = getPlumPurplePalaceTheme,
 }
 
-function applyTheme(themeData)
+function applyTheme(themeData, imguiOnly)
     if themeData.imguiData then
         for styleKey, colorObj in pairs(themeData.imguiData) do
             local imguiId = imgui_col[styleKey]
@@ -1019,33 +1033,40 @@ function applyTheme(themeData)
         end
     end
 
-    if themeData.loadupData then
+    if themeData.loadupData and not imguiOnly then
         for varName, colorObj in pairs(themeData.loadupData) do
-            loadup[varName] = colorObj
+            globalCustomStyle['loadup' .. varName] = colorObj
         end
+    end
+
+    if (not imguiOnly) then
+        globalCustomStyle.border = themeData.border
+        globalCustomStyle.pulse = themeData.pulse
     end
 
     return themeData
 end
 
-function setPluginAppearanceColors(colorTheme, hideBorder)
+function setPluginAppearanceColors(themeName, hideBorder)
     local themeData
-    if colorTheme and colorTheme:sub(1, 7) == 'custom_' then
-        themeData = getCustomTheme()
+    if themeName and themeName:sub(1, 7) == 'custom_' then
+        themeData = getCustomTheme(themeName)
     else
-        local themeFunction = THEMES[colorTheme] or THEMES['Original']
+        local themeFunction = THEMES[themeName] or THEMES['Original']
         themeData = themeFunction(globalVars.rgbPeriod)
     end
 
-    local borderColor = applyTheme(themeData).borderColor
-    local pulseColor = applyTheme(themeData).pulseColor or borderColor
+    local outputData = applyTheme(themeData)
+
+    local border = themeData.border
+    local pulse = themeData.pulse or border
 
     imgui.PushStyleColor(imgui_col.TableHeaderBg, imgui.GetColorU32(imgui_col.Button, 0.3))
 
     if hideBorder then return end
 
-    cache.borderColor = borderColor or getOriginalTheme().borderColor
-    cache.pulseColor = pulseColor or getOriginalTheme().pulseColor
+    cache.borderColor = border or getOriginalTheme().border
+    cache.pulseColor = pulse or getOriginalTheme().pulse
 end
 
 function getCurrentRGBColors(rgbPeriod, alpha)

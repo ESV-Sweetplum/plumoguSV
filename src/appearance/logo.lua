@@ -3,13 +3,14 @@ local function l(p1, p2, p3, p4, progress, timeProgress)
     local windowSize = table.vectorize2(state.WindowSize)
     local scale = 4
     local thickness = 4
-    local pulseCol = { loadup.PulseTextColorLeft or DEFAULT_STYLE.loadupPulseTextColorLeft, loadup.PulseTextColorRight or
-    DEFAULT_STYLE.loadupPulseTextColorRight }
+    local pulseCol = { globalCustomStyle.loadupPulseTextColorLeft or DEFAULT_STYLE.loadupPulseTextColorLeft,
+        globalCustomStyle.loadupPulseTextColorRight or
+        DEFAULT_STYLE.loadupPulseTextColorRight }
     local location = windowSize / 2
 
     local textStrength = math.min(1, progress * 2, (1 - progress) * 2)
 
-    local textCol = loadup.OpeningTextColor or
+    local textCol = globalCustomStyle.loadupOpeningTextColor or
         DEFAULT_STYLE.loadupOpeningTextColor - (1 - textStrength) * color.vctr.black
 
     local t0, t1
@@ -52,8 +53,9 @@ function logoThread()
     if ((cache.logoStartTime < 3 or loaded) and not globalVars.disableLoadup) then
         if (currentTime >= 0 and currentTime <= logoLength) then
             drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
-                loadup.OpeningTextColor or DEFAULT_STYLE.loadupOpeningTextColor, 4,
-                { loadup.PulseTextColorLeft or DEFAULT_STYLE.loadupPulseTextColorLeft, loadup.PulseTextColorRight or
+                globalCustomStyle.loadupOpeningTextColor or DEFAULT_STYLE.loadupOpeningTextColor, 4,
+                { globalCustomStyle.loadupPulseTextColorLeft or DEFAULT_STYLE.loadupPulseTextColorLeft, globalCustomStyle
+                .loadupPulseTextColorRight or
                 DEFAULT_STYLE.loadupPulseTextColorRight })
         end
     else
@@ -80,10 +82,10 @@ function drawLogo(currentTime, logoLength, ctx, windowSize, scale, textCol, thic
 
     local bgStrength = 4 * (timeProgress - timeProgress * timeProgress)
     local alphaStrengthFactor = vector.New(1, 1, 1, bgStrength)
-    local colTl = color.vrgbaToUint((loadup.BgTl or DEFAULT_STYLE.loadupBgTl) * alphaStrengthFactor)
-    local colTr = color.vrgbaToUint((loadup.BgTr or DEFAULT_STYLE.loadupBgTr) * alphaStrengthFactor)
-    local colBl = color.vrgbaToUint((loadup.BgBl or DEFAULT_STYLE.loadupBgBl) * alphaStrengthFactor)
-    local colBr = color.vrgbaToUint((loadup.BgBr or DEFAULT_STYLE.loadupBgBr) * alphaStrengthFactor)
+    local colTl = color.vrgbaToUint((globalCustomStyle.loadupBgTl or DEFAULT_STYLE.loadupBgTl) * alphaStrengthFactor)
+    local colTr = color.vrgbaToUint((globalCustomStyle.loadupBgTr or DEFAULT_STYLE.loadupBgTr) * alphaStrengthFactor)
+    local colBl = color.vrgbaToUint((globalCustomStyle.loadupBgBl or DEFAULT_STYLE.loadupBgBl) * alphaStrengthFactor)
+    local colBr = color.vrgbaToUint((globalCustomStyle.loadupBgBr or DEFAULT_STYLE.loadupBgBr) * alphaStrengthFactor)
 
     ctx.AddRectFilledMultiColor(vctr2(0), windowSize, colTl, colTr, colBr, colBl)
 

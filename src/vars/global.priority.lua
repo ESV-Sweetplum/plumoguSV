@@ -113,18 +113,18 @@ function setGlobalVars(tempGlobalVars)
     globalVars.useSelectionForNavigation = truthy(tempGlobalVars.useSelectionForNavigation)
 
     -- All fields below are colors that must be vectorized to properly perform color arithmetic.
-    local forceVectorizeList = { 'border', 'loadupOpeningTextColor', 'loadupPulseTextColorLeft',
+    local forceVectorizeList = { 'border', 'pulse', 'loadupOpeningTextColor', 'loadupPulseTextColorLeft',
         'loadupPulseTextColorRight', 'loadupBgTl', 'loadupBgTr', 'loadupBgBl', 'loadupBgBr' }
 
-    if (tempGlobalVars.customStyles) then
+    if (globalVars.customStyles) then
         for themeName, themeData in pairs(globalVars.customStyles) do
             for _, key in ipairs(forceVectorizeList) do
                 if (themeData[key]) then
-                    tempGlobalVars.customStyles[themeName][key] = table.vectorize4(themeData[key])
+                    globalVars.customStyles[themeName][key] = table.vectorize4(themeData[key])
                 end
             end
         end
-        globalCustomStyle = tempGlobalVars.customStyles[globalVars.colorThemeName] or {}
+        globalCustomStyle = globalVars.customStyles[globalVars.colorThemeName] or {}
     else
         globalCustomStyle = {}
     end

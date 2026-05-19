@@ -280,8 +280,9 @@ end
 
 VIBRATO_CURVATURES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 }
 
+
 DEFAULT_STYLE = {
-    border = vector.New(0.00, 0.00, 0.00, 0.00),
+    border = vector.New(0.81, 0.88, 1.00, 0.30),
     button = vector.New(0.31, 0.38, 0.50, 1.00),
     buttonActive = vector.New(0.51, 0.58, 0.70, 1.00),
     buttonHovered = vector.New(0.41, 0.48, 0.60, 1.00),
@@ -304,6 +305,7 @@ DEFAULT_STYLE = {
     plotLines = vector.New(0.61, 0.61, 0.61, 1.00),
     plotLinesHovered = vector.New(1.00, 0.43, 0.35, 1.00),
     popupBg = vector.New(0.08, 0.08, 0.08, 0.94),
+    pulse = vector.New(0.51, 0.58, 0.75, 1.00),
     scrollbarGrab = vector.New(0.31, 0.38, 0.50, 1.00),
     scrollbarGrabActive = vector.New(0.51, 0.58, 0.70, 1.00),
     scrollbarGrabHovered = vector.New(0.41, 0.48, 0.60, 1.00),
@@ -347,6 +349,7 @@ DEFAULT_STYLE_NAMES = {
     plotLines = 'Plot Lines',
     plotLinesHovered = 'Plot Lines\n(Hovered)',
     popupBg = 'Popup BG',
+    pulse = 'Pulse',
     scrollbarGrab = 'Scrollbar Grab',
     scrollbarGrabActive = 'Scrollbar Grab\n(Active)',
     scrollbarGrabHovered = 'Scrollbar Grab\n(Hovered)',
