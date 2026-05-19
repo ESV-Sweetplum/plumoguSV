@@ -36,26 +36,27 @@ function showPatchNotesWindow()
     imgui.End()
 end
 
-function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugFixes, newFeatures, devUpdates)
+function showPatchNotesElement(version, logoWidth, colorData, updateData)
+    local minHeight = imgui.GetWindowPos().y
     AddPadding()
+
     imgui.BeginChild(version .. 'Bezier', vector.New(486, 48), 2, 3)
     local ctx = imgui.GetWindowDrawList()
     local topLeft = imgui.GetWindowPos()
     local dim = imgui.GetWindowSize()
 
-    local minHeight = imgui.GetWindowPos().y
     local maxHeight = minHeight + 400
 
     if (topLeft.y - maxHeight > 0) then goto skipLogoRender end
-    if (topLeft.y - minHeight < -50) then goto skipLogoRender end
+    if (topLeft.y - minHeight < 0) then goto skipLogoRender end
     do
         local leftColor, rightColor
-        if (type(colorData) == 'table') then
-            logoFunction(ctx, topLeft + vector.New(243, 17), 1, 1)
-            leftColor, rightColor = colorData[1], colorData[2]
+        if (type(colorData.rect) == 'table') then
+            rasterizeVersionString(version, topLeft + vector.New(243 - logoWidth / 2, 42), 1, colorData.colFn)
+            leftColor, rightColor = colorData.rect[1], colorData.rect[2]
         else
-            logoFunction(ctx, topLeft + vector.New(243, 17), 1, colorData, 1)
-            leftColor, rightColor = colorData, colorData
+            rasterizeVersionString(version, topLeft + vector.New(243 - logoWidth / 2, 42), 1)
+            leftColor, rightColor = colorData.rect, colorData.rect
         end
 
         ctx.AddRectFilledMultiColor(topLeft + vector.New(0, 25), topLeft + vector.New(243 - logoWidth / 2 - 10, 28),
@@ -67,6 +68,9 @@ function showPatchNotesElement(version, logoFunction, logoWidth, colorData, bugF
     end
     ::skipLogoRender::
     imgui.EndChild()
+    local bugFixes = updateData.bugFixes
+    local newFeatures = updateData.newFeatures
+    local devUpdates = updateData.devUpdates
     if (truthy(bugFixes)) then
         imgui.SeparatorText('Bug Fixes / Minor Changes')
         for _, v in ipairs(bugFixes) do
