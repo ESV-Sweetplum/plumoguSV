@@ -2,12 +2,6 @@ function showCustomThemeSettings()
     local settingsChanged = false
     imgui.SeparatorText("Editing '" .. globalVars.colorThemeName:gsub('custom_', '') .. "'")
 
-    if (imgui.Button('Reset')) then
-        globalCustomStyle = table.duplicate(DEFAULT_STYLE)
-        globalVars.colorThemeName = 'Original'
-        write(globalVars)
-    end
-    KeepSameLine()
     if (imgui.Button('Rename')) then
         cache.boolean.renamingCustomTheme = not cache.boolean.renamingCustomTheme
     end
