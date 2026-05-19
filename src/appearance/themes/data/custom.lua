@@ -1,0 +1,53 @@
+function getCustomTheme(themeName)
+    local themeStyle = globalVars.customStyles[themeName]
+    if themeStyle == nil then
+        return getOriginalTheme()
+    end
+    return {
+        border = themeStyle.border or vector.New(0.81, 0.88, 1.00, 0.30),
+        pulse = themeStyle.pulse or vector.New(0.51, 0.58, 0.75, 1.00),
+        imguiData = {
+            WindowBg = themeStyle.windowBg or vector.New(0.00, 0.00, 0.00, 1.00),
+            PopupBg = themeStyle.popupBg or vector.New(0.08, 0.08, 0.08, 0.94),
+            FrameBg = themeStyle.frameBg or vector.New(0.14, 0.24, 0.28, 1.00),
+            TitleBg = themeStyle.titleBg or vector.New(0.41, 0.48, 0.65, 1.00),
+            CheckMark = themeStyle.checkMark or vector.New(0.81, 0.88, 1.00, 1.00),
+            SliderGrab = themeStyle.sliderGrab or vector.New(0.56, 0.63, 0.75, 1.00),
+            Button = themeStyle.button or vector.New(0.31, 0.38, 0.50, 1.00),
+            Tab = themeStyle.tab or vector.New(0.31, 0.38, 0.50, 1.00),
+            TabHovered = themeStyle.tabHovered or vector.New(0.51, 0.58, 0.75, 1.00),
+            TabActive = themeStyle.tabActive or vector.New(0.51, 0.58, 0.75, 1.00),
+            Header = themeStyle.header or vector.New(0.81, 0.88, 1.00, 0.40),
+            Separator = themeStyle.separator or vector.New(0.81, 0.88, 1.00, 0.30),
+            Text = themeStyle.text or vector.New(1.00, 1.00, 1.00, 1.00),
+            PlotLines = themeStyle.plotLines or vector.New(0.61, 0.61, 0.61, 1.00),
+            FrameBgHovered = themeStyle.frameBgHovered or vector.New(0.24, 0.34, 0.38, 1.00),
+            FrameBgActive = themeStyle.frameBgActive or vector.New(0.29, 0.39, 0.43, 1.00),
+            TitleBgActive = themeStyle.titleBgActive or vector.New(0.51, 0.58, 0.75, 1.00),
+            TitleBgCollapsed = themeStyle.titleBgCollapsed or vector.New(0.51, 0.58, 0.75, 0.50),
+            SliderGrabActive = themeStyle.sliderGrabActive or vector.New(0.61, 0.68, 0.80, 1.00),
+            ButtonHovered = themeStyle.buttonHovered or vector.New(0.41, 0.48, 0.60, 1.00),
+            ButtonActive = themeStyle.buttonActive or vector.New(0.51, 0.58, 0.70, 1.00),
+            HeaderHovered = themeStyle.headerHovered or vector.New(0.81, 0.88, 1.00, 0.50),
+            HeaderActive = themeStyle.headerActive or vector.New(0.81, 0.88, 1.00, 0.54),
+            TableBorderLight = themeStyle.tableBorderLight or vector.New(0.81, 0.88, 1.00, 0.30),
+            TableBorderStrong = themeStyle.tableBorderStrong or vector.New(0.81, 0.88, 1.00, 0.30),
+            TextSelectedBg = themeStyle.textSelectedBg or vector.New(0.81, 0.88, 1.00, 0.40),
+            ScrollbarGrab = themeStyle.scrollbarGrab or vector.New(0.31, 0.38, 0.50, 1.00),
+            ScrollbarGrabHovered = themeStyle.scrollbarGrabHovered or vector.New(0.41, 0.48, 0.60, 1.00),
+            ScrollbarGrabActive = themeStyle.scrollbarGrabActive or vector.New(0.51, 0.58, 0.70, 1.00),
+            PlotLinesHovered = themeStyle.plotLinesHovered or vector.New(1.00, 0.43, 0.35, 1.00),
+            PlotHistogram = themeStyle.plotHistogram or vector.New(0.90, 0.70, 0.00, 1.00),
+            PlotHistogramHovered = themeStyle.plotHistogramHovered or vector.New(1.00, 0.60, 0.00, 1.00),
+        },
+        loadupData = {
+            OpeningTextColor = themeStyle.loadupOpeningTextColor,
+            PulseTextColorLeft = themeStyle.loadupPulseTextColorLeft,
+            PulseTextColorRight = themeStyle.loadupPulseTextColorRight,
+            BgTl = themeStyle.loadupBgTl,
+            BgTr = themeStyle.loadupBgTr,
+            BgBl = themeStyle.loadupBgBl,
+            BgBr = themeStyle.loadupBgBr,
+        },
+    }
+end
