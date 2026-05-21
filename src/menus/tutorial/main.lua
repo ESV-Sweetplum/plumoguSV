@@ -98,20 +98,21 @@ function showTutorialWindow()
         imgui.Text('Please go to a 4K map to continue.')
         goto tutorialRenderSkip
     end
+    do
+        local queue = cache.get('windows/tutorial_queue')
 
-    local queue = cache.get('windows/tutorial_queue')
+        if (queue) then
+            tutorialWindowName = queue
+            cache.set('windows/tutorial_queue', nil)
+        end
 
-    if (queue) then
-        tutorialWindowName = queue
-        cache.set('windows/tutorial_queue', nil)
+        if (tutorialWindowName == '') then
+            nullFn()
+            goto tutorialRenderSkip
+        end
+
+        table.nestedValue(tree, tutorialWindowName:split('.'))()
     end
-
-    if (tutorialWindowName == '') then
-        nullFn()
-        goto tutorialRenderSkip
-    end
-
-    table.nestedValue(tree, tutorialWindowName:split('.'))()
 
     ::tutorialRenderSkip::
     imgui.EndChild()
