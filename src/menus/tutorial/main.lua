@@ -1,7 +1,7 @@
 function showTutorialWindow()
     imgui.SetNextWindowSize(vector.New(600, 500), imgui_cond.Always)
-    imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + 4278190080)
-    imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + 4278190080)
+    imgui.PushStyleColor(imgui_col.WindowBg, imgui.GetColorU32(imgui_col.WindowBg, 0) + color.int.black)
+    imgui.PushStyleColor(imgui_col.TitleBg, imgui.GetColorU32(imgui_col.TitleBg, 0) + color.int.black)
 
     startNextWindowNotCollapsed('plumoguSV Tutorial Menu')
 
