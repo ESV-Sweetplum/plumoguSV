@@ -25,14 +25,14 @@ function infoTab()
         imgui.Dummy(vctr2(10))
     end
     if (imgui.Button('Edit Settings', HALF_ACTION_BUTTON_SIZE)) then
-        cache.windows.showSettingsWindow = not cache.windows.showSettingsWindow
+        cache.set('windows/settings', not cache.get('windows/settings'))
         local coordinatesToCenter = game.window.getCenter() - vector.New(216.5, 200)
         imgui.SetWindowPos('plumoguSV Settings', coordinatesToCenter)
     end
     HoverToolTip('Edit various functions of the plugin, such as the appearance or internal calculations.')
     KeepSameLine()
     if (imgui.Button('See Patch Notes', HALF_ACTION_BUTTON_SIZE)) then
-        cache.windows.showPatchNotesWindow = not cache.windows.showPatchNotesWindow
+        cache.set('windows/patch_notes', not cache.get('windows/patch_notes'))
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos('plumoguSV Patch Notes', coordinatesToCenter)
     end
@@ -43,7 +43,7 @@ function infoTab()
     HoverToolTip('A quick and easy way to view SV/SSF counts and some other minute pieces of data.')
     KeepSameLine()
     if (imgui.Button('View Tutorials', HALF_ACTION_BUTTON_SIZE)) then
-        cache.windows.showTutorialWindow = not cache.windows.showTutorialWindow
+        cache.set('windows/tutorial', not cache.get('windows/tutorial'))
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos('plumoguSV Tutorial Menu', coordinatesToCenter)
     end

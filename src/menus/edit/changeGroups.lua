@@ -3,7 +3,7 @@ function changeGroupsMenu()
 
     local action = changeGroupsSettingsMenu(menuVars)
 
-    cache.saveTable('changeGroupsMenu', menuVars)
+    cache.save('changeGroupsMenu', menuVars)
 
     simpleActionMenu(table.concat({ action, ' items to ', menuVars.designatedTimingGroup }), 2, changeGroups, menuVars)
 end

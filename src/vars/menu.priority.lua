@@ -188,7 +188,7 @@ function getMenuVars(menuType, optionalLabel)
     local menuVars = DEFAULT_STARTING_MENU_VARS[menuKey]
 
     local labelText = table.concat({ menuType, optionalLabel or '', 'Menu' })
-    cache.loadTable(labelText, menuVars)
+    cache.load(labelText, menuVars)
 
     return menuVars
 end

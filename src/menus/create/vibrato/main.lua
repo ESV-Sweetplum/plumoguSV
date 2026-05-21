@@ -21,9 +21,9 @@ function placeVibratoSVMenu(separateWindow)
     if globalVars.showPresetMenu then
         local presetSelected = renderPresetMenu('Vibrato', menuVars, settingVars)
         if (not presetSelected) then
-            cache.saveTable(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
+            cache.save(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
                 settingVars)
-            cache.saveTable('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
+            cache.save('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
         end
         return
     end
@@ -46,7 +46,7 @@ function placeVibratoSVMenu(separateWindow)
     if currentSVType == 'Sigmoidal##Vibrato' then sigmoidalVibratoMenu(menuVars, settingVars, separateWindow) end
     if currentSVType == 'Custom##Vibrato' then customVibratoMenu(menuVars, settingVars, separateWindow) end
 
-    cache.saveTable(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
+    cache.save(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
         settingVars)
-    cache.saveTable('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
+    cache.save('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
 end

@@ -85,7 +85,7 @@ function showDefaultPropertiesSettings()
         chooseInterlace(menuVars)
 
         saveMenuPropertiesButton(menuVars, 'placeStandard')
-        cache.saveTable('placeStandardPropertyMenu', menuVars)
+        cache.save('placeStandardPropertyMenu', menuVars)
     end
     if (imgui.CollapsingHeader('General Special Settings')) then
         local menuVars = getMenuVars('placeSpecial', 'Property')
@@ -93,7 +93,7 @@ function showDefaultPropertiesSettings()
         chooseSpecialSVType(menuVars)
 
         saveMenuPropertiesButton(menuVars, 'placeSpecial')
-        cache.saveTable('placeSpecialPropertyMenu', menuVars)
+        cache.save('placeSpecialPropertyMenu', menuVars)
     end
     if (imgui.CollapsingHeader('General Still Settings')) then
         local menuVars = getMenuVars('placeStill', 'Property')
@@ -106,7 +106,7 @@ function showDefaultPropertiesSettings()
         chooseInterlace(menuVars)
 
         saveMenuPropertiesButton(menuVars, 'placeStill')
-        cache.saveTable('placeStillPropertyMenu', menuVars)
+        cache.save('placeStillPropertyMenu', menuVars)
     end
     if (imgui.CollapsingHeader('General Vibrato Settings')) then
         local menuVars = getMenuVars('placeVibrato', 'Property')
@@ -121,7 +121,7 @@ function showDefaultPropertiesSettings()
         end
 
         saveMenuPropertiesButton(menuVars, 'placeVibrato')
-        cache.saveTable('placeVibratoPropertyMenu', menuVars)
+        cache.save('placeVibratoPropertyMenu', menuVars)
     end
 
     imgui.SeparatorText('Edit Tab Settings')
@@ -135,7 +135,7 @@ function showDefaultPropertiesSettings()
             local menuVars = getMenuVars(label, 'Property')
             tbl.fn(menuVars)
             saveMenuPropertiesButton(menuVars, label)
-            cache.saveTable(label .. 'PropertyMenu', menuVars)
+            cache.save(label .. 'PropertyMenu', menuVars)
         end
         ::continue::
     end
@@ -153,7 +153,7 @@ function showDefaultPropertiesSettings()
         _, menuVars.deleteTable[4] = imgui.Checkbox('Delete Bookmarks', menuVars.deleteTable[4])
 
         saveMenuPropertiesButton(menuVars, 'delete')
-        cache.saveTable('deletePropertyMenu', menuVars)
+        cache.save('deletePropertyMenu', menuVars)
     end
 
     imgui.SeparatorText('Select Tab Settings')
@@ -169,7 +169,7 @@ function showDefaultPropertiesSettings()
     --         local menuVars = getMenuVars(label, "Property")
     --         tbl.fn(menuVars)
     --         saveMenuPropertiesButton(menuVars, label)
-    --         cache.saveTable(label .. "PropertyMenu", menuVars)
+    --         cache.save(label .. "PropertyMenu", menuVars)
     --     end
     --     ::continue::
     -- end
@@ -181,7 +181,7 @@ function showDefaultPropertiesSettings()
         BasicInputInt(menuVars, 'offset', 'From note #__', { 1, menuVars.every })
 
         saveMenuPropertiesButton(menuVars, 'selectAlternating')
-        cache.saveTable('selectAlternatingPropertyMenu', menuVars)
+        cache.save('selectAlternatingPropertyMenu', menuVars)
     end
     if (imgui.CollapsingHeader('Select By Snap Settings')) then
         local menuVars = getMenuVars('selectBySnap', 'Property')
@@ -189,7 +189,7 @@ function showDefaultPropertiesSettings()
         BasicInputInt(menuVars, 'snap', 'Snap', { 1, 100 })
 
         saveMenuPropertiesButton(menuVars, 'selectBySnap')
-        cache.saveTable('selectBySnapPropertyMenu', menuVars)
+        cache.save('selectBySnapPropertyMenu', menuVars)
     end
     if (imgui.CollapsingHeader('Select Chord Size Settings')) then
         local menuVars = getMenuVars('selectChordSize', 'Property')
@@ -202,7 +202,7 @@ function showDefaultPropertiesSettings()
         end
 
         saveMenuPropertiesButton(menuVars, 'selectChordSize')
-        cache.saveTable('selectChordSizePropertyMenu', menuVars)
+        cache.save('selectChordSizePropertyMenu', menuVars)
     end
     if (imgui.CollapsingHeader('Select Note Type Settings')) then
         local menuVars = getMenuVars('selectNoteType', 'Property')
@@ -212,7 +212,7 @@ function showDefaultPropertiesSettings()
         _, menuVars.ln = imgui.Checkbox('Select LNs', menuVars.ln)
 
         saveMenuPropertiesButton(menuVars, 'selectNoteType')
-        cache.saveTable('selectNoteTypePropertyMenu', menuVars)
+        cache.save('selectNoteTypePropertyMenu', menuVars)
     end
 
     imgui.SeparatorText('Standard/Still Settings')
@@ -225,7 +225,7 @@ function showDefaultPropertiesSettings()
             local settingVars = getSettingVars(label, 'Property')
             tbl.fn(settingVars, false, false, 'Property')
             saveSettingPropertiesButton(settingVars, label)
-            cache.saveTable(label .. 'PropertySettings', settingVars)
+            cache.save(label .. 'PropertySettings', settingVars)
         end
     end
 
@@ -240,7 +240,7 @@ function showDefaultPropertiesSettings()
             local settingVars = getSettingVars(label, 'Property')
             tbl.fn(settingVars)
             saveSettingPropertiesButton(settingVars, label)
-            cache.saveTable(label .. 'PropertySettings', settingVars)
+            cache.save(label .. 'PropertySettings', settingVars)
         end
         ::continue::
     end
@@ -253,7 +253,7 @@ function showDefaultPropertiesSettings()
         SwappableNegatableInputFloat2(settingVars, 'startMsx', 'endMsx', 'Start/End', ' msx', 0, 0.875)
 
         saveSettingPropertiesButton(settingVars, 'LinearVibratoSV')
-        cache.saveTable('LinearVibratoSVPropertySettings', settingVars)
+        cache.save('LinearVibratoSVPropertySettings', settingVars)
     end
     if (imgui.CollapsingHeader('Polynomial Vibrato SV Settings')) then
         local settingVars = getSettingVars('PolynomialVibratoSV', 'Property')
@@ -261,7 +261,7 @@ function showDefaultPropertiesSettings()
         SwappableNegatableInputFloat2(settingVars, 'startMsx', 'endMsx', 'Bounds##Vibrato', ' msx', 0, 0.875)
 
         saveSettingPropertiesButton(settingVars, 'PolynomialVibratoSV')
-        cache.saveTable('PolynomialVibratoSVPropertySettings', settingVars)
+        cache.save('PolynomialVibratoSVPropertySettings', settingVars)
     end
     if (imgui.CollapsingHeader('Exponential Vibrato SV Settings')) then
         local settingVars = getSettingVars('ExponentialVibratoSV', 'Property')
@@ -270,7 +270,7 @@ function showDefaultPropertiesSettings()
         chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
 
         saveSettingPropertiesButton(settingVars, 'ExponentialVibratoSV')
-        cache.saveTable('ExponentialVibratoSVPropertySettings', settingVars)
+        cache.save('ExponentialVibratoSVPropertySettings', settingVars)
     end
     if (imgui.CollapsingHeader('Sinusoidal Vibrato SV Settings')) then
         local settingVars = getSettingVars('SinusoidalVibratoSV', 'Property')
@@ -281,7 +281,7 @@ function showDefaultPropertiesSettings()
         choosePeriodShift(settingVars)
 
         saveSettingPropertiesButton(settingVars, 'SinusoidalVibratoSV')
-        cache.saveTable('SinusoidalVibratoSVPropertySettings', settingVars)
+        cache.save('SinusoidalVibratoSVPropertySettings', settingVars)
     end
     if (imgui.CollapsingHeader('Sigmoidal Vibrato SV Settings')) then
         local settingVars = getSettingVars('SigmoidalVibratoSV', 'Property')
@@ -290,7 +290,7 @@ function showDefaultPropertiesSettings()
         chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
 
         saveSettingPropertiesButton(settingVars, 'SigmoidalVibratoSV')
-        cache.saveTable('SigmoidalVibratoSVPropertySettings', settingVars)
+        cache.save('SigmoidalVibratoSVPropertySettings', settingVars)
     end
 
     imgui.SeparatorText('SSF Vibrato Settings')
@@ -302,7 +302,7 @@ function showDefaultPropertiesSettings()
         SwappableNegatableInputFloat2(settingVars, 'higherStart', 'higherEnd', 'Higher S/E SSFs', 'x')
 
         saveSettingPropertiesButton(settingVars, 'LinearVibratoSSF')
-        cache.saveTable('LinearVibratoSSFPropertySettings', settingVars)
+        cache.save('LinearVibratoSSFPropertySettings', settingVars)
     end
     if (imgui.CollapsingHeader('Exponential Vibrato SSF Settings')) then
         local settingVars = getSettingVars('ExponentialVibratoSSF', 'Property')
@@ -312,7 +312,7 @@ function showDefaultPropertiesSettings()
         chooseCurvatureCoefficient(settingVars, plotExponentialCurvature)
 
         saveSettingPropertiesButton(settingVars, 'ExponentialVibratoSSF')
-        cache.saveTable('ExponentialVibratoSSFPropertySettings', settingVars)
+        cache.save('ExponentialVibratoSSFPropertySettings', settingVars)
     end
     if (imgui.CollapsingHeader('Sinusoidal Vibrato SSF Settings')) then
         local settingVars = getSettingVars('SinusoidalVibratoSSF', 'Property')
@@ -324,7 +324,7 @@ function showDefaultPropertiesSettings()
         choosePeriodShift(settingVars)
 
         saveSettingPropertiesButton(settingVars, 'SinusoidalVibratoSSF')
-        cache.saveTable('SinusoidalVibratoSSFPropertySettings', settingVars)
+        cache.save('SinusoidalVibratoSSFPropertySettings', settingVars)
     end
     if (imgui.CollapsingHeader('Sigmoidal Vibrato SSF Settings')) then
         local settingVars = getSettingVars('SigmoidalVibratoSSF', 'Property')
@@ -334,6 +334,6 @@ function showDefaultPropertiesSettings()
         chooseCurvatureCoefficient(settingVars, plotSigmoidalCurvature)
 
         saveSettingPropertiesButton(settingVars, 'SigmoidalVibratoSSF')
-        cache.saveTable('SigmoidalVibratoSSFPropertySettings', settingVars)
+        cache.save('SigmoidalVibratoSSFPropertySettings', settingVars)
     end
 end

@@ -3,7 +3,7 @@ function copyNPasteMenu()
 
     local copiedItemCount = copyNPasteSettingsMenu(menuVars, true)
 
-    cache.saveTable('copyPasteMenu', menuVars)
+    cache.save('copyPasteMenu', menuVars)
 
     if not truthy(copiedItemCount) then return end
 

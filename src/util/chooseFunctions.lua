@@ -116,9 +116,6 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
     settingVars.p1 = normalizedPos1
     settingVars.p2 = normalizedPos2
 
-    cache.boolean.bezierFreeMode = settingVars.freeMode
-    cache.boolean.bezierManualMode = settingVars.manualMode
-
     return oldP1 ~= settingVars.p1 or oldP2 ~= settingVars.p2
 end
 
@@ -698,7 +695,7 @@ function choosePulseColor()
         write(globalVars)
     end
     if (not colorPickerOpened) then
-        cache.windows.showColorPicker = false
+        cache.set('windows/pulse_picker', false)
     end
     imgui.End()
 end

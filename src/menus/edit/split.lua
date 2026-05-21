@@ -2,7 +2,7 @@ function splitMenu()
     local menuVars = getMenuVars('split')
 
     splitSettingsMenu(menuVars)
-    cache.saveTable('splitMenu', menuVars)
+    cache.save('splitMenu', menuVars)
 
     simpleActionMenu('Split selected notes into TGs', 1, splitNotes, menuVars, false)
 end

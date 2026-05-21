@@ -10,7 +10,7 @@ function renderMeasureDataWidget()
         tgName = '',
     }
 
-    cache.loadTable('measureWidget', widgetVars)
+    cache.load('measureWidget', widgetVars)
 
     local uniqueDict = {}
     for _, ho in ipairs(state.SelectedHitObjects) do -- game.get.uniqueSelectedNoteOffsets was not used here because this approach exits the function faster
@@ -28,8 +28,11 @@ function renderMeasureDataWidget()
     uniqueDict = sort(uniqueDict, sortAscending) ---@type number[]
     local startOffset = uniqueDict[1]
     local endOffset = uniqueDict[2] or uniqueDict[1]
-    if (math.abs(endOffset - startOffset) < 1e-10 and not cache.boolean.changeOccurred and state.SelectedScrollGroupId == widgetVars.tgName) then return end
-    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or cache.boolean.changeOccurred or state.SelectedScrollGroupId ~= widgetVars.tgName) then
+    if (math.abs(endOffset - startOffset) < 1e-10 and not cache.get('map_edited')
+            and state.SelectedScrollGroupId == widgetVars.tgName) then
+        return
+    end
+    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or cache.get('map_edited') or state.SelectedScrollGroupId ~= widgetVars.tgName) then
         svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
@@ -49,5 +52,5 @@ function renderMeasureDataWidget()
     widgetVars.oldStartOffset = startOffset
     widgetVars.oldEndOffset = endOffset
 
-    cache.saveTable('measureWidget', widgetVars)
+    cache.save('measureWidget', widgetVars)
 end

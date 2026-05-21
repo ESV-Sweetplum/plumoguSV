@@ -1,28 +1,35 @@
 function renderPresetMenu(menuLabel, menuVars, settingVars)
-    local newPresetName = cache.newPresetName or ''
+    local presetVars = {
+        newPresetName = '',
+        importPresetName = '',
+        editModeEnabled = false,
+        importingPreset = false,
+    }
+
+    cache.load('vars/menu/preset', presetVars)
 
     imgui.SetCursorPosX(26)
-    cache.presetEditModeEnabled = RadioButtons('', cache.presetEditModeEnabled or false, { 'Select Mode', 'Edit Mode' },
+    presetVars.editModeEnabled = RadioButtons('', presetVars.editModeEnabled, { 'Select Mode', 'Edit Mode' },
         { false, true },
         { 'Allows you to select/delete presets.',
             'Allows you to setup preset shortcuts.' })
     AddSeparator()
-    if (not cache.presetEditModeEnabled) then
+    if (not presetVars.editModeEnabled) then
         imgui.AlignTextToFramePadding()
         imgui.Text('New Preset Name:')
         KeepSameLine()
         imgui.PushItemWidth(90)
-        _, newPresetName = imgui.InputTextWithHint('##PresetName', 'e.g. Jump', newPresetName, 4096)
+        _, presetVars.newPresetName = imgui.InputTextWithHint('##PresetName', 'e.g. Jump', presetVars.newPresetName, 4096)
         imgui.PopItemWidth()
         imgui.SameLine()
         local saveButtonClicked = imgui.Button('Save')
         HoverToolTip('Saves the current menu as a preset.')
-        if (saveButtonClicked and newPresetName:len() == 0) then
+        if (saveButtonClicked and presetVars.newPresetName:len() == 0) then
             print('e!', 'Please enter a name for your new preset.')
-        elseif (saveButtonClicked and newPresetName:len() > 0) then
+        elseif (saveButtonClicked and presetVars.newPresetName:len() > 0) then
             preset = {}
-            preset.name = newPresetName
-            newPresetName = ''
+            preset.name = presetVars.newPresetName
+            presetVars.newPresetName = ''
             preset.data = table.stringify({ menuVars = menuVars, settingVars = settingVars })
             preset.type = menuLabel
             preset.flags = {
@@ -42,26 +49,24 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             write(globalVars)
             print('i!', 'Saved preset "' .. preset.name .. '".')
         end
-        cache.newPresetName = newPresetName
     else
-        local importCustomPreset = cache.importCustomPreset or ''
+        local importedPresetName = presetVars.importPresetName
         imgui.AlignTextToFramePadding()
         imgui.Text('Import Preset:')
         KeepSameLine()
         imgui.PushItemWidth(103)
-        _, importCustomPreset = imgui.InputTextWithHint('##CustomPreset', 'Exported Str.', importCustomPreset,
+        _, importedPresetName = imgui.InputTextWithHint('##CustomPreset', 'Exported Str.', importedPresetName,
             MAX_IMPORT_CHARACTER_LIMIT)
-        cache.importCustomPreset = importCustomPreset
         imgui.PopItemWidth()
         imgui.SameLine()
         if (imgui.Button('Import##CustomPreset')) then
-            local parsedTable = table.parse(importCustomPreset)
+            local parsedTable = table.parse(importedPresetName)
             if (table.includes(table.property(globalVars.presets, 'name'), parsedTable.name)) then
                 print('e!',
                     'A preset with this name already exists. Please remove it or change the name in the import string.')
             else
                 table.insert(globalVars.presets, parsedTable)
-                importCustomPreset = ''
+                importedPresetName = ''
                 write(globalVars)
             end
         end
@@ -69,7 +74,7 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
 
     AddPadding()
 
-    if (not cache.presetEditModeEnabled) then
+    if (not presetVars.editModeEnabled) then
         InitializeTable('Preset Columns', 3, 1920,
             { '  Name##Preset', ' Menu##Preset', ' Actions##Preset' }, {
                 { imgui_table_column_flags.WidthFixed, 80 },
@@ -94,8 +99,8 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
             if (imgui.Button('Select##Preset' .. idx)) then
                 local data = table.parse(preset.data)
                 globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
-                cache.saveTable(preset.menu .. preset.type .. 'Settings', data.settingVars)
-                cache.saveTable('place' .. preset.type .. 'Menu', data.menuVars)
+                cache.save(preset.menu .. preset.type .. 'Settings', data.settingVars)
+                cache.save('place' .. preset.type .. 'Menu', data.menuVars)
                 globalVars.showPresetMenu = false
                 return true
             end
@@ -146,4 +151,6 @@ function renderPresetMenu(menuLabel, menuVars, settingVars)
 
         imgui.EndTable()
     end
+
+    cache.save('vars/menu/preset', presetVars)
 end

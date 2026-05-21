@@ -70,6 +70,6 @@ function setPluginAppearanceColors(themeName, disableBorderOverwrite)
     if disableBorderOverwrite then return end
     local originalTheme = getOriginalTheme()
 
-    cache.baseBorderColor = themeData.border or originalTheme.border
-    cache.pulseColor = themeData.pulse or themeData.border or originalTheme.pulse
+    cache.set('border/base_color', themeData.border or originalTheme.border)
+    cache.set('border/pulse_color', themeData.pulse or themeData.border or originalTheme.pulse)
 end

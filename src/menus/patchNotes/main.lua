@@ -16,7 +16,7 @@ function showPatchNotesWindow()
     local maxHeight = minHeight + 400
 
     if (not patchNotesOpened) then
-        cache.windows.showPatchNotesWindow = false
+        cache.set('windows/patch_notes', false)
     end
 
     showPatchNotesV221(color.int.white)

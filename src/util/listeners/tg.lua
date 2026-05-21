@@ -4,7 +4,7 @@ function listenForTimingGroupCount()
         if (globalVars.hideAutomatic) then
             table.filter(baseList, |str| not string.find(str, 'automate_'))
         end
-        cache.tgList = baseList
+        cache.lists_timingGroups = baseList
     end
 
     refreshTgList()

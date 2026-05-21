@@ -84,7 +84,7 @@ function showPluginSettingsWindow()
 
     imgui.Columns(1)
     if (not settingsOpened) then
-        cache.windows.showSettingsWindow = false
+        cache.set('windows/settings', false)
         cache.settingTypeIndex = 1
         state.SetValue('crazy', 'Crazy?')
         state.SetValue('activateCrazy', false)
@@ -106,10 +106,10 @@ function renderMemeButtons()
     end
     HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
     if (GradientButton('fuck you and\nyour stupid editor', color.vctr.red, color.vctr.white, 1500)) then
-        cache.boolean.destroyEditor = true
+        destroyEditor = true
     end
     HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
-    if (cache.boolean.destroyEditor) then
+    if (destroyEditor) then
         actions.GoToObjects(math.floor(math.random() * map.TrackLength))
         local ho1 = map.HitObjects[1]
         actions.RemoveHitObject(ho1)

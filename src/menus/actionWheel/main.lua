@@ -34,7 +34,7 @@ function checkForActionWheel()
         prevSegmentTime = 0,
     }
 
-    cache.loadTable('actionWheel', actionWheelData)
+    cache.load('actionWheel', actionWheelData)
 
     if (globalVars.actionWheelActivationIndex == 1) then     -- Hover/Release
         actionWheelData.state = utils.IsKeyDown(keys.LeftAlt) or false
@@ -97,7 +97,7 @@ function checkForActionWheel()
 
     if (not movedMouse) then
         ACTION_WHEEL_DISPLAYS[globalVars.actionWheelTypeIndex](actionWheelData.pos, actionWheelData.size, -1)
-        cache.saveTable('actionWheel', actionWheelData)
+        cache.save('actionWheel', actionWheelData)
         return
     end
 
@@ -124,6 +124,6 @@ function checkForActionWheel()
         actionWheelData.state = false
     end
 
-    cache.saveTable('actionWheel', actionWheelData)
+    cache.save('actionWheel', actionWheelData)
     ACTION_WHEEL_DISPLAYS[globalVars.actionWheelTypeIndex](actionWheelData.pos, actionWheelData.size, selectedSegment)
 end

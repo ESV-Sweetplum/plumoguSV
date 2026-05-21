@@ -34,9 +34,9 @@ function showAppearanceSettings()
     end
     KeepSameLine()
     if (imgui.Button('Import Theme')) then
-        cache.boolean.importingCustomTheme = not cache.boolean.importingCustomTheme
+        cache.set("user/importingTheme", not cache.get("user/importingTheme"))
     end
-    if (cache.boolean.importingCustomTheme) then
+    if (cache.get("user/importingTheme")) then
         local input = state.GetValue('importingCustomThemeInput', '')
         imgui.SetNextItemWidth(180)
         _, input = imgui.InputTextWithHint('##customThemeStr', 'Paste your theme string here.', input, 69420)
@@ -45,7 +45,7 @@ function showAppearanceSettings()
         if (imgui.Button('Send')) then
             setCustomStyleString(input)
             settingsChanged = true
-            cache.boolean.importingCustomTheme = false
+            cache.set("user/importingTheme", false)
             state.SetValue('importingCustomThemeInput', '')
         end
     end
@@ -62,7 +62,7 @@ function showAppearanceSettings()
         'Disables the loadup animation when launching the editor.')
     KeepSameLine()
     if (imgui.Button('Play', vector.New(42, 24))) then
-        cache.logoStartTime = clock.getTime()
+        cache.set("logo/start_time", clock.getTime())
     end
     imgui.SeparatorText("Capybaras")
     GlobalCheckbox('drawCapybara', 'Capybara', 'Draws a capybara at the bottom right of the screen')
@@ -75,9 +75,9 @@ function showAppearanceSettings()
     if (not globalVars.useCustomPulseColor) then imgui.BeginDisabled() end
     KeepSameLine()
     if (imgui.Button('Edit Color')) then
-        cache.windows.showColorPicker = not cache.windows.showColorPicker
+        cache.set("windows/pulsePicker", not cache.get("windows/pulsePicker"))
     end
-    if (cache.windows.showColorPicker) then
+    if (cache.get("windows/pulsePicker")) then
         choosePulseColor()
     end
     if (not globalVars.useCustomPulseColor) then

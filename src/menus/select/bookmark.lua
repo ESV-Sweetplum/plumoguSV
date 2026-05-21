@@ -79,5 +79,5 @@ function selectBookmarkMenu()
         imgui.Columns(1)
     end
 
-    cache.saveTable('selectBookmarkMenu', menuVars)
+    cache.save('selectBookmarkMenu', menuVars)
 end

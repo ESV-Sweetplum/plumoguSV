@@ -17,8 +17,8 @@ function placeSpecialSVMenu()
     if globalVars.showPresetMenu then
         local presetSelected = renderPresetMenu('Special', menuVars, settingVars)
         if (not presetSelected) then
-            cache.saveTable(currentSVType .. 'SpecialSettings', settingVars)
-            cache.saveTable('placeSpecialMenu', menuVars)
+            cache.save(currentSVType .. 'SpecialSettings', settingVars)
+            cache.save('placeSpecialMenu', menuVars)
         end
         return
     end
@@ -31,6 +31,6 @@ function placeSpecialSVMenu()
     if currentSVType == 'Automate' then automateSVMenu(settingVars) end
     if currentSVType == 'Penis' then penisMenu(settingVars) end
 
-    cache.saveTable(currentSVType .. 'SpecialSettings', settingVars)
-    cache.saveTable('placeSpecialMenu', menuVars)
+    cache.save(currentSVType .. 'SpecialSettings', settingVars)
+    cache.save('placeSpecialMenu', menuVars)
 end

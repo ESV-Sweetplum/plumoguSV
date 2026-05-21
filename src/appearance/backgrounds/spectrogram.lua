@@ -10,7 +10,7 @@ function renderSVSpectrogram()
     local binScalingFactor = 1.1
     local taperMinTime = 50
     local taperMaxTime = 2000
-    local tgCount = #cache.tgList
+    local tgCount = #cache.lists_timingGroups
 
     for tgId, tg in pairs(map.TimingGroups) do
         local col
@@ -69,13 +69,15 @@ function renderSVSpectrogram()
 end
 
 function smoothenSpectrogram(data)
-    if (not cache.gaussianKernel) then
-        local k, r = math.createKernel('gaussian', { sigma = 2.6 })
-        cache.gaussianKernel = k
-        cache.gaussianRadius = r
+    local kernel, radius;
+    if (not cache.get('gaussian/kernel')) then
+        kernal, radius = math.createKernel('gaussian', { sigma = 2.6 })
+        cache.set('gaussian/kernel', kernel)
+        cache.set('gaussian/radius', radius)
+    else
+        kernel = cache.get('gaussian/kernel')
+        radius = cache.get('gaussian/radius')
     end
-    local kernel = cache.gaussianKernel
-    local radius = cache.gaussianRadius
     local result = {}
 
     for i = 1, #data do

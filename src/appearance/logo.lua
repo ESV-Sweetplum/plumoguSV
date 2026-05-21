@@ -33,25 +33,28 @@ local function l(p1, p2, p3, p4, progress, timeProgress)
 end
 
 function logoThread()
+    local startTime = cache.get('logo/start_time', 0)
+    local loaded = cache.get('user/loaded')
+
     if (kbm.executedKeyCombo('Ctrl+L')) then
-        cache.logoStartTime = 1e10
+        startTime = 1e10
         loaded = true
     end
 
     curTime = state.UnixTime or 0
     -- If state.DeltaTime is significantly off of the computed delta time, that means that the computed delta time was delayed in some way. This is used to detect when the plugin is turned off and on (not rapidly).
     if (math.abs(curTime - (prevTime or 0) - state.DeltaTime) > 60000) then
-        cache.logoStartTime = clock.getTime()
-        if (cache.logoStartTime < 2.5) then
-            cache.logoStartTime = cache.logoStartTime + 0.75
+        startTime = clock.getTime()
+        if (startTime < 2.5) then
+            startTime = startTime + 0.75
         end
     end
     prevTime = state.UnixTime
 
-    local currentTime = clock.getTime() - cache.logoStartTime
+    local currentTime = clock.getTime() - startTime
     local logoLength = 3
 
-    if ((cache.logoStartTime < 3 or loaded) and not globalVars.disableLoadup) then
+    if ((startTime < 3 or loaded) and not globalVars.disableLoadup) then
         if (currentTime >= 0 and currentTime <= logoLength) then
             drawLogo(currentTime, logoLength, imgui.GetForegroundDrawList(), table.vectorize2(state.WindowSize), 4,
                 globalCustomStyle.loadupOpeningTextColor or DEFAULT_STYLE.loadupOpeningTextColor, 4,
@@ -60,10 +63,11 @@ function logoThread()
                 DEFAULT_STYLE.loadupPulseTextColorRight })
         end
     else
-        cache.logoStartTime = clock.getTime() - 5
+        startTime = clock.getTime() - 5
     end
 
-    loaded = true
+    cache.set('logo/start_time', startTime)
+    cache.set('user/loaded', true)
 end
 
 ---Draws logo, where dim = scale * (267, 48).

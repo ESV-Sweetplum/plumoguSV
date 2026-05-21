@@ -1,7 +1,7 @@
 PLUGIN_NAME = 'plumoguSV-dev'
 
 if (globalVars.capybaraMode) then
-    cache.windows.showSettingsWindow = false
+    cache.set('windows/settings', false)
     capybaraModeWindow()
     return
 end
@@ -44,13 +44,13 @@ if (not performanceMode) then
         renderMeasureDataWidget()
     end
 end
-if (cache.windows.showTutorialWindow) then
+if (cache.get('windows/tutorial')) then
     showTutorialWindow()
 end
-if (cache.windows.showSettingsWindow) then
+if (cache.get('windows/settings')) then
     showPluginSettingsWindow()
 end
-if (cache.windows.showPatchNotesWindow) then
+if (cache.get('windows/patch_notes')) then
     showPatchNotesWindow()
 end
 
@@ -61,11 +61,11 @@ imgui.End()
 
 logoThread()
 
-cache.boolean.changeOccurred = false
-local groups = cache.tgList
+local groups = cache.lists_timingGroups
 if (state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex]) then
     globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
 end
 
 _QParcelConfig.ignoreNotesOutsideTg = globalVars.ignoreNotesOutsideTg
 _QParcelConfig.useEndTimeOffsets = globalVars.useEndTimeOffsets
+cache.set('map_edited', false)

@@ -10,8 +10,8 @@ function placeStillSVMenu()
     if globalVars.showPresetMenu then
         local presetSelected = renderPresetMenu('Still', menuVars, settingVars)
         if (not presetSelected) then
-            cache.saveTable(currentSVType .. 'StillSettings', settingVars)
-            cache.saveTable('placeStillMenu', menuVars)
+            cache.save(currentSVType .. 'StillSettings', settingVars)
+            cache.save('placeStillMenu', menuVars)
         end
         return
     end
@@ -35,6 +35,6 @@ function placeStillSVMenu()
     menuVars.settingVars = settingVars
     simpleActionMenu('Place SVs between selected notes', 2, placeStillSVsParent, menuVars)
 
-    cache.saveTable(currentSVType .. 'StillSettings', settingVars)
-    cache.saveTable('placeStillMenu', menuVars)
+    cache.save(currentSVType .. 'StillSettings', settingVars)
+    cache.save('placeStillMenu', menuVars)
 end

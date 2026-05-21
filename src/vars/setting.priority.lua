@@ -260,6 +260,6 @@ function getSettingVars(svType, label)
     local settingVars = table.duplicate(DEFAULT_STARTING_SETTING_VARS[settingKey])
 
     local labelText = svType .. label .. 'Settings'
-    cache.loadTable(labelText, settingVars)
+    cache.load(labelText, settingVars)
     return settingVars
 end

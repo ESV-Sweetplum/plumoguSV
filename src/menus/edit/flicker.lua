@@ -3,7 +3,7 @@ function flickerMenu()
 
     flickerSettingsMenu(menuVars)
 
-    cache.saveTable('flickerMenu', menuVars)
+    cache.save('flickerMenu', menuVars)
 
     simpleActionMenu('Add flicker SVs between selected notes', 2, flickerSVs, menuVars)
 end

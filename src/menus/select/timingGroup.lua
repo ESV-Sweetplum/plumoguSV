@@ -6,5 +6,5 @@ function selectByTimingGroupMenu()
     simpleActionMenu(table.concat({ 'Select notes in ', menuVars.designatedTimingGroup }), 2, selectByTimingGroup,
         menuVars)
 
-    cache.saveTable('selectByTimingGroupMenu', menuVars)
+    cache.save('selectByTimingGroupMenu', menuVars)
 end

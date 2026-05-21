@@ -24,7 +24,7 @@ function renderReactiveSingularities()
 
     -- DOES NOT USE GETVARIABLES PARADIGM DUE TO FRAME RATE INEFFICIENCY
 
-    local pulseStatus = cache.pulseValue or 0
+    local pulseStatus = cache.get('border/pulse_value', 0)
 
     local slowSpeedR = 89
     local slowSpeedG = 0

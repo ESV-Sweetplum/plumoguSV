@@ -3,7 +3,7 @@ function convertSVSSFMenu()
 
     convertSVSSFSettingsMenu(menuVars)
 
-    cache.saveTable('convertSVSSFMenu', menuVars)
+    cache.save('convertSVSSFMenu', menuVars)
 
     simpleActionMenu(menuVars.conversionDirection and 'Convert SVs -> SSFs' or 'Convert SSFs -> SVs', 2, convertSVSSF,
         menuVars, false, false)

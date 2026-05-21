@@ -14,8 +14,8 @@ function checkForGlobalHotkeys()
             print('i!', 'Activated hotkey for preset "' .. preset.name .. '".')
             local data = table.parse(preset.data)
             globalVars.placeTypeIndex = table.indexOf(CREATE_TYPES, preset.type)
-            cache.saveTable(preset.menu .. preset.type .. 'Settings', data.settingVars)
-            cache.saveTable('place' .. preset.type .. 'Menu', data.menuVars)
+            cache.save(preset.menu .. preset.type .. 'Settings', data.settingVars)
+            cache.save('place' .. preset.type .. 'Menu', data.menuVars)
             globalVars.showPresetMenu = false
         end
         ::nextPreset::

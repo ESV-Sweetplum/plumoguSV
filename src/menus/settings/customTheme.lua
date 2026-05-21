@@ -3,7 +3,7 @@ function showCustomThemeSettings()
     imgui.SeparatorText("Editing '" .. globalVars.colorThemeName:gsub('custom_', '') .. "'")
 
     if (imgui.Button('Rename')) then
-        cache.boolean.renamingCustomTheme = not cache.boolean.renamingCustomTheme
+        cache.set('user/renaming_theme', not cache.get('user/renaming_theme'))
     end
     KeepSameLine()
     if (imgui.Button('Export')) then
@@ -19,7 +19,7 @@ function showCustomThemeSettings()
         cache.settingTypeIndex = table.indexOf(SETTING_TYPES, 'Appearance')
         write(globalVars)
     end
-    if (cache.boolean.renamingCustomTheme) then
+    if (cache.get('user/renaming_theme')) then
         local input = state.GetValue('renamingCustomThemeInput', '')
         imgui.SetNextItemWidth(130)
         _, input = imgui.InputTextWithHint('##customThemeStr', 'New Custom Theme Name', input, 69420)
@@ -31,12 +31,12 @@ function showCustomThemeSettings()
             globalVars.customStyles[globalVars.colorThemeName] = nil
             globalVars.colorThemeName = newName
             settingsChanged = true
-            cache.boolean.renamingCustomTheme = false
+            cache.set('user/renaming_theme', false)
             state.SetValue('renamingCustomThemeInput', '')
         end
         KeepSameLine()
         if (imgui.Button('X')) then
-            cache.boolean.renamingCustomTheme = false
+            cache.set('user/renaming_theme', false)
             state.SetValue('renamingCustomThemeInput', '')
         end
     end

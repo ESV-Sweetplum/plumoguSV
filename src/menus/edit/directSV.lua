@@ -1,15 +1,15 @@
 function updateDirectEdit()
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets) and not truthy(cache.lists.directSVList)) then return end
+    if (not truthy(offsets) and not truthy(cache.lists_directSVList)) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
 
     if (not truthy(offsets)) then
-        cache.lists.directSVList = {}
+        cache.lists_directSVList = {}
         return
     end
 
-    cache.lists.directSVList = game.get.svsBetweenOffsets(firstOffset - 50, lastOffset + 50)
+    cache.lists_directSVList = game.get.svsBetweenOffsets(firstOffset - 50, lastOffset + 50)
 end
 
 function directSVMenu()
@@ -18,7 +18,7 @@ function directSVMenu()
     if (clock.listen('directSV', 300)) then
         updateDirectEdit()
     end
-    local svs = cache.lists.directSVList or {}
+    local svs = cache.lists_directSVList or {}
     if (not truthy(svs)) then
         menuVars.selectableIndex = 1
         if (not truthy(state.SelectedHitObjects)) then
@@ -98,5 +98,5 @@ function directSVMenu()
 
     imgui.EndTable()
 
-    cache.saveTable('directSVMenu', menuVars)
+    cache.save('directSVMenu', menuVars)
 end

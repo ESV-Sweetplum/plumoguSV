@@ -1,7 +1,7 @@
 function addTeleportMenu()
     local menuVars = getMenuVars('addTeleport')
     addTeleportSettingsMenu(menuVars)
-    cache.saveTable('addTeleportMenu', menuVars)
+    cache.save('addTeleportMenu', menuVars)
 
     simpleActionMenu('Add teleport SVs at selected notes', 1, addTeleportSVs, menuVars)
 end

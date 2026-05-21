@@ -3,7 +3,7 @@ function reverseScrollMenu()
 
     reverseScrollSettingsMenu(menuVars)
 
-    cache.saveTable('reverseScrollMenu', menuVars)
+    cache.save('reverseScrollMenu', menuVars)
 
     simpleActionMenu('Reverse scroll between selected notes', 2, reverseScrollSVs, menuVars)
 end

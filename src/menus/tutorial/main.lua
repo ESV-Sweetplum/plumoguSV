@@ -6,10 +6,10 @@ function showTutorialWindow()
     startNextWindowNotCollapsed('plumoguSV Tutorial Menu')
 
     _, tutorialOpened = imgui.Begin('plumoguSV Tutorial Menu', true, 26)
-    local tutorialWindowName = cache.tutorialWindowName or ''
+    local tutorialWindowName = cache.get('windows/tutorial_step', '')
 
     if (not tutorialOpened) then
-        cache.windows.showTutorialWindow = false
+        cache.set('windows/tutorial', false)
     end
 
     local navigatorWidth = 200
@@ -69,7 +69,7 @@ function showTutorialWindow()
                 imgui.Selectable(text)
                 if (imgui.IsItemClicked()) then
                     tutorialWindowName = leafName
-                    cache.tutorialWindowName = tutorialWindowName
+                    cache.set('windows/tutorial_step', tutorialWindowName)
                 end
             end
         end
@@ -99,9 +99,11 @@ function showTutorialWindow()
         goto tutorialRenderSkip
     end
 
-    if (cache.tutorialWindowQueue) then
-        tutorialWindowName = cache.tutorialWindowQueue
-        cache.tutorialWindowQueue = nil
+    local queue = cache.get('windows/tutorial_queue')
+
+    if (queue) then
+        tutorialWindowName = queue
+        cache.set('windows/tutorial_queue', nil)
     end
 
     if (tutorialWindowName == '') then

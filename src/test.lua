@@ -91,10 +91,9 @@ function runTest()
     local cameraPoints = {}
     local outputPoints = {}
 
-    if (not cache.theta) then cache.theta = 0 end
-    cache.theta = cache.theta + speed
+    if (not theta) then theta = 0 end
+    theta = theta + speed
 
-    local theta = cache.theta
     local matRotZ = {
         { math.cos(theta),  math.sin(theta), 0, 0 },
         { -math.sin(theta), math.cos(theta), 0, 0 },

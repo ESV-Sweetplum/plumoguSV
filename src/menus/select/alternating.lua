@@ -2,7 +2,7 @@ function selectAlternatingMenu()
     local menuVars = getMenuVars('selectAlternating')
     BasicInputInt(menuVars, 'every', 'Note Period', { 1, MAX_SV_POINTS })
     BasicInputInt(menuVars, 'offset', 'Note Offset', { 1, menuVars.every })
-    cache.saveTable('selectAlternatingMenu', menuVars)
+    cache.save('selectAlternatingMenu', menuVars)
 
     simpleActionMenu(
         'Select a note every ' ..

@@ -24,8 +24,8 @@ function placeStandardSVMenu()
     if globalVars.showPresetMenu then
         local presetSelected = renderPresetMenu('Standard', menuVars, settingVars)
         if (not presetSelected) then
-            cache.saveTable(currentSVType .. 'StandardSettings', settingVars)
-            cache.saveTable('placeStandardMenu', menuVars)
+            cache.save(currentSVType .. 'StandardSettings', settingVars)
+            cache.save('placeStandardMenu', menuVars)
         end
         return
     end
@@ -48,6 +48,6 @@ function placeStandardSVMenu()
     end
     simpleActionMenu('Place SSFs between selected notes', 2, placeSSFs, menuVars, true)
 
-    cache.saveTable(currentSVType .. 'StandardSettings', settingVars)
-    cache.saveTable('placeStandardMenu', menuVars)
+    cache.save(currentSVType .. 'StandardSettings', settingVars)
+    cache.save('placeStandardMenu', menuVars)
 end

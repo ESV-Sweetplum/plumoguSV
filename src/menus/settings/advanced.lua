@@ -24,7 +24,7 @@ end
 function chooseMaxDisplacementMultiplierExponent(forceCache)
     imgui.PushItemWidth(70)
     local oldMdme = globalVars.maxDisplacementMultiplierExponent
-    if (forceCache) then oldMdme = cache.displacementExponent or 0 end
+    if (forceCache) then oldMdme = cache.get('vars/disp_exp', 0) end
     _, tempMDME = imgui.SliderInt('Max Displacement Multiplier Exp.',
         oldMdme, 0, 6)
     if (forceCache) then return end

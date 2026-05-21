@@ -1,5 +1,5 @@
 function changeTGIndex(diff)
-    local groups = cache.tgList
+    local groups = cache.lists_timingGroups
     local selectedTgDict = {}
     if (not truthy(state.SelectedHitObjects) or not globalVars.useSelectionForNavigation) then
         globalVars.scrollGroupIndex = math.wrap(globalVars.scrollGroupIndex + diff, 1, #groups, true)

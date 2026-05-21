@@ -1,5 +1,5 @@
 function changeNoteLockMode()
-    local mode = cache.noteLockMode or 0
+    local mode = cache.get('user/lock_mode', 0)
 
     mode = (mode + 1) % 4
     if mode == 0 then
@@ -21,16 +21,16 @@ function changeNoteLockMode()
             globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. '.')
     end
 
-    cache.noteLockMode = mode
+    cache.set('user/lock_mode', mode)
 end
 
 function initializeNoteLockMode()
-    cache.noteLockMode = 0
+    cache.set('user/lock_mode', 0)
 
     listen(function(action, type, fromLua)
         if fromLua then return end
         local actionIndex = tonumber(action.Type) ---@cast actionIndex EditorActionType
-        local mode = cache.noteLockMode or 0
+        local mode = cache.get('user/lock_mode', 0)
         if mode == 1 then -- No note modification at all
             if actionIndex >= action_type.CreateLayer then return end
             actions.Undo()

@@ -1,5 +1,5 @@
 function listenForGeneralChanges()
     listen(function()
-        cache.boolean.changeOccurred = true
+        cache.set('map_edited', true)
     end)
 end

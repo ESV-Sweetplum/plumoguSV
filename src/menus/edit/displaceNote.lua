@@ -1,7 +1,7 @@
 function displaceNoteMenu()
     local menuVars = getMenuVars('displaceNote')
     displaceNoteSettingsMenu(menuVars)
-    cache.saveTable('displaceNoteMenu', menuVars)
+    cache.save('displaceNoteMenu', menuVars)
 
     simpleActionMenu('Displace selected notes', 1, displaceNoteSVsParent, menuVars)
 end

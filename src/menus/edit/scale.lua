@@ -3,7 +3,7 @@ function scaleDisplaceMenu()
     local menuVars = getMenuVars('scaleDisplace')
 
     scaleDisplaceSettingsMenu(menuVars)
-    cache.saveTable('scaleDisplaceMenu', menuVars)
+    cache.save('scaleDisplaceMenu', menuVars)
 
     simpleActionMenu('Scale SVs between selected notes##displace', 2, scaleDisplaceSVs, menuVars)
 end
@@ -12,7 +12,7 @@ function scaleMultiplyMenu()
     local menuVars = getMenuVars('scaleMultiply')
 
     scaleMultiplySettingsMenu(menuVars)
-    cache.saveTable('scaleMultiplyMenu', menuVars)
+    cache.save('scaleMultiplyMenu', menuVars)
 
     simpleActionMenu('Scale SVs between selected notes##multiply', 2, scaleMultiplySVs, menuVars)
     if (menuVars.scaleTypeIndex ~= 2) then
