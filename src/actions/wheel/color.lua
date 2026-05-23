@@ -1,4 +1,4 @@
--- Taken from [kusa's BeatSnapColorOverride plugin](https://github.com/Illuminati-CRAZ/BeatSnapColorOverride), with minor changes to integrate into thsi codebase. All credits go to them. All credits go to them.
+-- Taken from [kusa's BeatSnapColorOverride plugin](https://github.com/Illuminati-CRAZ/BeatSnapColorOverride), with minor changes to integrate into this codebase. All credits go to them. All credits go to them.
 -- The function below is licensed under the MIT license. All other functions in this file retain the same license as plumoguSV.
 function kusaGeneralColor(n)
     if (not truthy(state.SelectedHitObjects)) then

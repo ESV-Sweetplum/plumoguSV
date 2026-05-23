@@ -1,5 +1,5 @@
--- Taken from [kusa's 1msthing plugin](https://github.com/Illuminati-CRAZ/1msthing), with minor changes to integrate into thsi codebase. All credits go to them.
--- The function below is licensed under the MIT license. All other functions in this file retain the same license as plumoguSV.
+-- Partially taken from [kusa's 1msthing plugin](https://github.com/Illuminati-CRAZ/1msthing), with minor changes to integrate into this codebase. Credits go to them.
+-- The function below retains the same license as the rest of plumoguSV.
 function kusaGeneralMovement(noteTransform)
     local notes = state.SelectedHitObjects
     local result = {}
