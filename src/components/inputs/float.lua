@@ -1,5 +1,3 @@
-function BasicInputFloat(label, value, decimalPlaces, suffix, step) end
-
 function ComputableInputFloat(label, value, decimalPlaces, suffix)
     local previousvalue = value
     local output = value
