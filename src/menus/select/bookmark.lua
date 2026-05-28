@@ -4,7 +4,7 @@ function selectBookmarkMenu()
     local menuVars = getMenuVars('selectBookmark')
     local times = {}
 
-    if (not truthy(bookmarks)) then
+    if not truthy(bookmarks) then
         imgui.TextWrapped('There are no bookmarks! Add one to navigate.')
     else
         imgui.PushItemWidth(70)
@@ -27,7 +27,7 @@ function selectBookmarkMenu()
         local skippedIndices = 0
 
         for idx, bm in ipairs(bookmarks) do
-            if (bm.StartTime < 0) then
+            if bm.StartTime < 0 then
                 skippedBookmarks = skippedBookmarks + 1
                 skippedIndices = skippedIndices + 1
                 goto nextBookmark
@@ -60,12 +60,12 @@ function selectBookmarkMenu()
 
             buttonText = 'Go to #' .. idx - skippedIndices
 
-            if (imgui.Button(buttonText, vector.New(imgui.CalcTextSize(buttonText).x + 20, 24))) then
+            if imgui.Button(buttonText, vector.New(imgui.CalcTextSize(buttonText).x + 20, 24)) then
                 actions.GoToObjects(bm.StartTime)
             end
             imgui.NextColumn()
 
-            if (idx ~= #bookmarks) then imgui.Separator() end
+            if idx ~= #bookmarks then imgui.Separator() end
             ::nextBookmark::
         end
 

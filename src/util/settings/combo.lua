@@ -1,7 +1,7 @@
 function comboSettingsMenu(settingVars, _, _, hideSettings)
     local settingsChanged = false
     local maxComboPhase = 0
-    if (not hideSettings) then
+    if not hideSettings then
         startNextWindowNotCollapsed('SV Type 1 Settings')
         imgui.Begin('SV Type 1 Settings', imgui_window_flags.AlwaysAutoResize)
         imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
@@ -26,13 +26,11 @@ function comboSettingsMenu(settingVars, _, _, hideSettings)
     end
 
     settingsChanged = chooseStandardSVTypes(settingVars) or settingsChanged
-    if (not hideSettings) then settingsChanged = chooseComboSVOption(settingVars, maxComboPhase) or settingsChanged end
+    if not hideSettings then settingsChanged = chooseComboSVOption(settingVars, maxComboPhase) or settingsChanged end
 
     AddSeparator()
     settingsChanged = chooseConstantShift(settingVars, 0) or settingsChanged
-    if not settingVars.dontNormalize then
-        settingsChanged = chooseAverageSV(settingVars) or settingsChanged
-    end
+    if not settingVars.dontNormalize then settingsChanged = chooseAverageSV(settingVars) or settingsChanged end
     settingsChanged = chooseFinalSV(settingVars, false) or settingsChanged
     settingsChanged = chooseNoNormalize(settingVars) or settingsChanged
 

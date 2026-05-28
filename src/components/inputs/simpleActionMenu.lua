@@ -6,20 +6,26 @@
 ---@param hideNoteReq? boolean Whether or not to hide the textual placeholder if the selected note requirement isn't met.
 ---@param disableKeyInput? boolean Whether or not to disallow keyboard inputs as a substitution to pressing the button.
 ---@param optionalKeyOverride? string (Assumes `disableKeyInput` is false) Optional string to change the activation keybind.
-function simpleActionMenu(buttonText, minimumNotes, actionfunc, menuVars, hideNoteReq, disableKeyInput,
-                          optionalKeyOverride)
-    if (not hideNoteReq) then AddSeparator() end
+function simpleActionMenu(
+    buttonText,
+    minimumNotes,
+    actionfunc,
+    menuVars,
+    hideNoteReq,
+    disableKeyInput,
+    optionalKeyOverride
+)
+    if not hideNoteReq then AddSeparator() end
     local enoughSelectedNotes = checkEnoughSelectedNotes(minimumNotes)
     local infoText = table.concat({ 'Select ', minimumNotes, ' or more ', pluralize('note', minimumNotes) })
-    if (not enoughSelectedNotes) then
-        if (not hideNoteReq) then imgui.Text(infoText) end
+    if not enoughSelectedNotes then
+        if not hideNoteReq then imgui.Text(infoText) end
         return
     end
     FunctionButton(buttonText, ACTION_BUTTON_SIZE, actionfunc, menuVars)
     if disableKeyInput then return end
     local keyCombo = optionalKeyOverride or globalVars.hotkeyList[1 + tn(hideNoteReq)]
-    local tooltip = HoverToolTip('Press \'' .. keyCombo ..
-        '\' on your keyboard to do the same thing as this button')
+    local tooltip = HoverToolTip("Press '" .. keyCombo .. "' on your keyboard to do the same thing as this button")
     executeFunctionIfTrue(kbm.pressedKeyCombo(keyCombo), actionfunc, menuVars)
 end
 

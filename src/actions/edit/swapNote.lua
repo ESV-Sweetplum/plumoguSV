@@ -4,7 +4,7 @@ function swapNoteSVs()
     local svsToRemove = {}
     local svTimeIsAdded = {}
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if not truthy(offsets) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
@@ -19,8 +19,7 @@ function swapNoteSVs()
         local beforeDisplacement = newDisplacement
         local atDisplacement = -newDisplacement
         local afterDisplacement = 0
-        prepareDisplacingSVs(noteOffset, svsToAdd, svTimeIsAdded, beforeDisplacement,
-            atDisplacement, afterDisplacement)
+        prepareDisplacingSVs(noteOffset, svsToAdd, svTimeIsAdded, beforeDisplacement, atDisplacement, afterDisplacement)
     end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)

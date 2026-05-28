@@ -6,8 +6,7 @@
 --    verticalShift : constant to add to each value in the set at very the end [Int/Float]
 --    numValues     : total number of values in the circular set [Int]
 --    dontNormalize : Whether or not to normalize values to the target average value [Boolean]
-function generateCircularSet(behavior, arcPercent, avgValue, verticalShift, numValues,
-                             dontNormalize)
+function generateCircularSet(behavior, arcPercent, avgValue, verticalShift, numValues, dontNormalize)
     local increaseValues = (behavior == 'Speed up')
     avgValue = avgValue - verticalShift
     local startingAngle = math.pi * (arcPercent * 0.01)

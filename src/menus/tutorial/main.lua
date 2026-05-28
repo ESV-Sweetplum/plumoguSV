@@ -8,15 +8,11 @@ function showTutorialWindow()
     _, tutorialOpened = imgui.Begin('plumoguSV Tutorial Menu', true, 26)
     local tutorialWindowName = cache.get('windows/tutorial_step', '')
 
-    if (not tutorialOpened) then
-        cache.set('windows/tutorial', false)
-    end
+    if not tutorialOpened then cache.set('windows/tutorial', false) end
 
     local navigatorWidth = 200
 
-    local nullFn = function()
-        imgui.Text('Select a tutorial on the left to view it.')
-    end
+    local nullFn = function() imgui.Text('Select a tutorial on the left to view it.') end
     local incompleteFn = function()
         imgui.TextWrapped('Sorry, this tutorial is not ready yet. Please come back when a new version comes out.')
     end
@@ -59,15 +55,15 @@ function showTutorialWindow()
     function renderBranch(branch, branchName)
         for text, data in pairs(branch) do
             local leafName = table.concat({ branchName, '.', text })
-            if (type(data) == 'table') then
-                if (imgui.TreeNode(text)) then
+            if type(data) == 'table' then
+                if imgui.TreeNode(text) then
                     renderBranch(data, leafName)
                     imgui.TreePop()
                 end
             else
-                if (imgui.GetCursorPosX() < 10) then imgui.SetCursorPosX(10) end
+                if imgui.GetCursorPosX() < 10 then imgui.SetCursorPosX(10) end
                 imgui.Selectable(text)
-                if (imgui.IsItemClicked()) then
+                if imgui.IsItemClicked() then
                     tutorialWindowName = leafName
                     cache.set('windows/tutorial_step', tutorialWindowName)
                 end
@@ -83,8 +79,7 @@ function showTutorialWindow()
     imgui.EndChild()
     imgui.NextColumn()
 
-    imgui.BeginChild('Tutorial Data', vector.New(380, 500), imgui_child_flags
-        .AlwaysUseWindowPadding)
+    imgui.BeginChild('Tutorial Data', vector.New(380, 500), imgui_child_flags.AlwaysUseWindowPadding)
 
     imgui.SetCursorPosY(0)
 
@@ -93,7 +88,7 @@ function showTutorialWindow()
         imgui.TextColored(vctr4(0), 'penis')
     end
 
-    if (game.keyCount ~= 4) then
+    if game.keyCount ~= 4 then
         imgui.SeparatorText('This tutorial does not support this key mode.')
         imgui.Text('Please go to a 4K map to continue.')
         goto tutorialRenderSkip
@@ -101,12 +96,12 @@ function showTutorialWindow()
     do
         local queue = cache.get('windows/tutorial_queue')
 
-        if (queue) then
+        if queue then
             tutorialWindowName = queue
             cache.set('windows/tutorial_queue', nil)
         end
 
-        if (tutorialWindowName == '') then
+        if tutorialWindowName == '' then
             nullFn()
             goto tutorialRenderSkip
         end

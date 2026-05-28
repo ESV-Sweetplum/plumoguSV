@@ -1,10 +1,10 @@
 function updateDirectEdit()
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets) and not truthy(cache.lists_directSVList)) then return end
+    if not truthy(offsets) and not truthy(cache.lists_directSVList) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
 
-    if (not truthy(offsets)) then
+    if not truthy(offsets) then
         cache.lists_directSVList = {}
         return
     end
@@ -15,53 +15,54 @@ end
 function directSVMenu()
     local menuVars = getMenuVars('directSV')
 
-    if (clock.listen('directSV', 300)) then
-        updateDirectEdit()
-    end
+    if clock.listen('directSV', 300) then updateDirectEdit() end
     local svs = cache.lists_directSVList or {}
-    if (not truthy(svs)) then
+    if not truthy(svs) then
         menuVars.selectableIndex = 1
-        if (not truthy(state.SelectedHitObjects)) then
+        if not truthy(state.SelectedHitObjects) then
             imgui.TextWrapped('Select a note to view local SVs.')
         else
-            imgui
-                .TextWrapped('There are no SVs in this area.')
+            imgui.TextWrapped('There are no SVs in this area.')
         end
         return
     end
 
-    if (menuVars.selectableIndex > #svs) then menuVars.selectableIndex = #svs end
+    if menuVars.selectableIndex > #svs then menuVars.selectableIndex = #svs end
 
     menuVars.startTime = ComputableInputFloat('Start Time', svs[menuVars.selectableIndex].StartTime, 10)
 
-    if (imgui.IsItemDeactivatedAfterEdit()) then
-        actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
-            createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime or 0, menuVars.multiplier)) })
+    if imgui.IsItemDeactivatedAfterEdit() then
+        actions.PerformBatch({
+            createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
+            createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime or 0, menuVars.multiplier)),
+        })
         updateDirectEdit()
     end
 
     menuVars.multiplier = ComputableInputFloat('Multiplier', svs[menuVars.selectableIndex].Multiplier, 10)
 
-    if (imgui.IsItemDeactivatedAfterEdit()) then
-        actions.PerformBatch({ createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
-            createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime, menuVars.multiplier or 1)) })
+    if imgui.IsItemDeactivatedAfterEdit() then
+        actions.PerformBatch({
+            createEA(action_type.RemoveScrollVelocity, svs[menuVars.selectableIndex]),
+            createEA(action_type.AddScrollVelocity, createSV(menuVars.startTime, menuVars.multiplier or 1)),
+        })
         updateDirectEdit()
     end
 
-    if (imgui.Button('Duplicate this SV')) then
+    if imgui.Button('Duplicate this SV') then
         local existingSV = svs[menuVars.selectableIndex]
         actions.PlaceScrollVelocity(createSV(existingSV.StartTime + 0.67, existingSV.Multiplier))
         updateDirectEdit()
     end
     KeepSameLine()
-    if (imgui.Button('Delete this SV')) then
+    if imgui.Button('Delete this SV') then
         actions.RemoveScrollVelocity(svs[menuVars.selectableIndex])
         updateDirectEdit()
     end
 
     imgui.Separator()
 
-    if (imgui.ArrowButton('##DirectSVLeft', imgui_dir.Left)) then
+    if imgui.ArrowButton('##DirectSVLeft', imgui_dir.Left) then
         menuVars.pageNumber = math.clamp(menuVars.pageNumber - 1, 1, math.ceil(#svs * 0.1))
     end
 
@@ -73,26 +74,33 @@ function directSVMenu()
     KeepSameLine()
     imgui.Text(' of ' .. math.ceil(#svs * 0.1))
     KeepSameLine()
-    if (imgui.ArrowButton('##DirectSVRight', imgui_dir.Right)) then
+    if imgui.ArrowButton('##DirectSVRight', imgui_dir.Right) then
         menuVars.pageNumber = math.clamp(menuVars.pageNumber + 1, 1, math.ceil(#svs * 0.1))
     end
 
     local startingPoint = 10 * menuVars.pageNumber - 10
 
-    InitializeTable('Direct SV', 2, imgui_table_flags.BordersInner, { 'Start Time', 'Multiplier' },
-        { { imgui_table_column_flags.WidthFixed, 130 }, imgui_table_column_flags.WidthStretch }, true)
+    InitializeTable(
+        'Direct SV',
+        2,
+        imgui_table_flags.BordersInner,
+        { 'Start Time', 'Multiplier' },
+        { { imgui_table_column_flags.WidthFixed, 130 }, imgui_table_column_flags.WidthStretch },
+        true
+    )
 
     for idx, v in pairs(table.slice(svs, startingPoint + 1, startingPoint + 10)) do
         imgui.PushID(idx)
         imgui.TableNextRow()
         imgui.TableSetColumnIndex(0)
-        imgui.Selectable(string.format('%.2f', v.StartTime), menuVars.selectableIndex == idx,
-            imgui_selectable_flags.SpanAllColumns)
-        if (imgui.IsItemClicked()) then
-            menuVars.selectableIndex = idx + startingPoint
-        end
+        imgui.Selectable(
+            string.format('%.2f', v.StartTime),
+            menuVars.selectableIndex == idx,
+            imgui_selectable_flags.SpanAllColumns
+        )
+        if imgui.IsItemClicked() then menuVars.selectableIndex = idx + startingPoint end
         imgui.TableSetColumnIndex(1)
-        imgui.Text(string.format('%.2f', v.Multiplier));
+        imgui.Text(string.format('%.2f', v.Multiplier))
         imgui.PopID()
     end
 

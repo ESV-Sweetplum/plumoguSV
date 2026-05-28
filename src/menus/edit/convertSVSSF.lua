@@ -5,12 +5,15 @@ function convertSVSSFMenu()
 
     cache.save('convertSVSSFMenu', menuVars)
 
-    simpleActionMenu(menuVars.conversionDirection and 'Convert SVs -> SSFs' or 'Convert SSFs -> SVs', 2, convertSVSSF,
-        menuVars, false, false)
-    simpleActionMenu('Swap SVs <-> SSFs', 2, swapSVSSF,
-        nil, true, true)
+    simpleActionMenu(
+        menuVars.conversionDirection and 'Convert SVs -> SSFs' or 'Convert SSFs -> SVs',
+        2,
+        convertSVSSF,
+        menuVars,
+        false,
+        false
+    )
+    simpleActionMenu('Swap SVs <-> SSFs', 2, swapSVSSF, nil, true, true)
 end
 
-function convertSVSSFSettingsMenu(menuVars)
-    chooseConvertSVSSFDirection(menuVars)
-end
+function convertSVSSFSettingsMenu(menuVars) chooseConvertSVSSFDirection(menuVars) end

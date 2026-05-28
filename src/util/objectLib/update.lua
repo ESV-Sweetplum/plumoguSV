@@ -9,13 +9,17 @@ function updateMenuSVs(currentSVType, menuVars, settingVars, skipFinalSV)
     if menuVars.interlace then interlaceMultiplier = menuVars.interlaceRatio end
     menuVars.svMultipliers = generateSVMultipliers(currentSVType, settingVars, interlaceMultiplier)
     local svMultipliersNoEndSV = table.duplicate(menuVars.svMultipliers)
-    if (#svMultipliersNoEndSV > 1) then table.remove(svMultipliersNoEndSV) end
+    if #svMultipliersNoEndSV > 1 then table.remove(svMultipliersNoEndSV) end
     menuVars.svDistances = calculateDistanceVsTime(svMultipliersNoEndSV)
 
-    updateFinalSV(settingVars.finalSVIndex, menuVars.svMultipliers, settingVars.customSV,
-        skipFinalSV)
-    updateSVStats(menuVars.svGraphStats, menuVars.svStats, menuVars.svMultipliers,
-        svMultipliersNoEndSV, menuVars.svDistances)
+    updateFinalSV(settingVars.finalSVIndex, menuVars.svMultipliers, settingVars.customSV, skipFinalSV)
+    updateSVStats(
+        menuVars.svGraphStats,
+        menuVars.svStats,
+        menuVars.svMultipliers,
+        svMultipliersNoEndSV,
+        menuVars.svDistances
+    )
 end
 
 -- Updates the final SV of the precalculated menu SVs
@@ -44,22 +48,23 @@ function updateStutterMenuSVs(settingVars)
     local svMultipliersNoEndSV2 = table.duplicate(settingVars.svMultipliers2)
     table.remove(svMultipliersNoEndSV2)
 
-    settingVars.svDistances = calculateStutterDistanceVsTime(svMultipliersNoEndSV,
+    settingVars.svDistances = calculateStutterDistanceVsTime(
+        svMultipliersNoEndSV,
         settingVars.stutterDuration,
-        settingVars.stuttersPerSection)
-    settingVars.svDistances2 = calculateStutterDistanceVsTime(svMultipliersNoEndSV2,
+        settingVars.stuttersPerSection
+    )
+    settingVars.svDistances2 = calculateStutterDistanceVsTime(
+        svMultipliersNoEndSV2,
         settingVars.stutterDuration,
-        settingVars.stuttersPerSection)
+        settingVars.stuttersPerSection
+    )
 
     if settingVars.linearlyChange then
-        updateFinalSV(settingVars.finalSVIndex, settingVars.svMultipliers2, settingVars.customSV,
-            false)
+        updateFinalSV(settingVars.finalSVIndex, settingVars.svMultipliers2, settingVars.customSV, false)
         table.remove(settingVars.svMultipliers)
     else
-        updateFinalSV(settingVars.finalSVIndex, settingVars.svMultipliers, settingVars.customSV,
-            false)
+        updateFinalSV(settingVars.finalSVIndex, settingVars.svMultipliers, settingVars.customSV, false)
     end
     updateGraphStats(settingVars.svGraphStats, settingVars.svMultipliers, settingVars.svDistances)
-    updateGraphStats(settingVars.svGraph2Stats, settingVars.svMultipliers2,
-        settingVars.svDistances2)
+    updateGraphStats(settingVars.svGraph2Stats, settingVars.svMultipliers2, settingVars.svDistances2)
 end

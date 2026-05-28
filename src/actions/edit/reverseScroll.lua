@@ -24,16 +24,18 @@ function reverseScrollSVs(menuVars)
             beforeDisplacement = noteDisplacement
             atDisplacement = -noteDisplacement
         end
-        if i == 1 or i == #offsets then
-            atDisplacement = atDisplacement + teleportDistance
-        end
-        prepareDisplacingSVs(noteOffset, almostSVsToAdd, svTimeIsAdded, beforeDisplacement,
-            atDisplacement, afterDisplacement)
+        if i == 1 or i == #offsets then atDisplacement = atDisplacement + teleportDistance end
+        prepareDisplacingSVs(
+            noteOffset,
+            almostSVsToAdd,
+            svTimeIsAdded,
+            beforeDisplacement,
+            atDisplacement,
+            afterDisplacement
+        )
     end
     for _, sv in ipairs(svsBetweenOffsets) do
-        if (not svTimeIsAdded[sv.StartTime]) then
-            table.insert(almostSVsToAdd, sv)
-        end
+        if not svTimeIsAdded[sv.StartTime] then table.insert(almostSVsToAdd, sv) end
     end
     for _, sv in ipairs(almostSVsToAdd) do
         local newSVMultiplier = -sv.Multiplier

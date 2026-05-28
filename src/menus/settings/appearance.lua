@@ -1,18 +1,20 @@
 function showAppearanceSettings()
-    if (globalVars.performanceMode) then
-        imgui.TextColored(color.vctr.red,
-            'Performance mode is currently enabled.\nPlease disable it to access appearance features.')
+    if globalVars.performanceMode then
+        imgui.TextColored(
+            color.vctr.red,
+            'Performance mode is currently enabled.\nPlease disable it to access appearance features.'
+        )
         imgui.BeginDisabled()
     end
-    imgui.SeparatorText("Plugin Theme")
+    imgui.SeparatorText('Plugin Theme')
     chooseStyleTheme()
     chooseColorTheme()
-    if (imgui.Button('Copy Current Theme')) then
+    if imgui.Button('Copy Current Theme') then
         setPluginAppearanceColors(globalVars.colorThemeName)
         local customStyle = {}
         for id, _ in pairs(DEFAULT_STYLE) do
             local query = id:capitalize()
-            if (id == "border" or id == "pulse" or query:match('%u%l+') == 'Loadup') then
+            if id == 'border' or id == 'pulse' or query:match('%u%l+') == 'Loadup' then
                 customStyle[id] = globalCustomStyle[id]
                 goto nextCustomStyle
             end
@@ -22,34 +24,33 @@ function showAppearanceSettings()
         globalCustomStyle = customStyle
         local newName = 'custom_Copy of ' .. globalVars.colorThemeName:gsub('^custom_', '')
         globalVars.colorThemeName = newName
-        if (not globalVars.customStyles) then globalVars.customStyles = {} end
+        if not globalVars.customStyles then globalVars.customStyles = {} end
         globalVars.customStyles[newName] = customStyle
         setPluginAppearanceColors(newName)
         print('s!', 'Duplicated the current theme into your custom theme list.')
         write(globalVars)
     end
-    if (globalVars.colorThemeName:sub(1, 7) ~= 'custom_') then
+    if globalVars.colorThemeName:sub(1, 7) ~= 'custom_' then
         HoverToolTip(
-            "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually.")
+            "Clicking this will recreate this theme in the CUSTOM theme option, allowing you to customize it however you'd like without having to clone it manually."
+        )
     end
     KeepSameLine()
-    if (imgui.Button('Import Theme')) then
-        cache.set("user/importingTheme", not cache.get("user/importingTheme"))
-    end
-    if (cache.get("user/importingTheme")) then
+    if imgui.Button('Import Theme') then cache.set('user/importingTheme', not cache.get('user/importingTheme')) end
+    if cache.get('user/importingTheme') then
         local input = state.GetValue('importingCustomThemeInput', '')
         imgui.SetNextItemWidth(180)
         _, input = imgui.InputTextWithHint('##customThemeStr', 'Paste your theme string here.', input, 69420)
         state.SetValue('importingCustomThemeInput', input)
         KeepSameLine()
-        if (imgui.Button('Send')) then
+        if imgui.Button('Send') then
             setCustomStyleString(input)
             settingsChanged = true
-            cache.set("user/importingTheme", false)
+            cache.set('user/importingTheme', false)
             state.SetValue('importingCustomThemeInput', '')
         end
     end
-    imgui.SeparatorText("Cursor Trail")
+    imgui.SeparatorText('Cursor Trail')
     chooseCursorTrail()
     chooseCursorTrailShape()
     chooseEffectFPS()
@@ -57,52 +58,45 @@ function showAppearanceSettings()
     chooseCursorShapeSize()
     chooseSnakeSpringConstant()
     chooseCursorTrailGhost()
-    imgui.SeparatorText("Loadup Animation")
-    GlobalCheckbox('disableLoadup', 'Disable Loadup Animation',
-        'Disables the loadup animation when launching the editor.')
+    imgui.SeparatorText('Loadup Animation')
+    GlobalCheckbox(
+        'disableLoadup',
+        'Disable Loadup Animation',
+        'Disables the loadup animation when launching the editor.'
+    )
     KeepSameLine()
-    if (imgui.Button('Play', vector.New(42, 24))) then
-        cache.set("logo/start_time", clock.getTime())
-    end
-    imgui.SeparatorText("Capybaras")
+    if imgui.Button('Play', vector.New(42, 24)) then cache.set('logo/start_time', clock.getTime()) end
+    imgui.SeparatorText('Capybaras')
     GlobalCheckbox('drawCapybara', 'Capybara', 'Draws a capybara at the bottom right of the screen')
     imgui.SameLine(0, RADIO_BUTTON_SPACING)
     GlobalCheckbox('drawCapybara2', 'Capybara 2', 'Draws a capybara at the bottom left of the screen')
     GlobalCheckbox('drawCapybara312', 'Capybara 312', 'Draws a capybara???!?!??!!!!? AGAIN?!?!')
-    imgui.SeparatorText("Plugin Pulse")
+    imgui.SeparatorText('Plugin Pulse')
     choosePulseCoefficient()
     GlobalCheckbox('useCustomPulseColor', 'Use Custom Color?')
-    if (not globalVars.useCustomPulseColor) then imgui.BeginDisabled() end
+    if not globalVars.useCustomPulseColor then imgui.BeginDisabled() end
     KeepSameLine()
-    if (imgui.Button('Edit Color')) then
-        cache.set("windows/pulsePicker", not cache.get("windows/pulsePicker"))
-    end
-    if (cache.get("windows/pulsePicker")) then
-        choosePulseColor()
-    end
-    if (not globalVars.useCustomPulseColor) then
+    if imgui.Button('Edit Color') then cache.set('windows/pulsePicker', not cache.get('windows/pulsePicker')) end
+    if cache.get('windows/pulsePicker') then choosePulseColor() end
+    if not globalVars.useCustomPulseColor then
         imgui.EndDisabled()
         state.SetValue('showColorPicker', false)
     end
-imgui.SeparatorText("Dynamic Background")
+    imgui.SeparatorText('Dynamic Background')
     local oldDynamicBgIndex = globalVars.dynamicBackgroundIndex
     globalVars.dynamicBackgroundIndex = Combo('Background Type', DYNAMIC_BACKGROUND_TYPES, oldDynamicBgIndex)
-    if (oldDynamicBgIndex ~= globalVars.dynamicBackgroundIndex) then
-        write(globalVars)
-    end
-    if (globalVars.performanceMode) then
-        imgui.EndDisabled()
-    end
+    if oldDynamicBgIndex ~= globalVars.dynamicBackgroundIndex then write(globalVars) end
+    if globalVars.performanceMode then imgui.EndDisabled() end
 end
 
 function chooseColorTheme()
     local function renderThemeTree(tree)
         local padding = 10
 
-        if (tree[1]) then
+        if tree[1] then
             local maxItemSize = 0
             for _, item in ipairs(tree) do
-                if (imgui.CalcTextSize(item.id).x > maxItemSize) then
+                if imgui.CalcTextSize(item.id).x > maxItemSize then
                     maxItemSize = imgui.CalcTextSize(item.id).x * 1.03
                 end
             end
@@ -113,24 +107,35 @@ function chooseColorTheme()
                 local topLeft = imgui.GetWindowPos()
                 local dim = imgui.GetWindowSize()
                 local pos = imgui.GetMousePos()
-                if (pos.x > topLeft.x and pos.x < topLeft.x + dim.x and pos.y > topLeft.y and pos.y < topLeft.y + dim.y) then
+                if
+                    pos.x > topLeft.x
+                    and pos.x < topLeft.x + dim.x
+                    and pos.y > topLeft.y
+                    and pos.y < topLeft.y + dim.y
+                then
                     local ctx = imgui.GetWindowDrawList()
                     ctx.AddRectFilled(topLeft, topLeft + dim, color.alterOpacity(color.int.white, -200))
                 end
-                if (type(item.textColor[1]) == 'table') then
+                if type(item.textColor[1]) == 'table' then
                     local strLen = item.id:len()
                     local charProgress = 0
                     local subdivisionLength = #item.textColor - 1
                     for char in item.id:gmatch('.') do
                         local progress = charProgress / (strLen - 1) * subdivisionLength % (1 + 1 / 10000)
                         local currentSubdivision = 1 + math.floor(charProgress / (strLen - 0.999) * subdivisionLength)
-                        local col1 = vector.New(item.textColor[currentSubdivision][1] / 255,
-                            item.textColor[currentSubdivision][2] / 255, item.textColor[currentSubdivision][3] / 255, 1)
-                        local col2 = vector.New(item.textColor[currentSubdivision + 1][1] / 255,
+                        local col1 = vector.New(
+                            item.textColor[currentSubdivision][1] / 255,
+                            item.textColor[currentSubdivision][2] / 255,
+                            item.textColor[currentSubdivision][3] / 255,
+                            1
+                        )
+                        local col2 = vector.New(
+                            item.textColor[currentSubdivision + 1][1] / 255,
                             item.textColor[currentSubdivision + 1][2] / 255,
-                            item.textColor[currentSubdivision + 1][3] / 255, 1)
-                        imgui.TextColored(col1 * (1 - progress) +
-                            col2 * progress, char)
+                            item.textColor[currentSubdivision + 1][3] / 255,
+                            1
+                        )
+                        imgui.TextColored(col1 * (1 - progress) + col2 * progress, char)
                         imgui.SameLine(0, 0)
                         charProgress = charProgress + 1
                     end
@@ -141,35 +146,36 @@ function chooseColorTheme()
                     end
                 end
                 imgui.EndChild()
-                if (imgui.IsItemClicked('Left')) then
+                if imgui.IsItemClicked('Left') then
                     globalVars.colorThemeName = item.internalId or item.id
-                    if (item.internalId) then
-                        globalCustomStyle = globalVars.customStyles[globalVars.colorThemeName]
-                    end
+                    if item.internalId then globalCustomStyle = globalVars.customStyles[globalVars.colorThemeName] end
                     write(globalVars)
                     imgui.CloseCurrentPopup()
                 end
             end
         else
             for k, v in pairs(tree) do
-                if (k == 'Custom') then
-                    if (imgui.BeginMenu('Custom Themes')) then
-                        if (not globalVars.customStyles or not next(globalVars.customStyles)) then
+                if k == 'Custom' then
+                    if imgui.BeginMenu('Custom Themes') then
+                        if not globalVars.customStyles or not next(globalVars.customStyles) then
                             imgui.Text('No Custom Themes')
                         else
-                            renderThemeTree(table.map(table.keys(globalVars.customStyles), |s|
-                                {
-                                    id = s:sub(8),
-                                    textColor = { 255, 255, 255 },
-                                    internalId = s,
-                                }
+                            renderThemeTree(table.map(
+                                table.keys(globalVars.customStyles),
+                                function(s)
+                                    return {
+                                        id = s:sub(8),
+                                        textColor = { 255, 255, 255 },
+                                        internalId = s,
+                                    }
+                                end
                             ))
                         end
                         imgui.EndMenu()
                     end
                 else
                     ---@diagnostic disable-next-line: param-type-mismatch
-                    if (imgui.BeginMenu(k)) then
+                    if imgui.BeginMenu(k) then
                         renderThemeTree(v)
                         imgui.EndMenu()
                     end
@@ -178,7 +184,7 @@ function chooseColorTheme()
         end
     end
 
-    if (imgui.BeginCombo('Color Theme', globalVars.colorThemeName:gsub('custom_', ''):fixToSize(130))) then
+    if imgui.BeginCombo('Color Theme', globalVars.colorThemeName:gsub('custom_', ''):fixToSize(130)) then
         renderThemeTree(THEME_TREE)
         imgui.EndCombo()
     end

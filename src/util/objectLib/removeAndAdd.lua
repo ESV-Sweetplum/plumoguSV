@@ -6,9 +6,7 @@ function removeAndAddSVs(svsToRemove, svsToAdd)
     if not truthy(svsToAdd) then return end
     for idx, sv in pairs(svsToRemove) do
         local baseSV = game.get.svStartTimeAt(sv.StartTime)
-        if (math.abs(baseSV - sv.StartTime) > tolerance) then
-            table.remove(svsToRemove, idx)
-        end
+        if math.abs(baseSV - sv.StartTime) > tolerance then table.remove(svsToRemove, idx) end
     end
     local editorActions = {
         createEA(action_type.RemoveScrollVelocityBatch, svsToRemove),

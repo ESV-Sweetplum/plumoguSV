@@ -1,7 +1,7 @@
 -- Taken from [kusa's BeatSnapColorOverride plugin](https://github.com/Illuminati-CRAZ/BeatSnapColorOverride), with minor changes to integrate into this codebase. All credits go to them. All credits go to them.
 -- The function below is licensed under the MIT license. All other functions in this file retain the same license as plumoguSV.
 function kusaGeneralColor(n)
-    if (not truthy(state.SelectedHitObjects)) then
+    if not truthy(state.SelectedHitObjects) then
         print('e!', 'You are not selecting any notes.')
         return false
     end
@@ -32,20 +32,19 @@ function kusaGeneralColor(n)
             if tp.StartTime > starttime + NORMAL_INTERVAL then break end
         end
 
-        if (n == 1) then
+        if n == 1 then
             table.insert(snaptimingpoints, utils.CreateTimingPoint(starttime, bpm, signature, false))
         else
-            table.insert(snaptimingpoints,
-                utils.CreateTimingPoint(starttime - SNAP_INTERVAL, BIG_NUMBER / n, signature, true))
-            table.insert(normaltimingpoints,
-                utils.CreateTimingPoint(starttime + NORMAL_INTERVAL, bpm, signature, true))
+            table.insert(
+                snaptimingpoints,
+                utils.CreateTimingPoint(starttime - SNAP_INTERVAL, BIG_NUMBER / n, signature, true)
+            )
+            table.insert(normaltimingpoints, utils.CreateTimingPoint(starttime + NORMAL_INTERVAL, bpm, signature, true))
         end
     end
 
     --remove any timing points from a previous override
-    if #currenttimingpoints ~= 0 then
-        actions.RemoveTimingPointBatch(currenttimingpoints)
-    end
+    if #currenttimingpoints ~= 0 then actions.RemoveTimingPointBatch(currenttimingpoints) end
 
     local queue = {}
     --place normal timing points first so that game doesn't lag like hell from 60000 BPM timing points

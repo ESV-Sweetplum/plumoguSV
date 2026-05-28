@@ -2,9 +2,13 @@ function kusaColorDisplay(pos, size, selectedSegment)
     local ctx = imgui.GetForegroundDrawList()
     local function showColorSegment(col, segment, isHovering)
         ctx.PathLineTo(pos)
-        ctx.PathArcTo(pos, size - 10,
+        ctx.PathArcTo(
+            pos,
+            size - 10,
             (segment * 2 - 1) * math.pi / 9 - math.pi / 2,
-            (segment * 2 + 1) * math.pi / 9 - math.pi / 2, 64)
+            (segment * 2 + 1) * math.pi / 9 - math.pi / 2,
+            64
+        )
         ctx.PathLineTo(pos)
 
         ctx.PathFillConvex(color.vrgbaToUint(col * (isHovering and 1 or 0.5) * vector.New(1, 1, 1, 2)))

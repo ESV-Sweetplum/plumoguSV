@@ -17,8 +17,7 @@ function displaceViewSVs(menuVars)
             atDisplacement = 0
             afterDisplacement = nil
         end
-        prepareDisplacingSVs(noteOffset, svsToAdd, svTimeIsAdded, beforeDisplacement,
-            atDisplacement, afterDisplacement)
+        prepareDisplacingSVs(noteOffset, svsToAdd, svTimeIsAdded, beforeDisplacement, atDisplacement, afterDisplacement)
     end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)

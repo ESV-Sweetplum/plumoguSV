@@ -13,5 +13,5 @@ function flickerSettingsMenu(menuVars)
     chooseVaryingDistance(menuVars)
     BasicCheckbox(menuVars, 'linearlyChange', 'Change distance over time')
     BasicInputInt(menuVars, 'numFlickers', 'Flickers', { 1, 9999 })
-    if (globalVars.advancedMode) then chooseFlickerPosition(menuVars) end
+    if globalVars.advancedMode then chooseFlickerPosition(menuVars) end
 end

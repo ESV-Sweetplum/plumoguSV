@@ -2,9 +2,7 @@ function applyTheme(themeData, imguiOnly)
     if themeData.imguiData then
         for styleKey, colorObj in pairs(themeData.imguiData) do
             local imguiId = imgui_col[styleKey]
-            if imguiId then
-                imgui.PushStyleColor(imguiId, colorObj)
-            end
+            if imguiId then imgui.PushStyleColor(imguiId, colorObj) end
         end
     end
 
@@ -14,7 +12,7 @@ function applyTheme(themeData, imguiOnly)
         end
     end
 
-    if (not imguiOnly) then
+    if not imguiOnly then
         globalCustomStyle.border = themeData.border
         globalCustomStyle.pulse = themeData.pulse
     end

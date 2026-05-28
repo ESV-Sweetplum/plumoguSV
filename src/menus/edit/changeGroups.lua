@@ -12,8 +12,8 @@ function changeGroupsSettingsMenu(menuVars)
     local action = menuVars.clone and 'Clone' or 'Move'
 
     imgui.AlignTextToFramePadding()
-    menuVars.designatedTimingGroup = chooseTimingGroup(table.concat({ '  ', action, ' to: ' }),
-        menuVars.designatedTimingGroup)
+    menuVars.designatedTimingGroup =
+        chooseTimingGroup(table.concat({ '  ', action, ' to: ' }), menuVars.designatedTimingGroup)
 
     _, menuVars.changeSVs = imgui.Checkbox('Change SVs?', menuVars.changeSVs)
     KeepSameLine()

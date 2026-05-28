@@ -32,8 +32,15 @@ function dynamicScaleMenu()
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, true) end
 
     startNextWindowNotCollapsed('SV Info')
-    makeSVInfoWindow('SV Info', menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
-        menuVars.svMultipliers, nil, true)
+    makeSVInfoWindow(
+        'SV Info',
+        menuVars.svGraphStats,
+        menuVars.svStats,
+        menuVars.svDistances,
+        menuVars.svMultipliers,
+        nil,
+        true
+    )
 
     local labelText = currentSVType .. 'DynamicScale'
     cache.save(currentSVType .. 'DynamicScaleSettings', settingVars)

@@ -33,23 +33,19 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
         imgui.SetCursorPos(point.pos - vctr2(point.size))
         imgui.InvisibleButton(tableLabel .. i, vctr2(point.size * 2))
 
-        if (imgui.IsMouseDown('Left') and imgui.IsItemActive()) then
-            dragList[i] = true
-        end
-        if (imgui.IsMouseDragging('Left') and dragList[i]) then
-            point.pos = point.pos + kbm.mouseDelta()
-        end
+        if imgui.IsMouseDown('Left') and imgui.IsItemActive() then dragList[i] = true end
+        if imgui.IsMouseDragging('Left') and dragList[i] then point.pos = point.pos + kbm.mouseDelta() end
 
         local pointCol = point.col
         local alphaDifference = 150 * 16 ^ 6
-        if (not dragList[i]) then pointCol = pointCol - alphaDifference end
+        if not dragList[i] then pointCol = pointCol - alphaDifference end
 
         ctx.AddCircleFilled(topLeft + point.pos, point.size, pointCol)
     end
 
     gridSize = gridSize or 1
 
-    if (not imgui.IsMouseDown('Left')) then
+    if not imgui.IsMouseDown('Left') then
         for i = 1, #points do
             dragList[i] = false
             local roundedX = math.round(points[i].pos.x / gridSize) * gridSize
@@ -62,37 +58,41 @@ function renderGraph(label, size, points, preferForeground, gridSize, yScale)
     if gridSize ~= 1 then
         for i = 0, size.x, gridSize do
             local lineCol = gray
-            if (truthy(i % 4)) then
-                lineCol = color.rgbaToUint(40, 40, 40, 255)
-            end
+            if truthy(i % 4) then lineCol = color.rgbaToUint(40, 40, 40, 255) end
 
             ctx.AddLine(vector.New(topLeft.x + i, topLeft.y), vector.New(topLeft.x + i, topLeft.y + dim.y), lineCol, 1)
         end
         for i = 0, size.y, gridSize do
             local lineCol = gray
-            if (truthy(i % 4)) then
-                lineCol = color.rgbaToUint(40, 40, 40, 255)
-            end
-            if (yScale and not truthy(i % 4)) then
+            if truthy(i % 4) then lineCol = color.rgbaToUint(40, 40, 40, 255) end
+            if yScale and not truthy(i % 4) then
                 local number = (yScale.y - yScale.x) * (size.y - i) / size.y + yScale.x
                 local textSize = imgui.CalcTextSize(tostring(number))
                 ctx.AddText(
                     vector.New(topLeft.x + 6, math.clamp(topLeft.y + i - 7, topLeft.y + 5, topLeft.y + dim.y - 16)),
                     color.int.white,
-                    tostring(number))
-                ctx.AddLine(vector.New(topLeft.x + textSize.x + 10, topLeft.y + i),
-                    vector.New(topLeft.x + dim.x, topLeft.y + i), lineCol,
-                    1)
+                    tostring(number)
+                )
+                ctx.AddLine(
+                    vector.New(topLeft.x + textSize.x + 10, topLeft.y + i),
+                    vector.New(topLeft.x + dim.x, topLeft.y + i),
+                    lineCol,
+                    1
+                )
             else
-                ctx.AddLine(vector.New(topLeft.x, topLeft.y + i), vector.New(topLeft.x + dim.x, topLeft.y + i), lineCol,
-                    1)
+                ctx.AddLine(
+                    vector.New(topLeft.x, topLeft.y + i),
+                    vector.New(topLeft.x + dim.x, topLeft.y + i),
+                    lineCol,
+                    1
+                )
             end
         end
     end
 
     local pointChanged = false
     for i = 1, #points do
-        if (points[i].pos ~= initPointList[i]) then
+        if points[i].pos ~= initPointList[i] then
             pointChanged = true
             break
         end

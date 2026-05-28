@@ -1,26 +1,21 @@
 function ssfVibrato(menuVars, func1, func2)
     printLegacyLNMessage()
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if not truthy(offsets) then return end
     local startTime = offsets[1]
     local endTime = offsets[#offsets]
     local fps = VIBRATO_FRAME_RATES[menuVars.vibratoQuality]
     local delta = 1000 / fps
     local time = startTime
-    local ssfs = { createSSF(startTime - 1 / getUsableDisplacementMultiplier(startTime),
-        game.get.ssfMultiplierAt(time)) }
+    local ssfs =
+        { createSSF(startTime - 1 / getUsableDisplacementMultiplier(startTime), game.get.ssfMultiplierAt(time)) }
     while time < endTime do
         local x = math.iLerp(startTime, endTime, time)
         local y = math.iLerp(startTime, endTime, time + delta)
-        table.insert(ssfs,
-            createSSF(time, func2(x)
-            ))
+        table.insert(ssfs, createSSF(time, func2(x)))
         table.insert(ssfs, createSSF(time + 1 / getUsableDisplacementMultiplier(time), func1(x)))
-        table.insert(ssfs,
-            createSSF(time + delta,
-                func1(y)))
-        table.insert(ssfs,
-            createSSF(time + delta + 1 / getUsableDisplacementMultiplier(time), func2(y)))
+        table.insert(ssfs, createSSF(time + delta, func1(y)))
+        table.insert(ssfs, createSSF(time + delta + 1 / getUsableDisplacementMultiplier(time), func2(y)))
         time = time + 2 * delta
     end
 

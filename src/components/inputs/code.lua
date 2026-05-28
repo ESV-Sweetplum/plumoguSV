@@ -6,8 +6,7 @@
 ---@return boolean active Whether or not the code input is currently in edit mode.
 function CodeInput(varsTable, parameterName, label, tooltipText)
     local oldCode = varsTable[parameterName]
-    _, varsTable[parameterName] = imgui.InputTextMultiline(label, oldCode, 16384,
-        vector.New(240, 120))
+    _, varsTable[parameterName] = imgui.InputTextMultiline(label, oldCode, 16384, vector.New(240, 120))
     if tooltipText then HoverToolTip(tooltipText) end
     return imgui.IsItemActive()
 end

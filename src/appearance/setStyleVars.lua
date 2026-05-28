@@ -7,11 +7,9 @@ function setPluginAppearance()
 end
 
 function setPluginAppearanceStyles(styleTheme)
-    local cornerRoundnessvalue = (styleTheme == 'Boxed' or
-        styleTheme == 'Boxed + Border') and 0 or 5 -- up to 12, 14 for WindowRounding and 16 for ChildRounding
+    local cornerRoundnessvalue = (styleTheme == 'Boxed' or styleTheme == 'Boxed + Border') and 0 or 5 -- up to 12, 14 for WindowRounding and 16 for ChildRounding
 
-    local borderSize = tn(styleTheme == 'Rounded + Border' or
-        styleTheme == 'Boxed + Border')
+    local borderSize = tn(styleTheme == 'Rounded + Border' or styleTheme == 'Boxed + Border')
 
     imgui.PushStyleVar(imgui_style_var.FrameBorderSize, borderSize)
     imgui.PushStyleVar(imgui_style_var.WindowPadding, vector.New(PADDING_WIDTH, 8))

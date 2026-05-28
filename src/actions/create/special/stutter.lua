@@ -7,33 +7,31 @@ function placeStutterSVs(settingVars)
         lastMultiplier = settingVars.svMultipliers2[3]
     end
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if not truthy(offsets) then return end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     local totalNumStutters = (#offsets - 1) * settingVars.stuttersPerSection
-    local firstStutterSVs = generateLinearSet(settingVars.startSV, lastFirstStutter,
-        totalNumStutters)
+    local firstStutterSVs = generateLinearSet(settingVars.startSV, lastFirstStutter, totalNumStutters)
     local svsToAdd = {}
     local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == 'Override')
     local stutterIndex = 1
     for i = 1, #offsets - 1 do
         local startOffset = offsets[i]
         local endOffset = offsets[i + 1]
-        local stutterOffsets = generateLinearSet(startOffset, endOffset,
-            settingVars.stuttersPerSection + 1)
+        local stutterOffsets = generateLinearSet(startOffset, endOffset, settingVars.stuttersPerSection + 1)
         for j = 1, #stutterOffsets - 1 do
             local duration = settingVars.stutterDuration
             if settingVars.linearlyChange then
                 local x = (j - 1) / (#stutterOffsets - 2)
-                if (#stutterOffsets == 2) then
-                    x = (i - 1) / (#offsets - 1)
-                end
+                if #stutterOffsets == 2 then x = (i - 1) / (#offsets - 1) end
                 duration = x * settingVars.stutterDuration2 + (1 - x) * settingVars.stutterDuration
             end
-            local svMultipliers = generateStutterSet(firstStutterSVs[stutterIndex],
+            local svMultipliers = generateStutterSet(
+                firstStutterSVs[stutterIndex],
                 duration,
                 settingVars.avgSV,
-                settingVars.controlLastSV)
+                settingVars.controlLastSV
+            )
             local stutterStart = stutterOffsets[j]
             local stutterEnd = stutterOffsets[j + 1]
             local timeInterval = stutterEnd - stutterStart
@@ -43,8 +41,6 @@ function placeStutterSVs(settingVars)
             stutterIndex = stutterIndex + 1
         end
     end
-    if (finalSVType ~= 'None') then
-        addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
-    end
+    if finalSVType ~= 'None' then addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override') end
     removeAndAddSVs(svsToRemove, svsToAdd)
 end

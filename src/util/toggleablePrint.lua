@@ -3,6 +3,6 @@
 ---@param msg string
 function toggleablePrint(type, msg)
     local creationMsg = msg:find('Create') and true or false
-    if (creationMsg and globalVars.dontPrintCreation) then return end
+    if creationMsg and globalVars.dontPrintCreation then return end
     print(type, msg)
 end

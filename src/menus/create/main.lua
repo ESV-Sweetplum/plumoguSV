@@ -6,7 +6,7 @@ CREATE_TYPES = { -- general categories of SVs to place
 }
 
 function createSVTab()
-    if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
+    if globalVars.advancedMode then chooseCurrentScrollGroup() end
     local changedTool = chooseCreateTool()
     local placeType = CREATE_TYPES[globalVars.placeTypeIndex]
 

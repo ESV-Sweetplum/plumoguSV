@@ -15,7 +15,7 @@ function scaleMultiplyMenu()
     cache.save('scaleMultiplyMenu', menuVars)
 
     simpleActionMenu('Scale SVs between selected notes##multiply', 2, scaleMultiplySVs, menuVars)
-    if (menuVars.scaleTypeIndex ~= 2) then
+    if menuVars.scaleTypeIndex ~= 2 then
         simpleActionMenu('Scale SSFs between selected notes##multiply', 2, scaleMultiplySSFs, menuVars, true)
     end
 end
@@ -25,6 +25,4 @@ function scaleDisplaceSettingsMenu(menuVars)
     scaleMultiplySettingsMenu(menuVars)
 end
 
-function scaleMultiplySettingsMenu(menuVars)
-    chooseScaleType(menuVars)
-end
+function scaleMultiplySettingsMenu(menuVars) chooseScaleType(menuVars) end

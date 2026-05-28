@@ -12,7 +12,7 @@ function renderDynamicConnection()
 
     local dt = state.DeltaTime * 0.05
 
-    if (#nodes_xList < 18) then
+    if #nodes_xList < 18 then
         table.insert(nodes_xList, topLeft.x + math.random() * dim.x)
         table.insert(nodes_yList, topLeft.y + math.random() * dim.y)
         table.insert(nodes_vxList, math.random() * 2 - 1)
@@ -31,12 +31,11 @@ function renderDynamicConnection()
         local opacity = math.clamp(math.floor(nodes_lifetimes[i]), 0, 255)
 
         nodes_distsToNearestEdge[i] =
-            math.min(topLeft.x + dim.x - x, x - topLeft.x, topLeft.y + dim.y - y,
-                y - topLeft.y)
+            math.min(topLeft.x + dim.x - x, x - topLeft.x, topLeft.y + dim.y - y, y - topLeft.y)
 
         local dist = nodes_distsToNearestEdge[i]
 
-        if (dist < -circleBuffer) then
+        if dist < -circleBuffer then
             nodes_xList[i] = topLeft.x + math.random() * dim.x
             nodes_yList[i] = topLeft.y + math.random() * dim.y
             nodes_vxList[i] = math.random() * 2 - 1
@@ -62,17 +61,30 @@ function renderDynamicConnection()
 
             local dist = (y2 - y1) ^ 2 + (x2 - x1) ^ 2
 
-            if (dist > maxDist) then goto nextNode end
+            if dist > maxDist then goto nextNode end
 
-            ctx.AddLine(vector.New(x1, y1), vector.New(x2, y2),
-                mainCol -
-                color.int.alphaMask *
-                (127 + math.max(
-                    math.floor((128 * (dist / maxDist) ^ 0.15)),
-                    128 - math.clamp(math.floor(math.min(nodes_lifetimes[i], nodes_lifetimes[j])
-                    ), 0, 128),
-                    128 - math.floor(128 * math.clamp(5 * (math.min(nodes_distsToNearestEdge[i], nodes_distsToNearestEdge[j]) + circleBuffer) / math.max(dim.x, dim.y), 0, 1))
-                )), 2)
+            ctx.AddLine(
+                vector.New(x1, y1),
+                vector.New(x2, y2),
+                mainCol
+                    - color.int.alphaMask
+                        * (127 + math.max(
+                            math.floor((128 * (dist / maxDist) ^ 0.15)),
+                            128 - math.clamp(math.floor(math.min(nodes_lifetimes[i], nodes_lifetimes[j])), 0, 128),
+                            128
+                                - math.floor(
+                                    128
+                                        * math.clamp(
+                                            5
+                                                * (math.min(nodes_distsToNearestEdge[i], nodes_distsToNearestEdge[j]) + circleBuffer)
+                                                / math.max(dim.x, dim.y),
+                                            0,
+                                            1
+                                        )
+                                )
+                        )),
+                2
+            )
             ::nextNode::
         end
     end

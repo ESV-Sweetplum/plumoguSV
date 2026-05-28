@@ -9,8 +9,17 @@
 --    dontNormalize    : whether or not to normalize values to the avg value [Boolean]
 --    avgValue         : average value of the set [Int/Float]
 --    verticalShift    : constant to add to each value in the set at very the end [Int/Float]
-function generateComboSet(values1, values2, comboPhase, comboType, comboMultiplier1,
-                          comboMultiplier2, dontNormalize, avgValue, verticalShift)
+function generateComboSet(
+    values1,
+    values2,
+    comboPhase,
+    comboType,
+    comboMultiplier1,
+    comboMultiplier2,
+    dontNormalize,
+    avgValue,
+    verticalShift
+)
     local comboValues = {}
     if comboType == 'SV Type 1 Only' then
         comboValues = table.duplicate(values1)
@@ -71,16 +80,14 @@ function generateComboSet(values1, values2, comboPhase, comboType, comboMultipli
         end
 
         if not truthy(comboValues) then table.insert(comboValues, 1) end
-        if (comboPhase - #values2 >= 0) then
+        if comboPhase - #values2 >= 0 then
             table.insert(comboValues, lastValue1)
         else
             table.insert(comboValues, lastValue2)
         end
     end
     avgValue = avgValue - verticalShift
-    if not dontNormalize then
-        comboValues = table.normalize(comboValues, avgValue, false)
-    end
+    if not dontNormalize then comboValues = table.normalize(comboValues, avgValue, false) end
     for i = 1, #comboValues do
         comboValues[i] = comboValues[i] + verticalShift
     end

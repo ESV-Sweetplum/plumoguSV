@@ -26,9 +26,7 @@ function calculateDisplacementsFromSVs(svs, offsets)
         while nextSV.StartTime > offsets[j] do
             local svToOffsetTime = offsets[j] - lastSV.StartTime
             local displacement = totalDisplacement
-            if svToOffsetTime > 0 then
-                displacement = displacement + lastSV.Multiplier * svToOffsetTime
-            end
+            if svToOffsetTime > 0 then displacement = displacement + lastSV.Multiplier * svToOffsetTime end
             table.insert(displacements, displacement)
             j = j + 1
         end

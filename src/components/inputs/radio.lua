@@ -13,12 +13,10 @@ function RadioButtons(label, value, options, optionValues, tooltipText)
     if tooltipText and #tooltipText > #optionValues then HoverToolTip(tooltipText[1]) end
     for idx, option in pairs(options) do
         imgui.SameLine(0, RADIO_BUTTON_SPACING)
-        if imgui.RadioButton(option, value == optionValues[idx]) then
-            value = optionValues[idx]
-        end
+        if imgui.RadioButton(option, value == optionValues[idx]) then value = optionValues[idx] end
         if tooltipText then
             local index = idx
-            if (type(tooltipText) == 'table' and #tooltipText > #optionValues) then index = idx + 1 end
+            if type(tooltipText) == 'table' and #tooltipText > #optionValues then index = idx + 1 end
             HoverToolTip(type(tooltipText) == 'string' and tooltipText or tooltipText[index])
         end
     end

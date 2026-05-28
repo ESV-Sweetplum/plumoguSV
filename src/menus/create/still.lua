@@ -9,7 +9,7 @@ function placeStillSVMenu()
     local settingVars = getSettingVars(currentSVType, 'Still')
     if globalVars.showPresetMenu then
         local presetSelected = renderPresetMenu('Still', menuVars, settingVars)
-        if (not presetSelected) then
+        if not presetSelected then
             cache.save(currentSVType .. 'StillSettings', settingVars)
             cache.save('placeStillMenu', menuVars)
         end
@@ -17,8 +17,14 @@ function placeStillSVMenu()
     end
     imgui.Text('Still Settings:')
     menuVars.noteSpacing = ComputableInputFloat('Note Spacing', menuVars.noteSpacing, 2, 'x')
-    menuVars.stillBehavior = Combo('Still Behavior', STILL_BEHAVIOR_TYPES, menuVars.stillBehavior, nil, nil,
-        { 'Apply the Still across the entire selected region.', 'Apply the Stills across the selected note groups.' })
+    menuVars.stillBehavior = Combo(
+        'Still Behavior',
+        STILL_BEHAVIOR_TYPES,
+        menuVars.stillBehavior,
+        nil,
+        nil,
+        { 'Apply the Still across the entire selected region.', 'Apply the Stills across the selected note groups.' }
+    )
     chooseStillType(menuVars)
 
     AddSeparator()
@@ -29,8 +35,15 @@ function placeStillSVMenu()
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, false) end
 
     startNextWindowNotCollapsed('SV Info')
-    makeSVInfoWindow('SV Info', menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
-        menuVars.svMultipliers, nil, false)
+    makeSVInfoWindow(
+        'SV Info',
+        menuVars.svGraphStats,
+        menuVars.svStats,
+        menuVars.svDistances,
+        menuVars.svMultipliers,
+        nil,
+        false
+    )
 
     menuVars.settingVars = settingVars
     simpleActionMenu('Place SVs between selected notes', 2, placeStillSVsParent, menuVars)

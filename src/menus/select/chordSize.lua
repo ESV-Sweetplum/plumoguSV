@@ -5,7 +5,7 @@ function selectChordSizeMenu()
         local varLabel = 'select' .. idx
         local label = table.concat({ 'Size ' .. idx .. ' Chord' })
         _, menuVars[varLabel] = imgui.Checkbox(label, menuVars[varLabel])
-        if (idx % 2 == 1) then KeepSameLine() end
+        if idx % 2 == 1 then KeepSameLine() end
     end
 
     -- BasicInputInt(menuVars, "laneSelector", "Lane Selector")

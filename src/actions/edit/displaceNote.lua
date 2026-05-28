@@ -1,20 +1,18 @@
 function displaceNoteSVsParent(menuVars)
     printLegacyLNMessage()
-    if (not menuVars.linearlyChange) then
+    if not menuVars.linearlyChange then
         displaceNoteSVs(menuVars)
         return
     end
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if not truthy(offsets) then return end
     local svsToRemove = {}
     local svsToAdd = {}
 
     for _, offset in ipairs(offsets) do
-        local displaceNoteResults = displaceNoteSVs(
-            {
-                distance = math.map(offsets[1], offsets[#offsets], offset, menuVars.distance1, menuVars.distance2),
-            },
-            false, offset)
+        local displaceNoteResults = displaceNoteSVs({
+            distance = math.map(offsets[1], offsets[#offsets], offset, menuVars.distance1, menuVars.distance2),
+        }, false, offset)
         svsToRemove = table.combine(svsToRemove, displaceNoteResults.svsToRemove)
         svsToAdd = table.combine(svsToAdd, displaceNoteResults.svsToAdd)
     end
@@ -27,7 +25,7 @@ function displaceNoteSVs(menuVars, place, optionalOffset)
     local svsToRemove = {}
     local svTimeIsAdded = {}
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return { svsToRemove = {}, svsToAdd = {} } end
+    if not truthy(offsets) then return { svsToRemove = {}, svsToAdd = {} } end
     if place == false then offsets = { optionalOffset } end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
@@ -37,8 +35,7 @@ function displaceNoteSVs(menuVars, place, optionalOffset)
         local beforeDisplacement = displaceAmount
         local atDisplacement = -displaceAmount
         local afterDisplacement = 0
-        prepareDisplacingSVs(noteOffset, svsToAdd, svTimeIsAdded, beforeDisplacement,
-            atDisplacement, afterDisplacement)
+        prepareDisplacingSVs(noteOffset, svsToAdd, svTimeIsAdded, beforeDisplacement, atDisplacement, afterDisplacement)
     end
     getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
     if place ~= false then

@@ -1,8 +1,6 @@
 function getCustomTheme(themeName)
     local themeStyle = globalVars.customStyles[themeName]
-    if themeStyle == nil then
-        return getOriginalTheme()
-    end
+    if themeStyle == nil then return getOriginalTheme() end
     return {
         border = themeStyle.border or vector.New(0.81, 0.88, 1.00, 0.30),
         pulse = themeStyle.pulse or vector.New(0.51, 0.58, 0.75, 1.00),

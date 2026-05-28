@@ -13,14 +13,15 @@
 --    offset: time in milliseconds [Int]
 function getUsableDisplacementMultiplier(offset)
     local exponent = cache.get('vars/disp_exp')
-    if (globalVars.useMinDisplacementMultiplier) then
-        if (not exponent) then
-            exponent = initializeDisplacementExponentCache()
-        end
+    if globalVars.useMinDisplacementMultiplier then
+        if not exponent then exponent = initializeDisplacementExponentCache() end
         return 2 ^ exponent
     else
-        exponent = math.clamp(23 - math.floor(math.log(math.abs(offset) + 1, 2)), 0,
-            globalVars.maxDisplacementMultiplierExponent)
+        exponent = math.clamp(
+            23 - math.floor(math.log(math.abs(offset) + 1, 2)),
+            0,
+            globalVars.maxDisplacementMultiplierExponent
+        )
         return 2 ^ exponent
     end
 end

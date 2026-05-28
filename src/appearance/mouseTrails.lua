@@ -24,12 +24,18 @@ function drawSnakeTrail(o, m, t)
     initializeSnakeTrailPoints(snakeTrailPoints, m, MAX_CURSOR_TRAIL_POINTS)
     cache.load('snakeTrailPoints', snakeTrailPoints)
     local needTrailUpdate = clock.listen('snakeTrail', 1000 / globalVars.effectFPS)
-    updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoints,
-        globalVars.snakeSpringConstant)
+    updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoints, globalVars.snakeSpringConstant)
     cache.save('snakeTrailPoints', snakeTrailPoints)
     local trailShape = TRAIL_SHAPES[globalVars.cursorTrailShapeIndex]
-    renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, globalVars.cursorTrailSize,
-        globalVars.cursorTrailGhost, trailShape)
+    renderSnakeTrailPoints(
+        o,
+        m,
+        snakeTrailPoints,
+        trailPoints,
+        globalVars.cursorTrailSize,
+        globalVars.cursorTrailGhost,
+        trailShape
+    )
 end
 
 -- Initializes the points of the snake trail
@@ -38,7 +44,7 @@ end
 --    m                : current (x, y) mouse position [Table]
 --    trailPoints      : number of trail points for the snake trail [Int]
 function initializeSnakeTrailPoints(snakeTrailPoints, m, trailPoints)
-    if (cache.get('trails/snake')) then
+    if cache.get('trails/snake') then
         for i = 1, trailPoints do
             snakeTrailPoints[i] = {}
         end
@@ -58,8 +64,7 @@ end
 --    m                   : current (x, y) mouse position [Table]
 --    trailPoints         : number of trail points to update [Int]
 --    snakeSpringConstant : how much to update the trail points per frame (0.01 to 1) [Int/Float]
-function updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoints,
-                                snakeSpringConstant)
+function updateSnakeTrailPoints(snakeTrailPoints, needTrailUpdate, m, trailPoints, snakeSpringConstant)
     if not needTrailUpdate then return end
     for i = trailPoints, 1, -1 do
         local currentTrailPoint = snakeTrailPoints[i]
@@ -82,14 +87,11 @@ end
 --    cursorTrailSize  : size of the cursor trail points [Int]
 --    cursorTrailGhost : whether or not to make later trail points more transparent [Boolean]
 --    trailShape       : shape of the trail points to draw [String]
-function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrailSize,
-                                cursorTrailGhost, trailShape)
+function renderSnakeTrailPoints(o, m, snakeTrailPoints, trailPoints, cursorTrailSize, cursorTrailGhost, trailShape)
     for i = 1, trailPoints do
         local point = snakeTrailPoints[i]
         local alpha = 255
-        if not cursorTrailGhost then
-            alpha = math.floor(255 * (trailPoints - i) / (trailPoints - 1))
-        end
+        if not cursorTrailGhost then alpha = math.floor(255 * (trailPoints - i) / (trailPoints - 1)) end
         local color = color.int.whiteMask * 255 + math.floor(alpha) * color.int.alphaMask
         if trailShape == 'Circles' then
             o.AddCircleFilled(point, cursorTrailSize, color)
@@ -258,8 +260,7 @@ function updateSparkleParticles(t, m, sparkleParticles, sparkleDuration, sparkle
             local randomX = m.x + sparkleSize * 3 * (math.random() - 0.5)
             local randomY = m.y + sparkleSize * 3 * (math.random() - 0.5)
             local yRange = 6 * sparkleSize
-            sparkleParticles[i] = generateParticle(randomX, randomY, 0, yRange, endTime,
-                showParticle)
+            sparkleParticles[i] = generateParticle(randomX, randomY, 0, yRange, endTime, showParticle)
         end
     end
 end

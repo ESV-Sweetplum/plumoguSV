@@ -20,8 +20,7 @@ function displaceNotesForAnimationFrames(settingVars)
         local endOffset = math.max(selectedStartTime, noteOffset)
         local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
-        local distanceBetweenOffsets = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
-            endOffset)
+        local distanceBetweenOffsets = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
         local distanceToTargetNote = distanceBetweenOffsets
         if selectedStartTime < noteOffset then distanceToTargetNote = -distanceBetweenOffsets end
 
@@ -34,8 +33,7 @@ function displaceNotesForAnimationFrames(settingVars)
         local beforeDisplacement = noteDisplaceAmount
         local atDisplacement = -noteDisplaceAmount
         local afterDisplacement = 0
-        prepareDisplacingSVs(noteOffset, svsToAdd, svTimeIsAdded, beforeDisplacement,
-            atDisplacement, afterDisplacement)
+        prepareDisplacingSVs(noteOffset, svsToAdd, svTimeIsAdded, beforeDisplacement, atDisplacement, afterDisplacement)
     end
     getRemovableSVs(svsToRemove, svTimeIsAdded, firstOffset, lastOffset)
     removeAndAddSVs(svsToRemove, svsToAdd)

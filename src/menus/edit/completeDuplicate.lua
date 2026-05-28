@@ -17,6 +17,10 @@ function completeDuplicateMenu()
 end
 
 function completeDuplicateSettingsMenu(menuVars)
-    BasicCheckbox(menuVars, 'dontCloneHos', "Don't Clone Notes",
-        'If true, will not copy notes during the complete duplicate process.')
+    BasicCheckbox(
+        menuVars,
+        'dontCloneHos',
+        "Don't Clone Notes",
+        'If true, will not copy notes during the complete duplicate process.'
+    )
 end

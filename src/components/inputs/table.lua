@@ -11,12 +11,12 @@ function InitializeTable(str_id, columnCount, tableFlags, columnNames, columnFla
     for i = 1, columnCount do
         local name = columnNames[i]
         local flags = columnFlags[i]
-        if (type(flags) == 'table') then
+        if type(flags) == 'table' then
             imgui.TableSetupColumn(name, flags[1], flags[2])
         else
             imgui.TableSetupColumn(name, flags)
         end
     end
 
-    if (showHeaderRow) then imgui.TableHeadersRow() end
+    if showHeaderRow then imgui.TableHeadersRow() end
 end

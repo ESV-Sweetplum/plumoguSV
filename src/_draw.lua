@@ -1,6 +1,6 @@
 PLUGIN_NAME = 'plumoguSV-dev'
 
-if (globalVars.capybaraMode) then
+if globalVars.capybaraMode then
     cache.set('windows/settings', false)
     capybaraModeWindow()
     return
@@ -12,7 +12,7 @@ startNextWindowNotCollapsed(PLUGIN_NAME)
 imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
 imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
 
-if (not performanceMode) then
+if not performanceMode then
     addGradient()
     renderBackground()
     drawCapybaraParent()
@@ -30,31 +30,21 @@ for i = 1, #TAB_MENUS do
 end
 imgui.EndTabBar()
 
-if (not performanceMode) then
-    if (globalVars.showVibratoWidget) then
+if not performanceMode then
+    if globalVars.showVibratoWidget then
         imgui.Begin('plumoguSV-vibrato', imgui_window_flags.AlwaysAutoResize)
         imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
         placeVibratoSVMenu(true)
         imgui.End()
     end
-    if (globalVars.showNoteDataWidget) then
-        renderNoteDataWidget()
-    end
-    if (globalVars.showMeasureDataWidget) then
-        renderMeasureDataWidget()
-    end
+    if globalVars.showNoteDataWidget then renderNoteDataWidget() end
+    if globalVars.showMeasureDataWidget then renderMeasureDataWidget() end
 end
-if (cache.get('windows/tutorial')) then
-    showTutorialWindow()
-end
-if (cache.get('windows/settings')) then
-    showPluginSettingsWindow()
-end
-if (cache.get('windows/patch_notes')) then
-    showPatchNotesWindow()
-end
+if cache.get('windows/tutorial') then showTutorialWindow() end
+if cache.get('windows/settings') then showPluginSettingsWindow() end
+if cache.get('windows/patch_notes') then showPatchNotesWindow() end
 
-if (not performanceMode and map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ') then
+if not performanceMode and map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ' then
     runTest()
 end
 imgui.End()
@@ -62,7 +52,7 @@ imgui.End()
 logoThread()
 
 local groups = cache.lists_timingGroups
-if (state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex]) then
+if state.SelectedScrollGroupId ~= groups[globalVars.scrollGroupIndex] then
     globalVars.scrollGroupIndex = table.indexOf(groups, state.SelectedScrollGroupId)
 end
 

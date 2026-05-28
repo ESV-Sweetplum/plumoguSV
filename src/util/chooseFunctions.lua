@@ -26,7 +26,7 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
     local normalizedPos1 = pos1 / 150
     local normalizedPos2 = pos2 / 150
 
-    if (not settingVars.manualMode) then
+    if not settingVars.manualMode then
         imgui.BeginChild('Bezier Interactive Window' .. optionalLabel, vctr2(150), 67, 31)
         local pointColor1 = 4278190335
         local pointColor2 = 4294735619
@@ -36,12 +36,12 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
 
         local pointList = { { pos = pos1, col = pointColor1, size = 5 }, { pos = pos2, col = pointColor2, size = 5 } }
 
-        local ctx = renderGraph('Bezier Interactive Window' .. optionalLabel, vctr2(150), pointList, settingVars
-            .freeMode)
+        local ctx =
+            renderGraph('Bezier Interactive Window' .. optionalLabel, vctr2(150), pointList, settingVars.freeMode)
         local topLeft = imgui.GetWindowPos()
         local dim = imgui.GetWindowSize()
 
-        if (not settingVars.freeMode) then
+        if not settingVars.freeMode then
             pointList[1].pos = vector.Clamp(pointList[1].pos, vctr2(0), vctr2(150))
             pointList[2].pos = vector.Clamp(pointList[2].pos, vctr2(0), vctr2(150))
         end
@@ -75,24 +75,31 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         normalizedPos1 = pos1 / 150
         normalizedPos2 = pos2 / 150
 
-        imgui.Text('\n         Point 1:\n      (' ..
-            string.format('%.2f', normalizedPos1.x) ..
-            ', ' .. string.format('%.2f', normalizedPos1.y) .. ')\n         Point 2:\n      (' ..
-            string.format('%.2f', normalizedPos2.x) .. ', ' .. string.format('%.2f', normalizedPos2.y) .. ')\n')
+        imgui.Text(
+            '\n         Point 1:\n      ('
+                .. string.format('%.2f', normalizedPos1.x)
+                .. ', '
+                .. string.format('%.2f', normalizedPos1.y)
+                .. ')\n         Point 2:\n      ('
+                .. string.format('%.2f', normalizedPos2.x)
+                .. ', '
+                .. string.format('%.2f', normalizedPos2.y)
+                .. ')\n'
+        )
 
         imgui.SetCursorPosY(80)
         imgui.SetCursorPosX(5)
         _, settingVars.freeMode = imgui.Checkbox('Free Mode##Bezier', settingVars.freeMode)
         HoverToolTip(
-            'Enable this to allow the bezier control points to move outside the boundary. WARNING: ONCE MOVED OUTSIDE, THEY CANNOT BE MOVED BACK IN. DISABLE AND RE-ENABLE FREE MODE TO ALLOW THEM TO BE INTERACTED WITH.')
+            'Enable this to allow the bezier control points to move outside the boundary. WARNING: ONCE MOVED OUTSIDE, THEY CANNOT BE MOVED BACK IN. DISABLE AND RE-ENABLE FREE MODE TO ALLOW THEM TO BE INTERACTED WITH.'
+        )
         imgui.SetCursorPosX(5)
         _, settingVars.manualMode = imgui.Checkbox('Manual Edit##Bezier', settingVars.manualMode)
-        HoverToolTip(
-            'Enable this to directly edit the bezier points.')
+        HoverToolTip('Enable this to directly edit the bezier points.')
 
         imgui.EndChild()
     else
-        if (settingVars.freeMode) then
+        if settingVars.freeMode then
             imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
             _, normalizedPos1 = imgui.InputFloat2('Point 1', pos1 / 150)
             imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
@@ -106,8 +113,7 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         _, settingVars.freeMode = imgui.Checkbox('Free Mode##Bezier', settingVars.freeMode)
         KeepSameLine()
         _, settingVars.manualMode = imgui.Checkbox('Manual Edit##Bezier', settingVars.manualMode)
-        HoverToolTip(
-            'Disable this to edit the bezier points with an interactive graph.')
+        HoverToolTip('Disable this to edit the bezier points with an interactive graph.')
     end
 
     local oldP1 = settingVars.p1
@@ -141,25 +147,21 @@ function chooseComboSVOption(settingVars, maxComboPhase)
     if currentComboType ~= 'SV Type 1 Only' and currentComboType ~= 'SV Type 2 Only' then
         addTypeChanged = BasicInputInt(settingVars, 'comboPhase', 'Combo Phase', { 0, maxComboPhase }) or addTypeChanged
     end
-    if currentComboType == 'Add' then
-        addTypeChanged = chooseAddComboMultipliers(settingVars) or addTypeChanged
-    end
+    if currentComboType == 'Add' then addTypeChanged = chooseAddComboMultipliers(settingVars) or addTypeChanged end
     return (oldIndex ~= settingVars.comboTypeIndex) or addTypeChanged
 end
 
 function chooseConstantShift(settingVars, defaultShift)
     local changed = false
-    settingVars.verticalShift, changed = ResettableNegatableComputableInputFloat('Vertical Shift',
-        settingVars.verticalShift, 0, 3,
-        'x')
+    settingVars.verticalShift, changed =
+        ResettableNegatableComputableInputFloat('Vertical Shift', settingVars.verticalShift, 0, 3, 'x')
     return changed
 end
 
 function chooseMsxVerticalShift(settingVars, defaultShift)
     local changed = false
-    settingVars.verticalShift, changed = ResettableNegatableComputableInputFloat('Vertical Shift',
-        settingVars.verticalShift, 0, 0,
-        ' msx')
+    settingVars.verticalShift, changed =
+        ResettableNegatableComputableInputFloat('Vertical Shift', settingVars.verticalShift, 0, 0, ' msx')
     return changed
 end
 
@@ -179,9 +181,7 @@ function chooseCurrentFrame(settingVars)
     imgui.Text('Previewing frame:')
     KeepSameLine()
     imgui.PushItemWidth(35)
-    if imgui.ArrowButton('##leftFrame', imgui_dir.Left) then
-        settingVars.currentFrame = settingVars.currentFrame - 1
-    end
+    if imgui.ArrowButton('##leftFrame', imgui_dir.Left) then settingVars.currentFrame = settingVars.currentFrame - 1 end
     KeepSameLine()
     _, settingVars.currentFrame = imgui.InputInt('##currentFrame', settingVars.currentFrame, 0, 0)
     KeepSameLine()
@@ -195,9 +195,7 @@ end
 function chooseCursorTrail()
     local oldCursorTrailIndex = globalVars.cursorTrailIndex
     globalVars.cursorTrailIndex = Combo('Trail Effect', CURSOR_TRAILS, oldCursorTrailIndex)
-    if (oldCursorTrailIndex ~= globalVars.cursorTrailIndex) then
-        write(globalVars)
-    end
+    if oldCursorTrailIndex ~= globalVars.cursorTrailIndex then write(globalVars) end
 end
 
 function chooseCursorTrailGhost()
@@ -211,9 +209,7 @@ function chooseCursorTrailPoints()
     if currentTrail ~= 'Snake' then return end
 
     local settingChanged = BasicInputInt(globalVars, 'cursorTrailPoints', 'Trail Points')
-    if settingChanged then
-        write(globalVars)
-    end
+    if settingChanged then write(globalVars) end
 end
 
 function chooseCursorTrailShape()
@@ -223,9 +219,7 @@ function chooseCursorTrailShape()
     local label = 'Trail Shape'
     local oldTrailShapeIndex = globalVars.cursorTrailShapeIndex
     globalVars.cursorTrailShapeIndex = Combo(label, TRAIL_SHAPES, oldTrailShapeIndex)
-    if (oldTrailShapeIndex ~= globalVars.cursorTrailShapeIndex) then
-        write(globalVars)
-    end
+    if oldTrailShapeIndex ~= globalVars.cursorTrailShapeIndex then write(globalVars) end
 end
 
 function chooseCursorShapeSize()
@@ -233,16 +227,12 @@ function chooseCursorShapeSize()
     if currentTrail ~= 'Snake' then return end
 
     local settingChanged = BasicInputInt(globalVars, 'cursorTrailSize', 'Shape Size')
-    if settingChanged then
-        write(globalVars)
-    end
+    if settingChanged then write(globalVars) end
 end
 
 function chooseCurveSharpness(settingVars)
     local oldSharpness = settingVars.curveSharpness
-    if imgui.Button('Reset##curveSharpness', SECONDARY_BUTTON_SIZE) then
-        settingVars.curveSharpness = 50
-    end
+    if imgui.Button('Reset##curveSharpness', SECONDARY_BUTTON_SIZE) then settingVars.curveSharpness = 50 end
     KeepSameLine()
     imgui.PushItemWidth(107)
     local _, newSharpness = imgui.SliderInt('Curve Sharpness', settingVars.curveSharpness, 1, 100, '%d%%')
@@ -274,7 +264,7 @@ function chooseDistance(menuVars)
 end
 
 function chooseVaryingDistance(settingVars)
-    if (not settingVars.linearlyChange) then
+    if not settingVars.linearlyChange then
         settingVars.distance = NegatableComputableInputFloat('Distance', settingVars.distance, 3, ' msx')
         return
     end
@@ -284,11 +274,14 @@ end
 function chooseEffectFPS()
     local currentTrail = CURSOR_TRAILS[globalVars.cursorTrailIndex]
     if currentTrail ~= 'Snake' then return end
-    local settingChanged = BasicInputInt(globalVars, 'effectFPS', 'Effect FPS', { 2, 1000 },
-        'Set this to a multiple of UPS or FPS to make cursor effects smooth')
-    if settingChanged then
-        write(globalVars)
-    end
+    local settingChanged = BasicInputInt(
+        globalVars,
+        'effectFPS',
+        'Effect FPS',
+        { 2, 1000 },
+        'Set this to a multiple of UPS or FPS to make cursor effects smooth'
+    )
+    if settingChanged then write(globalVars) end
 end
 
 function chooseFinalSV(settingVars, skipFinalSV)
@@ -308,16 +301,13 @@ function chooseFinalSV(settingVars, skipFinalSV)
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.5)
     settingVars.finalSVIndex = Combo('Final SV', FINAL_SV_TYPES, settingVars.finalSVIndex)
     HelpMarker("Final SV won't be placed if there's already an SV at the end time")
-    if finalSVType == 'Normal' or finalSVType == 'None' then
-        imgui.Unindent(DEFAULT_WIDGET_WIDTH * 0.35 + 25)
-    end
+    if finalSVType == 'Normal' or finalSVType == 'None' then imgui.Unindent(DEFAULT_WIDGET_WIDTH * 0.35 + 25) end
     imgui.PopItemWidth()
     return (oldIndex ~= settingVars.finalSVIndex) or (oldCustomSV ~= settingVars.customSV)
 end
 
 function chooseFrameSpacing(settingVars)
-    _, settingVars.frameDistance = imgui.InputFloat('Frame Spacing', settingVars.frameDistance,
-        0, 0, '%.0f msx')
+    _, settingVars.frameDistance = imgui.InputFloat('Frame Spacing', settingVars.frameDistance, 0, 0, '%.0f msx')
     settingVars.frameDistance = math.clamp(settingVars.frameDistance, 2000, 100000)
 end
 
@@ -337,13 +327,7 @@ function chooseIntensity(settingVars)
 
     local stepIndex = math.floor((oldIntensity - 0.01) / userStepSize)
 
-    local _, newStepIndex = imgui.SliderInt(
-        'Intensity',
-        stepIndex,
-        0,
-        totalSteps - 1,
-        settingVars.intensity .. '%%'
-    )
+    local _, newStepIndex = imgui.SliderInt('Intensity', stepIndex, 0, totalSteps - 1, settingVars.intensity .. '%%')
 
     local newIntensity = newStepIndex * userStepSize + 99 % userStepSize + 1
     settingVars.intensity = math.clamp(newIntensity, 1, 100)
@@ -357,8 +341,7 @@ function chooseInterlace(menuVars)
     KeepSameLine()
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.5)
     local oldRatio = menuVars.interlaceRatio
-    _, menuVars.interlaceRatio = imgui.InputFloat('Ratio##interlace', menuVars.interlaceRatio,
-        0, 0, '%.2f')
+    _, menuVars.interlaceRatio = imgui.InputFloat('Ratio##interlace', menuVars.interlaceRatio, 0, 0, '%.2f')
     imgui.PopItemWidth()
     return interlaceChanged or oldRatio ~= menuVars.interlaceRatio
 end
@@ -381,15 +364,11 @@ function chooseMenuStep(settingVars)
     imgui.Text('Step # :')
     KeepSameLine()
     imgui.PushItemWidth(24)
-    if imgui.ArrowButton('##leftMenuStep', imgui_dir.Left) then
-        settingVars.menuStep = settingVars.menuStep - 1
-    end
+    if imgui.ArrowButton('##leftMenuStep', imgui_dir.Left) then settingVars.menuStep = settingVars.menuStep - 1 end
     KeepSameLine()
     _, settingVars.menuStep = imgui.InputInt('##currentMenuStep', settingVars.menuStep, 0, 0)
     KeepSameLine()
-    if imgui.ArrowButton('##rightMenuStep', imgui_dir.Right) then
-        settingVars.menuStep = settingVars.menuStep + 1
-    end
+    if imgui.ArrowButton('##rightMenuStep', imgui_dir.Right) then settingVars.menuStep = settingVars.menuStep + 1 end
     imgui.PopItemWidth()
     settingVars.menuStep = math.wrappedClamp(settingVars.menuStep, 1, 3)
 end
@@ -400,14 +379,18 @@ function chooseNoNormalize(settingVars)
 end
 
 function chooseNoteSkinType(settingVars)
-    settingVars.noteSkinTypeIndex = Combo('Preview skin', NOTE_SKIN_TYPES,
-        settingVars.noteSkinTypeIndex)
+    settingVars.noteSkinTypeIndex = Combo('Preview skin', NOTE_SKIN_TYPES, settingVars.noteSkinTypeIndex)
     HelpMarker('Note skin type for the preview of the frames')
 end
 
 function chooseFlickerPosition(menuVars)
-    _, menuVars.flickerPosition = imgui.SliderFloat('Flicker Position', menuVars.flickerPosition, 0.05, 0.95,
-        math.round(menuVars.flickerPosition * 100) .. '%%')
+    _, menuVars.flickerPosition = imgui.SliderFloat(
+        'Flicker Position',
+        menuVars.flickerPosition,
+        0.05,
+        0.95,
+        math.round(menuVars.flickerPosition * 100) .. '%%'
+    )
     menuVars.flickerPosition = math.round(menuVars.flickerPosition * 2, 1) * 0.5
 end
 
@@ -423,7 +406,7 @@ end
 function choosePeriodShift(settingVars)
     local oldShift = settingVars.periodsShift
     local _, newShift = imgui.InputFloat('Phase Shift', oldShift, 0.25, 0.25, '%.2f')
-    if (globalVars.restrictSinusoidalPeriod) then
+    if globalVars.restrictSinusoidalPeriod then
         newShift = math.quarter(newShift)
         newShift = math.wrappedClamp(newShift, -0.75, 1)
     else
@@ -438,14 +421,16 @@ function chooseCurrentScrollGroup()
     imgui.Text('  Timing Group: ')
     KeepSameLine()
 
-    local groups, cols, hiddenGroups = game.get.timingGroupsAndColors(|c| globalVars.hideAutomatic and string.find(c, 'automate_'))
+    local groups, cols, hiddenGroups = game.get.timingGroupsAndColors(
+        function(c) return globalVars.hideAutomatic and string.find(c, 'automate_') end
+    )
 
     local prevIndex = globalVars.scrollGroupIndex
     imgui.PushItemWidth(155)
     globalVars.scrollGroupIndex = Combo('##scrollGroup', groups, globalVars.scrollGroupIndex, cols, hiddenGroups)
     imgui.PopItemWidth()
     AddSeparator()
-    if (prevIndex ~= globalVars.scrollGroupIndex) then
+    if prevIndex ~= globalVars.scrollGroupIndex then
         state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
     end
 end
@@ -455,7 +440,9 @@ function chooseTimingGroup(label, previousGroup)
     imgui.Text(label)
     KeepSameLine()
 
-    local groups, cols, hiddenGroups = game.get.timingGroupsAndColors(|c| globalVars.hideAutomatic and string.find(c, 'automate_'))
+    local groups, cols, hiddenGroups = game.get.timingGroupsAndColors(
+        function(c) return globalVars.hideAutomatic and string.find(c, 'automate_') end
+    )
 
     imgui.PushItemWidth(155)
     local previousIndex = table.indexOf(groups, previousGroup)
@@ -481,13 +468,15 @@ end
 
 function chooseRGBPeriod()
     local oldRGBPeriod = globalVars.rgbPeriod
-    _, globalVars.rgbPeriod = imgui.InputFloat('RGB cycle length', oldRGBPeriod, 0, 0,
-        '%.0f second' .. (math.round(globalVars.rgbPeriod) ~= 1 and 's' or ''))
-    globalVars.rgbPeriod = math.clamp(globalVars.rgbPeriod, MIN_RGB_CYCLE_TIME,
-        MAX_RGB_CYCLE_TIME)
-    if (oldRGBPeriod ~= globalVars.rgbPeriod) then
-        write(globalVars)
-    end
+    _, globalVars.rgbPeriod = imgui.InputFloat(
+        'RGB cycle length',
+        oldRGBPeriod,
+        0,
+        0,
+        '%.0f second' .. (math.round(globalVars.rgbPeriod) ~= 1 and 's' or '')
+    )
+    globalVars.rgbPeriod = math.clamp(globalVars.rgbPeriod, MIN_RGB_CYCLE_TIME, MAX_RGB_CYCLE_TIME)
+    if oldRGBPeriod ~= globalVars.rgbPeriod then write(globalVars) end
 end
 
 function chooseScaleType(menuVars)
@@ -508,9 +497,7 @@ function chooseSnakeSpringConstant()
     _, globalVars.snakeSpringConstant = imgui.InputFloat('Reactiveness##snake', oldValue, 0, 0, '%.2f')
     HelpMarker('Pick any number from 0.01 to 1')
     globalVars.snakeSpringConstant = math.clamp(globalVars.snakeSpringConstant, 0.01, 1)
-    if (globalVars.snakeSpringConstant ~= oldValue) then
-        write(globalVars)
-    end
+    if globalVars.snakeSpringConstant ~= oldValue then write(globalVars) end
 end
 
 function chooseSpecialSVType(menuVars)
@@ -533,8 +520,13 @@ end
 function chooseCurvatureCoefficient(settingVars, plotFn)
     plotFn(settingVars)
     imgui.SameLine(0, 0)
-    _, settingVars.curvatureIndex = imgui.SliderInt('Curvature', settingVars.curvatureIndex, 1, #VIBRATO_CURVATURES,
-        tostring(VIBRATO_CURVATURES[settingVars.curvatureIndex]))
+    _, settingVars.curvatureIndex = imgui.SliderInt(
+        'Curvature',
+        settingVars.curvatureIndex,
+        1,
+        #VIBRATO_CURVATURES,
+        tostring(VIBRATO_CURVATURES[settingVars.curvatureIndex])
+    )
 end
 
 function chooseStandardSVType(menuVars, excludeCombo)
@@ -587,9 +579,7 @@ function chooseStillType(menuVars)
     }
 
     local stillType = STILL_TYPES[menuVars.stillTypeIndex]
-    local dontChooseDistance = stillType == 'No' or
-        stillType == 'Auto' or
-        stillType == 'Otua'
+    local dontChooseDistance = stillType == 'No' or stillType == 'Auto' or stillType == 'Otua'
     local indentWidth = DEFAULT_WIDGET_WIDTH * 0.5 + 16
     if dontChooseDistance then
         imgui.Indent(indentWidth)
@@ -604,9 +594,7 @@ function chooseStillType(menuVars)
 
     HoverToolTip(tooltipList[menuVars.stillTypeIndex])
 
-    if dontChooseDistance then
-        imgui.Unindent(indentWidth)
-    end
+    if dontChooseDistance then imgui.Unindent(indentWidth) end
     imgui.PopItemWidth()
 end
 
@@ -624,9 +612,7 @@ end
 function chooseStyleTheme()
     local oldStyleTheme = globalVars.styleThemeIndex
     globalVars.styleThemeIndex = Combo('Style Theme', STYLE_THEMES, oldStyleTheme)
-    if (oldStyleTheme ~= globalVars.styleThemeIndex) then
-        write(globalVars)
-    end
+    if oldStyleTheme ~= globalVars.styleThemeIndex then write(globalVars) end
 end
 
 function chooseSVBehavior(settingVars)
@@ -638,7 +624,7 @@ function chooseSVBehavior(settingVars)
     local oldBehaviorIndex = settingVars.behaviorIndex
     settingVars.behaviorIndex = Combo('Behavior', SV_BEHAVIORS, oldBehaviorIndex)
     imgui.PopItemWidth()
-    if (swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary])) then
+    if swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary]) then
         settingVars.behaviorIndex = tn(oldBehaviorIndex == 1) + 1
     end
     imgui.PopStyleVar()
@@ -678,25 +664,18 @@ end
 
 function choosePulseCoefficient()
     local oldCoefficient = globalVars.pulseCoefficient
-    _, globalVars.pulseCoefficient = imgui.SliderFloat('Pulse Strength', oldCoefficient, 0, 1,
-        math.round(globalVars.pulseCoefficient * 100) .. '%%')
+    _, globalVars.pulseCoefficient =
+        imgui.SliderFloat('Pulse Strength', oldCoefficient, 0, 1, math.round(globalVars.pulseCoefficient * 100) .. '%%')
     globalVars.pulseCoefficient = math.clamp(globalVars.pulseCoefficient, 0, 1)
-    if (oldCoefficient ~= globalVars.pulseCoefficient) then
-        write(globalVars)
-    end
+    if oldCoefficient ~= globalVars.pulseCoefficient then write(globalVars) end
 end
 
 function choosePulseColor()
-    _, colorPickerOpened = imgui.Begin('plumoguSV Pulse Color Picker', true,
-        imgui_window_flags.AlwaysAutoResize)
+    _, colorPickerOpened = imgui.Begin('plumoguSV Pulse Color Picker', true, imgui_window_flags.AlwaysAutoResize)
     local oldColor = globalVars.pulseColor
     _, globalVars.pulseColor = imgui.ColorPicker4('Pulse Color', globalVars.pulseColor)
-    if (oldColor ~= globalVars.pulseColor) then
-        write(globalVars)
-    end
-    if (not colorPickerOpened) then
-        cache.set('windows/pulse_picker', false)
-    end
+    if oldColor ~= globalVars.pulseColor then write(globalVars) end
+    if not colorPickerOpened then cache.set('windows/pulse_picker', false) end
     imgui.End()
 end
 
@@ -725,19 +704,26 @@ function chooseVibratoDeviance(menuVars)
         imgui.PopItemWidth()
     end
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.53 + 1)
-    menuVars.deviationFunctionIndex = Combo('Deviance Type', VIBRATO_DEVIATION_TYPES, menuVars.deviationFunctionIndex, {},
+    menuVars.deviationFunctionIndex = Combo(
+        'Deviance Type',
+        VIBRATO_DEVIATION_TYPES,
+        menuVars.deviationFunctionIndex,
         {},
-        tooltipList)
+        {},
+        tooltipList
+    )
 
     HoverToolTip(tooltipList[menuVars.deviationFunctionIndex])
 
-    if dontChooseDistance then
-        imgui.Unindent(indentWidth)
-    end
+    if dontChooseDistance then imgui.Unindent(indentWidth) end
     imgui.PopItemWidth()
 end
 
 function chooseConvertSVSSFDirection(menuVars)
-    menuVars.conversionDirection = RadioButtons('Direction:', menuVars.conversionDirection, { 'SSF -> SV', 'SV -> SSF' },
-        { false, true })
+    menuVars.conversionDirection = RadioButtons(
+        'Direction:',
+        menuVars.conversionDirection,
+        { 'SSF -> SV', 'SV -> SSF' },
+        { false, true }
+    )
 end

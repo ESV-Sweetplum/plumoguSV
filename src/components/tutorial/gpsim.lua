@@ -1,5 +1,5 @@
 function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOverride, windowScale)
-    if (not forcedOverride) then
+    if not forcedOverride then
         imgui.Dummy(vector.New(0, 10))
         imgui.SetCursorPosX((380 - 270 * szFactor.x) / 2)
     end
@@ -24,21 +24,22 @@ function gpsim(label, szFactor, distanceFn, colTbl, simulationDuration, forcedOv
     for i = 1, #colTbl do
         for _, col in ipairs(colTbl[i]) do
             local height = 50 * (#colTbl * distanceFn(math.wrap(progress + 0.25, 0, 1), i) + #colTbl - i)
-            if height > 150 then
-                height = height - 50 * #colTbl
-            end
+            if height > 150 then height = height - 50 * #colTbl end
             local notePos = vector.New((col - 1) * 60 + 20, height) * szFactor
             local noteSize = vector.New(50, 20) * szFactor
 
             local uintColor = color.rgbaToUint(255, 0, 0, 255)
 
-            ctx.AddRectFilledMultiColor(topLeft + notePos, topLeft + notePos + noteSize, colorTable[#colTbl][i],
+            ctx.AddRectFilledMultiColor(
+                topLeft + notePos,
+                topLeft + notePos + noteSize,
                 colorTable[#colTbl][i],
-                colorTable[#colTbl][i], colorTable[#colTbl][i])
+                colorTable[#colTbl][i],
+                colorTable[#colTbl][i],
+                colorTable[#colTbl][i]
+            )
         end
     end
     imgui.EndChild()
-    if (not forcedOverride) then
-        imgui.Dummy(vector.New(0, 10))
-    end
+    if not forcedOverride then imgui.Dummy(vector.New(0, 10)) end
 end

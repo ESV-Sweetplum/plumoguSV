@@ -33,25 +33,7 @@
         "unused": "Warning"
     },
     "diagnostics.libraryFiles": "Disable",
-    "format.defaultConfig": {
-        "call_arg_parentheses": "keep",
-        "charset": "utf-8",
-        "continuation_indent": "4",
-        "end_of_line": "lf",
-        "indent_size": "4",
-        "indent_style": "space",
-        "insert_final_newline": "true",
-        "max_line_length": "120",
-        "quote_style": "single",
-        "spelling_language": "en-us",
-        "trailing_table_separator": "smart",
-        "trim_trailing_whitespace": "true"
-    },
-    "format.enable": true,
-    "runtime.nonstandardSymbol": [
-        "|lambda|",
-        "!="
-    ],
+    "format.enable": false,
     "runtime.version": "Lua 5.2",
     "type.castNumberToInteger": true,
     "type.checkTableShape": true,

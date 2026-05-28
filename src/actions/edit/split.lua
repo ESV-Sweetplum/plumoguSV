@@ -2,17 +2,17 @@ function splitNotes(menuVars)
     local noteDict = {}
     local notes = state.SelectedHitObjects
 
-    if (menuVars.modeIndex == 1) then
+    if menuVars.modeIndex == 1 then
         for _, note in ipairs(notes) do
-            if (noteDict[note.Lane]) then
+            if noteDict[note.Lane] then
                 table.insert(noteDict[note.Lane], note)
             else
                 noteDict[note.Lane] = { note }
             end
         end
-    elseif (menuVars.modeIndex == 2) then
+    elseif menuVars.modeIndex == 2 then
         for _, note in ipairs(notes) do
-            if (noteDict[note.StartTime]) then
+            if noteDict[note.StartTime] then
                 table.insert(noteDict[note.StartTime], note)
             else
                 noteDict[note.StartTime] = { note }
@@ -26,9 +26,9 @@ function splitNotes(menuVars)
 
     local prefix = 'col'
 
-    if (menuVars.modeIndex == 2) then
+    if menuVars.modeIndex == 2 then
         prefix = 'time'
-    elseif (menuVars.modeIndex == 3) then
+    elseif menuVars.modeIndex == 3 then
         prefix = 'solo'
     end
 
@@ -40,9 +40,10 @@ function splitNotes(menuVars)
         local startTimeTbl = table.unpack(table.property(noteList, 'StartTime'))
         local minStartTime = math.min(startTimeTbl)
         local maxStartTime = math.max(startTimeTbl)
-        local svs = menuVars.cloneSVs and
-            game.get.svsBetweenOffsets(minStartTime - menuVars.cloneRadius, maxStartTime + menuVars.cloneRadius) or {}
-        if (not table.includes(existingIds, id)) then
+        local svs = menuVars.cloneSVs
+                and game.get.svsBetweenOffsets(minStartTime - menuVars.cloneRadius, maxStartTime + menuVars.cloneRadius)
+            or {}
+        if not table.includes(existingIds, id) then
             local tg = createSG(svs, 1, color.rgbaToStr(generateRGBColor(false)))
             local ea = createEA(action_type.CreateTimingGroup, id, tg, noteList)
 

@@ -33,10 +33,12 @@ function drawCapybara()
     o.AddRectFilled(table.vectorize2(sz), headCoords1, bodyColor)
 
     -- draws capybara stem
-    o.AddRectFilled(vector.New(stemCoords.x, stemCoords.y), vector.New(stemCoords.x + 10, stemCoords.y + 20),
-        stemColor)
-    o.AddRectFilled(vector.New(stemCoords.x - 10, stemCoords.y), vector.New(stemCoords.x + 20, stemCoords.y - 5),
-        stemColor)
+    o.AddRectFilled(vector.New(stemCoords.x, stemCoords.y), vector.New(stemCoords.x + 10, stemCoords.y + 20), stemColor)
+    o.AddRectFilled(
+        vector.New(stemCoords.x - 10, stemCoords.y),
+        vector.New(stemCoords.x + 20, stemCoords.y - 5),
+        stemColor
+    )
 end
 
 function drawCapybara2()

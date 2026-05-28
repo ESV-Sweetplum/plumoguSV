@@ -23,7 +23,7 @@ function placeStandardSVMenu()
     local settingVars = getSettingVars(currentSVType, 'Standard')
     if globalVars.showPresetMenu then
         local presetSelected = renderPresetMenu('Standard', menuVars, settingVars)
-        if (not presetSelected) then
+        if not presetSelected then
             cache.save(currentSVType .. 'StandardSettings', settingVars)
             cache.save('placeStandardMenu', menuVars)
         end
@@ -37,11 +37,18 @@ function placeStandardSVMenu()
     if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, false) end
 
     startNextWindowNotCollapsed('SV Info')
-    makeSVInfoWindow('SV Info', menuVars.svGraphStats, menuVars.svStats, menuVars.svDistances,
-        menuVars.svMultipliers, nil, false)
+    makeSVInfoWindow(
+        'SV Info',
+        menuVars.svGraphStats,
+        menuVars.svStats,
+        menuVars.svDistances,
+        menuVars.svMultipliers,
+        nil,
+        false
+    )
 
     menuVars.settingVars = settingVars
-    if (STANDARD_SVS[menuVars.svTypeIndex] == 'Exponential' and settingVars.distanceMode == 2) then
+    if STANDARD_SVS[menuVars.svTypeIndex] == 'Exponential' and settingVars.distanceMode == 2 then
         simpleActionMenu('Place SVs between selected notes##Exponential', 2, placeExponentialSpecialSVs, menuVars)
     else
         simpleActionMenu('Place SVs between selected notes', 2, placeSVs, menuVars)

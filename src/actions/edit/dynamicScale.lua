@@ -9,8 +9,7 @@ function dynamicScaleSVs(menuVars)
         local targetAvgSV = targetAvgSVs[i]
         local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
-        local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
-            endOffset)
+        local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
         --[[
         local currentAvgSV = currentDistance / (endOffset - startOffset)
         local scalingFactor = targetAvgSV / currentAvgSV

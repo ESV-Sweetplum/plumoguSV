@@ -1,6 +1,4 @@
-function BasicInputFloat(label, value, decimalPlaces, suffix, step)
-
-end
+function BasicInputFloat(label, value, decimalPlaces, suffix, step) end
 
 function ComputableInputFloat(label, value, decimalPlaces, suffix)
     local previousvalue = value
@@ -9,17 +7,20 @@ function ComputableInputFloat(label, value, decimalPlaces, suffix)
     local fmt = '%.' .. decimalPlaces .. 'f'
     if suffix then fmt = fmt .. suffix end
 
-    _, value = imgui.InputTextWithHint(label, '2, 4/3 + 1, etc.',
-        string.format(fmt, value), 4096,
-        imgui_input_text_flags.AutoSelectAll)
-    if (imgui.IsItemEdited()) then
+    _, value = imgui.InputTextWithHint(
+        label,
+        '2, 4/3 + 1, etc.',
+        string.format(fmt, value),
+        4096,
+        imgui_input_text_flags.AutoSelectAll
+    )
+    if imgui.IsItemEdited() then
         local desiredComp = tostring(value):gsub('[^%d%+%-%*%/%.]', ''):gsub(suffix or '', '')
         output = expr(desiredComp)
-        if (output == nil) then output = value end
+        if output == nil then output = value end
     end
 
-    return tn(tostring(output):match('[%-]?%d+[%.]?%d+') or tostring(output):match('[%-]?%d+')),
-        previousvalue ~= output -- Need both matches due to modifiers not working on whole groups
+    return tn(tostring(output):match('[%-]?%d+[%.]?%d+') or tostring(output):match('[%-]?%d+')), previousvalue ~= output -- Need both matches due to modifiers not working on whole groups
 end
 
 function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
@@ -32,7 +33,10 @@ function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
     imgui.PushItemWidth(107)
     local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
     imgui.PopItemWidth()
-    if ((negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary])) and newValue ~= 0) then
+    if
+        (negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary]))
+        and newValue ~= 0
+    then
         newValue = -newValue
     end
     imgui.PopStyleVar(2)
@@ -44,7 +48,7 @@ function ResettableNegatableComputableInputFloat(label, value, defaultValue, dec
 
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local resetButtonPressed = imgui.Button('R', TERTIARY_BUTTON_SIZE)
-    if (resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary])) then
+    if resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary]) then
         value = defaultValue
     end
     HoverToolTip('Reset to the initial value.')
@@ -53,9 +57,7 @@ function ResettableNegatableComputableInputFloat(label, value, defaultValue, dec
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
     local negateButtonPressed = imgui.Button('N', TERTIARY_BUTTON_SIZE)
 
-    if negateButtonPressed and value ~= 0 then
-        value = -value
-    end
+    if negateButtonPressed and value ~= 0 then value = -value end
     HoverToolTip('Negate this value.')
 
     KeepSameLine()
@@ -88,17 +90,18 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     imgui.PopItemWidth()
     varsTable[lowerName] = newValues.x
     varsTable[higherName] = newValues.y
-    if (swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary])) then
+    if swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary]) then
         varsTable[lowerName] = oldValues.y
         varsTable[higherName] = oldValues.x
     end
-    if (negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary])) then
+    if negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary]) then
         varsTable[lowerName] = -oldValues.x
         varsTable[higherName] = -oldValues.y
     end
     imgui.PopStyleVar(3)
-    return swapButtonPressed or negateButtonPressed or
-        kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary]) or
-        kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary]) or
-        oldValues ~= newValues
+    return swapButtonPressed
+        or negateButtonPressed
+        or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary])
+        or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary])
+        or oldValues ~= newValues
 end

@@ -42,9 +42,7 @@ function storeDuplicateItems(menuVars)
     menuVars.msOffset = startOffset
 end
 
-function clearDuplicateItems(menuVars)
-    menuVars.objects = {}
-end
+function clearDuplicateItems(menuVars) menuVars.objects = {} end
 
 function placeDuplicateItems(menuVars)
     local placeTime = game.get.uniqueSelectedNoteOffsets()[1]
@@ -60,19 +58,24 @@ function placeDuplicateItems(menuVars)
     local offset = placeTime - menuVars.msOffset
     for _, obj in ipairs(menuVars.objects) do
         local data = obj.data
-        if (obj.type == 'ho' and not menuVars.dontCloneHos) then
-            local ho = utils.CreateHitObject(data.StartTime + offset, data.Lane,
-                data.EndTime == 0 and 0 or data.EndTime + offset, data.HitSound, data.EditorLayer)
+        if obj.type == 'ho' and not menuVars.dontCloneHos then
+            local ho = utils.CreateHitObject(
+                data.StartTime + offset,
+                data.Lane,
+                data.EndTime == 0 and 0 or data.EndTime + offset,
+                data.HitSound,
+                data.EditorLayer
+            )
             table.insert(hosToAdd, ho)
             table.insert(moveActions, createEA(action_type.MoveObjectsToTimingGroup, { ho }, data.TimingGroup))
         end
-        if (obj.type == 'tl') then
-            table.insert(tlsToAdd, utils.CreateTimingPoint(data.StartTime + offset, data.Bpm, data.Signature, data
-                .Hidden))
+        if obj.type == 'tl' then
+            table.insert(
+                tlsToAdd,
+                utils.CreateTimingPoint(data.StartTime + offset, data.Bpm, data.Signature, data.Hidden)
+            )
         end
-        if (obj.type == 'bm') then
-            table.insert(bmsToAdd, utils.CreateBookmark(data.StartTime + offset, data.Note))
-        end
+        if obj.type == 'bm' then table.insert(bmsToAdd, utils.CreateBookmark(data.StartTime + offset, data.Note)) end
     end
     for tgId, svList in pairs(svTbl) do
         local newSVList = {}

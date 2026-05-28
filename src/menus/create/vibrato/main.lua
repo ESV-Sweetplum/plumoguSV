@@ -16,13 +16,14 @@ function placeVibratoSVMenu(separateWindow)
     local modeText = menuVars.vibratoMode == 1 and 'SV' or 'SSF'
 
     local currentSVType = VIBRATO_SVS[menuVars.svTypeIndex]
-    local settingVars = getSettingVars(currentSVType .. modeText,
-        'Vibrato' .. tostring(separateWindow))
+    local settingVars = getSettingVars(currentSVType .. modeText, 'Vibrato' .. tostring(separateWindow))
     if globalVars.showPresetMenu then
         local presetSelected = renderPresetMenu('Vibrato', menuVars, settingVars)
-        if (not presetSelected) then
-            cache.save(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
-                settingVars)
+        if not presetSelected then
+            cache.save(
+                table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
+                settingVars
+            )
             cache.save('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
         end
         return
@@ -32,7 +33,7 @@ function placeVibratoSVMenu(separateWindow)
     menuVars.vibratoMode = Combo('Vibrato Mode', VIBRATO_TYPES, menuVars.vibratoMode)
 
     chooseVibratoQuality(menuVars)
-    if (menuVars.vibratoMode ~= 2) then
+    if menuVars.vibratoMode ~= 2 then
         chooseVibratoDeviance(menuVars)
         chooseVibratoSides(menuVars)
     end
@@ -46,7 +47,6 @@ function placeVibratoSVMenu(separateWindow)
     if currentSVType == 'Sigmoidal##Vibrato' then sigmoidalVibratoMenu(menuVars, settingVars, separateWindow) end
     if currentSVType == 'Custom##Vibrato' then customVibratoMenu(menuVars, settingVars, separateWindow) end
 
-    cache.save(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }),
-        settingVars)
+    cache.save(table.concat({ currentSVType, modeText, 'Vibrato', tostring(separateWindow), 'Settings' }), settingVars)
     cache.save('placeVibrato' .. tostring(separateWindow) .. 'Menu', menuVars)
 end

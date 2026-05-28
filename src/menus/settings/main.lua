@@ -10,7 +10,7 @@ SETTING_TYPES = {
 }
 
 function showPluginSettingsWindow()
-    if (not globalVars.performanceMode) then
+    if not globalVars.performanceMode then
         local bgColor = vector.New(0.2, 0.2, 0.2, 1)
         -- imgui.PopStyleColor(20)
         applyTheme(getIncognitoTheme(), true)
@@ -43,19 +43,17 @@ function showPluginSettingsWindow()
     }
 
     for idx, v in pairs(SETTING_TYPES) do
-        if (hideSettingDict[v]) then goto nextSetting end
-        if (imgui.Selectable(v, typeIndex == idx)) then
-            typeIndex = idx
-        end
+        if hideSettingDict[v] then goto nextSetting end
+        if imgui.Selectable(v, typeIndex == idx) then typeIndex = idx end
         ::nextSetting::
     end
     AddSeparator()
-    if (imgui.Button('Reset Settings')) then
+    if imgui.Button('Reset Settings') then
         write({})
         globalVars = DEFAULT_GLOBAL_VARS
         toggleablePrint('e!', 'Settings have been reset.')
     end
-    if (globalVars.advancedMode) then renderMemeButtons() end
+    if globalVars.advancedMode then renderMemeButtons() end
 
     imgui.EndChild()
     imgui.NextColumn()
@@ -77,20 +75,20 @@ function showPluginSettingsWindow()
     }
 
     local fn = settingMenuFunctionMap[SETTING_TYPES[typeIndex]]
-    if (fn) then fn() end
+    if fn then fn() end
 
     imgui.PopItemWidth()
     imgui.EndChild()
 
     imgui.Columns(1)
-    if (not settingsOpened) then
+    if not settingsOpened then
         cache.set('windows/settings', false)
         cache.settingTypeIndex = 1
         state.SetValue('crazy', 'Crazy?')
         state.SetValue('activateCrazy', false)
         state.SetValue('crazyIdx', 1)
     end
-    if (not globalVars.performanceMode) then
+    if not globalVars.performanceMode then
         imgui.PopStyleColor(41)
         pulseController()
         setPluginAppearanceColors(globalVars.colorThemeName, true)
@@ -100,16 +98,16 @@ function showPluginSettingsWindow()
 end
 
 function renderMemeButtons()
-    if (GradientButton('show me the quzz\n(quaver huzz)', color.vctr.red, color.vctr.white, 1500)) then
+    if GradientButton('show me the quzz\n(quaver huzz)', color.vctr.red, color.vctr.white, 1500) then
         ---@diagnostic disable-next-line: param-type-mismatch
         imgui.Text(nil)
     end
     HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
-    if (GradientButton('fuck you and\nyour stupid editor', color.vctr.red, color.vctr.white, 1500)) then
+    if GradientButton('fuck you and\nyour stupid editor', color.vctr.red, color.vctr.white, 1500) then
         destroyEditor = true
     end
     HoverToolTip("Press this button once (if you don't have any work saved) and never again.")
-    if (destroyEditor) then
+    if destroyEditor then
         actions.GoToObjects(math.floor(math.random() * map.TrackLength))
         local ho1 = map.HitObjects[1]
         actions.RemoveHitObject(ho1)
@@ -117,26 +115,22 @@ function renderMemeButtons()
     end
     local text = state.GetValue('crazy', 'Crazy?')
     local full =
-    ' I was crazy\nonce. They put me in\na map. A ranked map.\nA ranked map\nwith no SV. And no\nSV makes me crazy.\nCrazy?'
-    if (imgui.Button('Crazy?')) then
-        state.SetValue('activateCrazy', true)
-    end
-    if (state.GetValue('activateCrazy')) then
+        ' I was crazy\nonce. They put me in\na map. A ranked map.\nA ranked map\nwith no SV. And no\nSV makes me crazy.\nCrazy?'
+    if imgui.Button('Crazy?') then state.SetValue('activateCrazy', true) end
+    if state.GetValue('activateCrazy') then
         imgui.TextUnformatted(text)
-        if (clock.listen('crazy', 5 * math.exp(- #text / 1500))) then
+        if clock.listen('crazy', 5 * math.exp(-#text / 1500)) then
             local curIdx = state.GetValue('crazyIdx', 1)
-            if (curIdx > #full) then curIdx = curIdx - #full end
+            if curIdx > #full then curIdx = curIdx - #full end
             local char = full:charAt(curIdx)
             text = text .. full:charAt(curIdx)
-            if (full:charAt(curIdx) == '\n') then
+            if full:charAt(curIdx) == '\n' then
                 curIdx = curIdx + 1
                 text = text .. full:charAt(curIdx)
             end
             state.SetValue('crazyIdx', curIdx + 1)
             state.SetValue('crazy', text)
         end
-        if (imgui.GetScrollMaxY() > imgui.GetScrollY()) then
-            imgui.SetScrollHereY(1)
-        end
+        if imgui.GetScrollMaxY() > imgui.GetScrollY() then imgui.SetScrollHereY(1) end
     end
 end

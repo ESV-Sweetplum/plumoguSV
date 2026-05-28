@@ -5,8 +5,12 @@ function selectAlternatingMenu()
     cache.save('selectAlternatingMenu', menuVars)
 
     simpleActionMenu(
-        'Select a note every ' ..
-        menuVars.every .. pluralize(' note, from note #', menuVars.every, 5) .. menuVars.offset,
+        'Select a note every '
+            .. menuVars.every
+            .. pluralize(' note, from note #', menuVars.every, 5)
+            .. menuVars.offset,
         2,
-        selectAlternating, menuVars)
+        selectAlternating,
+        menuVars
+    )
 end

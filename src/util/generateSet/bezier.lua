@@ -12,7 +12,7 @@ function generateBezierSet(p1, p2, avgValue, numValues, verticalShift)
     local targetXPositions = {}
     local iterations = 20
     local xPosCount = numValues
-    if (globalVars.equalizeLinear) then xPosCount = xPosCount - 1 end
+    if globalVars.equalizeLinear then xPosCount = xPosCount - 1 end
 
     for i = 1, numValues do
         table.insert(timeGuesses, startingTimeGuess)

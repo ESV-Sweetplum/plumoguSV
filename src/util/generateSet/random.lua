@@ -11,9 +11,7 @@ function getRandomSet(values, avgValue, verticalShift, dontNormalize)
     for i = 1, #values do
         table.insert(randomSet, values[i])
     end
-    if not dontNormalize then
-        randomSet = table.normalize(randomSet, avgValue, false)
-    end
+    if not dontNormalize then randomSet = table.normalize(randomSet, avgValue, false) end
     for i = 1, #randomSet do
         randomSet[i] = randomSet[i] + verticalShift
     end

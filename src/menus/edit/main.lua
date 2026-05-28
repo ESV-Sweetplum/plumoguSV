@@ -21,7 +21,7 @@ EDIT_SV_TOOLS = { -- tools for editing SVs
 }
 
 function editSVTab()
-    if (globalVars.advancedMode) then chooseCurrentScrollGroup() end
+    if globalVars.advancedMode then chooseCurrentScrollGroup() end
     local changedTool = chooseEditTool()
     if changedTool then state.SetValue('global.editToolIndex', globalVars.editToolIndex) end
     AddSeparator()

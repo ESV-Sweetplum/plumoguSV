@@ -9,7 +9,7 @@ function BasicInputInt(varsTable, parameterName, label, bounds, tooltipText)
     local oldValue = varsTable[parameterName]
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 1, 1)
     if tooltipText then HelpMarker(tooltipText) end
-    if (bounds and bounds[1] and bounds[2]) then
+    if bounds and bounds[1] and bounds[2] then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
     end
     return oldValue ~= varsTable[parameterName]
@@ -27,13 +27,9 @@ function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipTex
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)
     imgui.PopItemWidth()
     if tooltipText then HelpMarker(tooltipText) end
-    if (multButtonPressed) then
-        varsTable[parameterName] = varsTable[parameterName] * 2
-    end
-    if (divButtonPressed) then
-        varsTable[parameterName] = varsTable[parameterName] / 2
-    end
-    if (bounds and bounds[1] and bounds[2]) then
+    if multButtonPressed then varsTable[parameterName] = varsTable[parameterName] * 2 end
+    if divButtonPressed then varsTable[parameterName] = varsTable[parameterName] / 2 end
+    if bounds and bounds[1] and bounds[2] then
         varsTable[parameterName] = math.clamp(varsTable[parameterName], bounds[1], bounds[2])
     end
     return oldValue ~= varsTable[parameterName]

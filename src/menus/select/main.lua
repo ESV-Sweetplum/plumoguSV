@@ -34,8 +34,8 @@ function chooseSelectTool()
     imgui.Text('  Current Type:')
     KeepSameLine()
     local oldSelectTypeIndex = globalVars.selectTypeIndex
-    globalVars.selectTypeIndex = Combo('##selecttool', SELECT_TOOLS, oldSelectTypeIndex, nil, nil,
-        SELECT_TAB_TOOLTIP_LIST)
+    globalVars.selectTypeIndex =
+        Combo('##selecttool', SELECT_TOOLS, oldSelectTypeIndex, nil, nil, SELECT_TAB_TOOLTIP_LIST)
 
     HoverToolTip(SELECT_TAB_TOOLTIP_LIST[globalVars.selectTypeIndex])
     return oldSelectTypeIndex ~= globalVars.selectTypeIndex

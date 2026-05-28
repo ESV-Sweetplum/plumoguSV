@@ -15,7 +15,7 @@ function infoTab()
     imgui.BulletText('Emik + William for plugin help.')
     imgui.BulletText('ESV members for constant support.')
     imgui.Dummy(vctr2(10))
-    if (not globalVars.disableKofiMessage) then
+    if not globalVars.disableKofiMessage then
         imgui.SetCursorPosX((imgui.GetWindowWidth() - 153) / 2)
         imgui.Text('If you enjoy using this plugin,')
         imgui.SetCursorPosX((imgui.GetWindowWidth() - 172) / 2)
@@ -24,25 +24,23 @@ function infoTab()
         imgui.TextLinkOpenURL('ko-fi!', 'https://ko-fi.com/plummyyummy')
         imgui.Dummy(vctr2(10))
     end
-    if (imgui.Button('Edit Settings', HALF_ACTION_BUTTON_SIZE)) then
+    if imgui.Button('Edit Settings', HALF_ACTION_BUTTON_SIZE) then
         cache.set('windows/settings', not cache.get('windows/settings'))
         local coordinatesToCenter = game.window.getCenter() - vector.New(216.5, 200)
         imgui.SetWindowPos('plumoguSV Settings', coordinatesToCenter)
     end
     HoverToolTip('Edit various functions of the plugin, such as the appearance or internal calculations.')
     KeepSameLine()
-    if (imgui.Button('See Patch Notes', HALF_ACTION_BUTTON_SIZE)) then
+    if imgui.Button('See Patch Notes', HALF_ACTION_BUTTON_SIZE) then
         cache.set('windows/patch_notes', not cache.get('windows/patch_notes'))
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos('plumoguSV Patch Notes', coordinatesToCenter)
     end
     HoverToolTip('Keep up with the progress of plumoguSV, and see what the newest updates have in store for you.')
-    if (imgui.Button('Get Map Stats', HALF_ACTION_BUTTON_SIZE)) then
-        getMapStats()
-    end
+    if imgui.Button('Get Map Stats', HALF_ACTION_BUTTON_SIZE) then getMapStats() end
     HoverToolTip('A quick and easy way to view SV/SSF counts and some other minute pieces of data.')
     KeepSameLine()
-    if (imgui.Button('View Tutorials', HALF_ACTION_BUTTON_SIZE)) then
+    if imgui.Button('View Tutorials', HALF_ACTION_BUTTON_SIZE) then
         cache.set('windows/tutorial', not cache.get('windows/tutorial'))
         local coordinatesToCenter = game.window.getCenter() - vector.New(300, 250)
         imgui.SetWindowPos('plumoguSV Tutorial Menu', coordinatesToCenter)

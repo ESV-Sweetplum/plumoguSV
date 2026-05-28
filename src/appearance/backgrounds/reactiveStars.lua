@@ -14,7 +14,7 @@ function renderReactiveStars()
 
     local clamp = math.clamp
 
-    if (dimX < 100 or clock.getTime() < 0.3) then return end
+    if dimX < 100 or clock.getTime() < 0.3 then return end
 
     createStar(dimX, dimY, 100)
     updateStars(dimX, dimY, state.DeltaTime)
@@ -37,7 +37,7 @@ function renderReactiveStars()
 end
 
 function createStar(dimX, dimY, n)
-    if (stars_listSize >= n) then return end
+    if stars_listSize >= n then return end
     stars_xList[stars_listSize + 1] = math.random() * dimX
     stars_yList[stars_listSize + 1] = math.random() * dimY
     stars_vxList[stars_listSize + 1] = math.random() * 3 + 1
@@ -58,11 +58,11 @@ function updateStars(dimX, dimY, dt)
         local y = stars_yList[i]
         local vx = stars_vxList[i]
 
-        while (x > dimX + 10) do
+        while x > dimX + 10 do
             starWrapped = true
             x = x - dimX - 20
         end
-        while (x < -10) do
+        while x < -10 do
             starWrapped = true
             x = x + dimX + 20
         end
@@ -72,8 +72,7 @@ function updateStars(dimX, dimY, dt)
             stars_vxList[i] = random() * 3 + 1
             stars_szList[i] = random(3) * 0.5
         else
-            stars_xList[i] = x + vx * dt * 0.05 *
-                clamp(2 * m, -50, 50)
+            stars_xList[i] = x + vx * dt * 0.05 * clamp(2 * m, -50, 50)
         end
     end
 end

@@ -17,10 +17,10 @@ function renderSVSpectrogram()
         local binValues = {}
         local m = game.get.svMultiplierAt(state.SongTime, tgId)
         local ssf = math.abs(game.get.ssfMultiplierAt(state.SongTime, tgId))
-        local startTime = math.max(game.get.svStartTimeAt(state.SongTime, tgId),
-            game.get.ssfStartTimeAt(state.SongTime, tgId))
+        local startTime =
+            math.max(game.get.svStartTimeAt(state.SongTime, tgId), game.get.ssfStartTimeAt(state.SongTime, tgId))
         local afterTime = state.SongTime - startTime
-        if (math.abs(afterTime) > taperMaxTime) then
+        if math.abs(afterTime) > taperMaxTime then
             binValues = table.constructRepeating(0.1, binCount)
             goto nextTg
         end
@@ -28,12 +28,12 @@ function renderSVSpectrogram()
             for i = -binCount / 2, binCount / 2 - 1 do
                 local binLower = ((binScalingFactor ^ (i + binCount / 2)) ^ binScalingFactor - 1) * side
                 local binHigher = binLower * binScalingFactor + (binScalingFactor - 1) * side
-                local str = math.max(1 - math.abs((m * ssf - (binLower + binHigher) / 2) / (binHigher - binLower)), 0) *
-                    0.99 +
-                    0.01
-                str = str *
-                    math.pow((1 - math.clamp((afterTime - taperMinTime) / (taperMaxTime - taperMinTime), 0, 1)), 4)
-                if (side == -1) then
+                local str = math.max(1 - math.abs((m * ssf - (binLower + binHigher) / 2) / (binHigher - binLower)), 0)
+                        * 0.99
+                    + 0.01
+                str = str
+                    * math.pow((1 - math.clamp((afterTime - taperMinTime) / (taperMaxTime - taperMinTime), 0, 1)), 4)
+                if side == -1 then
                     table.insert(binValues, 1, str)
                 else
                     table.insert(binValues, str)
@@ -44,24 +44,35 @@ function renderSVSpectrogram()
         binValues = smoothenSpectrogram(binValues)
         col = color.alterOpacity(color.vrgbaToUint(color.strToRgba(tg.ColorRgb or '255,255,255')), -200)
 
-        if (tgCount == 2) then
+        if tgCount == 2 then
             col = imgui.GetColorU32(imgui_col.Text, 0.5)
             rCol = imgui.GetColorU32(imgui_col.CheckMark, 0.5)
         end
 
         for i, value in ipairs(binValues) do
-            if (tgCount == 2) then
-                thisCol = color.vrgbaToUint(color.uintToRgba(col) * (doubleBinCount - i + 1) / (doubleBinCount + 1) +
-                    color.uintToRgba(rCol) * (i - 1) / (doubleBinCount + 1))
-                nextCol = color.vrgbaToUint(color.uintToRgba(col) * (doubleBinCount - i) / (doubleBinCount + 1) +
-                    color.uintToRgba(rCol) * i / (doubleBinCount + 1))
-                ctx.AddRectFilledMultiColor(bottomLeft + (i - 1) / doubleBinCount * vector.New(dim.x, 0),
-                    bottomLeft + vector.New((i) / doubleBinCount * dim.x, -dim.y * value),
-                    thisCol, nextCol, nextCol, thisCol)
+            if tgCount == 2 then
+                thisCol = color.vrgbaToUint(
+                    color.uintToRgba(col) * (doubleBinCount - i + 1) / (doubleBinCount + 1)
+                        + color.uintToRgba(rCol) * (i - 1) / (doubleBinCount + 1)
+                )
+                nextCol = color.vrgbaToUint(
+                    color.uintToRgba(col) * (doubleBinCount - i) / (doubleBinCount + 1)
+                        + color.uintToRgba(rCol) * i / (doubleBinCount + 1)
+                )
+                ctx.AddRectFilledMultiColor(
+                    bottomLeft + (i - 1) / doubleBinCount * vector.New(dim.x, 0),
+                    bottomLeft + vector.New(i / doubleBinCount * dim.x, -dim.y * value),
+                    thisCol,
+                    nextCol,
+                    nextCol,
+                    thisCol
+                )
             else
-                ctx.AddRectFilled(bottomLeft + (i - 1) / doubleBinCount * vector.New(dim.x, 0),
-                    bottomLeft + vector.New((i) / doubleBinCount * dim.x, -dim.y * value),
-                    col)
+                ctx.AddRectFilled(
+                    bottomLeft + (i - 1) / doubleBinCount * vector.New(dim.x, 0),
+                    bottomLeft + vector.New(i / doubleBinCount * dim.x, -dim.y * value),
+                    col
+                )
             end
         end
         ::nextTg::
@@ -69,8 +80,8 @@ function renderSVSpectrogram()
 end
 
 function smoothenSpectrogram(data)
-    local kernel, radius;
-    if (not cache.get('gaussian/kernel')) then
+    local kernel, radius
+    if not cache.get('gaussian/kernel') then
         kernal, radius = math.createKernel('gaussian', { sigma = 2.6 })
         cache.set('gaussian/kernel', kernel)
         cache.set('gaussian/radius', radius)

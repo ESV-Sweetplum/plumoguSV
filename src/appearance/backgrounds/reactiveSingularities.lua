@@ -35,11 +35,10 @@ function renderReactiveSingularities()
     local fastSpeedB = 117
 
     local speed = clamp(math.abs(multiplier), 0, 4)
-    if (dimX < 100 or clock.getTime() < 0.3) then return end
+    if dimX < 100 or clock.getTime() < 0.3 then return end
 
     createParticle(dimX, dimY, 150)
-    updateParticles(dimX, dimY,
-        state.DeltaTime * speed, multiplier)
+    updateParticles(dimX, dimY, state.DeltaTime * speed, multiplier)
 
     local lerp = math.lerp
 
@@ -55,8 +54,7 @@ function renderReactiveSingularities()
         local g = lerp(slowSpeedG, fastSpeedG, clampedSpeed)
         local b = lerp(slowSpeedB, fastSpeedB, clampedSpeed)
         local pos = vector.New(x + topLeft.x, y + topLeft.y)
-        ctx.AddCircleFilled(pos, 2,
-            color.rgbaToUint(r, g, b, 100 + pulseStatus * 155))
+        ctx.AddCircleFilled(pos, 2, color.rgbaToUint(r, g, b, 100 + pulseStatus * 155))
     end
 
     ctx.AddCircleFilled(dim / 2 + topLeft, 15, 4278190080)
@@ -65,7 +63,7 @@ function renderReactiveSingularities()
 end
 
 function createParticle(dimX, dimY, n)
-    if (#singularity_xList >= n) then return end
+    if #singularity_xList >= n then return end
     singularity_xList[#singularity_xList + 1] = math.random() * dimX
     singularity_yList[#singularity_yList + 1] = math.random() * dimY
     singularity_vxList[#singularity_vxList + 1] = 0
@@ -114,11 +112,11 @@ function updateParticles(dimX, dimY, dt, multiplier)
         singularity_xList[i] = x + vx * movementDist
         singularity_yList[i] = y + vy * movementDist
 
-        if (x < 0 or x > dimX) then
+        if x < 0 or x > dimX then
             singularity_vxList[i] = -singularity_vxList[i] * bounceCoefficient
             singularity_xList[i] = clamp(singularity_xList[i], 1, dimX - 1)
         end
-        if (y < 0 or y > dimY) then
+        if y < 0 or y > dimY then
             singularity_vyList[i] = -singularity_vyList[i] * bounceCoefficient
             singularity_yList[i] = clamp(singularity_yList[i], 1, dimY - 1)
         end

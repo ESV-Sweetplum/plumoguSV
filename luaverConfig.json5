@@ -1,10 +1,10 @@
 {
-    pluginName: "plumoguSV",
-    pluginVersion: "2.2.1",
-    pluginAuthor: "plummyyummy, kloi34",
-    pluginDescription: "The ultimate community-driven and open-source competitive SV plugin, remastered for the modern age.",
-    sources: ["QParcel", "src"],
-    outDir: "/",
+    pluginName: 'plumoguSV',
+    pluginVersion: '2.2.1',
+    pluginAuthor: 'plummyyummy, kloi34',
+    pluginDescription: 'The ultimate community-driven and open-source competitive SV plugin, remastered for the modern age.',
+    sources: ['QParcel', 'src'],
+    outDir: '/',
     buildVersionInPluginName: true,
-    workshopFolder: "assets"
+    workshopFolder: 'assets',
 }

@@ -2,23 +2,30 @@ function changeNoteLockMode()
     local mode = cache.get('user/lock_mode', 0)
 
     mode = (mode + 1) % 4
-    if mode == 0 then
-        print('s', 'Notes have been unlocked.')
-    end
+    if mode == 0 then print('s', 'Notes have been unlocked.') end
     if mode == 1 then
-        print('e',
-            'Notes have been fully locked. To change the lock mode, press ' ..
-            globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. '.')
+        print(
+            'e',
+            'Notes have been fully locked. To change the lock mode, press '
+                .. globalVars.hotkeyList[hotkeys_enum.toggle_note_lock]
+                .. '.'
+        )
     end
     if mode == 2 then
-        print('w',
-            'Notes can no longer be placed, only moved. To change the lock mode, press ' ..
-            globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. '.')
+        print(
+            'w',
+            'Notes can no longer be placed, only moved. To change the lock mode, press '
+                .. globalVars.hotkeyList[hotkeys_enum.toggle_note_lock]
+                .. '.'
+        )
     end
     if mode == 3 then
-        print('w',
-            'Notes can no longer be moved, only placed and deleted. To change the lock mode, press ' ..
-            globalVars.hotkeyList[hotkeys_enum.toggle_note_lock] .. '.')
+        print(
+            'w',
+            'Notes can no longer be moved, only placed and deleted. To change the lock mode, press '
+                .. globalVars.hotkeyList[hotkeys_enum.toggle_note_lock]
+                .. '.'
+        )
     end
 
     cache.set('user/lock_mode', mode)
@@ -44,7 +51,7 @@ function initializeNoteLockMode()
                 action_type.AddHitsound,
                 action_type.RemoveHitsound,
             }
-            if (not table.contains(allowedActions, actionIndex)) then return end
+            if not table.contains(allowedActions, actionIndex) then return end
             actions.Undo()
         end
         if mode == 3 then -- Only move notes
@@ -54,7 +61,7 @@ function initializeNoteLockMode()
                 action_type.SwapLanes,
                 action_type.MoveHitObjects,
             }
-            if (not table.contains(allowedActions, actionIndex)) then return end
+            if not table.contains(allowedActions, actionIndex) then return end
             actions.Undo()
         end
     end)

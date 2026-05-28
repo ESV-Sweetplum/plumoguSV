@@ -5,7 +5,7 @@ function convertSVSSF(menuVars)
     local objects = {}
     local editorActions = {}
 
-    if (menuVars.conversionDirection) then
+    if menuVars.conversionDirection then
         local svs = game.get.svsBetweenOffsets(startOffset, endOffset, false)
         for _, sv in ipairs(svs) do
             table.insert(objects, { StartTime = sv.StartTime, Multiplier = sv.Multiplier })
@@ -20,14 +20,13 @@ function convertSVSSF(menuVars)
     end
     local createTable = {}
     for _, obj in ipairs(objects) do
-        if (menuVars.conversionDirection) then
-            table.insert(createTable, createSSF(obj.StartTime,
-                obj.Multiplier))
+        if menuVars.conversionDirection then
+            table.insert(createTable, createSSF(obj.StartTime, obj.Multiplier))
         else
             table.insert(createTable, createSV(obj.StartTime, obj.Multiplier))
         end
     end
-    if (menuVars.conversionDirection) then
+    if menuVars.conversionDirection then
         table.insert(editorActions, createEA(action_type.AddScrollSpeedFactorBatch, createTable))
     else
         table.insert(editorActions, createEA(action_type.AddScrollVelocityBatch, createTable))

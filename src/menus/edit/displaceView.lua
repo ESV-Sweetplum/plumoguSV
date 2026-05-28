@@ -7,6 +7,4 @@ function displaceViewMenu()
     simpleActionMenu('Displace view between selected notes', 2, displaceViewSVs, menuVars)
 end
 
-function displaceViewSettingsMenu(menuVars)
-    chooseDistance(menuVars)
-end
+function displaceViewSettingsMenu(menuVars) chooseDistance(menuVars) end

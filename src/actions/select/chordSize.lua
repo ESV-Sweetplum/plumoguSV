@@ -1,11 +1,11 @@
 function selectByChordSizes(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if not truthy(offsets) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
 
     local notes = game.get.notesBetweenOffsets(startOffset, endOffset)
-    if (globalVars.comboizeSelect) then notes = state.SelectedHitObjects end
+    if globalVars.comboizeSelect then notes = state.SelectedHitObjects end
 
     notes = sort(notes, sortAscendingNoteLaneTime)
 
@@ -34,7 +34,7 @@ function selectByChordSizes(menuVars)
         local curLane = 0
         local totalNotes = {}
         for _, note in ipairs(notes) do
-            if (math.abs(note.StartTime - time) < 3) then
+            if math.abs(note.StartTime - time) < 3 then
                 size = size + 1
                 curLane = curLane + 1
                 -- if (table.contains(allowedOrdering, curLane)) then
@@ -48,9 +48,7 @@ function selectByChordSizes(menuVars)
     local notesToSelect = {}
 
     for idx = 1, game.keyCount do
-        if (menuVars['select' .. idx]) then
-            notesToSelect = table.combine(notesToSelect, sizeDict[idx])
-        end
+        if menuVars['select' .. idx] then notesToSelect = table.combine(notesToSelect, sizeDict[idx]) end
     end
 
     actions.SetHitObjectSelection(notesToSelect)

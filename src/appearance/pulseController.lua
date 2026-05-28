@@ -9,34 +9,34 @@ function pulseController()
 
     local timeOffset = 50 -- [`state.SongTime`](lua://state.SongTime) isn't entirely accurate while the song is playing, so this aims to correct that.
 
-    local timeSinceLastBar = ((state.SongTime + timeOffset) - game.get.timingPointAt(state.SongTime).StartTime) %
-        ((60000 / game.get.timingPointAt(state.SongTime).Bpm))
+    local timeSinceLastBar = ((state.SongTime + timeOffset) - game.get.timingPointAt(state.SongTime).StartTime)
+        % (60000 / game.get.timingPointAt(state.SongTime).Bpm)
 
     pulseVars.pulsedThisFrame = false
 
-    if ((timeSinceLastBar < pulseVars.previousBar)) then
+    if timeSinceLastBar < pulseVars.previousBar then
         pulseVars.pulseStatus = 1
         pulseVars.pulsedThisFrame = true
     else
-        pulseVars.pulseStatus = (pulseVars.pulseStatus - state.DeltaTime / (60000 / game.get.timingPointAt(state.SongTime).Bpm) * 1.2)
+        pulseVars.pulseStatus = (
+            pulseVars.pulseStatus - state.DeltaTime / (60000 / game.get.timingPointAt(state.SongTime).Bpm) * 1.2
+        )
     end
 
     pulseVars.previousBar = timeSinceLastBar
 
     local futureTime = state.SongTime + state.DeltaTime * 2 + timeOffset
 
-    if ((futureTime - game.get.timingPointAt(futureTime).StartTime) < 0) then
-        pulseVars.pulseStatus = 0
-    end
+    if (futureTime - game.get.timingPointAt(futureTime).StartTime) < 0 then pulseVars.pulseStatus = 0 end
 
     outputPulseStatus = math.max(pulseVars.pulseStatus, 0) * (globalVars.pulseCoefficient or 0)
 
     local borderColor = cache.get('border/base_color', vctr4(1))
-    if (type(borderColor) == 'table') then borderColor = table.vectorize4(borderColor) end
+    if type(borderColor) == 'table' then borderColor = table.vectorize4(borderColor) end
     local defaultPulseColor = cache.get('border/pulse_color')
 
     local pulseColor = globalVars.useCustomPulseColor and globalVars.pulseColor or defaultPulseColor
-    if (type(pulseColor) == 'table') then pulseColor = table.vectorize4(pulseColor) end
+    if type(pulseColor) == 'table' then pulseColor = table.vectorize4(pulseColor) end
 
     imgui.PushStyleColor(imgui_col.Border, pulseColor * outputPulseStatus + borderColor * (1 - outputPulseStatus))
 

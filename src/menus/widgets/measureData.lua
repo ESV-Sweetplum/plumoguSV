@@ -14,12 +14,10 @@ function renderMeasureDataWidget()
 
     local uniqueDict = {}
     for _, ho in ipairs(state.SelectedHitObjects) do -- game.get.uniqueSelectedNoteOffsets was not used here because this approach exits the function faster
-        if (not table.contains(uniqueDict, ho.StartTime)) then
-            table.insert(uniqueDict, ho.StartTime)
-        end
-        if (#uniqueDict > 2) then return end
+        if not table.contains(uniqueDict, ho.StartTime) then table.insert(uniqueDict, ho.StartTime) end
+        if #uniqueDict > 2 then return end
     end
-    if (#state.SelectedHitObjects == 1 and state.SelectedHitObjects[1].EndTime ~= 0) then
+    if #state.SelectedHitObjects == 1 and state.SelectedHitObjects[1].EndTime ~= 0 then
         uniqueDict = { state.SelectedHitObjects[1].StartTime, state.SelectedHitObjects[1].EndTime }
         imgui.BeginTooltip()
         AddSeparator()
@@ -28,11 +26,19 @@ function renderMeasureDataWidget()
     uniqueDict = sort(uniqueDict, sortAscending) ---@type number[]
     local startOffset = uniqueDict[1]
     local endOffset = uniqueDict[2] or uniqueDict[1]
-    if (math.abs(endOffset - startOffset) < 1e-10 and not cache.get('map_edited')
-            and state.SelectedScrollGroupId == widgetVars.tgName) then
+    if
+        math.abs(endOffset - startOffset) < 1e-10
+        and not cache.get('map_edited')
+        and state.SelectedScrollGroupId == widgetVars.tgName
+    then
         return
     end
-    if (endOffset ~= widgetVars.oldEndOffset or startOffset ~= widgetVars.oldStartOffset or cache.get('map_edited') or state.SelectedScrollGroupId ~= widgetVars.tgName) then
+    if
+        endOffset ~= widgetVars.oldEndOffset
+        or startOffset ~= widgetVars.oldStartOffset
+        or cache.get('map_edited')
+        or state.SelectedScrollGroupId ~= widgetVars.tgName
+    then
         svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)

@@ -5,9 +5,10 @@ function showPatchNotesWindow()
     imgui.SetWindowSize('plumoguSV Patch Notes', vector.New(500, 400))
     imgui.PushStyleColor(imgui_col.Separator, color.alterOpacity(color.int.white, -200))
 
-    local minorUpdateLeftColor = color.vrgbaToUint(color.hslaToRgba(math.sin(state.UnixTime / 500) * 60 + 300, 1, 0.7, 1))
-    local minorUpdateRightColor = color.vrgbaToUint(color.hslaToRgba(-math.sin(state.UnixTime / 500) * 60 + 300, 1, 0.7,
-        1))
+    local minorUpdateLeftColor =
+        color.vrgbaToUint(color.hslaToRgba(math.sin(state.UnixTime / 500) * 60 + 300, 1, 0.7, 1))
+    local minorUpdateRightColor =
+        color.vrgbaToUint(color.hslaToRgba(-math.sin(state.UnixTime / 500) * 60 + 300, 1, 0.7, 1))
 
     local majorUpdateLeftColor = color.vrgbaToUint(color.hslaToRgba((state.UnixTime % 3600) / 10, 1, 0.7, 1))
     local majorUpdateRightColor = color.vrgbaToUint(color.hslaToRgba(360 - (state.UnixTime % 3600) / 10, 1, 0.7, 1))
@@ -15,9 +16,7 @@ function showPatchNotesWindow()
     local minHeight = imgui.GetWindowPos().y
     local maxHeight = minHeight + 400
 
-    if (not patchNotesOpened) then
-        cache.set('windows/patch_notes', false)
-    end
+    if not patchNotesOpened then cache.set('windows/patch_notes', false) end
 
     showPatchNotesV221(color.int.white)
     showPatchNotesV220(minorUpdateLeftColor, minorUpdateRightColor)
@@ -48,11 +47,11 @@ function showPatchNotesElement(version, logoFn, logoWidth, colorData, updateData
     local maxHeight = minHeight + 400
     logoWidth = logoWidth + 5
 
-    if (topLeft.y - maxHeight > 0) then goto skipLogoRender end
-    if (topLeft.y - minHeight < 0) then goto skipLogoRender end
+    if topLeft.y - maxHeight > 0 then goto skipLogoRender end
+    if topLeft.y - minHeight < 0 then goto skipLogoRender end
     do
         local leftColor, rightColor
-        if (type(colorData) == 'table') then
+        if type(colorData) == 'table' then
             logoFn(ctx, topLeft + vector.New(243, 16), 1, 1)
             leftColor, rightColor = colorData[1], colorData[2]
         else
@@ -60,31 +59,41 @@ function showPatchNotesElement(version, logoFn, logoWidth, colorData, updateData
             leftColor, rightColor = colorData, colorData
         end
 
-        ctx.AddRectFilledMultiColor(topLeft + vector.New(0, 25), topLeft + vector.New(243 - logoWidth / 2 - 10, 28),
+        ctx.AddRectFilledMultiColor(
+            topLeft + vector.New(0, 25),
+            topLeft + vector.New(243 - logoWidth / 2 - 10, 28),
             leftColor,
-            rightColor, rightColor, leftColor)
-        ctx.AddRectFilledMultiColor(topLeft + vector.New(243 + logoWidth / 2 + 13, 25), topLeft + vector.New(486, 28),
             rightColor,
-            leftColor, leftColor, rightColor)
+            rightColor,
+            leftColor
+        )
+        ctx.AddRectFilledMultiColor(
+            topLeft + vector.New(243 + logoWidth / 2 + 13, 25),
+            topLeft + vector.New(486, 28),
+            rightColor,
+            leftColor,
+            leftColor,
+            rightColor
+        )
     end
     ::skipLogoRender::
     imgui.EndChild()
     local bugFixes = updateData.bugFixes
     local newFeatures = updateData.newFeatures
     local devUpdates = updateData.devUpdates
-    if (truthy(bugFixes)) then
+    if truthy(bugFixes) then
         imgui.SeparatorText('Bug Fixes / Minor Changes')
         for _, v in ipairs(bugFixes) do
             imgui.BulletText(v)
         end
     end
-    if (truthy(newFeatures)) then
+    if truthy(newFeatures) then
         imgui.SeparatorText('New Features')
         for _, v in ipairs(newFeatures) do
             imgui.BulletText(v)
         end
     end
-    if (truthy(devUpdates)) then
+    if truthy(devUpdates) then
         imgui.SeparatorText('Development Updates')
         for _, v in ipairs(devUpdates) do
             imgui.BulletText(v)

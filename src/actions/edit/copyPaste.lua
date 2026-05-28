@@ -1,14 +1,14 @@
 function copyItems(menuVars)
     clearCopiedItems(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if not truthy(offsets) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local lines = game.get.linesBetweenOffsets(startOffset, endOffset)
     local svs = game.get.svsBetweenOffsets(startOffset, endOffset)
     local ssfs = game.get.ssfsBetweenOffsets(startOffset, endOffset)
     local bms = game.get.bookmarksBetweenOffsets(startOffset, endOffset)
-    if (not menuVars.copyLines) then goto lineSkip end
+    if not menuVars.copyLines then goto lineSkip end
     for _, line in ipairs(lines) do
         local copiedLine = {
             relativeOffset = line.StartTime - startOffset,
@@ -19,7 +19,7 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.lines[menuVars.curSlot], copiedLine)
     end
     ::lineSkip::
-    if (not menuVars.copySVs) then goto svSkip end
+    if not menuVars.copySVs then goto svSkip end
     for _, sv in ipairs(svs) do
         local copiedSV = {
             relativeOffset = sv.StartTime - startOffset,
@@ -28,7 +28,7 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.SVs[menuVars.curSlot], copiedSV)
     end
     ::svSkip::
-    if (not menuVars.copySSFs) then goto ssfSkip end
+    if not menuVars.copySSFs then goto ssfSkip end
     for _, ssf in ipairs(ssfs) do
         local copiedSSF = {
             relativeOffset = ssf.StartTime - startOffset,
@@ -37,7 +37,7 @@ function copyItems(menuVars)
         table.insert(menuVars.copied.SSFs[menuVars.curSlot], copiedSSF)
     end
     ::ssfSkip::
-    if (not menuVars.copyBMs) then goto bmSkip end
+    if not menuVars.copyBMs then goto bmSkip end
     for _, bm in ipairs(bms) do
         local copiedBM = {
             relativeOffset = bm.StartTime - startOffset,
@@ -47,33 +47,43 @@ function copyItems(menuVars)
     end
     ::bmSkip::
     local printed = false
-    if (#menuVars.copied.BMs[menuVars.curSlot] > 0) then
+    if #menuVars.copied.BMs[menuVars.curSlot] > 0 then
         printed = true
-        toggleablePrint('s!',
-            'Copied ' ..
-            #menuVars.copied.BMs[menuVars.curSlot] .. pluralize(' Bookmark.', #menuVars.copied.BMs[menuVars.curSlot], -2))
+        toggleablePrint(
+            's!',
+            'Copied '
+                .. #menuVars.copied.BMs[menuVars.curSlot]
+                .. pluralize(' Bookmark.', #menuVars.copied.BMs[menuVars.curSlot], -2)
+        )
     end
-    if (#menuVars.copied.SSFs[menuVars.curSlot] > 0) then
+    if #menuVars.copied.SSFs[menuVars.curSlot] > 0 then
         printed = true
-        toggleablePrint('s!',
-            'Copied ' ..
-            #menuVars.copied.SSFs[menuVars.curSlot] .. pluralize(' SSF.', #menuVars.copied.SSFs[menuVars.curSlot], -2))
+        toggleablePrint(
+            's!',
+            'Copied '
+                .. #menuVars.copied.SSFs[menuVars.curSlot]
+                .. pluralize(' SSF.', #menuVars.copied.SSFs[menuVars.curSlot], -2)
+        )
     end
-    if (#menuVars.copied.SVs[menuVars.curSlot] > 0) then
+    if #menuVars.copied.SVs[menuVars.curSlot] > 0 then
         printed = true
-        toggleablePrint('s!',
-            'Copied ' ..
-            #menuVars.copied.SVs[menuVars.curSlot] .. pluralize(' SV.', #menuVars.copied.SVs[menuVars.curSlot], -2))
+        toggleablePrint(
+            's!',
+            'Copied '
+                .. #menuVars.copied.SVs[menuVars.curSlot]
+                .. pluralize(' SV.', #menuVars.copied.SVs[menuVars.curSlot], -2)
+        )
     end
-    if (#menuVars.copied.lines[menuVars.curSlot] > 0) then
+    if #menuVars.copied.lines[menuVars.curSlot] > 0 then
         printed = true
-        toggleablePrint('s!',
-            'Copied ' ..
-            #menuVars.copied.lines[menuVars.curSlot] .. pluralize(' Line.', #menuVars.copied.lines[menuVars.curSlot], -2))
+        toggleablePrint(
+            's!',
+            'Copied '
+                .. #menuVars.copied.lines[menuVars.curSlot]
+                .. pluralize(' Line.', #menuVars.copied.lines[menuVars.curSlot], -2)
+        )
     end
-    if (not printed) then
-        print('w!', 'There were no items to copy.')
-    end
+    if not printed then print('w!', 'There were no items to copy.') end
 end
 
 function clearCopiedItems(menuVars)
@@ -87,7 +97,7 @@ end
 
 function pasteItems(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if not truthy(offsets) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local lastCopiedLine = menuVars.copied.lines[menuVars.curSlot][#menuVars.copied.lines[menuVars.curSlot]]
@@ -122,17 +132,13 @@ function pasteItems(menuVars)
         local ignoranceTolerance = 0.01
         for _, line in ipairs(menuVars.copied.lines[menuVars.curSlot]) do
             local timeToPasteLine = pasteOffset + line.relativeOffset
-            if (math.abs(timeToPasteLine - nextOffset) < ignoranceTolerance and i ~= #offsets) then
-                goto nextLine
-            end
+            if math.abs(timeToPasteLine - nextOffset) < ignoranceTolerance and i ~= #offsets then goto nextLine end
             table.insert(linesToAdd, utils.CreateTimingPoint(timeToPasteLine, line.bpm, line.signature, line.hidden))
             ::nextLine::
         end
         for _, sv in ipairs(menuVars.copied.SVs[menuVars.curSlot]) do
             local timeToPasteSV = pasteOffset + sv.relativeOffset
-            if (math.abs(timeToPasteSV - nextOffset) < ignoranceTolerance and i ~= #offsets) then
-                goto nextSV
-            end
+            if math.abs(timeToPasteSV - nextOffset) < ignoranceTolerance and i ~= #offsets then goto nextSV end
             if menuVars.tryAlign then
                 timeToPasteSV = tryAlignToHitObjects(timeToPasteSV, hitObjectTimes, menuVars.alignWindow)
             end
@@ -141,17 +147,13 @@ function pasteItems(menuVars)
         end
         for _, ssf in ipairs(menuVars.copied.SSFs[menuVars.curSlot]) do
             local timeToPasteSSF = pasteOffset + ssf.relativeOffset
-            if (math.abs(timeToPasteSSF - nextOffset) < ignoranceTolerance and i ~= #offsets) then
-                goto nextSSF
-            end
+            if math.abs(timeToPasteSSF - nextOffset) < ignoranceTolerance and i ~= #offsets then goto nextSSF end
             table.insert(ssfsToAdd, createSSF(timeToPasteSSF, ssf.multiplier))
             ::nextSSF::
         end
         for _, bm in ipairs(menuVars.copied.BMs[menuVars.curSlot]) do
             local timeToPasteBM = pasteOffset + bm.relativeOffset
-            if (math.abs(timeToPasteBM - nextOffset) < ignoranceTolerance and i ~= #offsets) then
-                goto nextBM
-            end
+            if math.abs(timeToPasteBM - nextOffset) < ignoranceTolerance and i ~= #offsets then goto nextBM end
             table.insert(bmsToAdd, utils.CreateBookmark(timeToPasteBM, bm.note))
             ::nextBM::
         end
@@ -166,51 +168,41 @@ function pasteItems(menuVars)
         createEA(action_type.AddScrollSpeedFactorBatch, ssfsToAdd),
         createEA(action_type.AddBookmarkBatch, bmsToAdd),
     })
-    if (truthy(linesToRemove)) then
+    if truthy(linesToRemove) then
         toggleablePrint('e!', 'Deleted ' .. #linesToRemove .. pluralize(' timing point.', #linesToRemove, -2))
     end
-    if (truthy(svsToRemove)) then
-        toggleablePrint('e!',
-            'Deleted ' .. #svsToRemove .. pluralize(' scroll velocity.', #svsToRemove, -2))
+    if truthy(svsToRemove) then
+        toggleablePrint('e!', 'Deleted ' .. #svsToRemove .. pluralize(' scroll velocity.', #svsToRemove, -2))
     end
-    if (truthy(ssfsToRemove)) then
-        toggleablePrint('e!',
-            'Deleted ' .. #ssfsToRemove .. pluralize(' scroll speed factor.', #ssfsToRemove, -2))
+    if truthy(ssfsToRemove) then
+        toggleablePrint('e!', 'Deleted ' .. #ssfsToRemove .. pluralize(' scroll speed factor.', #ssfsToRemove, -2))
     end
-    if (truthy(bmsToRemove)) then
+    if truthy(bmsToRemove) then
         toggleablePrint('e!', 'Deleted ' .. #bmsToRemove .. pluralize(' bookmark.', #bmsToRemove, -2))
     end
-    if (truthy(linesToAdd)) then
+    if truthy(linesToAdd) then
         toggleablePrint('s!', 'Created ' .. #linesToAdd .. pluralize(' timing point.', #linesToAdd, -2))
     end
-    if (truthy(svsToAdd)) then
-        toggleablePrint('s!',
-            'Created ' .. #svsToAdd .. pluralize(' scroll velocity.', #svsToAdd, -2))
+    if truthy(svsToAdd) then
+        toggleablePrint('s!', 'Created ' .. #svsToAdd .. pluralize(' scroll velocity.', #svsToAdd, -2))
     end
-    if (truthy(ssfsToAdd)) then
-        toggleablePrint('s!',
-            'Created ' .. #ssfsToAdd .. pluralize(' scroll speed factor.', #ssfsToAdd, -2))
+    if truthy(ssfsToAdd) then
+        toggleablePrint('s!', 'Created ' .. #ssfsToAdd .. pluralize(' scroll speed factor.', #ssfsToAdd, -2))
     end
-    if (truthy(bmsToAdd)) then
+    if truthy(bmsToAdd) then
         toggleablePrint('s!', 'Created ' .. #bmsToAdd .. pluralize(' bookmark.', #bmsToAdd, -2))
     end
 end
 
 function tryAlignToHitObjects(time, hitObjectTimes, alignWindow)
-    if not truthy(hitObjectTimes) then
-        return time
-    end
+    if not truthy(hitObjectTimes) then return time end
 
     local closestTime = table.searchClosest(hitObjectTimes, time)
 
-    if math.abs(closestTime - time) > alignWindow then
-        return time
-    end
+    if math.abs(closestTime - time) > alignWindow then return time end
 
     time = math.frac(time) + closestTime - 1
-    if math.abs(closestTime - (time + 1)) < math.abs(closestTime - time) then
-        time = time + 1
-    end
+    if math.abs(closestTime - (time + 1)) < math.abs(closestTime - time) then time = time + 1 end
 
     return time
 end

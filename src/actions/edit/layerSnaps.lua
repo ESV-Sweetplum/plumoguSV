@@ -5,8 +5,7 @@ COLOR_MAP = {
     [4] = 'Yellow',
     [5] = 'White',
     [6] = 'Pink',
-    [8] =
-    'Orange',
+    [8] = 'Orange',
     [12] = 'Cyan',
     [16] = 'Green',
 }
@@ -30,16 +29,18 @@ function layerSnaps()
     local notes = map.HitObjects
     for _, ho in ipairs(notes) do
         local color = COLOR_MAP[game.get.snapAt(ho.StartTime)]
-        if (ho.EditorLayer == 0) then
+        if ho.EditorLayer == 0 then
             layer = { Name = 'Default', ColorRgb = '255,255,255', Hidden = false }
         else
             layer = map.EditorLayers[ho.EditorLayer]
         end
         local newLayerName = layer.Name .. '-plumoguSV-snap-' .. color
-        if (table.contains(layerNames, newLayerName)) then
-            if (table.contains(originalLayerNames, newLayerName)) then
-                print('e!',
-                    'Existing plumoguSV snap layers have been detected. Please remove them before trying to layer snaps again.')
+        if table.contains(layerNames, newLayerName) then
+            if table.contains(originalLayerNames, newLayerName) then
+                print(
+                    'e!',
+                    'Existing plumoguSV snap layers have been detected. Please remove them before trying to layer snaps again.'
+                )
                 return
             end
             table.insert(layerDict[newLayerName].hos, ho)
@@ -54,8 +55,7 @@ function layerSnaps()
 
     for layerName, layerData in pairs(layerDict) do
         local layer = utils.CreateEditorLayer(layerName, layerData.Hidden, layerData.ColorRgb)
-        table.insert(createLayerQueue,
-            createEA(action_type.CreateLayer, layer))
+        table.insert(createLayerQueue, createEA(action_type.CreateLayer, layer))
         table.insert(moveNoteQueue, createEA(action_type.MoveToLayer, layer, layerData.hos))
     end
     actions.PerformBatch(createLayerQueue)
@@ -79,39 +79,47 @@ function collapseSnaps()
 
             if tp.StartTime > ho.StartTime + snapInterval then break end
         end
-        if (ho.EditorLayer == 0) then
+        if ho.EditorLayer == 0 then
             hoLayer = { Name = 'Default', ColorRgb = '255,255,255', Hidden = false }
         else
             hoLayer = map.EditorLayers[ho.EditorLayer]
         end
-        if (not hoLayer.Name:find('plumoguSV')) then goto nextLayer end
+        if not hoLayer.Name:find('plumoguSV') then goto nextLayer end
         do
             local color = hoLayer.Name:match('-([a-zA-Z]+)$')
             local snap = REVERSE_COLOR_MAP[color]
             local mostRecentTP = game.get.timingPointAt(ho.StartTime)
             if snap == 1 then
-                table.insert(snapTpsToAdd,
-                    utils.CreateTimingPoint(ho.StartTime, mostRecentTP.Bpm, mostRecentTP.Signature, true))
+                table.insert(
+                    snapTpsToAdd,
+                    utils.CreateTimingPoint(ho.StartTime, mostRecentTP.Bpm, mostRecentTP.Signature, true)
+                )
             else
-                table.insert(snapTpsToAdd,
-                    utils.CreateTimingPoint(ho.StartTime - snapInterval,
-                        baseBpm / snap, mostRecentTP.Signature, true))
-                table.insert(normalTpsToAdd,
-                    utils.CreateTimingPoint(ho.StartTime + snapInterval,
-                        mostRecentTP.Bpm, mostRecentTP.Signature, true))
+                table.insert(
+                    snapTpsToAdd,
+                    utils.CreateTimingPoint(ho.StartTime - snapInterval, baseBpm / snap, mostRecentTP.Signature, true)
+                )
+                table.insert(
+                    normalTpsToAdd,
+                    utils.CreateTimingPoint(ho.StartTime + snapInterval, mostRecentTP.Bpm, mostRecentTP.Signature, true)
+                )
             end
             local originalLayerName = hoLayer.Name:match('^([^-]+)-')
 
-            table.insert(moveNoteActions,
-                createEA(action_type.MoveToLayer,
-                    map.EditorLayers[table.indexOf(table.property(map.EditorLayers, 'Name'), originalLayerName)], { ho }))
-            table.insert(removeLayerActions,
-                createEA(action_type.RemoveLayer, hoLayer))
+            table.insert(
+                moveNoteActions,
+                createEA(
+                    action_type.MoveToLayer,
+                    map.EditorLayers[table.indexOf(table.property(map.EditorLayers, 'Name'), originalLayerName)],
+                    { ho }
+                )
+            )
+            table.insert(removeLayerActions, createEA(action_type.RemoveLayer, hoLayer))
         end
         ::nextLayer::
     end
     actions.PerformBatch(moveNoteActions)
-    if (not truthy(#normalTpsToAdd + #snapTpsToAdd + #tpsToRemove)) then
+    if not truthy(#normalTpsToAdd + #snapTpsToAdd + #tpsToRemove) then
         print('w!', 'There were no generated layers you nonce')
         return
     end
@@ -129,7 +137,7 @@ function clearSnappedLayers()
             table.insert(removeLayerActions, createEA(action_type.RemoveLayer, layer))
         end
     end
-    if (not truthy(removeLayerActions)) then
+    if not truthy(removeLayerActions) then
         print('w!', 'There were no generated layers you nonce')
         return
     end

@@ -3,22 +3,18 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
     local placingStillSVs = menuVars.noteSpacing ~= nil
     local numMultipliers = #menuVars.svMultipliers
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if not truthy(offsets) then return end
     if placingStillSVs then
         offsets = game.get.uniqueNoteOffsetsBetweenSelected()
-        if (not truthy(offsets)) then return end
-        if place == false then
-            offsets = game.get.uniqueNoteOffsetsBetween(optionalStart, optionalEnd)
-        end
+        if not truthy(offsets) then return end
+        if place == false then offsets = game.get.uniqueNoteOffsetsBetween(optionalStart, optionalEnd) end
     end
     local firstOffset = offsets[1]
     local lastOffset = offsets[#offsets]
     if placingStillSVs then offsets = { firstOffset, lastOffset } end
     local svsToAdd = {}
     local svsToRemove = game.get.svsBetweenOffsets(firstOffset, lastOffset, finalSVType == 'Override')
-    if (not placingStillSVs) and globalVars.dontReplaceSV then
-        svsToRemove = {}
-    end
+    if (not placingStillSVs) and globalVars.dontReplaceSV then svsToRemove = {} end
     for i = 1, #offsets - 1 do
         local startOffset = offsets[i]
         local endOffset = offsets[i + 1]
@@ -33,20 +29,18 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
         end
     end
     local lastMultiplier = menuVars.svMultipliers[numMultipliers]
-    if (place == nil or place == true) then
+    if place == nil or place == true then
         if placingStillSVs then
-            local stillSVResult = getStillSVs(menuVars, firstOffset, lastOffset,
-                sort(svsToAdd, sortAscendingStartTime), svsToAdd)
+            local stillSVResult =
+                getStillSVs(menuVars, firstOffset, lastOffset, sort(svsToAdd, sortAscendingStartTime), svsToAdd)
             svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
         end
-        if (finalSVType ~= 'None') then
-            addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override')
-        end
+        if finalSVType ~= 'None' then addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override') end
         removeAndAddSVs(svsToRemove, svsToAdd)
         return
     end
-    local stillSVResult = getStillSVs(menuVars, firstOffset, lastOffset,
-        sort(svsToAdd, sortAscendingStartTime), svsToAdd, queuedSVs)
+    local stillSVResult =
+        getStillSVs(menuVars, firstOffset, lastOffset, sort(svsToAdd, sortAscendingStartTime), svsToAdd, queuedSVs)
     svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
     return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
 end

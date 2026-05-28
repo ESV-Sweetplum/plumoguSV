@@ -1,5 +1,5 @@
 function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
-    if (menuVars.vibratoMode == 1) then
+    if menuVars.vibratoMode == 1 then
         SwappableNegatableInputFloat2(settingVars, 'startMsx', 'endMsx', 'Bounds##Vibrato', ' msx', 0, 0.875)
         BasicInputInt(settingVars, 'controlPointCount', 'Control Points', { 1, 10 })
         AddSeparator()
@@ -9,14 +9,20 @@ function polynomialVibratoMenu(menuVars, settingVars, separateWindow)
         PolynomialEditor(size, settingVars, separateWindow)
 
         local func = function(t)
-            return (settingVars.startMsx - settingVars.endMsx) *
-                (1 - math.clamp(math.evaluatePolynomial(settingVars.plotCoefficients, t * size) / size, 0, 1)) +
-                settingVars.endMsx -- Reversed due to the way imgui draws
+            return (settingVars.startMsx - settingVars.endMsx)
+                    * (1 - math.clamp(math.evaluatePolynomial(settingVars.plotCoefficients, t * size) / size, 0, 1))
+                + settingVars.endMsx -- Reversed due to the way imgui draws
         end
 
-        simpleActionMenu('Vibrate', 2, function(v)
-            svVibrato(v, func)
-        end, menuVars, false, false, separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil)
+        simpleActionMenu(
+            'Vibrate',
+            2,
+            function(v) svVibrato(v, func) end,
+            menuVars,
+            false,
+            false,
+            separateWindow and globalVars.hotkeyList[hotkeys_enum.exec_vibrato] or nil
+        )
     else
         imgui.TextColored(color.vctr.red, 'This mode is not supported.')
     end
@@ -29,28 +35,32 @@ function PolynomialEditor(size, settingVars, separateWindow)
 
     local changedControlCount = false
 
-    while (settingVars.controlPointCount > #settingVars.controlPoints) do
+    while settingVars.controlPointCount > #settingVars.controlPoints do
         local points = table.duplicate(settingVars.controlPoints)
         table.insert(points, vector.New(math.random(), math.random()))
         settingVars.controlPoints = table.duplicate(points)
         changedControlCount = true
     end
 
-    while (settingVars.controlPointCount < #settingVars.controlPoints) do
+    while settingVars.controlPointCount < #settingVars.controlPoints do
         table.remove(settingVars.controlPoints, #settingVars.controlPoints)
         changedControlCount = true
     end
 
     for _, point in pairs(settingVars.controlPoints) do
-        table.insert(pointList,
-            { pos = table.vectorize2(point) * vctr2(size), col = color.int.white, size = 5 })
+        table.insert(pointList, { pos = table.vectorize2(point) * vctr2(size), col = color.int.white, size = 5 })
     end
 
     imgui.SetCursorPosX(26)
     imgui.BeginChild('Polynomial Vibrato Interactive Window' .. tostring(separateWindow), vctr2(size), 67, 31)
-    local ctx, changedPoints = renderGraph('Polynomial Vibrato Menu' .. tostring(separateWindow), vctr2(size),
-        pointList, false, 11,
-        vector.New(settingVars.startMsx, settingVars.endMsx))
+    local ctx, changedPoints = renderGraph(
+        'Polynomial Vibrato Menu' .. tostring(separateWindow),
+        vctr2(size),
+        pointList,
+        false,
+        11,
+        vector.New(settingVars.startMsx, settingVars.endMsx)
+    )
 
     changedPoints = not truthy(settingVars.plotPoints) or changedPoints
 
@@ -58,7 +68,7 @@ function PolynomialEditor(size, settingVars, separateWindow)
         settingVars.controlPoints[i] = vector.Clamp(pointList[i].pos, vctr2(0), vctr2(size)) / vctr2(size)
     end
 
-    if (changedPoints or changedControlCount) then
+    if changedPoints or changedControlCount then
         plotPoints = {}
 
         local mtrx = {}
@@ -74,10 +84,10 @@ function PolynomialEditor(size, settingVars, separateWindow)
 
         local sorted = false
 
-        while (not sorted) do
+        while not sorted do
             sorted = true
             for i = 1, #mtrx - 1 do
-                if (mtrx[i][2] < mtrx[i + 1][2]) then
+                if mtrx[i][2] < mtrx[i + 1][2] then
                     local tempRow = table.duplicate(mtrx[i])
                     mtrx[i] = table.duplicate(mtrx[i + 1])
                     mtrx[i + 1] = tempRow
@@ -107,9 +117,12 @@ function PolynomialEditor(size, settingVars, separateWindow)
 
     for i = 1, #settingVars.plotPoints - 1 do
         local opacityFactor = 0.7 - math.sin(20 * i / #settingVars.plotPoints - clock.getTime() * 5) / 2
-        ctx.AddLine(topLeft + settingVars.plotPoints[i],
+        ctx.AddLine(
+            topLeft + settingVars.plotPoints[i],
             vector.Clamp(topLeft + settingVars.plotPoints[i + 1], topLeft, topLeft + dim - vctr2(1)),
-            imgui.GetColorU32('PlotLines', opacityFactor), 3)
+            imgui.GetColorU32('PlotLines', opacityFactor),
+            3
+        )
     end
 
     imgui.EndChild()

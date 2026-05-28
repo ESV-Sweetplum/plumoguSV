@@ -1,4 +1,9 @@
 {
-    "editor.defaultFormatter": "sumneko.lua",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "[lua]": {
+        "editor.defaultFormatter": "JohnnyMorganz.stylua"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }

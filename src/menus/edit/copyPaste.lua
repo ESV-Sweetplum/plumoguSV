@@ -19,7 +19,7 @@ function copyNPasteSettingsMenu(menuVars, actionable)
     _, menuVars.copyBMs = imgui.Checkbox('Copy Bookmarks', menuVars.copyBMs)
     AddSeparator()
     if actionable then BasicInputInt(menuVars, 'curSlot', 'Current slot', { 1, 999 }) end
-    if (actionable and #menuVars.copied.lines < menuVars.curSlot) then
+    if actionable and #menuVars.copied.lines < menuVars.curSlot then
         local newCopied = table.duplicate(menuVars.copied)
         while #newCopied.lines < menuVars.curSlot do
             table.insert(newCopied.lines, {})
@@ -31,8 +31,10 @@ function copyNPasteSettingsMenu(menuVars, actionable)
     end
     if actionable then AddSeparator() end
 
-    local copiedItemCount = #menuVars.copied.lines[menuVars.curSlot] + #menuVars.copied.SVs[menuVars.curSlot] +
-        #menuVars.copied.SSFs[menuVars.curSlot] + #menuVars.copied.BMs[menuVars.curSlot]
+    local copiedItemCount = #menuVars.copied.lines[menuVars.curSlot]
+        + #menuVars.copied.SVs[menuVars.curSlot]
+        + #menuVars.copied.SSFs[menuVars.curSlot]
+        + #menuVars.copied.BMs[menuVars.curSlot]
 
     if actionable then
         if not truthy(copiedItemCount) then
@@ -42,7 +44,7 @@ function copyNPasteSettingsMenu(menuVars, actionable)
         end
     end
 
-    if (not truthy(copiedItemCount) and actionable) then return copiedItemCount end
+    if not truthy(copiedItemCount) and actionable then return copiedItemCount end
 
     if actionable then AddSeparator() end
 

@@ -12,7 +12,7 @@ function getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset, ret
             if svIsRemovable then table.insert(svsToRemove, sv) end
         end
     end
-    if (not retroactiveSVRemovalTable) then return end
+    if not retroactiveSVRemovalTable then return end
     for idx, sv in pairs(retroactiveSVRemovalTable) do
         local svIsInRange = sv.StartTime >= startOffset - 1 and sv.StartTime <= endOffset + 1
         if svIsInRange then
@@ -27,10 +27,10 @@ end
 ---@param offset number
 ---@return number
 function getHypotheticalSVMultiplierAt(svs, offset)
-    if (#svs == 1) then return svs[1].Multiplier end
+    if #svs == 1 then return svs[1].Multiplier end
     local index = #svs
-    while (index >= 1) do
-        if (svs[index].StartTime > offset) then
+    while index >= 1 do
+        if svs[index].StartTime > offset then
             index = index - 1
         else
             return svs[index].Multiplier
@@ -44,10 +44,10 @@ end
 ---@param offset number
 ---@return number
 function getHypotheticalSVTimeAt(svs, offset)
-    if (#svs == 1) then return svs[1].StartTime end
+    if #svs == 1 then return svs[1].StartTime end
     local index = #svs
-    while (index >= 1) do
-        if (svs[index].StartTime > offset) then
+    while index >= 1 do
+        if svs[index].StartTime > offset then
             index = index - 1
         else
             return svs[index].StartTime

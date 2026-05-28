@@ -3,7 +3,7 @@ function scaleDisplaceSVs(menuVars)
     local svsToRemove = {}
     local svTimeIsAdded = {}
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if not truthy(offsets) then return end
     local startOffset = offsets[1]
     local endOffset = offsets[#offsets]
     local isStartDisplace = DISPLACE_SCALE_SPOTS[menuVars.scaleSpotIndex] == 'Start'
@@ -13,8 +13,7 @@ function scaleDisplaceSVs(menuVars)
         local svsBetweenOffsets = game.get.svsBetweenOffsets(note1Offset, note2Offset)
         addStartSVIfMissing(svsBetweenOffsets, note1Offset)
         local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
-        local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, note1Offset,
-            note2Offset)
+        local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, note1Offset, note2Offset)
         local scalingDistance
         if scaleType == 'Average Value' then
             local targetDistance = menuVars.avgSV * (note2Offset - note1Offset)
@@ -26,11 +25,9 @@ function scaleDisplaceSVs(menuVars)
             scalingDistance = (menuVars.ratio - 1) * currentDistance
         end
         if isStartDisplace then
-            prepareDisplacingSVs(note1Offset, svsToAdd, svTimeIsAdded, nil, scalingDistance,
-                0)
+            prepareDisplacingSVs(note1Offset, svsToAdd, svTimeIsAdded, nil, scalingDistance, 0)
         else
-            prepareDisplacingSVs(note2Offset, svsToAdd, svTimeIsAdded, scalingDistance,
-                0, nil)
+            prepareDisplacingSVs(note2Offset, svsToAdd, svTimeIsAdded, scalingDistance, 0, nil)
         end
     end
     if isStartDisplace then addFinalSV(svsToAdd, endOffset, game.get.svMultiplierAt(endOffset)) end
@@ -40,7 +37,7 @@ end
 
 function scaleMultiplySVs(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if not truthy(offsets) then return end
     local svsToAdd = {}
     local svsToRemove = game.get.svsBetweenOffsets(offsets[1], offsets[#offsets])
     for i = 1, (#offsets - 1) do
@@ -49,10 +46,9 @@ function scaleMultiplySVs(menuVars)
         local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
         local scalingFactor = menuVars.ratio
-        local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset,
-            endOffset)
+        local currentDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset)
         local scaleType = SCALE_TYPES[menuVars.scaleTypeIndex]
-        if (currentDistance == 0) then
+        if currentDistance == 0 then
             currentDistance = (endOffset - startOffset) * game.get.svMultiplierAt(startOffset)
         end
         if scaleType == 'Average Value' then
@@ -71,7 +67,7 @@ end
 
 function scaleMultiplySSFs(menuVars)
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if not truthy(offsets) then return end
     local ssfsToAdd = {}
     local ssfsToRemove = game.get.ssfsBetweenOffsets(offsets[1], offsets[#offsets])
     for i = 1, (#offsets - 1) do
@@ -83,7 +79,7 @@ function scaleMultiplySSFs(menuVars)
         if scaleType == 'Average Value' then
             local ssfSum = 0
             for idx, ssf in ipairs(ssfsBetweenOffsets) do
-                if (idx == #ssfsBetweenOffsets) then break end
+                if idx == #ssfsBetweenOffsets then break end
                 ssfSum = ssfSum + ssf.Multiplier * (ssfsBetweenOffsets[idx + 1].StartTime - ssf.StartTime)
             end
             local currentAvgSSF = ssfSum / (endOffset - startOffset)

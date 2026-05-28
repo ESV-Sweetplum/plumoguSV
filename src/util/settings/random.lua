@@ -11,9 +11,7 @@ function randomSettingsMenu(settingVars, skipFinalSV, svPointsForce, disableRege
 
     AddSeparator()
     settingsChanged = chooseConstantShift(settingVars, 0) or settingsChanged
-    if not settingVars.dontNormalize then
-        settingsChanged = chooseAverageSV(settingVars) or settingsChanged
-    end
+    if not settingVars.dontNormalize then settingsChanged = chooseAverageSV(settingVars) or settingsChanged end
     settingsChanged = chooseFinalSV(settingVars, skipFinalSV) or settingsChanged
     settingsChanged = chooseNoNormalize(settingVars) or settingsChanged
 
@@ -22,6 +20,5 @@ end
 
 function generateRandomSetMenuSVs(settingVars)
     local randomType = RANDOM_TYPES[settingVars.randomTypeIndex]
-    settingVars.svMultipliers = generateRandomSet(settingVars.svPoints + 1, randomType,
-        settingVars.randomScale)
+    settingVars.svMultipliers = generateRandomSet(settingVars.svPoints + 1, randomType, settingVars.randomScale)
 end

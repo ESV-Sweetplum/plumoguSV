@@ -9,5 +9,5 @@
         "composite": true,
         "target": "es6",
         "tsBuildInfoFile": "../dist/tsconfigModules.tsbuildinfo"
-    },
+    }
 }

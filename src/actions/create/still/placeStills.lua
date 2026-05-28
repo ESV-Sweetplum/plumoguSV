@@ -3,8 +3,8 @@ function placeStillSVsParent(menuVars)
     local finalSVType = FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex]
     local svsToRemove = {}
     local svsToAdd = {}
-    if (menuVars.stillBehavior == 1) then
-        if (STANDARD_SVS[menuVars.svTypeIndex] == 'Exponential' and menuVars.settingVars.distanceMode == 2) then
+    if menuVars.stillBehavior == 1 then
+        if STANDARD_SVS[menuVars.svTypeIndex] == 'Exponential' and menuVars.settingVars.distanceMode == 2 then
             placeSVs(menuVars, nil, nil, nil, menuVars.settingVars.distance)
         else
             placeSVs(menuVars)
@@ -12,9 +12,9 @@ function placeStillSVsParent(menuVars)
         return
     end
     local offsets = game.get.uniqueSelectedNoteOffsets()
-    if (not truthy(offsets)) then return end
+    if not truthy(offsets) then return end
     for i = 1, (#offsets - 1) do
-        if (STANDARD_SVS[menuVars.svTypeIndex] == 'Exponential' and menuVars.settingVars.distanceMode == 2) then
+        if STANDARD_SVS[menuVars.svTypeIndex] == 'Exponential' and menuVars.settingVars.distanceMode == 2 then
             tbl = placeSVs(menuVars, false, offsets[i], offsets[i + 1], menuVars.settingVars.distance, svsToAdd)
         else
             tbl = placeSVs(menuVars, false, offsets[i], offsets[i + 1], nil, svsToAdd)
@@ -22,9 +22,13 @@ function placeStillSVsParent(menuVars)
         svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
         svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
     end
-    if (finalSVType ~= 'None') then
-        addFinalSV(svsToAdd, offsets[#offsets], menuVars.svMultipliers[#menuVars.svMultipliers],
-            finalSVType == 'Override')
+    if finalSVType ~= 'None' then
+        addFinalSV(
+            svsToAdd,
+            offsets[#offsets],
+            menuVars.svMultipliers[#menuVars.svMultipliers],
+            finalSVType == 'Override'
+        )
     end
     removeAndAddSVs(svsToRemove, svsToAdd)
 end
@@ -34,11 +38,11 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
     local noteSpacing = menuVars.noteSpacing
     local stillDistance = menuVars.stillDistance
     local noteOffsets = game.get.uniqueNoteOffsetsBetween(optionalStart, optionalEnd, true)
-    if (not noteOffsets) then return { svsToRemove = {}, svsToAdd = {} } end
+    if not noteOffsets then return { svsToRemove = {}, svsToAdd = {} } end
     local firstOffset = noteOffsets[1]
     local lastOffset = noteOffsets[#noteOffsets]
-    local svMultFn = truthy(queuedSVs) and (|t| getHypotheticalSVMultiplierAt(queuedSVs, t)) or
-        game.get.svMultiplierAt
+    local svMultFn = truthy(queuedSVs) and function(t) return getHypotheticalSVMultiplierAt(queuedSVs, t) end
+        or game.get.svMultiplierAt
     if stillType == 'Auto' then
         local multiplier = getUsableDisplacementMultiplier(firstOffset)
         local duration = 1 / multiplier
@@ -58,8 +62,7 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
     local svsBetweenOffsets = getHypotheticalSVsBetweenOffsets(svs, firstOffset, lastOffset)
     local svDisplacements = calculateDisplacementsFromSVs(svsBetweenOffsets, noteOffsets)
     local nsvDisplacements = calculateDisplacementsFromNotes(noteOffsets, noteSpacing)
-    local finalDisplacements = calculateStillDisplacements(stillType, stillDistance,
-        svDisplacements, nsvDisplacements)
+    local finalDisplacements = calculateStillDisplacements(stillType, stillDistance, svDisplacements, nsvDisplacements)
     for i = 1, #noteOffsets do
         local noteOffset = noteOffsets[i]
         local beforeDisplacement = nil
@@ -69,15 +72,21 @@ function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRem
             atDisplacement = -finalDisplacements[i]
             afterDisplacement = 0
         end
-        if i ~= 1 then
-            beforeDisplacement = finalDisplacements[i]
-        end
+        if i ~= 1 then beforeDisplacement = finalDisplacements[i] end
         local baseSVs = table.duplicate(svs)
-        prepareDisplacingSVs(noteOffset, svsToAdd, svTimeIsAdded, beforeDisplacement,
-            atDisplacement, afterDisplacement, true, baseSVs)
+        prepareDisplacingSVs(
+            noteOffset,
+            svsToAdd,
+            svTimeIsAdded,
+            beforeDisplacement,
+            atDisplacement,
+            afterDisplacement,
+            true,
+            baseSVs
+        )
     end
     getRemovableSVs(svsToRemove, svTimeIsAdded, firstOffset, lastOffset, retroactiveSVRemovalTable)
-    while (svsToAdd[#svsToAdd].StartTime == optionalEnd) do
+    while svsToAdd[#svsToAdd].StartTime == optionalEnd do
         table.remove(svsToAdd, #svsToAdd)
     end
 

@@ -6,65 +6,107 @@
 function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
     local multipliers = { 727, 69 } ---@type number[]
     if svType == 'Linear' then
-        if (settingVars.distanceMode == 1) then
-            multipliers = generateLinearSet(settingVars.startSV, settingVars.endSV,
-                settingVars.svPoints + 1, true)
-        elseif (settingVars.distanceMode == 2) then
-            if (globalVars.equalizeLinear) then
-                multipliers = generateLinearSet(settingVars.startSV, 2 * settingVars.avgSV - settingVars.startSV,
-                    settingVars.svPoints + 1, true)
+        if settingVars.distanceMode == 1 then
+            multipliers = generateLinearSet(settingVars.startSV, settingVars.endSV, settingVars.svPoints + 1, true)
+        elseif settingVars.distanceMode == 2 then
+            if globalVars.equalizeLinear then
+                multipliers = generateLinearSet(
+                    settingVars.startSV,
+                    2 * settingVars.avgSV - settingVars.startSV,
+                    settingVars.svPoints + 1,
+                    true
+                )
             else
-                multipliers = generateLinearSet(settingVars.startSV,
-                    2 * settingVars.avgSV - settingVars.startSV +
-                    2 * (settingVars.avgSV - settingVars.startSV) / (settingVars.svPoints - 1),
-                    settingVars.svPoints + 1, true)
+                multipliers = generateLinearSet(
+                    settingVars.startSV,
+                    2 * settingVars.avgSV
+                        - settingVars.startSV
+                        + 2 * (settingVars.avgSV - settingVars.startSV) / (settingVars.svPoints - 1),
+                    settingVars.svPoints + 1,
+                    true
+                )
             end
         else
-            if (globalVars.equalizeLinear) then
+            if globalVars.equalizeLinear then
                 multipliers = generateLinearSet(
                     2 * settingVars.avgSV - settingVars.endSV,
                     settingVars.endSV,
-                    settingVars.svPoints + 1, true)
+                    settingVars.svPoints + 1,
+                    true
+                )
             else
                 local startSV = 2 * settingVars.avgSV - settingVars.endSV
                 multipliers = generateLinearSet(
-                    startSV, settingVars.endSV + startSV / (settingVars.svPoints - 1),
-                    settingVars.svPoints + 1, true)
+                    startSV,
+                    settingVars.endSV + startSV / (settingVars.svPoints - 1),
+                    settingVars.svPoints + 1,
+                    true
+                )
             end
         end
     elseif svType == 'Exponential' then
         local behavior = SV_BEHAVIORS[settingVars.behaviorIndex]
-        if (settingVars.distanceMode == 3) then
-            multipliers = generateExponentialSet2(behavior, settingVars.svPoints + 1, settingVars.startSV,
+        if settingVars.distanceMode == 3 then
+            multipliers = generateExponentialSet2(
+                behavior,
+                settingVars.svPoints + 1,
+                settingVars.startSV,
                 settingVars.endSV,
-                settingVars.intensity)
+                settingVars.intensity
+            )
         else
-            multipliers = generateExponentialSet(behavior, settingVars.svPoints + 1, settingVars.avgSV,
-                settingVars.intensity, settingVars.verticalShift)
+            multipliers = generateExponentialSet(
+                behavior,
+                settingVars.svPoints + 1,
+                settingVars.avgSV,
+                settingVars.intensity,
+                settingVars.verticalShift
+            )
         end
     elseif svType == 'Bezier' then
-        multipliers = generateBezierSet(settingVars.p1, settingVars.p2, settingVars.avgSV,
-            settingVars.svPoints + 1, settingVars.verticalShift)
+        multipliers = generateBezierSet(
+            settingVars.p1,
+            settingVars.p2,
+            settingVars.avgSV,
+            settingVars.svPoints + 1,
+            settingVars.verticalShift
+        )
     elseif svType == 'Hermite' then
-        multipliers = generateHermiteSet(settingVars.startSV, settingVars.endSV,
-            settingVars.verticalShift, settingVars.avgSV,
-            settingVars.svPoints + 1)
+        multipliers = generateHermiteSet(
+            settingVars.startSV,
+            settingVars.endSV,
+            settingVars.verticalShift,
+            settingVars.avgSV,
+            settingVars.svPoints + 1
+        )
     elseif svType == 'Sinusoidal' then
-        multipliers = generateSinusoidalSet(settingVars.startSV, settingVars.endSV,
-            settingVars.periods, settingVars.periodsShift,
+        multipliers = generateSinusoidalSet(
+            settingVars.startSV,
+            settingVars.endSV,
+            settingVars.periods,
+            settingVars.periodsShift,
             settingVars.svsPerQuarterPeriod,
-            settingVars.verticalShift, settingVars.curveSharpness)
+            settingVars.verticalShift,
+            settingVars.curveSharpness
+        )
     elseif svType == 'Circular' then
         local behavior = SV_BEHAVIORS[settingVars.behaviorIndex]
-        multipliers = generateCircularSet(behavior, settingVars.arcPercent, settingVars.avgSV,
-            settingVars.verticalShift, settingVars.svPoints + 1,
-            settingVars.dontNormalize)
+        multipliers = generateCircularSet(
+            behavior,
+            settingVars.arcPercent,
+            settingVars.avgSV,
+            settingVars.verticalShift,
+            settingVars.svPoints + 1,
+            settingVars.dontNormalize
+        )
     elseif svType == 'Random' then
-        if not truthy(settingVars.svMultipliers) then
-            generateRandomSetMenuSVs(settingVars)
-        end
-        multipliers = getRandomSet(settingVars.svMultipliers, settingVars.avgSV,
-            settingVars.verticalShift, settingVars.dontNormalize)
+        if not truthy(settingVars.svMultipliers) then generateRandomSetMenuSVs(settingVars) end
+        multipliers = getRandomSet(
+            settingVars.svMultipliers,
+            settingVars.avgSV,
+            settingVars.verticalShift,
+            settingVars.dontNormalize
+        )
     elseif svType == 'Custom' then
         multipliers = generateCustomSet(settingVars.svMultipliers)
     elseif svType == 'Chinchilla' then
@@ -81,10 +123,17 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
         local labelText2 = svType2 .. 'Combo2'
         cache.save(labelText2 .. 'Settings', settingVars2)
         local comboType = COMBO_SV_TYPE[settingVars.comboTypeIndex]
-        multipliers = generateComboSet(multipliers1, multipliers2, settingVars.comboPhase,
-            comboType, settingVars.comboMultiplier1,
-            settingVars.comboMultiplier2, settingVars.dontNormalize,
-            settingVars.avgSV, settingVars.verticalShift)
+        multipliers = generateComboSet(
+            multipliers1,
+            multipliers2,
+            settingVars.comboPhase,
+            comboType,
+            settingVars.comboMultiplier1,
+            settingVars.comboMultiplier2,
+            settingVars.dontNormalize,
+            settingVars.avgSV,
+            settingVars.verticalShift
+        )
     elseif svType == 'Code' then
         multipliers = {}
         local fn = eval(settingVars.code) ---@type fun(t: number): number
@@ -92,11 +141,19 @@ function generateSVMultipliers(svType, settingVars, interlaceMultiplier)
             table.insert(multipliers, fn(i / settingVars.svPoints))
         end
     elseif svType == 'Stutter1' then
-        multipliers = generateStutterSet(settingVars.startSV, settingVars.stutterDuration,
-            settingVars.avgSV, settingVars.controlLastSV)
+        multipliers = generateStutterSet(
+            settingVars.startSV,
+            settingVars.stutterDuration,
+            settingVars.avgSV,
+            settingVars.controlLastSV
+        )
     elseif svType == 'Stutter2' then
-        multipliers = generateStutterSet(settingVars.endSV, settingVars.stutterDuration,
-            settingVars.avgSV, settingVars.controlLastSV)
+        multipliers = generateStutterSet(
+            settingVars.endSV,
+            settingVars.stutterDuration,
+            settingVars.avgSV,
+            settingVars.controlLastSV
+        )
     end
     if interlaceMultiplier then
         local newMultipliers = {}

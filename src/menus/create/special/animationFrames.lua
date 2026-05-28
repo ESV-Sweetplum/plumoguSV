@@ -74,7 +74,7 @@ function addFrameTimes(settingVars)
     for _, ho in pairs(state.SelectedHitObjects) do
         local lane = ho.Lane
         local time = ho.StartTime
-        if (not hasAlreadyAddedLaneTime[lane][time]) then
+        if not hasAlreadyAddedLaneTime[lane][time] then
             hasAlreadyAddedLaneTime[lane][time] = true
             if frameTimeToIndex[time] then
                 local index = frameTimeToIndex[time]
@@ -149,9 +149,7 @@ function drawCurrentFrame(settingVars)
                 local yBlankSpace = 2 * noteSpacing + circleRadius + frameTime.position / 2
                 local x1 = leftBlankSpace + (noteWidth + noteSpacing) * (lane - 1)
                 local y1 = childHeight - yBlankSpace
-                if globalVars.upscroll then
-                    y1 = childHeight - y1
-                end
+                if globalVars.upscroll then y1 = childHeight - y1 end
                 local p1 = coordsRelativeToWindow(x1, y1)
                 drawlist.AddCircleFilled(p1, circleRadius, noteColor, 20)
             end

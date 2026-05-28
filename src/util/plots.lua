@@ -92,9 +92,9 @@ function plotExponentialCurvature(settingVars)
         else
             value = (1 - (1 - t) ^ (1 / curvature))
         end
-        if (trueStart > trueEnd) then
+        if trueStart > trueEnd then
             value = 1 - value
-        elseif (trueStart == trueEnd) then
+        elseif trueStart == trueEnd then
             value = 0.5
         end
         table.insert(values, value)
@@ -125,9 +125,9 @@ function plotSigmoidalCurvature(settingVars)
             end
         end
         value = value / 2
-        if ((settingVars.startMsx or settingVars.lowerStart) > (settingVars.endMsx or settingVars.lowerEnd)) then
+        if (settingVars.startMsx or settingVars.lowerStart) > (settingVars.endMsx or settingVars.lowerEnd) then
             value = 1 - value
-        elseif ((settingVars.startMsx or settingVars.lowerStart) == (settingVars.endMsx or settingVars.lowerEnd)) then
+        elseif (settingVars.startMsx or settingVars.lowerStart) == (settingVars.endMsx or settingVars.lowerEnd) then
             value = 0.5
         end
         table.insert(values, value)
@@ -170,11 +170,10 @@ end
 --    svMultipliers   : multiplier values of the SVs [Table]
 --    stutterDuration : percent duration of first stutter (nil if not stutter SV) [Int]
 --    skipDistGraph   : whether or not to skip showing the distance graph [Boolean]
-function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMultipliers,
-                          stutterDuration, skipDistGraph)
-    if (globalVars.hideSVInfo) then return end
+function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMultipliers, stutterDuration, skipDistGraph)
+    if globalVars.hideSVInfo then return end
     imgui.Begin(windowText, imgui_window_flags.AlwaysAutoResize)
-    if (globalVars.showSVInfoVisualizer and not globalVars.performanceMode) then
+    if globalVars.showSVInfoVisualizer and not globalVars.performanceMode then
         local ctx = imgui.GetWindowDrawList()
         local topLeft = imgui.GetWindowPos()
         local dim = imgui.GetWindowSize()
@@ -196,9 +195,11 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
         local heightValue = topLeft.y + dim.y - curDist * dim.y / (maxDist - minDist)
 
         for i = 1, game.keyCount do
-            ctx.AddRectFilled(vector.New(topLeft.x + (i - 1) * dim.x / game.keyCount + 5, heightValue),
+            ctx.AddRectFilled(
+                vector.New(topLeft.x + (i - 1) * dim.x / game.keyCount + 5, heightValue),
                 vector.New(topLeft.x + i * dim.x / game.keyCount - 5, heightValue + 20),
-                imgui.GetColorU32(imgui_col.Header, (1 - (1 - progress) ^ 10)))
+                imgui.GetColorU32(imgui_col.Header, (1 - (1 - progress) ^ 10))
+            )
         end
         if svStats then
             local normativeMax = math.max(math.abs(svStats.minSV), math.abs(svStats.maxSV))
@@ -208,15 +209,17 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
                 local x
                 local y = (#svMultipliers - idx + 1) / (#svMultipliers + 1)
                 local apx = y - (inverseProgress * 2 - 0.6)
-                if (math.abs(apx) > appearanceTime) then goto nextMultiplier end
+                if math.abs(apx) > appearanceTime then goto nextMultiplier end
                 apx = apx / appearanceTime / 2 + 0.5
                 x = math.abs(m) / normativeMax
                 ctx.AddRectFilled(
-                    vector.New(topLeft.x,
-                        topLeft.y + dim.y * (y + (1 - 2 * math.min(apx, 0.5)) / (#svMultipliers + 1))),
-                    vector.New(topLeft.x + dim.x * x,
-                        topLeft.y + dim.y * (y + 2 * (1 - math.max(apx, 0.5)) / (#svMultipliers + 1))),
-                    imgui.GetColorU32(imgui_col.PlotHistogram, (apx - apx * apx) * 2 + 0.1))
+                    vector.New(topLeft.x, topLeft.y + dim.y * (y + (1 - 2 * math.min(apx, 0.5)) / (#svMultipliers + 1))),
+                    vector.New(
+                        topLeft.x + dim.x * x,
+                        topLeft.y + dim.y * (y + 2 * (1 - math.max(apx, 0.5)) / (#svMultipliers + 1))
+                    ),
+                    imgui.GetColorU32(imgui_col.PlotHistogram, (apx - apx * apx) * 2 + 0.1)
+                )
                 ::nextMultiplier::
             end
         end
@@ -294,16 +297,35 @@ end
 function displayStutterSVWindows(settingVars)
     if settingVars.linearlyChange then
         startNextWindowNotCollapsed('SV Info (Starting first SV)')
-        makeSVInfoWindow('SV Info (Starting first SV)', settingVars.svGraphStats, nil,
-            settingVars.svDistances, settingVars.svMultipliers,
-            settingVars.stutterDuration, false)
+        makeSVInfoWindow(
+            'SV Info (Starting first SV)',
+            settingVars.svGraphStats,
+            nil,
+            settingVars.svDistances,
+            settingVars.svMultipliers,
+            settingVars.stutterDuration,
+            false
+        )
         startNextWindowNotCollapsed('SV Info (Ending first SV)')
-        makeSVInfoWindow('SV Info (Ending first SV)', settingVars.svGraph2Stats, nil,
-            settingVars.svDistances2, settingVars.svMultipliers2,
-            settingVars.stutterDuration, false)
+        makeSVInfoWindow(
+            'SV Info (Ending first SV)',
+            settingVars.svGraph2Stats,
+            nil,
+            settingVars.svDistances2,
+            settingVars.svMultipliers2,
+            settingVars.stutterDuration,
+            false
+        )
     else
         startNextWindowNotCollapsed('SV Info')
-        makeSVInfoWindow('SV Info', settingVars.svGraphStats, nil, settingVars.svDistances,
-            settingVars.svMultipliers, settingVars.stutterDuration, false)
+        makeSVInfoWindow(
+            'SV Info',
+            settingVars.svGraphStats,
+            nil,
+            settingVars.svDistances,
+            settingVars.svMultipliers,
+            settingVars.stutterDuration,
+            false
+        )
     end
 end

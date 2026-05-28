@@ -16,7 +16,7 @@ function placeSpecialSVMenu()
     local settingVars = getSettingVars(currentSVType, 'Special')
     if globalVars.showPresetMenu then
         local presetSelected = renderPresetMenu('Special', menuVars, settingVars)
-        if (not presetSelected) then
+        if not presetSelected then
             cache.save(currentSVType .. 'SpecialSettings', settingVars)
             cache.save('placeSpecialMenu', menuVars)
         end
@@ -25,9 +25,7 @@ function placeSpecialSVMenu()
 
     if currentSVType == 'Stutter' then stutterMenu(settingVars) end
     if currentSVType == 'Teleport Stutter' then teleportStutterMenu(settingVars) end
-    if currentSVType == 'Frames Setup' then
-        animationFramesSetupMenu(settingVars)
-    end
+    if currentSVType == 'Frames Setup' then animationFramesSetupMenu(settingVars) end
     if currentSVType == 'Automate' then automateSVMenu(settingVars) end
     if currentSVType == 'Penis' then penisMenu(settingVars) end
 
