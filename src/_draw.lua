@@ -58,4 +58,5 @@ end
 
 _QParcelConfig.ignoreNotesOutsideTg = globalVars.ignoreNotesOutsideTg
 _QParcelConfig.useEndTimeOffsets = globalVars.useEndTimeOffsets
+
 cache.set('map_edited', false)
