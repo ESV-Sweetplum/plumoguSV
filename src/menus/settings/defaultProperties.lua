@@ -336,4 +336,10 @@ function showDefaultPropertiesSettings()
         saveSettingPropertiesButton(settingVars, 'SigmoidalVibratoSSF')
         cache.save('SigmoidalVibratoSSFPropertySettings', settingVars)
     end
+        simpleActionMenu('Reset Default Properties', 0, function()
+        print('e!', 'Reset default properties.')
+        globalVars.defaultProperties = {}
+        loadDefaultProperties({})
+        write(globalVars)
+    end, nil, true, true)
 end
