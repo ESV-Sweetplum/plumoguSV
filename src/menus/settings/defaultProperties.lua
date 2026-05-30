@@ -347,9 +347,8 @@ function showDefaultPropertiesSettings()
         cache.save('SigmoidalVibratoSSFPropertySettings', settingVars)
     end
     simpleActionMenu('Reset Default Properties', 0, function()
-        print('e!', 'Reset default properties.')
+        print('e!', 'Reset default properties. Changes will be shown on the next editor refresh.')
         globalVars.defaultProperties = {}
-        loadDefaultProperties({})
         write(globalVars)
     end, nil, true, true)
 end
