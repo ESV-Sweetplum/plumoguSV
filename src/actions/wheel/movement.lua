@@ -30,7 +30,8 @@ function kusaMovementUp()
                 note.EndTime == 0 and 0 or note.EndTime + 1,
                 note.HitSound,
                 note.EditorLayer,
-                note.Type
+                note.Type,
+                note.TimingGroup
             )
         end
     )
@@ -46,7 +47,8 @@ function kusaMovementRight()
                 note.EndTime,
                 note.HitSound,
                 note.EditorLayer,
-                note.Type
+                note.Type,
+                note.TimingGroup
             )
         end
     )
@@ -62,7 +64,8 @@ function kusaMovementDown()
                 note.EndTime == 0 and 0 or note.EndTime - 1,
                 note.HitSound,
                 note.EditorLayer,
-                note.Type
+                note.Type,
+                note.TimingGroup
             )
         end
     )
@@ -78,7 +81,8 @@ function kusaMovementLeft()
                 note.EndTime,
                 note.HitSound,
                 note.EditorLayer,
-                note.Type
+                note.Type,
+                note.TimingGroup
             )
         end
     )
