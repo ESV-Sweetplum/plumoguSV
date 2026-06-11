@@ -60,45 +60,45 @@ end
 
 function kusaColorRed()
     local success = kusaGeneralColor(1)
-    if success then print('s!', 'Set selected note colors to red.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Set selected note colors to red.') end
 end
 
 function kusaColorOrange()
     local success = kusaGeneralColor(8)
-    if success then print('s!', 'Set selected note colors to orange.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Set selected note colors to orange.') end
 end
 
 function kusaColorYellow()
     local success = kusaGeneralColor(4)
-    if success then print('s!', 'Set selected note colors to yellow.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Set selected note colors to yellow.') end
 end
 
 function kusaColorGreen()
     local success = kusaGeneralColor(16)
-    if success then print('s!', 'Set selected note colors to green.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Set selected note colors to green.') end
 end
 
 function kusaColorCyan()
     local success = kusaGeneralColor(12)
-    if success then print('s!', 'Set selected note colors to cyan.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Set selected note colors to cyan.') end
 end
 
 function kusaColorBlue()
     local success = kusaGeneralColor(2)
-    if success then print('s!', 'Set selected note colors to blue.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Set selected note colors to blue.') end
 end
 
 function kusaColorPurple()
     local success = kusaGeneralColor(3)
-    if success then print('s!', 'Set selected note colors to purple.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Set selected note colors to purple.') end
 end
 
 function kusaColorPink()
     local success = kusaGeneralColor(6)
-    if success then print('s!', 'Set selected note colors to pink.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Set selected note colors to pink.') end
 end
 
 function kusaColorWhite()
     local success = kusaGeneralColor(5)
-    if success then print('s!', 'Set selected note colors to white.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Set selected note colors to white.') end
 end

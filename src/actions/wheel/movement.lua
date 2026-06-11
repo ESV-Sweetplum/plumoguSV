@@ -35,7 +35,7 @@ function kusaMovementUp()
             )
         end
     )
-    if success then print('s!', 'Moved selected notes up by 1ms.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Moved selected notes up by 1ms.') end
 end
 
 function kusaMovementRight()
@@ -52,7 +52,9 @@ function kusaMovementRight()
             )
         end
     )
-    if success then print('s!', 'Shifted selected notes one lane to the right.') end
+    if success and globalVars.printActionWheelMessage then
+        print('s!', 'Shifted selected notes one lane to the right.')
+    end
 end
 
 function kusaMovementDown()
@@ -69,7 +71,7 @@ function kusaMovementDown()
             )
         end
     )
-    if success then print('s!', 'Moved selected notes down by 1ms.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Moved selected notes down by 1ms.') end
 end
 
 function kusaMovementLeft()
@@ -86,5 +88,7 @@ function kusaMovementLeft()
             )
         end
     )
-    if success then print('s!', 'Shifted selected notes one lane to the left.') end
+    if success and globalVars.printActionWheelMessage then
+        print('s!', 'Shifted selected notes one lane to the left.')
+    end
 end

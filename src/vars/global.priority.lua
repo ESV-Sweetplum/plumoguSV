@@ -32,6 +32,7 @@ globalVars = {
     placeTypeIndex = 1,
     presetKeybinds = {},
     presets = {},
+    printActionWheelMessage = true,
     printLegacyLNMessage = true,
     pulseCoefficient = 0,
     pulseColor = vector.New(0, 0, 0, 0),
@@ -94,6 +95,7 @@ function setGlobalVars(tempGlobalVars)
     globalVars.maxDisplacementMultiplierExponent = setGlobalNumber(tempGlobalVars, 'maxDisplacementMultiplierExponent')
     globalVars.performanceMode = truthy(tempGlobalVars.performanceMode)
     globalVars.presetKeybinds = table.duplicate(tempGlobalVars.presetKeybinds)
+    globalVars.printActionWheelMessage = truthy(tempGlobalVars.printActionWheelMessage, true)
     globalVars.printLegacyLNMessage = truthy(tempGlobalVars.printLegacyLNMessage, true)
     globalVars.pulseCoefficient = setGlobalNumber(tempGlobalVars, 'pulseCoefficient')
     globalVars.pulseColor = table.vectorize4(tempGlobalVars.pulseColor)
