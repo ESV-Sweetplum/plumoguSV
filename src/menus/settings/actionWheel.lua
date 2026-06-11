@@ -21,7 +21,7 @@ function showActionWheelSettings()
         nil,
         ACTION_WHEEL_TOOLTIP_LIST
     )
-    globalVars.printActionWheelMessage = GlobalCheckbox(
+    GlobalCheckbox(
         'printActionWheelMessage',
         'Print Action Wheel Message',
         'If enabled, prints a notification every time the action wheel is triggered.'
