@@ -44,9 +44,9 @@ if cache.get('windows/tutorial') then showTutorialWindow() end
 if cache.get('windows/settings') then showPluginSettingsWindow() end
 if cache.get('windows/patch_notes') then showPatchNotesWindow() end
 
-if not performanceMode and map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ' then
-    runTest()
-end
+-- if not performanceMode and map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ' then
+-- runTest()
+-- end
 imgui.End()
 
 logoThread()
