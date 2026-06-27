@@ -86,6 +86,7 @@ DEFAULT_STARTING_MENU_VARS = {
     },
     dynamicScale = {
         noteTimes = {},
+        scaleTypeIndex = 1,
         svTypeIndex = 1,
         svMultipliers = {},
         svDistances = {},

@@ -53,7 +53,7 @@ function showPluginSettingsWindow()
         globalVars = DEFAULT_GLOBAL_VARS
         toggleablePrint('e!', 'Settings have been reset.')
     end
-    if globalVars.advancedMode then renderMemeButtons() end
+    -- if globalVars.advancedMode then renderMemeButtons() end
 
     imgui.EndChild()
     imgui.NextColumn()
