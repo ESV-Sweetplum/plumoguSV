@@ -47,11 +47,7 @@ function kusaGeneralColor(n)
     if #currenttimingpoints ~= 0 then actions.RemoveTimingPointBatch(currenttimingpoints) end
 
     local queue = {}
-    --place normal timing points first so that game doesn't lag like hell from 60000 BPM timing points
-    --actions.PlaceTimingPointBatch(normaltimingpoints)
     table.insert(queue, utils.CreateEditorAction(action_type.AddTimingPointBatch, normaltimingpoints))
-
-    --actions.PlaceTimingPointBatch(snaptimingpoints)
     table.insert(queue, utils.CreateEditorAction(action_type.AddTimingPointBatch, snaptimingpoints))
 
     actions.PerformBatch(queue)
