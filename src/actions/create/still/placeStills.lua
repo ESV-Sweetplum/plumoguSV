@@ -1,8 +1,6 @@
 function placeStillSVsParent(menuVars)
     printLegacyLNMessage()
     local finalSVType = FINAL_SV_TYPES[menuVars.settingVars.finalSVIndex]
-    local svsToRemove = {}
-    local svsToAdd = {}
     if menuVars.stillBehavior == 1 then
         if STANDARD_SVS[menuVars.svTypeIndex] == 'Exponential' and menuVars.settingVars.distanceMode == 2 then
             placeSVs(menuVars, nil, nil, nil, menuVars.settingVars.distance)
@@ -15,22 +13,20 @@ function placeStillSVsParent(menuVars)
     if not truthy(offsets) then return end
     for i = 1, (#offsets - 1) do
         if STANDARD_SVS[menuVars.svTypeIndex] == 'Exponential' and menuVars.settingVars.distanceMode == 2 then
-            tbl = placeSVs(menuVars, false, offsets[i], offsets[i + 1], menuVars.settingVars.distance, svsToAdd)
+            placeSVs(menuVars, false, offsets[i], offsets[i + 1], menuVars.settingVars.distance, queue.cur.svsToAdd)
         else
-            tbl = placeSVs(menuVars, false, offsets[i], offsets[i + 1], nil, svsToAdd)
+            placeSVs(menuVars, false, offsets[i], offsets[i + 1], nil, queue.cur.svsToAdd)
         end
-        svsToRemove = table.combine(svsToRemove, tbl.svsToRemove)
-        svsToAdd = table.combine(svsToAdd, tbl.svsToAdd)
     end
     if finalSVType ~= 'None' then
         addFinalSV(
-            svsToAdd,
+            queue.cur.svsToAdd,
             offsets[#offsets],
             menuVars.svMultipliers[#menuVars.svMultipliers],
             finalSVType == 'Override'
         )
     end
-    removeAndAddSVs(svsToRemove, svsToAdd)
+    queue.execute()
 end
 
 function getStillSVs(menuVars, optionalStart, optionalEnd, svs, retroactiveSVRemovalTable, queuedSVs)

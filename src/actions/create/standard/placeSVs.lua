@@ -36,11 +36,13 @@ function placeSVs(menuVars, place, optionalStart, optionalEnd, optionalDistance,
             svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
         end
         if finalSVType ~= 'None' then addFinalSV(svsToAdd, lastOffset, lastMultiplier, finalSVType == 'Override') end
-        removeAndAddSVs(svsToRemove, svsToAdd)
+        queue.add({ rSVs = svsToRemove, aSVs = svsToAdd })
+        queue.execute() -- Eventually fix svs to add not being able to be added in correct tg
         return
     end
     local stillSVResult =
         getStillSVs(menuVars, firstOffset, lastOffset, sort(svsToAdd, sortAscendingStartTime), svsToAdd, queuedSVs)
-    svsToAdd = table.combine(svsToAdd, stillSVResult.svsToAdd)
-    return { svsToRemove = svsToRemove, svsToAdd = svsToAdd }
+
+    queue.add({ rSVs = svsToRemove, aSVs = svsToAdd })
+    queue.add({ aSVs = stillSVResult.svsToAdd })
 end
