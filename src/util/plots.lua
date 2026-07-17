@@ -173,6 +173,7 @@ end
 function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMultipliers, stutterDuration, skipDistGraph)
     if globalVars.hideSVInfo then return end
     imgui.Begin(windowText, imgui_window_flags.AlwaysAutoResize)
+    imgui.SetWindowFontScale(0.87)
     if globalVars.showSVInfoVisualizer and not globalVars.performanceMode then
         local ctx = imgui.GetWindowDrawList()
         local topLeft = imgui.GetWindowPos()

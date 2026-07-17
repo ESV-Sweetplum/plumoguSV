@@ -672,6 +672,8 @@ end
 
 function choosePulseColor()
     _, colorPickerOpened = imgui.Begin('plumoguSV Pulse Color Picker', true, imgui_window_flags.AlwaysAutoResize)
+    imgui.SetWindowFontScale(0.87)
+
     local oldColor = globalVars.pulseColor
     _, globalVars.pulseColor = imgui.ColorPicker4('Pulse Color', globalVars.pulseColor)
     if oldColor ~= globalVars.pulseColor then write(globalVars) end
