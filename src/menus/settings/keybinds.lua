@@ -9,7 +9,7 @@ function showKeybindSettings()
         if separator then imgui.SeparatorText(separator) end
         local keyOccurrences = keybindHashmap.counts[hotkeyCombo]
         if keyOccurrences > 1 then
-            PushStyleColor(imgui_col.Text, color.int.oRedMask * 200 + color.int.oWhiteMask * 55)
+            PushStyleColor(imgui_col.Text, color.uintToRgba(color.int.oRedMask * 200 + color.int.oWhiteMask * 55))
         end
         if
             imgui.Button(

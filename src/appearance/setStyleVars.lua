@@ -63,7 +63,7 @@ function setPluginAppearanceColors(themeName, disableBorderOverwrite)
 
     local outputData = applyTheme(themeData)
 
-    PushStyleColor(imgui_col.TableHeaderBg, imgui.GetColorU32(imgui_col.Button, 0.3))
+    PushStyleColor(imgui_col.TableHeaderBg, color.uintToRgba(imgui.GetColorU32(imgui_col.Button, 0.3)))
 
     if disableBorderOverwrite then return end
     local originalTheme = getOriginalTheme()

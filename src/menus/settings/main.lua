@@ -13,7 +13,7 @@ function showPluginSettingsWindow()
     if not globalVars.performanceMode then
         local bgColor = vector.New(0.2, 0.2, 0.2, 1)
         -- PopStyleColor(20)
-        applyTheme(getIncognitoTheme(), true)
+        setPluginAppearanceColors('Incognito', true)
         setPluginAppearanceStyles('Rounded + Border')
         PushStyleColor(imgui_col.WindowBg, bgColor)
         PushStyleColor(imgui_col.TitleBg, bgColor)
@@ -90,7 +90,7 @@ function showPluginSettingsWindow()
         state.SetValue('crazyIdx', 1)
     end
     if not globalVars.performanceMode then
-        PopStyleColor(41)
+        PopAllStyleColors()
         pulseController()
         setPluginAppearanceColors(globalVars.colorThemeName, true)
         setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])

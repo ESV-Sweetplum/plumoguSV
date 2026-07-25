@@ -74,7 +74,7 @@ end
 
 function initializeCurvaturePlot()
     imgui.PushItemWidth(28)
-    PushStyleColor(imgui_col.FrameBg, 0)
+    PushStyleColor(imgui_col.FrameBg, vctr4(0))
     return {}
 end
 
