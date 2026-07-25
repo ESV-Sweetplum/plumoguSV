@@ -32,7 +32,7 @@ function showAdvancedSettings()
     )
     imgui.SeparatorText('Vibrato Related')
     local oldVibratoRates = table.vectorize4(globalVars.vibratoFrameRates)
-    imgui.SetNextItemWidth(imgui.GetWindowWidth() - 50)
+    imgui.SetNextItemWidth(imgui.GetWindowWidth() - 100)
     local _, newVibratoRates = imgui.InputInt4('Frame Rates', oldVibratoRates)
     if oldVibratoRates ~= newVibratoRates then
         globalVars.vibratoFrameRates = { newVibratoRates.x, newVibratoRates.y, newVibratoRates.z, newVibratoRates.w }
