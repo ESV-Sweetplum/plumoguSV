@@ -26,13 +26,7 @@ function renderMeasureDataWidget()
     uniqueDict = sort(uniqueDict, sortAscending) ---@type number[]
     local startOffset = uniqueDict[1]
     local endOffset = uniqueDict[2] or uniqueDict[1]
-    if
-        math.abs(endOffset - startOffset) < 1e-10
-        and not cache.get('map_edited')
-        and state.SelectedScrollGroupId == widgetVars.tgName
-    then
-        return
-    end
+    if math.abs(endOffset - startOffset) < 1e-10 then return end
     if
         endOffset ~= widgetVars.oldEndOffset
         or startOffset ~= widgetVars.oldStartOffset
