@@ -4,7 +4,7 @@ function ssfVibrato(menuVars, func1, func2)
     if not truthy(offsets) then return end
     local startTime = offsets[1]
     local endTime = offsets[#offsets]
-    local fps = VIBRATO_FRAME_RATES[menuVars.vibratoQuality]
+    local fps = globalVars.vibratoFrameRates[menuVars.vibratoQuality]
     local delta = 1000 / fps
     local time = startTime
     local ssfs =

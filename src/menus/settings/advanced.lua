@@ -30,6 +30,15 @@ function showAdvancedSettings()
         'Use LN Ends As Offsets',
         "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets."
     )
+    imgui.SeparatorText('Vibrato Related')
+    local oldVibratoRates = table.vectorize4(globalVars.vibratoFrameRates)
+    imgui.SetNextItemWidth(imgui.GetWindowWidth() - 50)
+    local _, newVibratoRates = imgui.InputInt4('Frame Rates', oldVibratoRates)
+    if oldVibratoRates ~= newVibratoRates then
+        globalVars.vibratoFrameRates = { newVibratoRates.x, newVibratoRates.y, newVibratoRates.z, newVibratoRates.w }
+        reconstructVibratoQualities()
+        write(globalVars)
+    end
 end
 
 function chooseMaxDisplacementMultiplierExponent(forceCache)

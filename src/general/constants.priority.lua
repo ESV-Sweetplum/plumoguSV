@@ -189,15 +189,19 @@ VIBRATO_QUALITIES = {
     'Medium',
     'High',
     'Ultra',
-    'Omega',
 }
 
-VIBRATO_FRAME_RATES = { 60, 90, 150, 210, 270 }
+DEFAULT_VIBRATO_RATES = { 75, 90, 125, 150 }
 
-VIBRATO_DETAILED_QUALITIES = {} -- what actually shows up in-game
+function reconstructVibratoQualities()
+    VIBRATO_DETAILED_QUALITIES = {} -- what actually shows up in-game
 
-for i, v in pairs(VIBRATO_QUALITIES) do
-    table.insert(VIBRATO_DETAILED_QUALITIES, v .. '  (~' .. VIBRATO_FRAME_RATES[i] .. 'fps)')
+    for i, v in pairs(VIBRATO_QUALITIES) do
+        table.insert(
+            VIBRATO_DETAILED_QUALITIES,
+            v .. '  (~' .. (globalVars.vibratoFrameRates or DEFAULT_VIBRATO_RATES)[i] .. 'fps)'
+        )
+    end
 end
 
 VIBRATO_CURVATURES = {

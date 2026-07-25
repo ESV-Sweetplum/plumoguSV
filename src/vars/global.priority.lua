@@ -54,6 +54,7 @@ globalVars = {
     useEndTimeOffsets = false,
     useMinDisplacementMultiplier = true,
     useSelectionForNavigation = false,
+    vibratoFrameRates = table.duplicate(DEFAULT_VIBRATO_RATES),
 }
 
 DEFAULT_GLOBAL_VARS = table.duplicate(globalVars)
@@ -113,6 +114,12 @@ function setGlobalVars(tempGlobalVars)
     globalVars.useEndTimeOffsets = truthy(tempGlobalVars.useEndTimeOffsets)
     globalVars.useMinDisplacementMultiplier = truthy(tempGlobalVars.useMinDisplacementMultiplier, true)
     globalVars.useSelectionForNavigation = truthy(tempGlobalVars.useSelectionForNavigation)
+    globalVars.vibratoFrameRates = table.map(
+        tempGlobalVars.vibratoFrameRates or globalVars.vibratoFrameRates,
+        function(e) return tonumber(e) end
+    )
+
+    reconstructVibratoQualities()
 
     -- All fields below are colors that must be vectorized to properly perform color arithmetic.
     local forceVectorizeList = {
