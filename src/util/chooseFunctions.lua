@@ -235,9 +235,9 @@ end
 
 function chooseCurveSharpness(settingVars)
     local oldSharpness = settingVars.curveSharpness
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(4, 4))
+    PushStyleVar(imgui_style_var.FramePadding, vector.New(4, 4))
     if imgui.Button('Reset##curveSharpness', SECONDARY_BUTTON_SIZE) then settingVars.curveSharpness = 50 end
-    imgui.PopStyleVar()
+    PopStyleVar()
     KeepSameLine()
     imgui.PushItemWidth(107 * OVERALL_SCALE)
     local _, newSharpness = imgui.SliderInt('Curve Sharpness', settingVars.curveSharpness, 1, 100, '%d%%')
@@ -624,7 +624,7 @@ function chooseSVBehavior(settingVars)
     local swapButtonPressed = imgui.Button('Swap', SECONDARY_BUTTON_SIZE)
     HoverToolTip('Switch between slow down/speed up')
     KeepSameLine()
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
+    PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(107 * OVERALL_SCALE)
     local oldBehaviorIndex = settingVars.behaviorIndex
     settingVars.behaviorIndex = Combo('Behavior', SV_BEHAVIORS, oldBehaviorIndex)
@@ -632,7 +632,7 @@ function chooseSVBehavior(settingVars)
     if swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary]) then
         settingVars.behaviorIndex = tn(oldBehaviorIndex == 1) + 1
     end
-    imgui.PopStyleVar()
+    PopStyleVar()
     return oldBehaviorIndex ~= settingVars.behaviorIndex
 end
 

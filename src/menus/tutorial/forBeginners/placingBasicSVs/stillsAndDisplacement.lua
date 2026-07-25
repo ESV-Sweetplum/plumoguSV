@@ -34,12 +34,12 @@ function showStillsAndDisplacementTutorial()
         GUIDELINE_COLOR,
         'Try using the following settings and place these SVs between\ntwo 1/1 notes in a jumpstream (or any other dense pattern):'
     )
-    imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
+    PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
     imgui.BulletText('Still > Linear')
     imgui.BulletText('Still Spacing 1.00x')
     imgui.BulletText('Displacement "END" 0.00msx')
     imgui.BulletText('Start/End SV -1.5x to 1.5x')
-    imgui.PopStyleColor()
+    PopStyleColor()
     imgui.TextWrapped('You should be able to produce a jumping effect with little issues.')
     ForceHeight(860)
 end

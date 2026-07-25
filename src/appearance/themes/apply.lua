@@ -2,7 +2,7 @@ function applyTheme(themeData, imguiOnly)
     if themeData.imguiData then
         for styleKey, colorObj in pairs(themeData.imguiData) do
             local imguiId = imgui_col[styleKey]
-            if imguiId then imgui.PushStyleColor(imguiId, colorObj) end
+            if imguiId then PushStyleColor(imguiId, colorObj) end
         end
     end
 

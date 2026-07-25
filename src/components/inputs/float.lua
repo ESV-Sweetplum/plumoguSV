@@ -23,11 +23,11 @@ end
 
 function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
     local oldValue = value
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
+    PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
     local negateButtonPressed = imgui.Button('Neg.##' .. label, SECONDARY_BUTTON_SIZE)
     HoverToolTip('Negate this value.')
     KeepSameLine()
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
+    PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(107 * OVERALL_SCALE)
     local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
     imgui.PopItemWidth()
@@ -37,14 +37,14 @@ function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
     then
         newValue = -newValue
     end
-    imgui.PopStyleVar(2)
+    PopStyleVar(2)
     return newValue, oldValue ~= newValue
 end
 
 function ResettableNegatableComputableInputFloat(label, value, defaultValue, decimalPlaces, suffix)
     local oldValue = value
 
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
+    PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local resetButtonPressed = imgui.Button('R', TERTIARY_BUTTON_SIZE)
     if resetButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.reset_secondary]) then
         value = defaultValue
@@ -52,20 +52,20 @@ function ResettableNegatableComputableInputFloat(label, value, defaultValue, dec
     HoverToolTip('Reset to the initial value.')
     KeepSameLine()
 
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
+    PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
     local negateButtonPressed = imgui.Button('N', TERTIARY_BUTTON_SIZE)
 
     if negateButtonPressed and value ~= 0 then value = -value end
     HoverToolTip('Negate this value.')
 
     KeepSameLine()
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
+    PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
 
     imgui.PushItemWidth(107 * OVERALL_SCALE)
     local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
     imgui.PopItemWidth()
 
-    imgui.PopStyleVar(3)
+    PopStyleVar(3)
     return newValue, oldValue ~= newValue
 end
 
@@ -73,16 +73,16 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     digits = digits or 2
     suffix = suffix or 'x'
     widthFactor = widthFactor or 0.7
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
+    PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local swapButtonPressed = imgui.Button('S##' .. lowerName, TERTIARY_BUTTON_SIZE)
     HoverToolTip('Swap the two values.')
     local oldValues = vector.New(varsTable[lowerName], varsTable[higherName])
     KeepSameLine()
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
+    PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local negateButtonPressed = imgui.Button('N##' .. higherName, TERTIARY_BUTTON_SIZE)
     HoverToolTip('Negate the two values.')
     KeepSameLine()
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
+    PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
     imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * widthFactor - SAMELINE_SPACING)
     local _, newValues = imgui.InputFloat2(label, oldValues, '%.' .. digits .. 'f' .. suffix)
     imgui.PopItemWidth()
@@ -96,7 +96,7 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
         varsTable[lowerName] = -oldValues.x
         varsTable[higherName] = -oldValues.y
     end
-    imgui.PopStyleVar(3)
+    PopStyleVar(3)
     return swapButtonPressed
         or negateButtonPressed
         or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary])

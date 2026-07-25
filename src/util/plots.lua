@@ -74,7 +74,7 @@ end
 
 function initializeCurvaturePlot()
     imgui.PushItemWidth(28)
-    imgui.PushStyleColor(imgui_col.FrameBg, 0)
+    PushStyleColor(imgui_col.FrameBg, 0)
     return {}
 end
 
@@ -100,7 +100,7 @@ function plotExponentialCurvature(settingVars)
         table.insert(values, value)
     end
     imgui.PlotLines('##ExponentialCurvaturePlot', values, #values, 0, '', 0, 1)
-    imgui.PopStyleColor()
+    PopStyleColor()
     imgui.PopItemWidth()
 end
 
@@ -133,7 +133,7 @@ function plotSigmoidalCurvature(settingVars)
         table.insert(values, value)
     end
     imgui.PlotLines('##SigmoidalCurvaturePlot', values, #values, 0, '', 0, 1)
-    imgui.PopStyleColor()
+    PopStyleColor()
     imgui.PopItemWidth()
 end
 

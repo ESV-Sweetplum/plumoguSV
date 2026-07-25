@@ -9,7 +9,7 @@ function showKeybindSettings()
         if separator then imgui.SeparatorText(separator) end
         local keyOccurrences = keybindHashmap.counts[hotkeyCombo]
         if keyOccurrences > 1 then
-            imgui.PushStyleColor(imgui_col.Text, color.int.oRedMask * 200 + color.int.oWhiteMask * 55)
+            PushStyleColor(imgui_col.Text, color.int.oRedMask * 200 + color.int.oWhiteMask * 55)
         end
         if
             imgui.Button(
@@ -29,7 +29,7 @@ function showKeybindSettings()
                     .. table.concat(keybindHashmap.names[hotkeyCombo], '\n- ')
                     .. '\n\nPlease change a keybind to avoid collisions.'
             )
-            imgui.PopStyleColor()
+            PopStyleColor()
         end
         KeepSameLine()
         imgui.SetCursorPosX(90)

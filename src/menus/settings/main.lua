@@ -12,17 +12,17 @@ SETTING_TYPES = {
 function showPluginSettingsWindow()
     if not globalVars.performanceMode then
         local bgColor = vector.New(0.2, 0.2, 0.2, 1)
-        -- imgui.PopStyleColor(20)
+        -- PopStyleColor(20)
         applyTheme(getIncognitoTheme(), true)
         setPluginAppearanceStyles('Rounded + Border')
-        imgui.PushStyleColor(imgui_col.WindowBg, bgColor)
-        imgui.PushStyleColor(imgui_col.TitleBg, bgColor)
-        imgui.PushStyleColor(imgui_col.TitleBgActive, bgColor)
-        imgui.PushStyleColor(imgui_col.Border, vctr4(1))
+        PushStyleColor(imgui_col.WindowBg, bgColor)
+        PushStyleColor(imgui_col.TitleBg, bgColor)
+        PushStyleColor(imgui_col.TitleBgActive, bgColor)
+        PushStyleColor(imgui_col.Border, vctr4(1))
     end
     startNextWindowNotCollapsed('plumoguSV Settings')
     _, settingsOpened = imgui.Begin('plumoguSV Settings', true, 42)
-    imgui.SetWindowFontScale(FONT_SCALE)
+    imgui.SetWindowFontScale(0.8)
     imgui.SetWindowSize('plumoguSV Settings', vector.New(450, 400))
 
     local typeIndex = cache.settingTypeIndex or 1
@@ -90,7 +90,7 @@ function showPluginSettingsWindow()
         state.SetValue('crazyIdx', 1)
     end
     if not globalVars.performanceMode then
-        imgui.PopStyleColor(41)
+        PopStyleColor(41)
         pulseController()
         setPluginAppearanceColors(globalVars.colorThemeName, true)
         setPluginAppearanceStyles(STYLE_THEMES[globalVars.styleThemeIndex])

@@ -13,13 +13,13 @@ function showStartingTutorial()
     imgui.TextColored(GUIDELINE_COLOR, 'Blue')
     imgui.SameLine(0, 0)
     imgui.Text('.')
-    imgui.PushStyleColor(imgui_col.Text, INSTRUCTION_COLOR)
+    PushStyleColor(imgui_col.Text, INSTRUCTION_COLOR)
     imgui.BulletText('Red text indicates an instruction that MUST\nbe completed for the tutorial to continue.')
-    imgui.PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
+    PushStyleColor(imgui_col.Text, GUIDELINE_COLOR)
     imgui.BulletText(
         "Blue text indicates an instruction that could be skipped \nand won't progress the tutorial, but helps for learning."
     )
-    imgui.PopStyleColor(2)
+    PopStyleColor(2)
     imgui.SeparatorText('Selections')
     imgui.TextWrapped(
         'Often times we will say the phrase "within the selection", which just means within a specific time (e.g. between 5 seconds and 6 seconds into the song). If you select two notes, the SVs within the selection are all SVs with a start time between the first note and the last note. This definition applies to all objects with a StartTime property, that being SVs, SSFs, and timing lines.'

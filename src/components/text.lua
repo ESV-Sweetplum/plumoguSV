@@ -6,5 +6,5 @@
 function GradientText(color1, color2, text, oscillationPeriod)
     PushGradientStyle(color1, color2, imgui_col.Text, oscillationPeriod)
     imgui.Text(text)
-    imgui.PopStyleColor()
+    PopStyleColor()
 end

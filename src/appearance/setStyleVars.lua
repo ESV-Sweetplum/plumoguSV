@@ -11,21 +11,21 @@ function setPluginAppearanceStyles(styleTheme)
 
     local borderSize = tn(styleTheme == 'Rounded + Border' or styleTheme == 'Boxed + Border')
 
-    imgui.PushStyleVar(imgui_style_var.FrameBorderSize, borderSize)
-    imgui.PushStyleVar(imgui_style_var.WindowPadding, vector.New(PADDING_WIDTH, 8))
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushStyleVar(imgui_style_var.ItemSpacing, vector.New(DEFAULT_WIDGET_HEIGHT * 0.5 - 1, 4))
-    imgui.PushStyleVar(imgui_style_var.ItemInnerSpacing, vector.New(SAMELINE_SPACING, 6))
-    imgui.PushStyleVar(imgui_style_var.WindowRounding, cornerRoundnessvalue)
-    imgui.PushStyleVar(imgui_style_var.ChildRounding, cornerRoundnessvalue)
-    imgui.PushStyleVar(imgui_style_var.FrameRounding, cornerRoundnessvalue)
-    imgui.PushStyleVar(imgui_style_var.GrabRounding, cornerRoundnessvalue)
-    imgui.PushStyleVar(imgui_style_var.ScrollbarRounding, cornerRoundnessvalue)
-    imgui.PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessvalue)
-    imgui.PushStyleVar(imgui_style_var.CellPadding, 0)
+    PushStyleVar(imgui_style_var.FrameBorderSize, borderSize)
+    PushStyleVar(imgui_style_var.WindowPadding, vector.New(PADDING_WIDTH, 8))
+    PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
+    PushStyleVar(imgui_style_var.ItemSpacing, vector.New(DEFAULT_WIDGET_HEIGHT * 0.5 - 1, 4))
+    PushStyleVar(imgui_style_var.ItemInnerSpacing, vector.New(SAMELINE_SPACING, 6))
+    PushStyleVar(imgui_style_var.WindowRounding, cornerRoundnessvalue)
+    PushStyleVar(imgui_style_var.ChildRounding, cornerRoundnessvalue)
+    PushStyleVar(imgui_style_var.FrameRounding, cornerRoundnessvalue)
+    PushStyleVar(imgui_style_var.GrabRounding, cornerRoundnessvalue)
+    PushStyleVar(imgui_style_var.ScrollbarRounding, cornerRoundnessvalue)
+    PushStyleVar(imgui_style_var.TabRounding, cornerRoundnessvalue)
+    PushStyleVar(imgui_style_var.CellPadding, 0)
 
     -- Doesn't work even though TabBorderSize is changeable in the style editor demo
-    -- imgui.PushStyleVar( imgui_style_var.TabBorderSize,      borderSize           )
+    -- PushStyleVar( imgui_style_var.TabBorderSize,      borderSize           )
 
     -- https://github.com/ocornut/imgui/issues/7297
     -- Apparently TabBorderSize doesn't have a imgui_style_var, so it can only be changed with
@@ -63,7 +63,7 @@ function setPluginAppearanceColors(themeName, disableBorderOverwrite)
 
     local outputData = applyTheme(themeData)
 
-    imgui.PushStyleColor(imgui_col.TableHeaderBg, imgui.GetColorU32(imgui_col.Button, 0.3))
+    PushStyleColor(imgui_col.TableHeaderBg, imgui.GetColorU32(imgui_col.Button, 0.3))
 
     if disableBorderOverwrite then return end
     local originalTheme = getOriginalTheme()

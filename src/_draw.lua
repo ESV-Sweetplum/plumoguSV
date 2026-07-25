@@ -1,3 +1,6 @@
+PopAllStyleColors()
+PopAllStyleVars()
+
 PLUGIN_NAME = 'plumoguSV-dev'
 
 if globalVars.capybaraMode then
@@ -8,22 +11,23 @@ end
 
 local performanceMode = globalVars.performanceMode
 
-startNextWindowNotCollapsed(PLUGIN_NAME)
-imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
-imgui.Begin(PLUGIN_NAME, 72)
-
-imgui.SetWindowFontScale(FONT_SCALE)
-
 if not performanceMode then
-    addGradient()
+    setPluginAppearance()
     renderBackground()
     drawCapybaraParent()
     drawCursorTrail()
     pulseController()
     checkForGlobalHotkeys()
     checkForActionWheel()
-    setPluginAppearance()
 end
+
+startNextWindowNotCollapsed(PLUGIN_NAME)
+imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
+imgui.Begin(PLUGIN_NAME, 72)
+
+imgui.SetWindowFontScale(FONT_SCALE)
+
+if not performanceMode then addGradient() end
 
 imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
 imgui.BeginTabBar('SV tabs')
