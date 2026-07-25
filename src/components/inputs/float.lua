@@ -28,7 +28,7 @@ function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
     HoverToolTip('Negate this value.')
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(107)
+    imgui.PushItemWidth(107 * OVERALL_SCALE)
     local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
     imgui.PopItemWidth()
     if
@@ -61,7 +61,7 @@ function ResettableNegatableComputableInputFloat(label, value, defaultValue, dec
     KeepSameLine()
     imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
 
-    imgui.PushItemWidth(107)
+    imgui.PushItemWidth(107 * OVERALL_SCALE)
     local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
     imgui.PopItemWidth()
 
@@ -78,7 +78,7 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     HoverToolTip('Swap the two values.')
     local oldValues = vector.New(varsTable[lowerName], varsTable[higherName])
     KeepSameLine()
-    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(6.5, 4))
+    imgui.PushStyleVar(imgui_style_var.FramePadding, vector.New(7, 4))
     local negateButtonPressed = imgui.Button('N##' .. higherName, TERTIARY_BUTTON_SIZE)
     HoverToolTip('Negate the two values.')
     KeepSameLine()

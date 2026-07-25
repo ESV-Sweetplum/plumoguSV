@@ -4,6 +4,7 @@ function comboSettingsMenu(settingVars, _, _, hideSettings)
     if not hideSettings then
         startNextWindowNotCollapsed('SV Type 1 Settings')
         imgui.Begin('SV Type 1 Settings', imgui_window_flags.AlwaysAutoResize)
+        imgui.SetWindowFontScale(FONT_SCALE)
         imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
         local svType1 = STANDARD_SVS[settingVars.svType1Index]
         local settingVars1 = getSettingVars(svType1, 'Combo1')
@@ -14,6 +15,7 @@ function comboSettingsMenu(settingVars, _, _, hideSettings)
 
         startNextWindowNotCollapsed('SV Type 2 Settings')
         imgui.Begin('SV Type 2 Settings', imgui_window_flags.AlwaysAutoResize)
+        imgui.SetWindowFontScale(FONT_SCALE)
         imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
         local svType2 = STANDARD_SVS[settingVars.svType2Index]
         local settingVars2 = getSettingVars(svType2, 'Combo2')
