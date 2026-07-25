@@ -30,11 +30,12 @@ function kusaMovementUp()
                 note.EndTime == 0 and 0 or note.EndTime + 1,
                 note.HitSound,
                 note.EditorLayer,
-                note.Type
+                note.Type,
+                note.TimingGroup
             )
         end
     )
-    if success then print('s!', 'Moved selected notes up by 1ms.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Moved selected notes up by 1ms.') end
 end
 
 function kusaMovementRight()
@@ -46,11 +47,14 @@ function kusaMovementRight()
                 note.EndTime,
                 note.HitSound,
                 note.EditorLayer,
-                note.Type
+                note.Type,
+                note.TimingGroup
             )
         end
     )
-    if success then print('s!', 'Shifted selected notes one lane to the right.') end
+    if success and globalVars.printActionWheelMessage then
+        print('s!', 'Shifted selected notes one lane to the right.')
+    end
 end
 
 function kusaMovementDown()
@@ -62,11 +66,12 @@ function kusaMovementDown()
                 note.EndTime == 0 and 0 or note.EndTime - 1,
                 note.HitSound,
                 note.EditorLayer,
-                note.Type
+                note.Type,
+                note.TimingGroup
             )
         end
     )
-    if success then print('s!', 'Moved selected notes down by 1ms.') end
+    if success and globalVars.printActionWheelMessage then print('s!', 'Moved selected notes down by 1ms.') end
 end
 
 function kusaMovementLeft()
@@ -78,9 +83,12 @@ function kusaMovementLeft()
                 note.EndTime,
                 note.HitSound,
                 note.EditorLayer,
-                note.Type
+                note.Type,
+                note.TimingGroup
             )
         end
     )
-    if success then print('s!', 'Shifted selected notes one lane to the left.') end
+    if success and globalVars.printActionWheelMessage then
+        print('s!', 'Shifted selected notes one lane to the left.')
+    end
 end

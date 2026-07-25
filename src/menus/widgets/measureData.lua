@@ -39,12 +39,12 @@ function renderMeasureDataWidget()
         or cache.get('map_edited')
         or state.SelectedScrollGroupId ~= widgetVars.tgName
     then
-        svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
+        local svsBetweenOffsets = game.get.svsBetweenOffsets(startOffset, endOffset)
         widgetVars.nsvDistance = endOffset - startOffset
         addStartSVIfMissing(svsBetweenOffsets, startOffset)
-        totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset) or 0
+        local totalDistance = calculateDisplacementFromSVs(svsBetweenOffsets, startOffset, endOffset) or 0
         widgetVars.roundedSVDistance = math.round(totalDistance, 3)
-        avgSV = totalDistance / (endOffset - startOffset)
+        local avgSV = totalDistance / (endOffset - startOffset)
         widgetVars.roundedAvgSV = math.round(avgSV, 3)
         widgetVars.tgName = state.SelectedScrollGroupId
     end

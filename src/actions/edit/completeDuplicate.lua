@@ -64,7 +64,9 @@ function placeDuplicateItems(menuVars)
                 data.Lane,
                 data.EndTime == 0 and 0 or data.EndTime + offset,
                 data.HitSound,
-                data.EditorLayer
+                data.EditorLayer,
+                data.Type,
+                data.TimingGroup
             )
             table.insert(hosToAdd, ho)
             table.insert(moveActions, createEA(action_type.MoveObjectsToTimingGroup, { ho }, data.TimingGroup))

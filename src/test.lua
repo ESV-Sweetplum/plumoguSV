@@ -4,7 +4,7 @@ function runTest()
     local dim = imgui.GetWindowSize()
 
     local fov = 90
-    local zoom = (1 / (1 + math.exp(-1 * (state.SongTime - 52619) / 30)))
+    local zoom = 1
     local fovRad = fov / 180 * math.pi
     local f = 1 / math.tan(fovRad / 2)
     local screenWidth = dim.x
@@ -22,7 +22,7 @@ function runTest()
 
     local speed = absMinM * state.DeltaTime / 300
 
-    local cameraPos = { 0, 4, -7 }
+    local cameraPos = { 0, -4, -7 }
 
     local projectionMatrix = {
         { f / aspectRatio, 0, 0, 0 },
@@ -122,11 +122,27 @@ function runTest()
     local outputPoints = {}
 
     if not theta then theta = 0 end
+    if not theta2 then theta2 = 0 end
+    if not penisGear then penisGear = 1 end
     theta = theta + speed
+    theta2 = theta2 + speed * clock.getTime() / penisGear
+
+    imgui.Text('rpm: ' .. speed * clock.getTime() / (state.DeltaTime / 1000) / 6.282 * 120 / penisGear)
+    imgui.Text('gear: ' .. penisGear)
+
+    if imgui.Button('shift down') then
+        if penisGear > 1 then
+            penisGear = penisGear - 1
+        else
+            penisGear = penisGear / 10
+        end
+    end
+    KeepSameLine()
+    if imgui.Button('shift up') then penisGear = math.floor(penisGear + 1) end
 
     local matRotZ = {
-        { math.cos(theta), math.sin(theta), 0, 0 },
-        { -math.sin(theta), math.cos(theta), 0, 0 },
+        { math.cos(3.14159), math.sin(3.14159), 0, 0 },
+        { -math.sin(3.14159), math.cos(3.14159), 0, 0 },
         { 0, 0, 1, 0 },
         { 0, 0, 0, 1 },
     }
@@ -139,17 +155,20 @@ function runTest()
     }
 
     local matRotY = {
-        { math.cos(theta / math.sqrt(2)), 0, math.sin(theta / math.sqrt(2)), 0 },
+        { math.cos(theta2), 0, math.sin(theta2), 0 },
         { 0, 1, 0, 0 },
-        { -math.sin(theta / math.sqrt(2)), 0, math.cos(theta / math.sqrt(2)), 0 },
+        { -math.sin(theta2), 0, math.cos(theta2), 0 },
         { 0, 0, 0, 1 },
     }
 
     for idx, point in pairs(inputPoints) do
         local inputPoint = table.map(point, function(i) return table.duplicate({ i }) end)
+
+        inputPoint[2][1] = inputPoint[2][1] + 4 * math.sin(state.UnixTime / 200)
+
         -- inputPoint = matrix.multiply(matRotX, inputPoint)
         inputPoint = matrix.multiply(matRotY, inputPoint)
-        -- inputPoint = matrix.multiply(matRotZ, inputPoint)
+        inputPoint = matrix.multiply(matRotZ, inputPoint)
 
         inputPoint[1][1] = inputPoint[1][1] - cameraPos[1]
         inputPoint[2][1] = inputPoint[2][1] - cameraPos[2]

@@ -1,52 +1,92 @@
 function dynamicScaleMenu()
+    local scaleTypes = {
+        'Note-Interpolated',
+        'SV-Interpolated',
+    }
+
     local menuVars = getMenuVars('dynamicScale')
-    local numNoteTimes = #menuVars.noteTimes
-    imgui.Text(#menuVars.noteTimes .. ' note times assigned to scale SVs between')
-    addNoteTimesToDynamicScaleButton(menuVars)
-    if numNoteTimes == 0 then
-        cache.save('dynamicScaleMenu', menuVars)
-        return
+    menuVars.scaleTypeIndex = Combo('Scale Type', scaleTypes, menuVars.scaleTypeIndex)
+    if menuVars.scaleTypeIndex == 1 then
+        local numNoteTimes = #menuVars.noteTimes
+        imgui.Text(#menuVars.noteTimes .. ' note times assigned to scale SVs between')
+        addNoteTimesToDynamicScaleButton(menuVars)
+        if numNoteTimes == 0 then
+            cache.save('dynamicScaleMenu', menuVars)
+            return
+        else
+            clearNoteTimesButton(menuVars)
+        end
+
+        AddSeparator()
+        if #menuVars.noteTimes < 3 then
+            imgui.Text('Not enough note times assigned')
+            imgui.Text('Assign 3 or more note times instead')
+            cache.save('dynamicScaleMenu', menuVars)
+            return
+        end
+
+        local numSVPoints = numNoteTimes - 1
+        local needSVUpdate = not truthy(menuVars.svMultipliers) or (#menuVars.svMultipliers ~= numSVPoints)
+        imgui.AlignTextToFramePadding()
+        imgui.Text('Shape:')
+        KeepSameLine()
+        needSVUpdate = chooseStandardSVType(menuVars, true) or needSVUpdate
+
+        AddSeparator()
+        local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
+
+        local settingVars = getSettingVars(currentSVType, 'DynamicScale')
+        needSVUpdate = svSettingsMenu(currentSVType, settingVars, true, numSVPoints, 'DynamicScale') or needSVUpdate
+        if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, true) end
+
+        startNextWindowNotCollapsed('SV Info')
+        makeSVInfoWindow(
+            'SV Info',
+            menuVars.svGraphStats,
+            menuVars.svStats,
+            menuVars.svDistances,
+            menuVars.svMultipliers,
+            nil,
+            true
+        )
+
+        local labelText = currentSVType .. 'DynamicScale'
+        cache.save(currentSVType .. 'DynamicScaleSettings', settingVars)
+
+        simpleActionMenu('Scale spacing between assigned notes', 0, dynamicScaleSVsParent, menuVars)
     else
-        clearNoteTimesButton(menuVars)
+        AddSeparator()
+
+        local needSVUpdate = not truthy(menuVars.svMultipliers)
+        imgui.AlignTextToFramePadding()
+        imgui.Text('Shape:')
+        KeepSameLine()
+        needSVUpdate = chooseStandardSVType(menuVars, true) or needSVUpdate
+
+        AddSeparator()
+        local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
+
+        local settingVars = getSettingVars(currentSVType, 'DynamicScale')
+        needSVUpdate = svSettingsMenu(currentSVType, settingVars, true, nil, 'DynamicScale') or needSVUpdate
+        if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, true) end
+
+        startNextWindowNotCollapsed('SV Info')
+        makeSVInfoWindow(
+            'SV Info',
+            menuVars.svGraphStats,
+            menuVars.svStats,
+            menuVars.svDistances,
+            menuVars.svMultipliers,
+            nil,
+            true
+        )
+
+        local labelText = currentSVType .. 'DynamicScale'
+        cache.save(currentSVType .. 'DynamicScaleSettings', settingVars)
+
+        simpleActionMenu('Scale spacing between assigned notes', 0, dynamicScaleSVsParent, menuVars)
     end
-
-    AddSeparator()
-    if #menuVars.noteTimes < 3 then
-        imgui.Text('Not enough note times assigned')
-        imgui.Text('Assign 3 or more note times instead')
-        cache.save('dynamicScaleMenu', menuVars)
-        return
-    end
-    local numSVPoints = numNoteTimes - 1
-    local needSVUpdate = not truthy(menuVars.svMultipliers) or (#menuVars.svMultipliers ~= numSVPoints)
-    imgui.AlignTextToFramePadding()
-    imgui.Text('Shape:')
-    KeepSameLine()
-    needSVUpdate = chooseStandardSVType(menuVars, true) or needSVUpdate
-
-    AddSeparator()
-    local currentSVType = STANDARD_SVS[menuVars.svTypeIndex]
-
-    local settingVars = getSettingVars(currentSVType, 'DynamicScale')
-    needSVUpdate = svSettingsMenu(currentSVType, settingVars, true, numSVPoints, 'DynamicScale') or needSVUpdate
-    if needSVUpdate then updateMenuSVs(currentSVType, menuVars, settingVars, true) end
-
-    startNextWindowNotCollapsed('SV Info')
-    makeSVInfoWindow(
-        'SV Info',
-        menuVars.svGraphStats,
-        menuVars.svStats,
-        menuVars.svDistances,
-        menuVars.svMultipliers,
-        nil,
-        true
-    )
-
-    local labelText = currentSVType .. 'DynamicScale'
-    cache.save(currentSVType .. 'DynamicScaleSettings', settingVars)
     cache.save('dynamicScaleMenu', menuVars)
-
-    simpleActionMenu('Scale spacing between assigned notes', 0, dynamicScaleSVs, menuVars)
 end
 
 function clearNoteTimesButton(menuVars)
