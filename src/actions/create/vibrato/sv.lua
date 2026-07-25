@@ -52,10 +52,17 @@ function svVibrato(menuVars, heightFn)
                 prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil, prevHeight + newHeight, 0)
                 x = (tp + 1) / teleportCount
                 offset = nextVibro * x + startVibro * (1 - x)
-                local multiplicativeFactor = tp == teleportCount - 2 and 1 or 2
-                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil, -newHeight * multiplicativeFactor, 0)
+                prepareDisplacingSVs(offset, svsToAdd, svTimeIsAdded, nil, -newHeight * 2, 0)
                 prevHeight = newHeight
             end
+            prepareDisplacingSVs(
+                nextVibro - 1 / getUsableDisplacementMultiplier(nextVibro),
+                svsToAdd,
+                svTimeIsAdded,
+                prevHeight,
+                0,
+                nil
+            )
         else
             local prevHeight = heightFn(startPos, 1)
             for tp = 1, teleportCount - 2, 3 do
