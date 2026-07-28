@@ -11,19 +11,20 @@ end
 
 local performanceMode = globalVars.performanceMode
 
-startNextWindowNotCollapsed(PLUGIN_NAME)
-imgui.SetNextWindowSizeConstraints(vector.New(276, 0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
-imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
-
 if not performanceMode then
     setPluginAppearance()
-    renderBackground()
     drawCapybaraParent()
     drawCursorTrail()
     pulseController()
     checkForGlobalHotkeys()
     checkForActionWheel()
 end
+
+startNextWindowNotCollapsed(PLUGIN_NAME)
+imgui.SetNextWindowSizeConstraints(vector.New(276, 0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
+imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
+
+if not performanceMode then renderBackground() end
 
 startNextWindowNotCollapsed(PLUGIN_NAME)
 imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
@@ -36,8 +37,9 @@ imgui.BeginTabBar('SV tabs', imgui_tab_bar_flags.FittingPolicyScroll)
 for i = 1, #TAB_MENUS do
     createMenuTab(TAB_MENUS[i])
 end
-imgui.SetWindowFontScale(1)
 imgui.EndTabBar()
+
+imgui.SetWindowFontScale(1)
 
 if not performanceMode then
     if globalVars.showVibratoWidget then
