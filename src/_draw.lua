@@ -12,7 +12,7 @@ end
 local performanceMode = globalVars.performanceMode
 
 startNextWindowNotCollapsed(PLUGIN_NAME)
-imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
+imgui.SetNextWindowSizeConstraints(vector.New(276, 0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
 imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
 
 if not performanceMode then
@@ -32,10 +32,11 @@ imgui.Begin(PLUGIN_NAME, 72)
 if not performanceMode then addGradient() end
 
 imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
-imgui.BeginTabBar('SV tabs')
+imgui.BeginTabBar('SV tabs', imgui_tab_bar_flags.FittingPolicyScroll)
 for i = 1, #TAB_MENUS do
     createMenuTab(TAB_MENUS[i])
 end
+imgui.SetWindowFontScale(1)
 imgui.EndTabBar()
 
 if not performanceMode then
