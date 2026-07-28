@@ -2,7 +2,6 @@
 function showPatchNotesWindow()
     startNextWindowNotCollapsed('plumoguSV Patch Notes')
     _, patchNotesOpened = imgui.Begin('plumoguSV Patch Notes', true, imgui_window_flags.NoResize)
-    imgui.SetWindowFontScale(FONT_SCALE)
     imgui.SetWindowSize('plumoguSV Patch Notes', vector.New(500, 400))
     PushStyleColor(imgui_col.Separator, color.alterOpacity(color.vctr.white, -0.8))
 

@@ -6,8 +6,6 @@ function showTutorialWindow()
     startNextWindowNotCollapsed('plumoguSV Tutorial Menu')
 
     _, tutorialOpened = imgui.Begin('plumoguSV Tutorial Menu', true, 26)
-    imgui.SetWindowFontScale(FONT_SCALE)
-
     local tutorialWindowName = cache.get('windows/tutorial_step', '')
 
     if not tutorialOpened then cache.set('windows/tutorial', false) end

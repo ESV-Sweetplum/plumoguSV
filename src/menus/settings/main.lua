@@ -22,7 +22,6 @@ function showPluginSettingsWindow()
     end
     startNextWindowNotCollapsed('plumoguSV Settings')
     _, settingsOpened = imgui.Begin('plumoguSV Settings', true, 42)
-    imgui.SetWindowFontScale(0.8)
     imgui.SetWindowSize('plumoguSV Settings', vector.New(450, 400))
 
     local typeIndex = cache.settingTypeIndex or 1

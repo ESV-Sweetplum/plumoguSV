@@ -1,18 +1,15 @@
-OVERALL_SCALE = 1.15
-
 DEFAULT_WIDGET_HEIGHT = 26 -- value determining the height of GUI widgets
-DEFAULT_WIDGET_WIDTH = 160 * OVERALL_SCALE -- value determining the width of GUI widgets
+DEFAULT_WIDGET_WIDTH = 160 -- value determining the width of GUI widgets
 PADDING_WIDTH = 8 -- value determining window and frame padding
-RADIO_BUTTON_SPACING = 7.5 * OVERALL_SCALE -- value determining spacing between radio buttons
-SAMELINE_SPACING = 5 * OVERALL_SCALE -- value determining spacing between GUI items on the same row
-ACTION_BUTTON_SIZE = vector.New(264, 42) * OVERALL_SCALE -- dimensions of the button that does important things
-PLOT_GRAPH_SIZE = vector.New(264, 100) -- dimensions of the plot graph for SVs and note motion
-HALF_ACTION_BUTTON_SIZE = vector.New((264 - SAMELINE_SPACING) / 2, 42) * vector.New(OVERALL_SCALE, 1) -- dimensions of a button that does kinda important things
-SECONDARY_BUTTON_SIZE = vector.New(48, 24) * OVERALL_SCALE -- dimensions of a button that does less important things
-TERTIARY_BUTTON_SIZE = vector.New(21.5, 24) * OVERALL_SCALE -- dimensions of a button that does much less important things
-LARGE_TERTIARY_BUTTON_SIZE = TERTIARY_BUTTON_SIZE * vector.New(1.4, 1)
-EXPORT_BUTTON_SIZE = vector.New(43, 24) * OVERALL_SCALE -- dimensions of the export menu settings button
-BEEG_BUTTON_SIZE = vector.New(264, 24) * OVERALL_SCALE -- beeg button
+RADIO_BUTTON_SPACING = 7.5 -- value determining spacing between radio buttons
+SAMELINE_SPACING = 5 -- value determining spacing between GUI items on the same row
+ACTION_BUTTON_SIZE = vector.New(253, 42) -- dimensions of the button that does important things
+PLOT_GRAPH_SIZE = vector.New(253, 100) -- dimensions of the plot graph for SVs and note motion
+HALF_ACTION_BUTTON_SIZE = vector.New((253 - SAMELINE_SPACING) / 2, 42) -- dimensions of a button that does kinda important things
+SECONDARY_BUTTON_SIZE = vector.New(48, 24) -- dimensions of a button that does less important things
+TERTIARY_BUTTON_SIZE = vector.New(21.5, 24) -- dimensions of a button that does much less important things
+EXPORT_BUTTON_SIZE = vector.New(40, 24) -- dimensions of the export menu settings button
+BEEG_BUTTON_SIZE = vector.New(253, 24) -- beeg button
 
 MIN_RGB_CYCLE_TIME = 0.1 -- minimum seconds for one complete RGB color cycle
 MAX_RGB_CYCLE_TIME = 300 -- maximum seconds for one complete RGB color cycle
@@ -20,8 +17,6 @@ MAX_CURSOR_TRAIL_POINTS = 100 -- maximum number of points for cursor trail effec
 MAX_SV_POINTS = 1024 -- maximum number of SV points allowed
 MAX_ANIMATION_FRAMES = 999 -- maximum number of animation frames allowed
 MAX_IMPORT_CHARACTER_LIMIT = 999999 -- maximum number of characters allowed for import text
-
-FONT_SCALE = 1
 
 CHINCHILLA_TYPES = {
     'Exponential',
@@ -137,7 +132,7 @@ STILL_TYPES = {
 VIBRATO_DEVIATION_TYPES = {
     'None',
     'Linear',
-    'Gauss.',
+    'Gaussian',
 }
 
 STUTTER_CONTROLS = {

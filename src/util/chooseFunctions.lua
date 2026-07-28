@@ -20,32 +20,30 @@ function chooseAverageSV(menuVars)
 end
 
 function chooseInteractiveBezier(settingVars, optionalLabel)
-    local size = 160
+    local pos1 = (settingVars.p1 * 150) or vector.New(30, 75)
+    local pos2 = (settingVars.p2 * 150) or vector.New(120, 75)
 
-    local pos1 = (settingVars.p1 * size) or vector.New(30, 75)
-    local pos2 = (settingVars.p2 * size) or vector.New(120, 75)
-
-    local normalizedPos1 = pos1 / size
-    local normalizedPos2 = pos2 / size
+    local normalizedPos1 = pos1 / 150
+    local normalizedPos2 = pos2 / 150
 
     if not settingVars.manualMode then
-        imgui.BeginChild('Bezier Interactive Window' .. optionalLabel, vctr2(size), 67, 31)
+        imgui.BeginChild('Bezier Interactive Window' .. optionalLabel, vctr2(150), 67, 31)
         local pointColor1 = 4278190335
         local pointColor2 = 4294735619
 
-        pos1.y = size - pos1.y
-        pos2.y = size - pos2.y
+        pos1.y = 150 - pos1.y
+        pos2.y = 150 - pos2.y
 
         local pointList = { { pos = pos1, col = pointColor1, size = 5 }, { pos = pos2, col = pointColor2, size = 5 } }
 
         local ctx =
-            renderGraph('Bezier Interactive Window' .. optionalLabel, vctr2(size), pointList, settingVars.freeMode)
+            renderGraph('Bezier Interactive Window' .. optionalLabel, vctr2(150), pointList, settingVars.freeMode)
         local topLeft = imgui.GetWindowPos()
         local dim = imgui.GetWindowSize()
 
         if not settingVars.freeMode then
-            pointList[1].pos = vector.Clamp(pointList[1].pos, vctr2(0), vctr2(size))
-            pointList[2].pos = vector.Clamp(pointList[2].pos, vctr2(0), vctr2(size))
+            pointList[1].pos = vector.Clamp(pointList[1].pos, vctr2(0), vctr2(150))
+            pointList[2].pos = vector.Clamp(pointList[2].pos, vctr2(0), vctr2(150))
         end
 
         pos1 = pointList[1].pos
@@ -68,15 +66,14 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
         imgui.EndChild()
 
         KeepSameLine()
-        imgui.BeginChild('Bezier Data', vector.New(120, size))
-        imgui.SetCursorPosY(-15)
+        imgui.BeginChild('Bezier Data', vector.New(100, 150))
         imgui.SetCursorPosX(7)
 
-        pos1.y = size - pos1.y
-        pos2.y = size - pos2.y
+        pos1.y = 150 - pos1.y
+        pos2.y = 150 - pos2.y
 
-        normalizedPos1 = pos1 / size
-        normalizedPos2 = pos2 / size
+        normalizedPos1 = pos1 / 150
+        normalizedPos2 = pos2 / 150
 
         imgui.Text(
             '\n         Point 1:\n      ('
@@ -90,7 +87,7 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
                 .. ')\n'
         )
 
-        imgui.SetCursorPosY(90)
+        imgui.SetCursorPosY(80)
         imgui.SetCursorPosX(5)
         _, settingVars.freeMode = imgui.Checkbox('Free Mode##Bezier', settingVars.freeMode)
         HoverToolTip(
@@ -104,14 +101,14 @@ function chooseInteractiveBezier(settingVars, optionalLabel)
     else
         if settingVars.freeMode then
             imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
-            _, normalizedPos1 = imgui.InputFloat2('Point 1', pos1 / size)
+            _, normalizedPos1 = imgui.InputFloat2('Point 1', pos1 / 150)
             imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
-            _, normalizedPos2 = imgui.InputFloat2('Point 2', pos2 / size)
+            _, normalizedPos2 = imgui.InputFloat2('Point 2', pos2 / 150)
         else
             imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
-            _, normalizedPos1 = imgui.SliderFloat2('Point 1', pos1 / size, 0, 1)
+            _, normalizedPos1 = imgui.SliderFloat2('Point 1', pos1 / 150, 0, 1)
             imgui.SetNextItemWidth(DEFAULT_WIDGET_WIDTH)
-            _, normalizedPos2 = imgui.SliderFloat2('Point 2', pos2 / size, 0, 1)
+            _, normalizedPos2 = imgui.SliderFloat2('Point 2', pos2 / 150, 0, 1)
         end
         _, settingVars.freeMode = imgui.Checkbox('Free Mode##Bezier', settingVars.freeMode)
         KeepSameLine()
@@ -239,7 +236,7 @@ function chooseCurveSharpness(settingVars)
     if imgui.Button('Reset##curveSharpness', SECONDARY_BUTTON_SIZE) then settingVars.curveSharpness = 50 end
     PopStyleVar()
     KeepSameLine()
-    imgui.PushItemWidth(107 * OVERALL_SCALE)
+    imgui.PushItemWidth(107)
     local _, newSharpness = imgui.SliderInt('Curve Sharpness', settingVars.curveSharpness, 1, 100, '%d%%')
     imgui.PopItemWidth()
     settingVars.curveSharpness = newSharpness
@@ -296,17 +293,17 @@ function chooseFinalSV(settingVars, skipFinalSV)
     local oldCustomSV = settingVars.customSV
     local finalSVType = FINAL_SV_TYPES[settingVars.finalSVIndex]
     if finalSVType ~= 'Normal' and finalSVType ~= 'None' then
-        imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.41)
-        _, settingVars.customSV = imgui.InputFloat('##FinalSV', settingVars.customSV, 0, 0, '%.2fx')
+        imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.35)
+        _, settingVars.customSV = imgui.InputFloat('SV', settingVars.customSV, 0, 0, '%.2fx')
         KeepSameLine()
         imgui.PopItemWidth()
     else
-        imgui.Indent(DEFAULT_WIDGET_WIDTH * 0.31 + 24)
+        imgui.Indent(DEFAULT_WIDGET_WIDTH * 0.35 + 25)
     end
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.55)
+    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.5)
     settingVars.finalSVIndex = Combo('Final SV', FINAL_SV_TYPES, settingVars.finalSVIndex)
     HelpMarker("Final SV won't be placed if there's already an SV at the end time")
-    if finalSVType == 'Normal' or finalSVType == 'None' then imgui.Unindent(DEFAULT_WIDGET_WIDTH * 0.31 + 24) end
+    if finalSVType == 'Normal' or finalSVType == 'None' then imgui.Unindent(DEFAULT_WIDGET_WIDTH * 0.35 + 25) end
     imgui.PopItemWidth()
     return (oldIndex ~= settingVars.finalSVIndex) or (oldCustomSV ~= settingVars.customSV)
 end
@@ -589,12 +586,12 @@ function chooseStillType(menuVars)
     if dontChooseDistance then
         imgui.Indent(indentWidth)
     else
-        imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.6 - 8)
+        imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.6 - 5)
         menuVars.stillDistance = ComputableInputFloat('##still', menuVars.stillDistance, 2, ' msx')
         KeepSameLine()
         imgui.PopItemWidth()
     end
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.42)
+    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.4)
     menuVars.stillTypeIndex = Combo('Displacement', STILL_TYPES, menuVars.stillTypeIndex, {}, {}, tooltipList)
 
     HoverToolTip(tooltipList[menuVars.stillTypeIndex])
@@ -625,10 +622,9 @@ function chooseSVBehavior(settingVars)
     HoverToolTip('Switch between slow down/speed up')
     KeepSameLine()
     PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(107 * OVERALL_SCALE)
+    imgui.SetNextItemWidth(107)
     local oldBehaviorIndex = settingVars.behaviorIndex
     settingVars.behaviorIndex = Combo('Behavior', SV_BEHAVIORS, oldBehaviorIndex)
-    imgui.PopItemWidth()
     if swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary]) then
         settingVars.behaviorIndex = tn(oldBehaviorIndex == 1) + 1
     end
@@ -677,8 +673,6 @@ end
 
 function choosePulseColor()
     _, colorPickerOpened = imgui.Begin('plumoguSV Pulse Color Picker', true, imgui_window_flags.AlwaysAutoResize)
-    imgui.SetWindowFontScale(FONT_SCALE)
-
     local oldColor = globalVars.pulseColor
     _, globalVars.pulseColor = imgui.ColorPicker4('Pulse Color', globalVars.pulseColor)
     if oldColor ~= globalVars.pulseColor then write(globalVars) end
@@ -701,7 +695,7 @@ function chooseVibratoDeviance(menuVars)
 
     local deviationType = VIBRATO_DEVIATION_TYPES[menuVars.deviationFunctionIndex]
     local dontChooseDistance = deviationType == 'None'
-    local indentWidth = DEFAULT_WIDGET_WIDTH * 0.37 + 19
+    local indentWidth = DEFAULT_WIDGET_WIDTH * 0.37 + 16
     if dontChooseDistance then
         imgui.Indent(indentWidth)
     else

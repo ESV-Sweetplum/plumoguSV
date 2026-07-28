@@ -28,9 +28,8 @@ function NegatableComputableInputFloat(label, value, decimalPlaces, suffix)
     HoverToolTip('Negate this value.')
     KeepSameLine()
     PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(107 * OVERALL_SCALE)
+    imgui.SetNextItemWidth(107)
     local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
-    imgui.PopItemWidth()
     if
         (negateButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.negate_primary]))
         and newValue ~= 0
@@ -61,7 +60,7 @@ function ResettableNegatableComputableInputFloat(label, value, defaultValue, dec
     KeepSameLine()
     PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
 
-    imgui.PushItemWidth(107 * OVERALL_SCALE)
+    imgui.PushItemWidth(107)
     local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
     imgui.PopItemWidth()
 

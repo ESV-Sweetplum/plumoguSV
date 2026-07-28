@@ -11,6 +11,10 @@ end
 
 local performanceMode = globalVars.performanceMode
 
+startNextWindowNotCollapsed(PLUGIN_NAME)
+imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
+imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
+
 if not performanceMode then
     setPluginAppearance()
     renderBackground()
@@ -24,8 +28,6 @@ end
 startNextWindowNotCollapsed(PLUGIN_NAME)
 imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
 imgui.Begin(PLUGIN_NAME, 72)
-
-imgui.SetWindowFontScale(FONT_SCALE)
 
 if not performanceMode then addGradient() end
 
