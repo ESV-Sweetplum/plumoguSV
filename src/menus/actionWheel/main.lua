@@ -37,12 +37,12 @@ function checkForActionWheel()
     cache.load('actionWheel', actionWheelData)
 
     if globalVars.actionWheelActivationIndex == 1 then -- Hover/Release
-        actionWheelData.state = utils.IsKeyDown(keys.LeftAlt) or false
+        actionWheelData.state = kbm.holdingKeyCombo('Alt') or false
     elseif globalVars.actionWheelActivationIndex == 2 then -- Tap/Click
-        if utils.IsKeyPressed(keys.LeftAlt) then actionWheelData.state = not actionWheelData.state end
+        if kbm.executedKeyCombo('Alt') then actionWheelData.state = not actionWheelData.state end
     end
 
-    if utils.IsKeyPressed(keys.LeftAlt) and actionWheelData.state then actionWheelData.pos = imgui.GetMousePos() end
+    if kbm.executedKeyCombo('Alt') and actionWheelData.state then actionWheelData.pos = imgui.GetMousePos() end
 
     local SEGMENT_COUNT = #ACTION_WHEEL_FUNCTIONS[globalVars.actionWheelTypeIndex]
     local SEGMENT_SIZE = math.pi * 2 / SEGMENT_COUNT
@@ -127,7 +127,7 @@ function checkForActionWheel()
     ctx.PathFillConvex(col)
     ctx.PathClear()
 
-    if utils.IsKeyReleased(keys.LeftAlt) and globalVars.actionWheelActivationIndex == 1 then
+    if kbm.releasedKeyCombo('Alt') and globalVars.actionWheelActivationIndex == 1 then
         ACTION_WHEEL_FUNCTIONS[globalVars.actionWheelTypeIndex][selectedSegment + 1]()
     end
     if imgui.IsMouseClicked('Left') and globalVars.actionWheelActivationIndex == 2 then
