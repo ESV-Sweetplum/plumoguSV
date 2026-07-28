@@ -27,7 +27,7 @@ function chooseCreateTool()
     }
 
     imgui.AlignTextToFramePadding()
-    imgui.Text(' Type: ')
+    imgui.Text('Type:')
     KeepSameLine()
     local oldPlaceTypeIndex = globalVars.placeTypeIndex
     imgui.SetCursorPosX(imgui.GetCursorPosX() + 2)
