@@ -127,7 +127,10 @@ function checkForActionWheel()
     ctx.PathFillConvex(col)
     ctx.PathClear()
 
-    if kbm.releasedKeyCombo('Alt') and globalVars.actionWheelActivationIndex == 1 then
+    if
+        utils.IsKeyReleased(keys.LeftAlt)
+        or utils.IsKeyReleased(keys.RightAlt) and globalVars.actionWheelActivationIndex == 1
+    then
         ACTION_WHEEL_FUNCTIONS[globalVars.actionWheelTypeIndex][selectedSegment + 1]()
     end
     if imgui.IsMouseClicked('Left') and globalVars.actionWheelActivationIndex == 2 then

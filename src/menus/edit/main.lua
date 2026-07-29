@@ -12,6 +12,7 @@ EDIT_SV_TOOLS = { -- tools for editing SVs
     'Layer Snaps',
     'Lint Map',
     'Measure',
+    'Normalize (Displace)',
     'Reverse Scroll',
     'Scale (Displace)',
     'Scale (Multiply)',
@@ -39,6 +40,7 @@ function editSVTab()
     if toolName == 'Layer Snaps' then layerSnapMenu() end
     if toolName == 'Lint Map' then lintMapMenu() end
     if toolName == 'Measure' then measureMenu() end
+    if toolName == 'Normalize (Displace)' then normalizeDisplaceMenu() end
     if toolName == 'Reverse Scroll' then reverseScrollMenu() end
     if toolName == 'Scale (Displace)' then scaleDisplaceMenu() end
     if toolName == 'Scale (Multiply)' then scaleMultiplyMenu() end

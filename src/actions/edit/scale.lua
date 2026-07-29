@@ -18,7 +18,6 @@ function scaleDisplaceSVs(menuVars)
         if scaleType == 'Average Value' then
             local targetDistance = menuVars.avgSV * (note2Offset - note1Offset)
             scalingDistance = targetDistance - currentDistance
-            print(scalingDistance)
         elseif scaleType == 'Absolute Distance' then
             scalingDistance = menuVars.distance - currentDistance
         elseif scaleType == 'Relative Ratio' then

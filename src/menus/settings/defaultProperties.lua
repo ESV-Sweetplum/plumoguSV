@@ -73,6 +73,7 @@ function showDefaultPropertiesSettings()
         nil,
         nil,
         nil,
+        normalizeDisplaceSettingsMenu,
         reverseScrollSettingsMenu,
         scaleDisplaceSettingsMenu,
         scaleMultiplySettingsMenu,

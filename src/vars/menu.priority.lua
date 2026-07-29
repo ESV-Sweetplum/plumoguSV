@@ -117,6 +117,9 @@ DEFAULT_STARTING_MENU_VARS = {
         roundedEndDisplacement = 0,
         roundedAvgSVDisplaceless = 0,
     },
+    normalizeDisplace = {
+        avgSV = 0.6,
+    },
     reverseScroll = {
         distance = 400,
     },
