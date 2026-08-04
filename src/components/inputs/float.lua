@@ -60,9 +60,9 @@ function ResettableNegatableComputableInputFloat(label, value, defaultValue, dec
     KeepSameLine()
     PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
 
-    imgui.PushItemWidth(107)
+    PushItemWidth(107)
     local newValue = ComputableInputFloat(label, value, decimalPlaces, suffix)
-    imgui.PopItemWidth()
+    PopItemWidth()
 
     PopStyleVar(3)
     return newValue, oldValue ~= newValue
@@ -82,9 +82,9 @@ function SwappableNegatableInputFloat2(varsTable, lowerName, higherName, label, 
     HoverToolTip('Negate the two values.')
     KeepSameLine()
     PushStyleVar(imgui_style_var.FramePadding, vector.New(PADDING_WIDTH, 5))
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * widthFactor - SAMELINE_SPACING)
+    PushItemWidth(DEFAULT_WIDGET_WIDTH * widthFactor - SAMELINE_SPACING)
     local _, newValues = imgui.InputFloat2(label, oldValues, '%.' .. digits .. 'f' .. suffix)
-    imgui.PopItemWidth()
+    PopItemWidth()
     varsTable[lowerName] = newValues.x
     varsTable[higherName] = newValues.y
     if swapButtonPressed or kbm.pressedKeyCombo(globalVars.hotkeyList[hotkeys_enum.swap_primary]) then

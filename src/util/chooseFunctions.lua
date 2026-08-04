@@ -180,7 +180,7 @@ function chooseCurrentFrame(settingVars)
     imgui.AlignTextToFramePadding()
     imgui.Text('Previewing frame:')
     KeepSameLine()
-    imgui.PushItemWidth(35)
+    PushItemWidth(35)
     if imgui.ArrowButton('##leftFrame', imgui_dir.Left) then settingVars.currentFrame = settingVars.currentFrame - 1 end
     KeepSameLine()
     _, settingVars.currentFrame = imgui.InputInt('##currentFrame', settingVars.currentFrame, 0, 0)
@@ -189,7 +189,7 @@ function chooseCurrentFrame(settingVars)
         settingVars.currentFrame = settingVars.currentFrame + 1
     end
     settingVars.currentFrame = math.wrappedClamp(settingVars.currentFrame, 1, settingVars.numFrames)
-    imgui.PopItemWidth()
+    PopItemWidth()
 end
 
 function chooseCursorTrail()
@@ -236,9 +236,9 @@ function chooseCurveSharpness(settingVars)
     if imgui.Button('Reset##curveSharpness', SECONDARY_BUTTON_SIZE) then settingVars.curveSharpness = 50 end
     PopStyleVar()
     KeepSameLine()
-    imgui.PushItemWidth(107)
+    PushItemWidth(107)
     local _, newSharpness = imgui.SliderInt('Curve Sharpness', settingVars.curveSharpness, 1, 100, '%d%%')
-    imgui.PopItemWidth()
+    PopItemWidth()
     settingVars.curveSharpness = newSharpness
     return oldSharpness ~= newSharpness
 end
@@ -293,18 +293,18 @@ function chooseFinalSV(settingVars, skipFinalSV)
     local oldCustomSV = settingVars.customSV
     local finalSVType = FINAL_SV_TYPES[settingVars.finalSVIndex]
     if finalSVType ~= 'Normal' and finalSVType ~= 'None' then
-        imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.35)
+        PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.35)
         _, settingVars.customSV = imgui.InputFloat('SV', settingVars.customSV, 0, 0, '%.2fx')
         KeepSameLine()
-        imgui.PopItemWidth()
+        PopItemWidth()
     else
         imgui.Indent(DEFAULT_WIDGET_WIDTH * 0.35 + 25)
     end
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.5)
+    PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.5)
     settingVars.finalSVIndex = Combo('Final SV', FINAL_SV_TYPES, settingVars.finalSVIndex)
     HelpMarker("Final SV won't be placed if there's already an SV at the end time")
     if finalSVType == 'Normal' or finalSVType == 'None' then imgui.Unindent(DEFAULT_WIDGET_WIDTH * 0.35 + 25) end
-    imgui.PopItemWidth()
+    PopItemWidth()
     return (oldIndex ~= settingVars.finalSVIndex) or (oldCustomSV ~= settingVars.customSV)
 end
 
@@ -341,10 +341,10 @@ function chooseInterlace(menuVars)
     local interlaceChanged = BasicCheckbox(menuVars, 'interlace', 'Interlace')
     if not menuVars.interlace then return interlaceChanged end
     KeepSameLine()
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.5)
+    PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.5)
     local oldRatio = menuVars.interlaceRatio
     _, menuVars.interlaceRatio = imgui.InputFloat('Ratio##interlace', menuVars.interlaceRatio, 0, 0, '%.2f')
-    imgui.PopItemWidth()
+    PopItemWidth()
     return interlaceChanged or oldRatio ~= menuVars.interlaceRatio
 end
 
@@ -365,13 +365,13 @@ function chooseMenuStep(settingVars)
     imgui.AlignTextToFramePadding()
     imgui.Text('Step # :')
     KeepSameLine()
-    imgui.PushItemWidth(24)
+    PushItemWidth(24)
     if imgui.ArrowButton('##leftMenuStep', imgui_dir.Left) then settingVars.menuStep = settingVars.menuStep - 1 end
     KeepSameLine()
     _, settingVars.menuStep = imgui.InputInt('##currentMenuStep', settingVars.menuStep, 0, 0)
     KeepSameLine()
     if imgui.ArrowButton('##rightMenuStep', imgui_dir.Right) then settingVars.menuStep = settingVars.menuStep + 1 end
-    imgui.PopItemWidth()
+    PopItemWidth()
     settingVars.menuStep = math.wrappedClamp(settingVars.menuStep, 1, 3)
 end
 
@@ -428,9 +428,9 @@ function chooseCurrentScrollGroup()
     )
 
     local prevIndex = globalVars.scrollGroupIndex
-    imgui.PushItemWidth(155)
+    PushItemWidth(155)
     globalVars.scrollGroupIndex = Combo('##scrollGroup', groups, globalVars.scrollGroupIndex, cols, hiddenGroups)
-    imgui.PopItemWidth()
+    PopItemWidth()
     AddSeparator()
     if prevIndex ~= globalVars.scrollGroupIndex then
         state.SelectedScrollGroupId = groups[globalVars.scrollGroupIndex]
@@ -446,10 +446,10 @@ function chooseTimingGroup(label, previousGroup)
         function(c) return globalVars.hideAutomatic and string.find(c, 'automate_') end
     )
 
-    imgui.PushItemWidth(155)
+    PushItemWidth(155)
     local previousIndex = table.indexOf(groups, previousGroup)
     local newIndex = Combo('##changingScrollGroup', groups, previousIndex, cols, hiddenGroups)
-    imgui.PopItemWidth()
+    PopItemWidth()
     imgui.Dummy(vector.New(0, 2))
 
     return groups[newIndex]
@@ -586,18 +586,18 @@ function chooseStillType(menuVars)
     if dontChooseDistance then
         imgui.Indent(indentWidth)
     else
-        imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.6 - 5)
+        PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.6 - 5)
         menuVars.stillDistance = ComputableInputFloat('##still', menuVars.stillDistance, 2, ' msx')
         KeepSameLine()
-        imgui.PopItemWidth()
+        PopItemWidth()
     end
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.4)
+    PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.4)
     menuVars.stillTypeIndex = Combo('Displacement', STILL_TYPES, menuVars.stillTypeIndex, {}, {}, tooltipList)
 
     HoverToolTip(tooltipList[menuVars.stillTypeIndex])
 
     if dontChooseDistance then imgui.Unindent(indentWidth) end
-    imgui.PopItemWidth()
+    PopItemWidth()
 end
 
 function chooseStutterDuration(settingVars)
@@ -699,12 +699,12 @@ function chooseVibratoDeviance(menuVars)
     if dontChooseDistance then
         imgui.Indent(indentWidth)
     else
-        imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.47 - 5)
+        PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.47 - 5)
         menuVars.deviationDistance = ComputableInputFloat('##deviation', menuVars.deviationDistance, 2, ' msx')
         KeepSameLine()
-        imgui.PopItemWidth()
+        PopItemWidth()
     end
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.53 + 1)
+    PushItemWidth(DEFAULT_WIDGET_WIDTH * 0.53 + 1)
     menuVars.deviationFunctionIndex = Combo(
         'Deviance Type',
         VIBRATO_DEVIATION_TYPES,
@@ -717,7 +717,7 @@ function chooseVibratoDeviance(menuVars)
     HoverToolTip(tooltipList[menuVars.deviationFunctionIndex])
 
     if dontChooseDistance then imgui.Unindent(indentWidth) end
-    imgui.PopItemWidth()
+    PopItemWidth()
 end
 
 function chooseConvertSVSSFDirection(menuVars)

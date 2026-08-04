@@ -73,7 +73,7 @@ function plotSVs(svVals, minScale, maxScale)
 end
 
 function initializeCurvaturePlot()
-    imgui.PushItemWidth(28)
+    PushItemWidth(28)
     PushStyleColor(imgui_col.FrameBg, vctr4(0))
     return {}
 end
@@ -101,7 +101,7 @@ function plotExponentialCurvature(settingVars)
     end
     imgui.PlotLines('##ExponentialCurvaturePlot', values, #values, 0, '', 0, 1)
     PopStyleColor()
-    imgui.PopItemWidth()
+    PopItemWidth()
 end
 
 function plotSigmoidalCurvature(settingVars)
@@ -134,7 +134,7 @@ function plotSigmoidalCurvature(settingVars)
     end
     imgui.PlotLines('##SigmoidalCurvaturePlot', values, #values, 0, '', 0, 1)
     PopStyleColor()
-    imgui.PopItemWidth()
+    PopItemWidth()
 end
 
 -- Updates stats for the current menu's SVs
@@ -232,9 +232,9 @@ function makeSVInfoWindow(windowText, svGraphStats, svStats, svDistances, svMult
             for i = 1, #svDistances do
                 local svDistance = svDistances[i]
                 local content = tostring(svDistance)
-                imgui.PushItemWidth(imgui.GetContentRegionAvailWidth())
+                PushItemWidth(imgui.GetContentRegionAvailWidth())
                 imgui.InputText('##' .. i, content, #content, imgui_input_text_flags.AutoSelectAll)
-                imgui.PopItemWidth()
+                PopItemWidth()
             end
         end
     end

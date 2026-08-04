@@ -23,9 +23,9 @@ function ExponentialInputInt(varsTable, parameterName, label, bounds, tooltipTex
     local divButtonPressed = imgui.Button('/2##' .. label)
     HoverToolTip('Half this value.')
     KeepSameLine()
-    imgui.PushItemWidth(91.5)
+    PushItemWidth(91.5)
     _, varsTable[parameterName] = imgui.InputInt(label, oldValue, 0, 0)
-    imgui.PopItemWidth()
+    PopItemWidth()
     if tooltipText then HelpMarker(tooltipText) end
     if multButtonPressed then varsTable[parameterName] = varsTable[parameterName] * 2 end
     if divButtonPressed then varsTable[parameterName] = varsTable[parameterName] / 2 end

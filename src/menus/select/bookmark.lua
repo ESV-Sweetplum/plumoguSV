@@ -7,7 +7,7 @@ function selectBookmarkMenu()
     if not truthy(bookmarks) then
         imgui.TextWrapped('There are no bookmarks! Add one to navigate.')
     else
-        imgui.PushItemWidth(70)
+        PushItemWidth(70)
         _, menuVars.searchTerm = imgui.InputText('Search', menuVars.searchTerm, 4096)
         KeepSameLine()
         _, menuVars.filterTerm = imgui.InputText('Ignore', menuVars.filterTerm, 4096)
@@ -75,7 +75,7 @@ function selectBookmarkMenu()
         imgui.SetColumnWidth(1, 110)
         imgui.SetColumnWidth(2, 80)
 
-        imgui.PopItemWidth()
+        PopItemWidth()
         imgui.Columns(1)
     end
 

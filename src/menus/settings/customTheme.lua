@@ -41,11 +41,11 @@ function showCustomThemeSettings()
 
     imgui.SeparatorText('Search')
 
-    imgui.PushItemWidth(imgui.GetWindowWidth() - 25)
+    PushItemWidth(imgui.GetWindowWidth() - 25)
     local searchText = state.GetValue('customTheme_searchText', '')
     _, searchText = imgui.InputTextWithHint('##CustomThemeSearch', 'Border, Title, Frame BG, etc.', searchText, 100)
     state.SetValue('customTheme_searchText', searchText)
-    imgui.PopItemWidth()
+    PopItemWidth()
 
     for _, id in ipairs(table.keys(DEFAULT_STYLE)) do
         local name = DEFAULT_STYLE_NAMES[id]

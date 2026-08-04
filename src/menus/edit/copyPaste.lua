@@ -49,10 +49,10 @@ function copyNPasteSettingsMenu(menuVars, actionable)
     if actionable then AddSeparator() end
 
     _, menuVars.tryAlign = imgui.Checkbox('Try to fix misalignments', menuVars.tryAlign)
-    imgui.PushItemWidth(100)
+    PushItemWidth(100)
     _, menuVars.alignWindow = imgui.SliderInt('Alignment window (ms)', menuVars.alignWindow, 1, 10)
     menuVars.alignWindow = math.clamp(menuVars.alignWindow, 1, 10)
-    imgui.PopItemWidth()
+    PopItemWidth()
 
     return copiedItemCount
 end

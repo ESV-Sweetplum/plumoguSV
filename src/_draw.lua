@@ -1,5 +1,6 @@
 PopAllStyleColors()
 PopAllStyleVars()
+PopAllItemWidths()
 
 PLUGIN_NAME = 'plumoguSV-dev'
 
@@ -22,17 +23,13 @@ end
 
 startNextWindowNotCollapsed(PLUGIN_NAME)
 imgui.SetNextWindowSizeConstraints(vector.New(276, 0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
-imgui.Begin(PLUGIN_NAME, imgui_window_flags.AlwaysAutoResize)
 
 if not performanceMode then renderBackground() end
-
-startNextWindowNotCollapsed(PLUGIN_NAME)
-imgui.SetNextWindowSizeConstraints(vctr2(0), vector.Max(table.vectorize2(state.WindowSize) / 2, vctr2(676))) -- RAHHHH 6 7 6 7 6 7 6 7 6 7 6 7
 imgui.Begin(PLUGIN_NAME, 72)
 
 if not performanceMode then addGradient() end
 
-imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
+PushItemWidth(DEFAULT_WIDGET_WIDTH)
 imgui.BeginTabBar('SV tabs', imgui_tab_bar_flags.FittingPolicyScroll)
 for i = 1, #TAB_MENUS do
     createMenuTab(TAB_MENUS[i])
@@ -43,10 +40,11 @@ imgui.SetWindowFontScale(1)
 
 if not performanceMode then
     if globalVars.showVibratoWidget then
+        PushItemWidth(DEFAULT_WIDGET_WIDTH)
         imgui.Begin('plumoguSV-vibrato', imgui_window_flags.AlwaysAutoResize)
-        imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
         placeVibratoSVMenu(true)
         imgui.End()
+        PopItemWidth()
     end
     if globalVars.showNoteDataWidget then renderNoteDataWidget() end
     if globalVars.showMeasureDataWidget then renderMeasureDataWidget() end
@@ -54,9 +52,9 @@ end
 if cache.get('windows/tutorial') then showTutorialWindow() end
 if cache.get('windows/settings') then showPluginSettingsWindow() end
 if cache.get('windows/patch_notes') then showPatchNotesWindow() end
-
+PopItemWidth()
 -- if not performanceMode and map.ToString():sub(1, 49) == 'elxnce2 - DJ ELXNCE BRINGS BACK EARLY 2021 VIBES ' then
--- runTest()
+--     runTest()
 -- end
 imgui.End()
 

@@ -12,7 +12,6 @@ SETTING_TYPES = {
 function showPluginSettingsWindow()
     if not globalVars.performanceMode then
         local bgColor = vector.New(0.2, 0.2, 0.2, 1)
-        -- PopStyleColor(20)
         setPluginAppearanceColors('Incognito', true)
         setPluginAppearanceStyles('Rounded + Border')
         PushStyleColor(imgui_col.WindowBg, bgColor)
@@ -59,7 +58,7 @@ function showPluginSettingsWindow()
     imgui.NextColumn()
 
     imgui.BeginChild('Settings Data', vector.New(283, 357))
-    imgui.PushItemWidth(DEFAULT_WIDGET_WIDTH)
+    PushItemWidth(DEFAULT_WIDGET_WIDTH)
 
     cache.settingTypeIndex = typeIndex
 
@@ -77,11 +76,12 @@ function showPluginSettingsWindow()
     local fn = settingMenuFunctionMap[SETTING_TYPES[typeIndex]]
     if fn then fn() end
 
-    imgui.PopItemWidth()
+    PopItemWidth()
     imgui.EndChild()
 
     imgui.Columns(1)
     if not settingsOpened then
+        print(settingsOpened)
         cache.set('windows/settings', false)
         cache.settingTypeIndex = 1
         state.SetValue('crazy', 'Crazy?')

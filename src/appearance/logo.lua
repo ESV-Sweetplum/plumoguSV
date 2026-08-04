@@ -17,17 +17,30 @@ local function l(p1, p2, p3, p4, progress, timeProgress)
     local t0, t1
     local trueProgress = progress * 2
 
+    if p1 == p2 and p3 == p4 then
+        p2, p3 = p3 / 2 + p2 / 2, p2 / 2 + p3 / 2
+        if trueProgress < 1 then trueProgress = (trueProgress + 4) / 5 end
+    end
+
     if trueProgress < 1 then
         t0 = 10 * (trueProgress - 1)
-        t1 = (1 - trueProgress / 2) * t0 + trueProgress
+        t1 = (1 - trueProgress * 0.9) * t0 + trueProgress
     else
         trueProgress = trueProgress - 1
-        t0 = trueProgress * 20
-        t1 = 1 - trueProgress + t0
+        t0 = trueProgress * 27
+        t1 = math.max((trueProgress * 9) ^ 1.5 + 1, t0 * 2 + 1)
     end
 
     local center = vector.New(267, 48) * scale / 2
     location = location - center
+
+    local avgX = (p1.x + p4.x) / 2
+    local xProgress = avgX / (scale * 264.77)
+    local xCol = (1 - xProgress) * pulseCol[1] + pulseCol[2] * xProgress
+    local pulseStrength = 2 ^ (-50 * (timeProgress - 1 / 3 - xProgress / 3) ^ 2)
+    local bezierCol = xCol * pulseStrength + textCol * (1 - pulseStrength)
+
+    bezierCol.w = 1 - (2 * math.abs(1 / 2 - timeProgress)) ^ (trueProgress < 1 and 3 or 1)
 
     partialBezierCubic(
         ctx,
@@ -38,9 +51,8 @@ local function l(p1, p2, p3, p4, progress, timeProgress)
         scale * p2,
         scale * p3,
         scale * p4,
-        textCol,
+        bezierCol,
         thickness,
-        pulseCol,
         scale * 264.77,
         timeProgress
     )
@@ -1869,22 +1881,15 @@ end
 ---@param p4 Vector2
 ---@param col Vector4
 ---@param thickness number
----@param pulseCol [Vector4, Vector4]
 ---@param timeProgress number
-function partialBezierCubic(ctx, t0, t1, location, p1, p2, p3, p4, col, thickness, pulseCol, maxValue, timeProgress)
+function partialBezierCubic(ctx, t0, t1, location, p1, p2, p3, p4, col, thickness, maxValue, timeProgress)
     local u0 = 1.0 - t0
     local u1 = 1.0 - t1
 
-    local avgX = (p1.x + p4.x) / 2
-    local xProgress = avgX / maxValue
-    local xCol = (1 - xProgress) * pulseCol[1] + pulseCol[2] * xProgress
-    local pulseStrength = 2 ^ (-50 * (timeProgress - 1 / 3 - xProgress / 3) ^ 2)
-    local bezierCol = xCol * pulseStrength + col * (1 - pulseStrength)
-
     local qa = p1 * u0 * u0 + p2 * 2 * t0 * u0 + p3 * t0 * t0
     local qb = p1 * u1 * u1 + p2 * 2 * t1 * u1 + p3 * t1 * t1
-    local qc = p2 * u0 * u0 + p2 * 2 * t0 * u0 + p4 * t0 * t0
-    local qd = p2 * u1 * u1 + p2 * 2 * t1 * u1 + p4 * t1 * t1
+    local qc = p2 * u0 * u0 + p3 * 2 * t0 * u0 + p4 * t0 * t0
+    local qd = p2 * u1 * u1 + p3 * 2 * t1 * u1 + p4 * t1 * t1
 
     local np1 = qa * u0 + qc * t0
     local np2 = qa * u1 + qc * t1
@@ -1896,7 +1901,7 @@ function partialBezierCubic(ctx, t0, t1, location, p1, p2, p3, p4, col, thicknes
         location + np2,
         location + np3,
         location + np4,
-        color.vrgbaToUint(bezierCol),
+        color.vrgbaToUint(col),
         thickness
     )
 end

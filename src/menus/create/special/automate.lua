@@ -27,8 +27,8 @@ function automateSVSettingsMenu(settingVars)
     _, settingVars.maintainMs = imgui.Checkbox('Static Time?', settingVars.maintainMs)
     if settingVars.maintainMs then
         KeepSameLine()
-        imgui.PushItemWidth(71)
+        PushItemWidth(71)
         settingVars.ms = ComputableInputFloat('Time', settingVars.ms, 2, 'ms')
-        imgui.PopItemWidth()
+        PopItemWidth()
     end
 end
