@@ -18,7 +18,8 @@ local function l(p1, p2, p3, p4, progress, timeProgress)
     local trueProgress = progress * 2
 
     if p1 == p2 and p3 == p4 then
-        p2, p3 = p3 / 2 + p2 / 2, p2 / 2 + p3 / 2
+        local avg = p3 / 2 + p2 / 2
+        p2, p3 = avg, avg
         if trueProgress < 1 then trueProgress = (trueProgress + 4) / 5 end
     end
 
