@@ -33,10 +33,10 @@ function alignTimingLines()
         if initialTl.StartTime == time then table.insert(tpsToRemove, initialTl) end
         table.insert(tpsToAdd, utils.CreateTimingPoint(time, initialTl.Bpm, initialTl.Signature, initialTl.Hidden))
     end
-    actions.PerformBatch({
+    actions.PerformBatch {
         createEA(action_type.AddTimingPointBatch, tpsToAdd),
         createEA(action_type.RemoveTimingPointBatch, tpsToRemove),
-    })
+    }
 
     toggleablePrint('s!', 'Created ' .. #tpsToAdd .. pluralize(' timing point.', #tpsToAdd, -2))
     if truthy(tpsToRemove) then
@@ -45,48 +45,53 @@ function alignTimingLines()
 end
 
 function fixFlippedLNEnds()
-    local svsToRemove = {}
-    local svsToAdd = {}
-    local svTimeIsAdded = {}
-    local lnEndTimeFixed = {}
-    local fixedLNEndsCount = 0
     local ogTg = state.SelectedScrollGroupId
-    for _, ho in ipairs(map.HitObjects) do
-        state.SelectedScrollGroupId = ho.TimingGroup
-        local lnEndTime = ho.EndTime
-        local isLN = lnEndTime ~= 0
-        local endHasNegativeSV = (game.get.svMultiplierAt(lnEndTime) <= 0)
-        local hasntAlreadyBeenFixed = lnEndTimeFixed[lnEndTime] == nil
-        if isLN and endHasNegativeSV and hasntAlreadyBeenFixed then
-            lnEndTimeFixed[lnEndTime] = true
-            local multiplier = getUsableDisplacementMultiplier(lnEndTime)
-            local duration = 1 / multiplier
-            local timeAt = lnEndTime
-            local timeAfter = lnEndTime + duration
-            local timeAfterAfter = lnEndTime + duration + duration
-            svTimeIsAdded[timeAt] = true
-            svTimeIsAdded[timeAfter] = true
-            svTimeIsAdded[timeAfterAfter] = true
-            local svMultiplierAt = game.get.svMultiplierAt(timeAt)
-            local svMultiplierAfter = game.get.svMultiplierAt(timeAfter)
-            local svMultiplierAfterAfter = game.get.svMultiplierAt(timeAfterAfter)
-            local newMultiplierAt = 0.001
-            local newMultiplierAfter = svMultiplierAt + svMultiplierAfter
-            local newMultiplierAfterAfter = svMultiplierAfterAfter
-            addSVToList(svsToAdd, timeAt, newMultiplierAt, true)
-            addSVToList(svsToAdd, timeAfter, newMultiplierAfter, true)
-            addSVToList(svsToAdd, timeAfterAfter, newMultiplierAfterAfter, true)
-            fixedLNEndsCount = fixedLNEndsCount + 1
+    local editorActions = {}
+    local fixedLNEndsCount = 0
+
+    for tgId, tg in pairs(map.TimingGroups) do
+        local svsToRemove = {}
+        local svsToAdd = {}
+        local svTimeIsAdded = {}
+        local lnEndTimeFixed = {}
+        state.SelectedScrollGroupId = tgId
+        for _, ho in ipairs(map.HitObjects) do
+            if ho.TimingGroup == tgId then
+                local lnEndTime = ho.EndTime
+                local isLN = lnEndTime ~= 0
+                local endHasNegativeSV = (game.get.svMultiplierAt(lnEndTime) <= 0)
+                local hasntAlreadyBeenFixed = lnEndTimeFixed[lnEndTime] == nil
+                if isLN and endHasNegativeSV and hasntAlreadyBeenFixed then
+                    lnEndTimeFixed[lnEndTime] = true
+                    local multiplier = getUsableDisplacementMultiplier(lnEndTime)
+                    local duration = 1 / multiplier
+                    local timeAt = lnEndTime
+                    local timeAfter = lnEndTime + duration
+                    local timeAfterAfter = lnEndTime + duration + duration
+                    svTimeIsAdded[timeAt] = true
+                    svTimeIsAdded[timeAfter] = true
+                    svTimeIsAdded[timeAfterAfter] = true
+                    local svMultiplierAt = game.get.svMultiplierAt(timeAt)
+                    local svMultiplierAfter = game.get.svMultiplierAt(timeAfter)
+                    local svMultiplierAfterAfter = game.get.svMultiplierAt(timeAfterAfter)
+                    local newMultiplierAt = 0.001
+                    local newMultiplierAfter = svMultiplierAt + svMultiplierAfter
+                    local newMultiplierAfterAfter = svMultiplierAfterAfter
+                    addSVToList(svsToAdd, timeAt, newMultiplierAt, true)
+                    addSVToList(svsToAdd, timeAfter, newMultiplierAfter, true)
+                    addSVToList(svsToAdd, timeAfterAfter, newMultiplierAfterAfter, true)
+                    fixedLNEndsCount = fixedLNEndsCount + 1
+                end
+            end
         end
+        local startOffset = map.HitObjects[1].StartTime
+        local endOffset = map.HitObjects[#map.HitObjects].EndTime
+        if endOffset == 0 then endOffset = map.HitObjects[#map.HitObjects].StartTime end
+        getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
+        table.insert(editorActions, createEA(action_type.RemoveScrollVelocityBatch, svsToRemove))
+        table.insert(editorActions, createEA(action_type.AddScrollVelocityBatch, svsToAdd))
     end
-    local startOffset = map.HitObjects[1].StartTime
-    local endOffset = map.HitObjects[#map.HitObjects].EndTime
-    if endOffset == 0 then endOffset = map.HitObjects[#map.HitObjects].StartTime end
-    getRemovableSVs(svsToRemove, svTimeIsAdded, startOffset, endOffset)
-    actions.PerformBatch({
-        createEA(action_type.RemoveScrollVelocityBatch, svsToRemove),
-        createEA(action_type.AddScrollVelocityBatch, svsToAdd),
-    })
+    actions.PerformBatch(editorActions)
 
     local type = truthy(fixedLNEndsCount) and 's!' or 'w!'
     print(type, 'Fixed ' .. fixedLNEndsCount .. pluralize(' flipped LN end.', fixedLNEndsCount, -2))
@@ -132,7 +137,7 @@ function mergeSVsAndSSFs()
     local type = truthy(svSum + ssfSum) and 's!' or 'w!'
     print(
         type,
-        table.concat({ 'Removed ', svSum, pluralize(' SV', svSum), ' and ', ssfSum, pluralize(' SSF.', ssfSum, -2) })
+        table.concat { 'Removed ', svSum, pluralize(' SV', svSum), ' and ', ssfSum, pluralize(' SSF.', ssfSum, -2) }
     )
 
     state.SelectedScrollGroupId = ogTg
@@ -196,7 +201,7 @@ function removeUnnecessarySVsAndSSFs()
     local type = truthy(svSum + ssfSum) and 's!' or 'w!'
     print(
         type,
-        table.concat({ 'Removed ', svSum, pluralize(' SV', svSum), ' and ', ssfSum, pluralize(' SSF.', ssfSum, -2) })
+        table.concat { 'Removed ', svSum, pluralize(' SV', svSum), ' and ', ssfSum, pluralize(' SSF.', ssfSum, -2) }
     )
     state.SelectedScrollGroupId = ogTG
 end
@@ -262,7 +267,7 @@ function removePostTGSVsAndSSFs()
     local type = truthy(svSum + ssfSum) and 's!' or 'w!'
     print(
         type,
-        table.concat({ 'Removed ', svSum, pluralize(' SV', svSum), ' and ', ssfSum, pluralize(' SSF.', ssfSum, -2) })
+        table.concat { 'Removed ', svSum, pluralize(' SV', svSum), ' and ', ssfSum, pluralize(' SSF.', ssfSum, -2) }
     )
     state.SelectedScrollGroupId = ogTG
 end

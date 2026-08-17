@@ -14,13 +14,13 @@ function comboSettingsMenu(settingVars, _, _, hideSettings)
 
         startNextWindowNotCollapsed('SV Type 2 Settings')
         imgui.Begin('SV Type 2 Settings', imgui_window_flags.AlwaysAutoResize)
-        PushItemWidth(DEFAULT_WIDGET_WIDTH)
         local svType2 = STANDARD_SVS[settingVars.svType2Index]
         local settingVars2 = getSettingVars(svType2, 'Combo2')
         settingsChanged = svSettingsMenu(svType2, settingVars2, true, nil, 'Combo2') or settingsChanged
         local labelText2 = svType2 .. 'Combo2'
         cache.save(labelText2 .. 'Settings', settingVars2)
         imgui.End()
+        PopItemWidth()
 
         maxComboPhase = settingVars1.svPoints + settingVars2.svPoints
     end
