@@ -2,10 +2,10 @@ function changeGroups(menuVars)
     if state.SelectedScrollGroupId == menuVars.designatedTimingGroup then
         print(
             'w!',
-            table.concat({
+            table.concat {
                 menuVars.clone and 'Cloning' or 'Moving',
                 ' from one timing group to the same timing group will do nothing.',
-            })
+            }
         )
         return
     end

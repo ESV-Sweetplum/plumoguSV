@@ -21,7 +21,7 @@ if not tempGlobalVars and state and map and utils and actions then
         'w!',
         'This seems to be your first time using plumoguSV. If you need any help, please press the button labelled "View Tutorials" in the "Info" tab.'
     )
-    setPresets({})
+    setPresets {}
 else
     setGlobalVars(tempGlobalVars)
     loadDefaultProperties(tempGlobalVars.defaultProperties)
@@ -31,8 +31,6 @@ end
 initializeNoteLockMode()
 triggerListeners()
 setPluginAppearance()
-
-state.SelectedScrollGroupId = '$Default' or map.GetTimingGroupIds()[1]
 
 if not truthy(map.TimingPoints) then print('e!', 'Please place a timing point before attempting to use plumoguSV.') end
 

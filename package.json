@@ -24,7 +24,7 @@
         "@types/adm-zip": "^0.5.7",
         "@types/ahocorasick": "^1.0.0",
         "@types/luaparse": "^0.2.13",
-        "adm-zip": "^0.5.16",
+        "adm-zip": "^0.6.0",
         "ahocorasick": "^1.0.2",
         "chalk": "^5.6.2",
         "chokidar": "^4.0.3",
