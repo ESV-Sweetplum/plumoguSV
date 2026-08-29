@@ -145,6 +145,9 @@ DEFAULT_STARTING_MENU_VARS = {
         cloneSVs = false,
         cloneRadius = 1000,
     },
+    stillify = {
+        avgSV = 1,
+    },
     verticalShift = {
         verticalShift = 1,
     },
@@ -191,7 +194,7 @@ function getMenuVars(menuType, optionalLabel)
     -- local menuVars = table.duplicate(DEFAULT_STARTING_MENU_VARS[menuKey])
     local menuVars = DEFAULT_STARTING_MENU_VARS[menuKey]
 
-    local labelText = table.concat({ menuType, optionalLabel or '', 'Menu' })
+    local labelText = table.concat { menuType, optionalLabel or '', 'Menu' }
     cache.load(labelText, menuVars)
 
     return menuVars

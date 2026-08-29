@@ -1,4 +1,5 @@
 EDIT_SV_TOOLS = { -- tools for editing SVs
+    "Alexei's Stillify",
     'Add Teleport',
     'Change Groups',
     'Complete Duplicate',
@@ -27,6 +28,7 @@ function editSVTab()
     if changedTool then state.SetValue('global.editToolIndex', globalVars.editToolIndex) end
     AddSeparator()
     local toolName = EDIT_SV_TOOLS[globalVars.editToolIndex]
+    if toolName == "Alexei's Stillify" then stillifyMenu() end
     if toolName == 'Add Teleport' then addTeleportMenu() end
     if toolName == 'Change Groups' then changeGroupsMenu() end
     if toolName == 'Complete Duplicate' then completeDuplicateMenu() end
@@ -51,6 +53,7 @@ end
 
 function chooseEditTool()
     local tooltipList = {
+        'Applies stillness to existing SVs.',
         'Add a large teleport SV to move far away.',
         'Moves SVs and SSFs to a designated timing group.',
         'Convert multipliers between SV/SSF.',
