@@ -18,6 +18,7 @@ EDIT_SV_TOOLS = { -- tools for editing SVs
     'Split',
     'Swap Notes',
     'Vertical Shift',
+    'Stutter (Preserve Displacement)',
 }
 
 function editSVTab()
@@ -45,6 +46,7 @@ function editSVTab()
     if toolName == 'Split' then splitMenu() end
     if toolName == 'Swap Notes' then swapNotesMenu() end
     if toolName == 'Vertical Shift' then verticalShiftMenu() end
+    if toolName == 'Stutter (Preserve Displacement)' then stutterPreserveDisplacementMenu() end
 end
 
 function chooseEditTool()
@@ -68,6 +70,7 @@ function chooseEditTool()
         'Split notes into different timing groups for finer control.',
         'Swap positions of notes using SVs.',
         'Adds a constant value to SVs in a range.',
+        'Stutter between adjacent selected note times without changing the distance traveled.',
     }
 
     imgui.AlignTextToFramePadding()

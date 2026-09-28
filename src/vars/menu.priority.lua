@@ -144,6 +144,11 @@ DEFAULT_STARTING_MENU_VARS = {
     verticalShift = {
         verticalShift = 1,
     },
+    stutterPreserveDisplacement = {
+        startSV = 1.5,
+        stutterDuration = 50,
+        controlLastSV = false,
+    },
     selectAlternating = {
         every = 1,
         offset = 0,

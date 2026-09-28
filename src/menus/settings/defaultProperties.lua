@@ -79,6 +79,7 @@ function showDefaultPropertiesSettings()
         splitSettingsMenu,
         nil,
         verticalShiftSettingsMenu,
+        stutterPreserveDisplacementSettingsMenu,
     }
 
     imgui.SeparatorText('Create Tab Settings')
