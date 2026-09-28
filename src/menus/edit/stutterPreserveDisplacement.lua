@@ -11,4 +11,11 @@ function stutterPreserveDisplacementSettingsMenu(menuVars)
     chooseControlSecondSV(menuVars)
     _, menuVars.startSV = imgui.InputFloat('SV Value', menuVars.startSV, 0, 0, '%.2fx')
     chooseStutterDuration(menuVars)
+    BasicInputInt(
+        menuVars,
+        'stuttersPerSection',
+        'Stutters',
+        { 1, 1000 },
+        'Number of stutters between each pair of adjacent selected note times.'
+    )
 end

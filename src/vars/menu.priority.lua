@@ -147,6 +147,7 @@ DEFAULT_STARTING_MENU_VARS = {
     stutterPreserveDisplacement = {
         startSV = 1.5,
         stutterDuration = 50,
+        stuttersPerSection = 1,
         controlLastSV = false,
     },
     selectAlternating = {
