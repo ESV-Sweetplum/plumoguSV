@@ -21,6 +21,12 @@ This is a plugin for [Quaver](https://github.com/Quaver), the ultimate community
 
 [![Tech Stack](https://skillicons.dev/icons?i=js,ts,lua,md)](https://skillicons.dev)
 
+## Nix development and packaging
+
+Run `nix develop` for Node.js, TypeScript, and StyLua. Inside the shell, run `npm ci` to install the JavaScript dependencies, then `npm run dev` to start the development watcher.
+
+Run `nix build` to compile and package the plugin. The result contains the installable GitHub plugin under `result/share/quaver/Plugins/`, the release ZIP under `result/share/plumoguSV/`, and the Steam package in the same directory. `nix flake check` builds the package and validates its release files. There is no separate automated test suite in this repository.
+
 ## Plugin Overview
 
 plumoguSV makes working with SVs quick and easy!
