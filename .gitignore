@@ -7,3 +7,6 @@ config.yaml
 plugin.lua
 settings.ini
 intellisense.lua
+.envrc
+.direnv/
+/result
