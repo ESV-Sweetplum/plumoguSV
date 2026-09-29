@@ -9,3 +9,4 @@ settings.ini
 intellisense.lua
 .envrc
 .direnv/
+/result
