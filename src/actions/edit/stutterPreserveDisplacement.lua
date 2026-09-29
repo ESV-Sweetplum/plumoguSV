@@ -19,8 +19,15 @@ function stutterPreserveDisplacementSVs(menuVars)
             local stutterEnd = stutterOffsets[j + 1]
             local timeInterval = stutterEnd - stutterStart
             local originalSVs = game.get.svsBetweenOffsets(stutterStart, stutterEnd)
-            addStartSVIfMissing(originalSVs, stutterStart)
-            local originalDistance = calculateDisplacementFromSVs(originalSVs, stutterStart, stutterEnd)
+            local originalDistance = 0
+            local lastSVOffset = stutterStart
+            local lastMultiplier = game.get.svMultiplierAt(stutterStart)
+            for _, sv in ipairs(originalSVs) do
+                originalDistance = originalDistance + (sv.StartTime - lastSVOffset) * lastMultiplier
+                lastSVOffset = sv.StartTime
+                lastMultiplier = sv.Multiplier
+            end
+            originalDistance = originalDistance + (stutterEnd - lastSVOffset) * lastMultiplier
             local averageSV = originalDistance / timeInterval
             local stutterSVs = generateStutterSet(menuVars.startSV, duration, averageSV, menuVars.controlLastSV)
             local secondSVOffset = stutterStart + timeInterval * duration * 0.01
