@@ -48,7 +48,7 @@ function showPluginSettingsWindow()
     end
     AddSeparator()
     if imgui.Button('Reset Settings') then
-        write({})
+        write {}
         globalVars = DEFAULT_GLOBAL_VARS
         toggleablePrint('e!', 'Settings have been reset.')
     end
@@ -81,7 +81,6 @@ function showPluginSettingsWindow()
 
     imgui.Columns(1)
     if not settingsOpened then
-        print(settingsOpened)
         cache.set('windows/settings', false)
         cache.settingTypeIndex = 1
         state.SetValue('crazy', 'Crazy?')

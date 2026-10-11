@@ -21,9 +21,11 @@ function showAdvancedSettings()
         'Use Displacement Multiplier Supremum',
         'Uses the greatest minimum possible displacement multiplier throughout the whole map to ensure that copy-paste is possible while maintaining consistency.'
     )
-    if globalVars.useMinDisplacementMultiplier then imgui.BeginDisabled() end
-    chooseMaxDisplacementMultiplierExponent(globalVars.useMinDisplacementMultiplier)
-    if globalVars.useMinDisplacementMultiplier then imgui.EndDisabled() end
+    if globalVars.useMinDisplacementMultiplier and globalVars.maxDisplacementMultiplierExponent then
+        if globalVars.useMinDisplacementMultiplier then imgui.BeginDisabled() end
+        chooseMaxDisplacementMultiplierExponent(globalVars.useMinDisplacementMultiplier)
+        if globalVars.useMinDisplacementMultiplier then imgui.EndDisabled() end
+    end
     imgui.SeparatorText('Long Note Related')
     GlobalCheckbox(
         'useEndTimeOffsets',
@@ -31,13 +33,16 @@ function showAdvancedSettings()
         "When true, LN ends will be considered as their own offsets, meaning you don't have to select two notes. All functions which rely on getting note offsets will now additionally include LN ends as their own offsets."
     )
     imgui.SeparatorText('Vibrato Related')
-    local oldVibratoRates = table.vectorize4(globalVars.vibratoFrameRates)
-    imgui.SetNextItemWidth(imgui.GetWindowWidth() - 100)
-    local _, newVibratoRates = imgui.InputInt4('Frame Rates', oldVibratoRates)
-    if oldVibratoRates ~= newVibratoRates then
-        globalVars.vibratoFrameRates = { newVibratoRates.x, newVibratoRates.y, newVibratoRates.z, newVibratoRates.w }
-        reconstructVibratoQualities()
-        write(globalVars)
+    if globalVars.vibratoFrameRates then
+        local oldVibratoRates = table.vectorize4(globalVars.vibratoFrameRates)
+        imgui.SetNextItemWidth(imgui.GetWindowWidth() - 100)
+        local _, newVibratoRates = imgui.InputInt4('Frame Rates', oldVibratoRates)
+        if oldVibratoRates ~= newVibratoRates then
+            globalVars.vibratoFrameRates =
+                { newVibratoRates.x, newVibratoRates.y, newVibratoRates.z, newVibratoRates.w }
+            reconstructVibratoQualities()
+            write(globalVars)
+        end
     end
 end
 
@@ -46,11 +51,11 @@ function chooseMaxDisplacementMultiplierExponent(forceCache)
     local oldMdme = globalVars.maxDisplacementMultiplierExponent
     if forceCache then oldMdme = cache.get('vars/disp_exp', 0) end
     _, tempMDME = imgui.SliderInt('Max Displacement Multiplier Exp.', oldMdme, 0, 6)
+    PopItemWidth()
     if forceCache then return end
     HoverToolTip(
         'plumoguSV designs pseudo-instantaneous movement via a very large SV immediately followed by a different SV. To ensure that the movement truly looks instantaneous, the distance between these two SVs is minimal (conventionally, 1/64th of a millisecond). However, as a map progresses over time, this distance is too small for the engine to handle due to floating point errors. This causes issues for SV mappers trying to copy a section from an early part of the map to a later part of a map, where the displacement distance needs to be larger. Lowering this number fixes that, at the cost of potential two-frame teleports during the rendering of the map. In specific, the denominator of the displacement distance (in ms) will be set to 2^{setting}, where ^ denotes exponentiation.'
     )
     globalVars.maxDisplacementMultiplierExponent = math.clamp(tempMDME, 0, 6)
-    PopItemWidth()
     if oldMdme ~= globalVars.maxDisplacementMultiplierExponent then write(globalVars) end
 end

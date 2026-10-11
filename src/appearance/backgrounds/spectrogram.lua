@@ -1,5 +1,5 @@
 function renderSVSpectrogram()
-    local binCount = 12
+    local binCount = 24
     local doubleBinCount = binCount * 2
 
     local ctx = imgui.GetWindowDrawList()
@@ -82,7 +82,7 @@ end
 function smoothenSpectrogram(data)
     local kernel, radius
     if not cache.get('gaussian/kernel') then
-        kernal, radius = math.createKernel('gaussian', { sigma = 2.6 })
+        kernel, radius = math.createKernel('gaussian', { sigma = 2.6 })
         cache.set('gaussian/kernel', kernel)
         cache.set('gaussian/radius', radius)
     else

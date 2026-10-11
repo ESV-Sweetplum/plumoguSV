@@ -14,15 +14,11 @@ function runTest()
     local zFar = 1000
     local q = zFar / (zFar - zNear)
 
-    local absMinM = math.min(math.abs(game.get.svMultiplierAt(state.SongTime) ^ 2), 5)
-
     if state.SongTime - state.DeltaTime < 52619 and state.SongTime > 52619 then
         print('e!', 'No one will believe you.')
     end
 
-    local speed = absMinM * state.DeltaTime / 300
-
-    local cameraPos = { 0, -4, -7 }
+    local cameraPos = { 0, 0, -7 - 7 * math.sin(state.UnixTime / 500) ^ 2 }
 
     local projectionMatrix = {
         { f / aspectRatio, 0, 0, 0 },
@@ -122,27 +118,11 @@ function runTest()
     local outputPoints = {}
 
     if not theta then theta = 0 end
-    if not theta2 then theta2 = 0 end
-    if not penisGear then penisGear = 1 end
-    theta = theta + speed
-    theta2 = theta2 + speed * clock.getTime() / penisGear
-
-    imgui.Text('rpm: ' .. speed * clock.getTime() / (state.DeltaTime / 1000) / 6.282 * 120 / penisGear)
-    imgui.Text('gear: ' .. penisGear)
-
-    if imgui.Button('shift down') then
-        if penisGear > 1 then
-            penisGear = penisGear - 1
-        else
-            penisGear = penisGear / 10
-        end
-    end
-    KeepSameLine()
-    if imgui.Button('shift up') then penisGear = math.floor(penisGear + 1) end
+    theta = theta + state.DeltaTime / 500
 
     local matRotZ = {
-        { math.cos(3.14159), math.sin(3.14159), 0, 0 },
-        { -math.sin(3.14159), math.cos(3.14159), 0, 0 },
+        { math.cos(theta * math.sqrt(2)), math.sin(theta * math.sqrt(2)), 0, 0 },
+        { -math.sin(theta * math.sqrt(2)), math.cos(theta * math.sqrt(2)), 0, 0 },
         { 0, 0, 1, 0 },
         { 0, 0, 0, 1 },
     }
@@ -155,16 +135,14 @@ function runTest()
     }
 
     local matRotY = {
-        { math.cos(theta2), 0, math.sin(theta2), 0 },
+        { math.cos(theta), 0, math.sin(theta), 0 },
         { 0, 1, 0, 0 },
-        { -math.sin(theta2), 0, math.cos(theta2), 0 },
+        { -math.sin(theta), 0, math.cos(theta), 0 },
         { 0, 0, 0, 1 },
     }
 
     for idx, point in pairs(inputPoints) do
-        local inputPoint = table.map(point, function(i) return table.duplicate({ i }) end)
-
-        inputPoint[2][1] = inputPoint[2][1] + 4 * math.sin(state.UnixTime / 200)
+        local inputPoint = table.map(point, function(i) return table.duplicate { i } end)
 
         -- inputPoint = matrix.multiply(matRotX, inputPoint)
         inputPoint = matrix.multiply(matRotY, inputPoint)
